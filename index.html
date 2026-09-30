@@ -5458,15 +5458,18 @@ function lsDel(k){ try{ localStorage.removeItem(k); }catch(e){} }
 const Cloud = {
   client:null, active:false, user:null, role:null, status:'local', channel:null,
   pending:new Map(), retryTimer:null, recentOwnWrites:new Map(), needsSeed:false, lastError:'',
+  // Supabase needs the bare project address (https://xyz.supabase.co). People often paste the
+  // "API URL" with /rest/v1/ on the end, which makes every call fail with "Invalid path".
+  cleanUrl(url){ try{ return new URL(String(url).trim()).origin; }catch(e){ return String(url||'').trim().replace(/\/+$/,''); } },
   config(){
     try{
       const c = JSON.parse(lsGet(CLOUD_CONFIG_LS_KEY)||'null');
-      if(c && c.url && c.key) return c;
+      if(c && c.url && c.key) return {...c, url:this.cleanUrl(c.url), key:String(c.key).trim()};
     }catch(e){}
-    if(DEFAULT_SUPABASE_URL && DEFAULT_SUPABASE_ANON_KEY) return {url:DEFAULT_SUPABASE_URL, key:DEFAULT_SUPABASE_ANON_KEY, builtIn:true};
+    if(DEFAULT_SUPABASE_URL && DEFAULT_SUPABASE_ANON_KEY) return {url:this.cleanUrl(DEFAULT_SUPABASE_URL), key:DEFAULT_SUPABASE_ANON_KEY.trim(), builtIn:true};
     return null;
   },
-  saveConfig(url,key){ lsSet(CLOUD_CONFIG_LS_KEY, JSON.stringify({url:url.trim().replace(/\/+$/,''), key:key.trim()})); },
+  saveConfig(url,key){ lsSet(CLOUD_CONFIG_LS_KEY, JSON.stringify({url:this.cleanUrl(url), key:key.trim()})); },
   clearConfig(){ lsDel(CLOUD_CONFIG_LS_KEY); },
   canEdit(){ return !this.active || this.role==='editor' || this.role==='admin'; },
   setStatus(status, detail){
