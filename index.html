@@ -5832,14 +5832,14 @@ async function ingestFiles(entries, {interactive=true}={}){
         const det1 = autoDetectMapping(sh.headers, FILE1_COLUMN_SPECS), det2 = autoDetectMapping(sh.headers, FILE2_COLUMN_SPECS);
         const ok1 = !det1.missingRequired.length, ok2 = !det2.missingRequired.length;
         if(!ok1 && !ok2) continue; // e.g. the CRM's hidden helper sheet
-        const lower = entry.name.toLowerCase();
-        const hint1 = /created[\s_-]*on/.test(lower) && !/date[\s_-]*of/.test(lower);
-        const hint2 = /date[\s_-]*of/.test(lower) && !/created[\s_-]*on/.test(lower);
+        // The sheet name wins (e.g. one workbook with "Created On" and "Date Of" tabs), then the file name.
+        const hintOf = t=>{ const l=String(t||'').toLowerCase(); const c=/created[\s_-]*on/.test(l), d=/date[\s_-]*of/.test(l); return c&&!d ? 'schedules' : d&&!c ? 'shows' : null; };
+        const hinted = hintOf(sh.name) || hintOf(entry.name);
         let source = null;
-        if(hint1 && ok1) source='schedules'; else if(hint2 && ok2) source='shows';
+        if(hinted==='schedules' && ok1) source='schedules'; else if(hinted==='shows' && ok2) source='shows';
         else if(ok1 && !ok2) source='schedules'; else if(ok2 && !ok1) source='shows';
-        else if(interactive) source = await chooseSourceDialog(entry.name);
-        if(!source){ lastFolderScanLog.push({name:entry.name, status:'unclassified', detail:'skipped — could not tell whether it is a Created On or Date Of export (rename it to include "Created On" or "Date Of")'}); continue; }
+        else if(interactive) source = await chooseSourceDialog(entry.name+(sheets.length>1?' → sheet “'+sh.name+'”':''));
+        if(!source){ lastFolderScanLog.push({name:entry.name+(sheets.length>1?' / '+sh.name:''), status:'unclassified', detail:'skipped — could not tell whether it is a Created On or Date Of export (name the sheet or file "Created On" or "Date Of")'}); continue; }
         usedSheet = true;
         const full = autoDetectMapping(sh.headers, ALL_SPECS).mapping;
         const mappedRaw = new Set(Object.values(full).filter(Boolean));
@@ -5869,7 +5869,7 @@ async function ingestFiles(entries, {interactive=true}={}){
             employee_number:eid||null, candidate_name:String(out['Candidate Name']||'').trim()||null, ord:idx, data:out});
           localRows.set(id, out);
         });
-        const importId = await Server.rpc('dash_import_begin', {p_source:source, p_file_name:entry.name});
+        const importId = await Server.rpc('dash_import_begin', {p_source:source, p_file_name:entry.name+(sheets.length>1?' / '+sh.name:'')});
         for(let i=0;i<batch.length;i+=IMPORT_BATCH){
           importProgress('Saving '+entry.name+': '+fmtNum(Math.min(i+IMPORT_BATCH, batch.length))+' / '+fmtNum(batch.length)+' rows…');
           await Server.rpc('dash_import_rows', {p_import_id:importId, p_source:source, p_rows:batch.slice(i,i+IMPORT_BATCH)});
@@ -5877,8 +5877,8 @@ async function ingestFiles(entries, {interactive=true}={}){
         const fin = await Server.rpc('dash_import_finish', {p_import_id:importId, p_source:source, p_from:minD, p_to:maxD, p_rows_read:sh.rows.length, p_removed_columns:removed});
         (fin.weeks||[]).forEach(w=>allWeeks.add(w));
         totalRows += batch.length; totalSkipped += skipped;
-        imported.push({entry, source, rows:batch.length, removed});
-        lastFolderScanLog.push({name:entry.name, status:source==='schedules'?'file1':'file2', detail:fmtNum(batch.length)+' rows'+(skipped?' ('+fmtNum(skipped)+' without a date skipped)':'')+' · '+(removed.length?'removed contact column(s): '+removed.join(', '):'no contact columns found')+(fin.cleared?' · '+fmtNum(fin.cleared)+' outdated row(s) replaced':'')});
+        if(!imported.some(x=>x.entry===entry)) imported.push({entry, source, rows:batch.length, removed}); else imported.find(x=>x.entry===entry).rows += batch.length;
+        lastFolderScanLog.push({name:entry.name+(sheets.length>1?' / '+sh.name:''), status:source==='schedules'?'file1':'file2', detail:fmtNum(batch.length)+' rows'+(skipped?' ('+fmtNum(skipped)+' without a date skipped)':'')+' · '+(removed.length?'removed contact column(s): '+removed.join(', '):'no contact columns found')+(fin.cleared?' · '+fmtNum(fin.cleared)+' outdated row(s) replaced':'')});
       }
       if(!usedSheet && !lastFolderScanLog.some(l=>l.name===entry.name)) lastFolderScanLog.push({name:entry.name, status:'unclassified', detail:'no Created On / Date Of / goals sheet found'});
     }
