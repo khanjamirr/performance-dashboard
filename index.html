@@ -5397,8 +5397,10 @@ async function saveExcludedBranches(){
 //    The key must be the PUBLISHABLE / anon key — never the secret / service_role key.
 //    Without a password nobody can read anything: every table is private and every call
 //    is checked against a signed-in session on the server.
-const SUPABASE_URL = '';
-const SUPABASE_KEY = '';
+const SUPABASE_URL = 'https://vgalfqkzoedzdbggwhfa.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_Lm98TYtjj1G6OgHKPtNznw_xBw_UFRw';
+// backup: the legacy anon key, used automatically only if the publishable key is rejected
+const SUPABASE_FALLBACK_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZnYWxmcWt6b2VkemRiZ2d3aGZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA3OTY2OTEsImV4cCI6MjEwNjM3MjY5MX0.5JUb4xFEqb5Js7U_SeEEL3Lz_VnZ4bHQor1JEs6K-Mk';
 
 const CONN_LS_KEY = 'ipd_conn_v4';
 const TOKEN_LS_KEY = 'ipd_session_v4';
@@ -5691,6 +5693,12 @@ async function startAuthFlow(){
   let status;
   try{ status = await Server.call('dash_status'); }
   catch(e){
+    // publishable key rejected (older client or key disabled) → retry once with the anon key
+    if(typeof SUPABASE_FALLBACK_KEY!=='undefined' && SUPABASE_FALLBACK_KEY && Server.cfg && Server.cfg.key!==SUPABASE_FALLBACK_KEY && /api ?key|jwt|401|unauthori/i.test(e.message+' '+(e.code||''))){
+      Server.cfg = {...Server.cfg, key:SUPABASE_FALLBACK_KEY};
+      Server.client = window.supabase.createClient(Server.cleanUrl(Server.cfg.url), SUPABASE_FALLBACK_KEY, {auth:{persistSession:false, autoRefreshToken:false, detectSessionInUrl:false}});
+      return startAuthFlow();
+    }
     showAuthGate(Server.conn()?.builtIn ? 'login' : 'connect', /Could not find|schema cache/i.test(e.message) ? 'The database is not set up yet — run supabase_setup.sql in Supabase first.' : 'Cannot reach the database: '+cleanErr(e));
     return;
   }
