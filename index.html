@@ -487,6 +487,7 @@ th .col-filter-btn.active{background:#175967;color:#fff}
 #authGate .field input{width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font:inherit;font-size:13px}
 #cloudSettings .field{margin-bottom:12px}
 .upload-result{margin:12px 0 0;padding:0;list-style:none;font-size:12.5px;line-height:1.5}.upload-result li{padding:4px 0;border-top:1px solid var(--border)}.upload-result li.bad strong{color:var(--red)}
+.dedupe-seg button{font-size:12px;padding:7px 11px;min-height:36px}.dedupe-seg button[aria-pressed="true"]{background:#17666c;color:#fff}
 .import-panel .import-row{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
 @media(max-width:700px){.master-scroll{max-height:none}.remark-td{min-width:130px}}
 
@@ -654,7 +655,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
     <div class="brand">
       <div>
         <h1 id="dashboardTitle" title="Click to go home">Performance Dashboard</h1>
-        <p><span id="versionLabelInline">Version 4.3.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
+        <p><span id="versionLabelInline">Version 4.3.1</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
       </div>
     </div>
     <nav class="nav" id="navList">
@@ -697,6 +698,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
             <div class="period-picker-list" id="periodPickerList"></div>
           </div>
         </div>
+        <div class="seg dedupe-seg" id="dedupeSwitch" role="group" aria-label="Duplicate Employee Numbers"><button type="button" data-dedupe="1" title="Each Employee Number counts once per week">Deduped</button><button type="button" data-dedupe="0" title="Every row counts, including repeat Employee Numbers">Raw</button></div>
         <span class="lbl hidden" id="weeklyDivisionSelectLbl">Division:</span>
         <select id="weeklyDivisionSelect" class="hidden"></select>
       </div>
@@ -726,7 +728,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       </div>
       <div class="muted-note" id="storageModeNote" style="text-align:center;margin-top:24px;">Data stored locally in this browser.</div>
       <div class="muted-note" style="text-align:center;margin-top:4px;opacity:.65;">
-        <span id="footerVersionLabel">Version 4.3.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
+        <span id="footerVersionLabel">Version 4.3.1</span> &middot; &copy; <span id="footerCopyrightYear"></span>
       </div>
     </div>
   </main>
@@ -928,12 +930,21 @@ async function loadPerformerHighlightSetting(){
 async function savePerformerHighlightSetting(){
   await storageSet('showPerformerHighlights', showPerformerHighlights);
 }
+// Deduped / Raw is a personal view choice: it never changes what anyone else sees.
+const DEDUPE_LS_KEY = 'ipd_dedupe_view';
 async function loadDedupeSetting(){
-  const val = await storageGet('dedupeByEmployeeNumber');
-  dedupeByEmployeeNumber = (val===null || val===undefined) ? true : !!val;
+  let mine = null; try{ mine = localStorage.getItem(DEDUPE_LS_KEY); }catch(e){}
+  if(mine==='1' || mine==='0'){ dedupeByEmployeeNumber = mine==='1'; return; }
+  const teamDefault = await storageGet('dedupeByEmployeeNumber');
+  dedupeByEmployeeNumber = (teamDefault===null || teamDefault===undefined) ? true : !!teamDefault;
 }
 async function saveDedupeSetting(){
-  await storageSet('dedupeByEmployeeNumber', dedupeByEmployeeNumber);
+  try{ localStorage.setItem(DEDUPE_LS_KEY, dedupeByEmployeeNumber ? '1' : '0'); }catch(e){}
+}
+function syncDedupeControls(){
+  document.querySelectorAll('[data-dedupe]').forEach(b=>b.setAttribute('aria-pressed', String((b.dataset.dedupe==='1')===dedupeByEmployeeNumber)));
+  const seg = document.getElementById('dedupeSwitch');
+  if(seg) seg.classList.toggle('hidden', typeof currentView!=='undefined' && currentView==='master');
 }
 let excludedBranchesSet = new Set(); // branch names hidden from branch-level breakdowns
 let recruiterDivisionsByWeek = {}; // {weekEndDate: {recruiterName: division}} — only weeks with explicit assignments
@@ -1818,16 +1829,22 @@ function closeUploadModalFn(){ uploadModal.classList.add('hidden'); }
 function navigateToFolderSync(){
   openSettingsModal('sync');
 }
+async function setDedupeMode(on){
+  if(on===dedupeByEmployeeNumber) return;
+  return toggleDedupeSetting();
+}
 async function toggleDedupeSetting(){
-  if(weeksData.length===0 || isSnapshotMode) return;
+  if(weeksData.length===0) return;
   dedupeByEmployeeNumber = !dedupeByEmployeeNumber;
   await saveDedupeSetting();
   await loadAllWeeks();
-  showToast(dedupeByEmployeeNumber ? 'Now showing deduped data.' : 'Now showing raw (non-deduped) data.');
+  showToast(dedupeByEmployeeNumber ? 'Deduped: each Employee Number counts once per week.' : 'Raw: duplicate Employee Numbers are counted again.');
   refreshUI();
+  syncDedupeControls();
   if(settingsModalOpen) renderSettingsModalContent();
 }
 document.getElementById('dashboardTitle').addEventListener('click', goToHome);
+document.getElementById('dedupeSwitch').addEventListener('click', e=>{ const b=e.target.closest('[data-dedupe]'); if(b) setDedupeMode(b.dataset.dedupe==='1'); });
 
 document.getElementById('emptyUploadFilesBtn').addEventListener('click', ()=>pickSpreadsheetsToUpload());
 
@@ -2781,6 +2798,7 @@ async function refreshUI(){
 
   renderPeriodPickerButton();
   closePeriodPicker();
+  syncDedupeControls();
   ['weeklyDivisionSelect','weeklyDivisionSelectLbl'].forEach(id=>document.getElementById(id).classList.toggle('hidden',currentView!=='performance'));
   if(!hasData){ if(showDashboardViews) renderMasterView(); return; }
 
@@ -2817,7 +2835,7 @@ function renderSettingsModalContent(){
   }
   const dedupeBtn = document.getElementById('settingsDedupeToggleBtn');
   if(dedupeBtn){
-    dedupeBtn.textContent = dedupeByEmployeeNumber ? 'Deduped' : 'Raw (duplicates included)';
+    dedupeBtn.textContent = dedupeByEmployeeNumber ? 'My view: Deduped' : 'My view: Raw (duplicates included)';
     dedupeBtn.classList.toggle('btn-primary', dedupeByEmployeeNumber);
     dedupeBtn.classList.toggle('btn-secondary', !dedupeByEmployeeNumber);
     dedupeBtn.onclick = toggleDedupeSetting;
@@ -5769,7 +5787,7 @@ const LiveReload = {
   },
 };
 async function reloadAllFromStorage(){
-  await loadDivisionNames(); await loadAllWeeks(); await loadExcludedRecruiters(); await loadExcludedBranches();
+  await loadDivisionNames(); await loadDedupeSetting(); await loadAllWeeks(); await loadExcludedRecruiters(); await loadExcludedBranches();
   await loadRecruiterDivisions(); await loadBranchDivisions(); await loadDedupeSetting(); await loadPerformerHighlightSetting();
   refreshUI();
   if(settingsModalOpen) renderSettingsModalContent();
@@ -5910,7 +5928,7 @@ async function afterLogin(boot){
       await Server.loadKv(t=>setLoading(t));
       await Remarks.load().catch(()=>{});
     }
-    await loadDivisionNames(); await loadAllWeeks(); await loadExcludedRecruiters(); await loadExcludedBranches();
+    await loadDivisionNames(); await loadDedupeSetting(); await loadAllWeeks(); await loadExcludedRecruiters(); await loadExcludedBranches();
     await loadRecruiterDivisions(); await loadBranchDivisions(); await loadDedupeSetting(); await loadPerformerHighlightSetting();
     deleteSourceFilesAfterImport = lsGet('ipd_delete_sources')!=='0';
     applyPermissions();
@@ -6684,7 +6702,7 @@ async function renderUploadHistory(){
 }
 
 /* ============================= INIT ============================= */
-const APP_VERSION = 'Version 4.3.0';
+const APP_VERSION = 'Version 4.3.1';
 async function init(){
   document.getElementById('versionLabelInline').textContent = APP_VERSION;
   document.getElementById('footerVersionLabel').textContent = APP_VERSION;
