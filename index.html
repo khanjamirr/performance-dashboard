@@ -482,6 +482,7 @@ th .col-filter-btn.active{background:#175967;color:#fff}
 #cloudSettings .field input{width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font:inherit;font-size:13px;background:#fff}
 #authGate .field input{width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font:inherit;font-size:13px}
 #cloudSettings .field{margin-bottom:12px}
+.upload-result{margin:12px 0 0;padding:0;list-style:none;font-size:12.5px;line-height:1.5}.upload-result li{padding:4px 0;border-top:1px solid var(--border)}.upload-result li.bad strong{color:var(--red)}
 .import-panel .import-row{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
 @media(max-width:700px){.master-scroll{max-height:none}.remark-td{min-width:130px}}
 
@@ -570,9 +571,6 @@ body.no-views #dashboardViews::before{content:"Your account has no modules yet. 
       </div>
       <button data-view="uploads" class="ribbon-btn" id="settingsNavBtn">&#9881; Settings</button>
       <div class="user-chip-wrap hidden" id="userChipWrap"><button type="button" class="ribbon-btn user-chip" id="userChip" title="My account"></button><button type="button" class="ribbon-btn" id="signOutBtn" title="Sign out">Sign out</button></div>
-      <div class="sidebar-footer" id="ribbonVersionTimerWrap" style="border-top:none;padding-top:0;opacity:.75;display:flex;align-items:center;gap:8px;">
-        <span id="ribbonSyncTimer" style="font-variant-numeric:tabular-nums;letter-spacing:.02em;" title="Time until the next automatic Folder Sync check">&#9201; 15:00</span>
-      </div>
     </div>
   </header>
 
@@ -605,10 +603,9 @@ body.no-views #dashboardViews::before{content:"Your account has no modules yet. 
       <div id="emptyState" class="empty-state">
         <div class="icon" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19V11M10 19V5M16 19V9M22 19V2"/></svg></div><div class="welcome-eyebrow">CLARITY. ALIGNMENT. PERFORMANCE.</div>
         <h3>A clearer view of<br>your recruiting performance.</h3>
-        <p>Bring your schedules, interview outcomes, and team performance into one executive view. Connect your Excel folder to turn weekly activity into actionable insight.</p>
+        <p>Bring your schedules, interview outcomes, and team performance into one executive view. Upload your Created On and Date Of exports to turn weekly activity into actionable insight.</p>
         <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-          <button class="btn btn-primary upload-only" id="emptyUploadFilesBtn">Upload spreadsheets <span aria-hidden="true">&rarr;</span></button>
-          <button class="btn btn-secondary upload-only" id="emptyUploadFolderBtn">Connect data folder</button>
+          <button class="btn btn-primary upload-only" id="emptyUploadFilesBtn">Upload Excel files <span aria-hidden="true">&rarr;</span></button>
         </div>
 <div class="welcome-features"><div><strong><b>01</b> Executive overview</strong><span>Schedules, outcomes, and conversion<br>in one connected picture.</span></div><div><strong><b>02</b> Team accountability</strong><span>Recruiter and branch performance<br>with clear goals and comparisons.</span></div><div><strong><b>03</b> Decisions with context</strong><span>Weekly trends and reporting<br>to guide your next conversation.</span></div></div>
       </div>
@@ -1727,7 +1724,7 @@ async function toggleDedupeSetting(){
   if(settingsModalOpen) renderSettingsModalContent();
 }
 document.getElementById('dashboardTitle').addEventListener('click', goToHome);
-document.getElementById('emptyUploadFolderBtn').addEventListener('click', navigateToFolderSync);
+
 document.getElementById('emptyUploadFilesBtn').addEventListener('click', ()=>pickSpreadsheetsToUpload());
 
 document.getElementById('closeUploadModal').addEventListener('click', ()=>{
@@ -2246,18 +2243,15 @@ function parseGoalsColumnHeader(header){
 }
 
 function renderFolderUploadExplainer(){
-  renderFolderUploadExplainerInner();
   const container = document.getElementById('view-folderUploads');
   if(!container || isSnapshotMode) return;
   if(!Server.can('upload')){ container.innerHTML = '<div class="panel"><span class="hint">Your account cannot upload data. Ask the super admin for the “Upload spreadsheets” right.</span></div>'; return; }
-  const box = document.createElement('div');
-  box.className = 'panel import-panel';
-  box.innerHTML = `<div class="import-row"><div><h3 style="margin:0 0 4px;">Import raw spreadsheets</h3><span class="hint">Contact-number columns are stripped, rows merge into the single master sheet, weeks recalculate for everyone. Uploaded files are never stored — only the extracted rows. Goals files are imported and kept.</span></div>
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><label class="hint" style="display:flex;gap:6px;align-items:center;cursor:pointer;"><input type="checkbox" id="deleteSourcesToggle" ${deleteSourceFilesAfterImport?'checked':''}> Delete source files from the linked folder after import</label>${Server.isAdmin()?'<button class="btn btn-secondary" id="recalcAllBtn" title="Rebuild every weekly summary from the master sheet on the server — no upload needed">Recalculate all weeks</button>':''}<button class="btn btn-primary" id="uploadFilesBtn">Upload spreadsheets</button></div></div>`;
-  container.prepend(box);
-  box.querySelector('#uploadFilesBtn').onclick = pickSpreadsheetsToUpload;
-  box.querySelector('#recalcAllBtn')?.addEventListener('click', recalculateAllWeeks);
-  box.querySelector('#deleteSourcesToggle').onchange = async (e)=>{ deleteSourceFilesAfterImport = e.target.checked; lsSet('ipd_delete_sources', deleteSourceFilesAfterImport?'1':'0'); showToast(deleteSourceFilesAfterImport?'Source files will be deleted after each import (the browser will ask for edit access to the folder once).':'Source files will be kept in the folder.'); };
+  const log = lastFolderScanLog.length ? `<ul class="upload-result">${lastFolderScanLog.map(l=>`<li class="${/file1|file2|goals/.test(l.status)?'ok':'bad'}"><strong>${escapeHtml(l.name)}</strong> — ${escapeHtml(l.detail)}</li>`).join('')}</ul>` : '';
+  container.innerHTML = `<div class="panel import-panel"><div class="import-row">
+      <div><h3 style="margin:0 0 4px;">Upload data</h3><span class="hint">Upload the Created On and Date Of exports (separately or together) and the goals file. Rows with the same dates and details replace the existing ones; anything new is added. Contact numbers are removed and the files themselves are not kept.</span></div>
+      <button class="btn btn-primary" id="uploadFilesBtn">Upload Excel files</button>
+    </div>${log}</div>`;
+  container.querySelector('#uploadFilesBtn').onclick = pickSpreadsheetsToUpload;
 }
 function renderFolderUploadExplainerInner(){
   const container = document.getElementById('view-folderUploads');
@@ -4879,12 +4873,9 @@ function renderManageView(){
   }
   container.innerHTML = `
     ${storageWarningHtml}
-    ${isSnapshotMode ? '<div class="panel" style="background:var(--indigo-light);border-color:#C9DCF3;"><span style="font-size:13px;color:var(--indigo);font-weight:600;">This is a shared, read-only snapshot \u2014 weeks can\u2019t be added or removed here.</span></div>' : `<div class="panel" style="display:flex;align-items:center;justify-content:space-between;">
-      <span class="hint">Share the whole interactive dashboard (not just one page) as a standalone, read-only HTML file.</span>
-      <button class="btn btn-secondary btn-sm" id="shareHtmlSnapshotBtn">Share Full Dashboard (HTML)</button>
-    </div>`}
+    ${isSnapshotMode ? '<div class="panel" style="background:var(--indigo-light);border-color:#C9DCF3;"><span style="font-size:13px;color:var(--indigo);font-weight:600;">This is a shared, read-only snapshot \u2014 weeks can\u2019t be added or removed here.</span></div>' : ''}
     <div class="panel">
-      <div class="panel-head"><h3>All Saved Weeks</h3><div style="display:flex;align-items:center;gap:10px;"><span class="hint">${weeksData.length} week${weeksData.length===1?'':'s'}${isSnapshotMode?' in this snapshot':' stored in this browser'}</span>${copyBtnHtml('manageWeeksTable')}${downloadBtnHtml('manageWeeksTable','all-saved-weeks.xlsx')}</div></div>
+      <div class="panel-head"><h3>All Saved Weeks</h3><div style="display:flex;align-items:center;gap:10px;"><span class="hint">${weeksData.length} week${weeksData.length===1?'':'s'}${isSnapshotMode?' in this snapshot':' stored on the server'}</span>${copyBtnHtml('manageWeeksTable')}${downloadBtnHtml('manageWeeksTable','all-saved-weeks.xlsx')}</div></div>
       <table id="manageWeeksTable">
         <thead><tr><th>Week #</th><th>Week Ending</th><th>Saved</th><th>Schedules</th><th>Shows</th><th>Show Rate</th>${isSnapshotMode?'':'<th></th>'}</tr></thead>
         <tbody>
@@ -5875,7 +5866,7 @@ async function ingestFiles(entries, {interactive=true}={}){
           importProgress('Saving '+entry.name+': '+fmtNum(Math.min(i+IMPORT_BATCH, batch.length))+' / '+fmtNum(batch.length)+' rows…');
           await Server.rpc('dash_import_rows', {p_import_id:importId, p_source:source, p_rows:batch.slice(i,i+IMPORT_BATCH)});
         }
-        const fin = await Server.rpc('dash_import_finish', {p_import_id:importId, p_source:source, p_from:minD, p_to:maxD, p_rows_read:sh.rows.length, p_removed_columns:removed});
+        const fin = await Server.rpc('dash_import_finish', {p_import_id:importId, p_source:source, p_from:null, p_to:null, p_rows_read:sh.rows.length, p_removed_columns:removed});
         (fin.weeks||[]).forEach(w=>allWeeks.add(w));
         totalRows += batch.length; totalSkipped += skipped;
         if(!imported.some(x=>x.entry===entry)) imported.push({entry, source, rows:batch.length, removed}); else imported.find(x=>x.entry===entry).rows += batch.length;
@@ -5897,16 +5888,16 @@ async function ingestFiles(entries, {interactive=true}={}){
     }
     lastSuccessfulSyncAt = new Date(); resetSyncCountdown();
     await loadAllWeeks(); refreshUI();
-    showToast('Imported '+fmtNum(totalRows)+' rows from '+imported.length+' file'+(imported.length===1?'':'s')+' into the master sheet'+(allWeeks.size?' · '+allWeeks.size+' week'+(allWeeks.size===1?'':'s')+' recalculated':'')+(deleted?' · '+deleted+' source file'+(deleted===1?'':'s')+' deleted':'')+'.');
+    if(imported.length) showToast('Imported '+fmtNum(totalRows)+' rows from '+imported.length+' file'+(imported.length===1?'':'s')+' into the master sheet'+(allWeeks.size?' · '+allWeeks.size+' week'+(allWeeks.size===1?'':'s')+' recalculated':'')+(deleted?' · '+deleted+' source file'+(deleted===1?'':'s')+' deleted':'')+'.');
   }catch(e){
     console.error(e);
     showToast('Import stopped: '+cleanErr(e)+'. Your files were not deleted — you can run the import again safely.');
   }finally{
     Server.ownMasterUntil = Date.now()+8000;
     setLoading(null);
-    const u=document.getElementById('uploadFilesBtn'); if(u) u.textContent='Upload spreadsheets';
+    const u=document.getElementById('uploadFilesBtn'); if(u) u.textContent='Upload Excel files';
     const f=document.getElementById('folderSyncNowBtn'); if(f) f.textContent='Sync Now';
-    if(settingsModalOpen) renderFolderUploadExplainer();
+    if(settingsModalOpen){ renderFolderUploadExplainer(); renderUploadHistory(); }
     if(currentView==='master') drawMasterTable();
   }
 }
@@ -6217,7 +6208,7 @@ async function renderMasterView(){
         <label class="hint master-period"><input type="checkbox" id="masterPeriodOnly" ${st.periodOnly?'checked':''}> Selected period only</label>
         <button class="btn btn-secondary btn-sm" id="masterClearFilters">Clear filters</button>
         <button class="btn btn-secondary btn-sm export-only" id="masterDownload">&#11015; Master sheet (.xlsx)</button>
-        <button class="btn btn-primary btn-sm upload-only" data-upload-raw>Upload spreadsheets</button>
+        <button class="btn btn-primary btn-sm upload-only" data-upload-raw>Upload Excel files</button>
       </div>
     </div>
     <div class="master-selbar" id="masterSelBar"></div>
@@ -6246,7 +6237,7 @@ async function drawMasterTable(){
   const rows = res.rows || [];
   document.getElementById('masterCounts').textContent = fmtNum(res.total)+' row'+(res.total===1?'':'s')+(res.excluded?' · '+fmtNum(res.excluded)+' excluded from metrics':'')+' · one row per interview · contact numbers removed on import';
   if(!res.total && !Object.keys(st.filters).length && !st.search && st.files==='all' && !st.periodOnly){
-    table.innerHTML = `<tbody><tr><td class="master-empty-cell"><h3>The master sheet is empty</h3><p class="hint">${Server.can('upload')?'Upload your Created On and Date Of exports (and the goals file). Contact numbers are removed, rows are merged into this single sheet on the server, and the uploaded files are discarded.':'Ask someone with upload rights to import the latest exports.'}</p>${Server.can('upload')?'<button class="btn btn-primary" data-upload-raw2>Upload spreadsheets</button>':''}</td></tr></tbody>`;
+    table.innerHTML = `<tbody><tr><td class="master-empty-cell"><h3>The master sheet is empty</h3><p class="hint">${Server.can('upload')?'Upload your Created On and Date Of exports (and the goals file). Contact numbers are removed, rows are merged into this single sheet on the server, and the uploaded files are discarded.':'Ask someone with upload rights to import the latest exports.'}</p>${Server.can('upload')?'<button class="btn btn-primary" data-upload-raw2>Upload Excel files</button>':''}</td></tr></tbody>`;
     table.querySelector('[data-upload-raw2]')?.addEventListener('click', pickSpreadsheetsToUpload);
     document.getElementById('masterPager').innerHTML=''; drawMasterSelBar(); return;
   }
@@ -6510,8 +6501,6 @@ async function init(){
     return;
   }
   setLocked(true);
-  await tryRestoreLinkedFolder();
-  startSyncCountdown();
   const st = await Server.connect();
   if(st==='noconfig'){ showAuthGate('connect'); return; }
   if(st==='nolib'){ showAuthGate('login', 'Could not load the database library — check your internet connection and reload.'); return; }
