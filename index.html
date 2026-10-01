@@ -359,6 +359,8 @@
 
   ::-webkit-scrollbar{height:8px;width:8px;}
   ::-webkit-scrollbar-thumb{background:#D8DEE8;border-radius:8px;}
+.nl-short{display:none}
+@media (max-width:1700px){.nav .nl-full{display:none}.nav .nl-short{display:inline}}
 </style>
 <style id="executive-design">
 :root{--bg:#f2f5f6;--surface:#fff;--border:#dfe7e9;--navy:#102c3b;--navy-2:#193e4d;--indigo:#146f78;--indigo-light:#e7f3f3;--teal:#17775c;--teal-light:#e8f5ee;--amber:#94671b;--amber-light:#fbf2df;--red:#bb4d50;--red-light:#fbecee;--text:#183442;--text-secondary:#5b707c;--text-tertiary:#687e89;--radius:12px;--radius-lg:18px;--shadow:0 3px 16px #17374405}
@@ -489,6 +491,13 @@ th .col-filter-btn.active{background:#175967;color:#fff}
 .upload-result{margin:12px 0 0;padding:0;list-style:none;font-size:12.5px;line-height:1.5}.upload-result li{padding:4px 0;border-top:1px solid var(--border)}.upload-result li.bad strong{color:var(--red)}
 .dedupe-seg button{font-size:12px;padding:7px 11px;min-height:36px}.dedupe-seg button[aria-pressed="true"]{background:#17666c;color:#fff}
 .num-bad{color:var(--red);font-weight:700}.num-bad em{font-style:normal;font-weight:500;color:var(--text-tertiary);font-size:11px}
+.cand-controls{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px}.cand-field{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:#3b5562;text-transform:uppercase;letter-spacing:.05em}.cand-field select{min-width:240px;min-height:38px;border:1px solid var(--border);border-radius:9px;padding:6px 10px;font:inherit;font-size:13px;text-transform:none;letter-spacing:0;font-weight:600;color:var(--text);background:#fff}
+.cand-cats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.cand-cat{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:118px;padding:9px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;font:inherit;font-size:11.5px;color:var(--text-secondary);cursor:pointer;text-align:left}.cand-cat strong{font-size:19px;color:var(--text)}.cand-cat[aria-selected="true"]{border-color:#17666c;background:#e8f3f3;color:#17666c;box-shadow:inset 0 0 0 1px #17666c}.cand-cat.dup{border-style:dashed}
+.cand-summary{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:13px;margin-bottom:10px}.cand-actions{margin-left:auto;display:flex;gap:6px}.cand-scroll{overflow:auto;max-height:calc(100vh - 330px)}.cand-table th{position:sticky;top:0;background:#f5f8f9;z-index:1}
+@media(max-width:760px){.cand-field{flex:1 1 100%}.cand-field select{min-width:0;width:100%}.cand-cat{min-width:calc(50% - 4px);flex:1 1 calc(50% - 4px)}.cand-scroll{max-height:none}.cand-actions{margin-left:0}}
+.copy-cell{border:0;background:none;padding:2px 4px;margin:-2px -4px;border-radius:5px;font:inherit;color:inherit;text-align:left;cursor:copy}.copy-cell:hover{background:#e8f3f3;color:#17666c}.copy-cell.mono{font-variant-numeric:tabular-nums}.copy-cell.copied,.copy-row.copied{background:#d6efe6!important;color:#0f6b52!important}
+.copy-row{border:1px solid var(--border);background:#fff;border-radius:6px;width:28px;height:28px;display:grid;place-items:center;color:#5b707c;cursor:pointer}.copy-row:hover{color:#17666c;border-color:#17666c}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .import-panel .import-row{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
 @media(max-width:700px){.master-scroll{max-height:none}.remark-td{min-width:130px}}
 
@@ -656,15 +665,16 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
     <div class="brand">
       <div>
         <h1 id="dashboardTitle" title="Click to go home">Performance Dashboard</h1>
-        <p><span id="versionLabelInline">Version 4.4.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
+        <p><span id="versionLabelInline">Version 4.5.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
       </div>
     </div>
     <nav class="nav" id="navList">
-      <button data-view="performance" class="active"><span class="dot"></span>Performance Summary</button>
+      <button data-view="performance" class="active"><span class="dot"></span><span class="nl-full">Performance Summary</span><span class="nl-short">Summary</span></button>
       <div class="divider"></div>
-      <button data-view="recruiters"><span class="dot"></span>Recruiter Performance</button>
-      <button data-view="branches"><span class="dot"></span>Branch Performance</button>
-      <button data-view="master"><span class="dot"></span>Master Data</button>
+      <button data-view="recruiters"><span class="dot"></span><span class="nl-full">Recruiter Performance</span><span class="nl-short">Recruiters</span></button>
+      <button data-view="branches"><span class="dot"></span><span class="nl-full">Branch Performance</span><span class="nl-short">Branches</span></button>
+      <button data-view="master"><span class="dot"></span><span class="nl-full">Master Data</span><span class="nl-short">Master</span></button>
+      <button data-view="candidates"><span class="dot"></span><span class="nl-full">Candidates</span><span class="nl-short">Candidates</span></button>
     </nav>
     <div class="ribbon-actions">
       <button class="ribbon-btn" id="clearAllFiltersBtn" title="Reset every dashboard filter and selection to the latest available week">Clear all filters</button>
@@ -726,10 +736,11 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
         <div id="view-recruiters" class="hidden"></div>
         <div id="view-branches" class="hidden"></div>
         <div id="view-master" class="hidden"></div>
+        <div id="view-candidates" class="hidden"></div>
       </div>
       <div class="muted-note" id="storageModeNote" style="text-align:center;margin-top:24px;">Data stored locally in this browser.</div>
       <div class="muted-note" style="text-align:center;margin-top:4px;opacity:.65;">
-        <span id="footerVersionLabel">Version 4.4.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
+        <span id="footerVersionLabel">Version 4.5.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
       </div>
     </div>
   </main>
@@ -2762,6 +2773,7 @@ const VIEW_META = {
   performance:{title:'Performance Summary', sub:'Interview schedules, shows, and outcomes for the selected week'},
   recruiters:{title:'Recruiter Performance', sub:'Show rates and outcomes by recruiter'},
   branches:{title:'Branch Performance', sub:'Show rates and outcomes by branch'},
+  candidates:{title:'Candidates', sub:'Who is counted in each category, by week'},
   master:{title:'Master Data', sub:'Every candidate row from every import, in one sheet — filter any column, exclude or include candidates'},
   uploads:{title:'Uploads', sub:'Manage uploaded weeks and recruiter goals & divisions'},
 };
@@ -2787,13 +2799,13 @@ async function refreshUI(){
   document.getElementById('viewTitle').textContent = meta.title;
   document.getElementById('viewSub').textContent = showDashboardViews ? meta.sub : 'No data uploaded yet';
 
-  ['performance','recruiters','branches','master'].forEach(v=>{
+  ['performance','recruiters','branches','master','candidates'].forEach(v=>{
     document.getElementById('view-'+v).classList.toggle('hidden', v!==currentView);
   });
 
   document.getElementById('topbarCenter').classList.toggle('hidden', !showDashboardViews);
 
-  if(currentView!=='recruiters' && currentView!=='branches' && currentView!=='master'){
+  if(currentView!=='recruiters' && currentView!=='branches' && currentView!=='master' && currentView!=='candidates'){
     const extra = document.getElementById('topbarExtra');
     if(extra) extra.innerHTML = '';
   }
@@ -2801,6 +2813,7 @@ async function refreshUI(){
   renderPeriodPickerButton();
   closePeriodPicker();
   syncDedupeControls();
+  document.getElementById('periodPicker')?.classList.toggle('hidden', currentView==='candidates');
   ['weeklyDivisionSelect','weeklyDivisionSelectLbl'].forEach(id=>document.getElementById(id).classList.toggle('hidden',currentView!=='performance'));
   if(!hasData){ if(showDashboardViews) renderMasterView(); return; }
 
@@ -2813,6 +2826,7 @@ async function refreshUI(){
   else if(currentView==='recruiters') renderPeopleView('recruiters');
   else if(currentView==='branches') renderPeopleView('branches');
   else if(currentView==='master') renderMasterView();
+  else if(currentView==='candidates') renderCandidatesView();
 }
 
 /* ============================= SETTINGS MODAL ============================= */
@@ -5527,6 +5541,7 @@ const MODULES = [
   {key:'performance', label:'Performance Summary', hint:'Weekly, monthly and quarterly overview'},
   {key:'recruiters',  label:'Recruiter Performance', hint:'Recruiter table, trends, smart alerts, reading remarks'},
   {key:'branches',    label:'Branch Performance', hint:'Branch table and trends'},
+  {key:'candidates',  label:'Candidates', hint:'Names and Employee Numbers behind each count, by week and category'},
   {key:'master',      label:'Master Data — view', hint:'Browse and filter every candidate row'},
   {key:'master_edit', label:'Master Data — exclude / include', hint:'Remove candidates from the metrics or bring them back'},
   {key:'upload',      label:'Upload spreadsheets', hint:'Import Created On / Date Of / goals files, folder sync'},
@@ -5534,7 +5549,7 @@ const MODULES = [
   {key:'settings',    label:'Settings', hint:'Divisions, branch divisions, show/hide recruiters, saved weeks'},
   {key:'export',      label:'Download & share', hint:'Excel, PDF, Word, master sheet download, snapshots'},
 ];
-const VIEW_MODULE = {performance:'performance', recruiters:'recruiters', branches:'branches', master:'master'};
+const VIEW_MODULE = {performance:'performance', recruiters:'recruiters', branches:'branches', master:'master', candidates:'candidates'};
 
 function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
 function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
@@ -5770,6 +5785,7 @@ const Server = {
       try{ const me = await this.rpc('dash_me'); const changed = JSON.stringify(me.modules)!==JSON.stringify(this.user.modules) || me.name!==this.user.name; this.user=me; if(changed){ applyPermissions(); showToast('Your access rights were updated.'); } }catch(e){}
       if(settingsModalOpen && !document.getElementById('settingsPane-users')?.classList.contains('hidden')) renderUsersAdmin();
     }
+    if(master){ candState.cache.clear(); if(currentView==='candidates') renderCandidatesView(); }
     if(master && currentView==='master') drawMasterTable();
     if(kvKeys.size || remarks) LiveReload.schedule([...authors]);
     else if(master && authors.size) showToast('Master sheet updated by '+[...authors].join(', '));
@@ -6120,6 +6136,7 @@ async function ingestFiles(entries, {interactive=true}={}){
     const f=document.getElementById('folderSyncNowBtn'); if(f) f.textContent='Sync Now';
     if(settingsModalOpen){ renderFolderUploadExplainer(); renderUploadHistory(); renderNumberCheck(); }
     if(currentView==='master') drawMasterTable();
+    candState.cache.clear();
   }
 }
 async function importGoalSheets(goalSheets){
@@ -6697,6 +6714,129 @@ function renderMyAccount(){
     catch(e){ msg.textContent = cleanErr(e); }
   };
 }
+/* ------------------------------------ CANDIDATES MODULE ------------------------------------ */
+// Shows exactly which candidates (name + Employee Number) are counted in each category for a
+// week. It runs the same counting code as the dashboard on that week's rows, so the totals here
+// always equal the numbers on the cards (Deduped or Raw, following the switch).
+const CAND_CATEGORIES = [
+  {key:'schedules',  label:'Schedules',    src:'s', list:'schedulesList', dateCol:'Created On', dateLabel:'Created On'},
+  {key:'interviews', label:'Interviews',   src:'v', list:'interviewsList', dateCol:'Date Of', dateLabel:'Date Of'},
+  {key:'shows',      label:'Shows',        src:'v', list:'showsList',     dateCol:'Date Of', dateLabel:'Date Of'},
+  {key:'noShows',    label:'No-shows',     src:'v', list:'noShowsList',   dateCol:'Date Of', dateLabel:'Date Of'},
+  {key:'i9',         label:'I-9 Complete', src:'v', list:'i9List',        dateCol:'Date Of', dateLabel:'Date Of'},
+  {key:'placed',     label:'Placed',       src:'v', list:'placedList',    dateCol:'Date Of', dateLabel:'Date Of'},
+  {key:'dupSchedules',  label:'Duplicates removed · Schedules',  src:'s', dup:true, dateCol:'Created On', dateLabel:'Created On'},
+  {key:'dupInterviews', label:'Duplicates removed · Interviews', src:'v', dup:true, dateCol:'Date Of', dateLabel:'Date Of'},
+];
+const candState = {week:null, cat:'schedules', recruiter:'', search:'', limit:500, cache:new Map(), rev:0};
+async function loadCandidateWeek(week){
+  if(candState.cache.has(week)) return candState.cache.get(week);
+  const rows = await Server.rpc('dash_week_rows', {p_week:week});
+  const s = rows.filter(r=>r.s).sort((a,b)=>(Number(a.so)||0)-(Number(b.so)||0)).map(r=>r.data);
+  const v = rows.filter(r=>r.v).sort((a,b)=>(Number(a.vo)||0)-(Number(b.vo)||0)).map(r=>r.data);
+  const data = {s, v};
+  candState.cache.set(week, data);
+  return data;
+}
+function candDuplicates(rows, week, dateCol){
+  const seen = new Map(), dups = [];
+  rows.forEach(row=>{
+    const d = toDateVal(row[dateCol]); if(!d || !inWeekRange(d, week)) return;
+    const eidRaw = String(row['Employee Number']||'').trim(), eid = normalizeEmployeeNumber(eidRaw);
+    const name = String(row['Candidate Name']||'').trim();
+    const key = eid ? 'eid:'+eid : (name ? 'name:'+name.toLowerCase()+'|'+toIsoDateOnly(d) : '');
+    if(!key) return;
+    const item = {name:name||'Unknown', eid:eidRaw||'–', date:toIsoDateOnly(d), recruiter:String(row['Created By']||'').trim()||'Unassigned', branch:String(row['Branch']||'').trim()||'Unassigned'};
+    if(seen.has(key)) dups.push({...item, keptWith:seen.get(key)}); else seen.set(key, item);
+  });
+  return dups;
+}
+function candCompute(data, week){
+  const out = {}, counted = {};
+  const p1 = processFile1(data.s, MAP1, week, dedupeByEmployeeNumber);
+  const p2 = processFile2(data.v, MAP2, week, dedupeByEmployeeNumber).byRecruiter;
+  const flat = (by, key)=> Object.entries(by).flatMap(([rec,o])=>(o[key]||[]).map(c=>({...c, recruiter:rec, branch:o.branch||'Unassigned'})));
+  const totals = {schedules:0, interviews:0, shows:0, noShows:0, i9:0, placed:0};
+  Object.values(p1).forEach(o=>{ totals.schedules += o.schedules||0; });
+  Object.values(p2).forEach(o=>{ totals.interviews += o.scheduledDateOf||0; totals.shows += o.shows||0; totals.noShows += o.noShows||0; totals.i9 += o.i9||0; totals.placed += o.placed||0; });
+  CAND_CATEGORIES.forEach(c=>{
+    if(c.dup){ out[c.key] = candDuplicates(c.src==='s'?data.s:data.v, week, c.dateCol); counted[c.key] = out[c.key].length; }
+    else { out[c.key] = flat(c.src==='s'?p1:p2, c.list); counted[c.key] = totals[c.key]; }
+  });
+  return {lists:out, counted};
+}
+async function renderCandidatesView(){
+  const container = document.getElementById('view-candidates'); if(!container) return;
+  const st = candState; const rev = ++st.rev;
+  const weeks = [...weeksData].map(w=>w.weekEndDate).sort().reverse();
+  if(!weeks.length){ container.innerHTML = '<div class="panel"><p class="hint" style="margin:0;">No weeks yet — upload data first.</p></div>'; return; }
+  if(!st.week || !weeks.includes(st.week)){ const sel = selectedPeriodWeeks(); st.week = (sel.length ? sel[sel.length-1].weekEndDate : weeks[0]); if(!weeks.includes(st.week)) st.week = weeks[0]; }
+  const extra = document.getElementById('topbarExtra');
+  if(extra){
+    extra.innerHTML = `<div class="header-search"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input type="search" id="candSearch" aria-label="Search candidates" placeholder="Search name or Employee Number…" autocomplete="off"></div>`;
+    const s = document.getElementById('candSearch'); s.value = st.search;
+    let t; s.addEventListener('input', ()=>{ clearTimeout(t); t=setTimeout(()=>{ st.search=s.value; st.limit=500; drawCandidateTable(); }, 200); });
+  }
+  container.innerHTML = `<div class="panel cand-panel">
+    <div class="cand-controls">
+      <label class="cand-field"><span>Week</span><select id="candWeek">${weeks.map(w=>`<option value="${w}" ${w===st.week?'selected':''}>Wk ${isoWeekNumber(new Date(w+'T00:00:00'))} · ${fmtDate(toIsoDateOnly(new Date(new Date(w+'T00:00:00').getTime()-6*86400000))).replace(/, \d{4}$/,'')} – ${fmtDate(w)}</option>`).join('')}</select></label>
+      <label class="cand-field"><span>Recruiter</span><select id="candRecruiter"><option value="">All recruiters</option></select></label>
+    </div>
+    <div class="cand-cats" id="candCats" role="tablist" aria-label="Category"><span class="hint">Loading week…</span></div>
+    <div class="cand-summary" id="candSummary"></div>
+    <div class="cand-scroll"><table id="candTable" class="users-table cand-table"></table></div>
+    <div id="candMore" style="text-align:center;margin-top:10px;"></div>
+  </div>`;
+  container.querySelector('#candWeek').onchange = e=>{ st.week = e.target.value; st.recruiter=''; st.limit=500; renderCandidatesView(); };
+  let data;
+  try{ data = await loadCandidateWeek(st.week); }
+  catch(e){ if(rev===st.rev) container.querySelector('#candCats').innerHTML = '<span class="hint">'+(/Could not find|schema cache|does not exist/i.test(e.message)?'Run the latest supabase_setup.sql in Supabase to enable this module.':escapeHtml(cleanErr(e)))+'</span>'; return; }
+  if(rev!==st.rev) return;
+  st.computed = candCompute(data, st.week);
+  const recs = [...new Set(Object.values(st.computed.lists).flat().map(r=>r.recruiter))].sort();
+  const rs = container.querySelector('#candRecruiter');
+  rs.innerHTML = '<option value="">All recruiters</option>'+recs.map(r=>`<option ${r===st.recruiter?'selected':''}>${escapeHtml(r)}</option>`).join('');
+  rs.onchange = e=>{ st.recruiter = e.target.value; st.limit=500; drawCandidateCats(); drawCandidateTable(); };
+  drawCandidateCats(); drawCandidateTable();
+}
+function candFiltered(){
+  const st = candState; let rows = (st.computed && st.computed.lists[st.cat]) || [];
+  if(st.recruiter) rows = rows.filter(r=>r.recruiter===st.recruiter);
+  const t = st.search.trim().toLowerCase();
+  if(t) rows = rows.filter(r=>String(r.name).toLowerCase().includes(t) || String(r.eid).toLowerCase().includes(t));
+  return rows;
+}
+function drawCandidateCats(){
+  const st = candState, host = document.getElementById('candCats'); if(!host || !st.computed) return;
+  host.innerHTML = CAND_CATEGORIES.map(c=>{
+    const n = st.recruiter ? st.computed.lists[c.key].filter(r=>r.recruiter===st.recruiter).length : st.computed.counted[c.key];
+    return `<button type="button" role="tab" class="cand-cat${c.dup?' dup':''}" data-cat="${c.key}" aria-selected="${st.cat===c.key}">${escapeHtml(c.label)}<strong>${fmtNum(n)}</strong></button>`;
+  }).join('');
+  host.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{ st.cat=b.dataset.cat; st.limit=500; drawCandidateCats(); drawCandidateTable(); });
+}
+function drawCandidateTable(){
+  const st = candState, table = document.getElementById('candTable'); if(!table || !st.computed) return;
+  const cat = CAND_CATEGORIES.find(c=>c.key===st.cat);
+  const rows = candFiltered();
+  const listedAll = st.computed.lists[st.cat].length, counted = st.computed.counted[st.cat];
+  const wk = 'Wk '+isoWeekNumber(new Date(st.week+'T00:00:00'))+' · week ending '+fmtDate(st.week);
+  const mode = cat.dup ? 'rows not counted in Deduped' : (dedupeByEmployeeNumber ? 'Deduped — each Employee Number once' : 'Raw — every row, duplicates included');
+  document.getElementById('candSummary').innerHTML = `<strong>${fmtNum(rows.length)}</strong> ${cat.dup?'duplicate row':'candidate'}${rows.length===1?'':'s'} in <strong>${escapeHtml(cat.label)}</strong> · ${escapeHtml(wk)}${st.recruiter?' · '+escapeHtml(st.recruiter):''} <span class="hint">(${mode})</span>${!cat.dup && !st.recruiter && !st.search && counted>listedAll ? `<span class="hint"> · ${fmtNum(counted-listedAll)} counted row${counted-listedAll===1?' has':'s have'} no name or Employee Number</span>`:''}
+    <span class="cand-actions"><button class="btn btn-secondary btn-sm" id="candCopy" title="Copy the whole list (paste straight into Excel)">&#128203; Copy all</button><button class="btn btn-secondary btn-sm export-only" id="candExcel">&#11015; Excel</button></span>`;
+  const shown = rows.slice(0, st.limit);
+  table.innerHTML = `<thead><tr><th>#</th><th>Candidate name</th><th>Employee Number</th><th>${escapeHtml(cat.dateLabel)}</th><th>Recruiter</th><th>Branch</th>${cat.dup?'<th>Already counted under</th>':''}<th><span class="sr-only">Copy row</span></th></tr></thead>
+    <tbody>${shown.map((r,i)=>`<tr data-i="${i}"><td class="hint">${i+1}</td><td><button type="button" class="copy-cell" data-copy="${escapeHtml(r.name)}" title="Click to copy">${escapeHtml(r.name)}</button></td><td><button type="button" class="copy-cell mono" data-copy="${escapeHtml(r.eid)}" title="Click to copy">${escapeHtml(r.eid)}</button></td><td style="white-space:nowrap;">${r.date?fmtDate(r.date):'–'}</td><td>${escapeHtml(r.recruiter)}</td><td>${escapeHtml(r.branch)}</td>${cat.dup?`<td class="hint">${escapeHtml(r.keptWith.recruiter)} · ${r.keptWith.date?fmtDate(r.keptWith.date):''}</td>`:''}<td><button type="button" class="copy-row" data-row="${i}" title="Copy name and Employee Number" aria-label="Copy ${escapeHtml(r.name)} and Employee Number"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button></td></tr>`).join('') || `<tr><td colspan="7" class="hint" style="padding:16px;">Nobody in this category${st.recruiter||st.search?' for this filter':''}.</td></tr>`}</tbody>`;
+  const more = document.getElementById('candMore');
+  more.innerHTML = rows.length>st.limit ? `<button class="btn btn-secondary btn-sm">Show all ${fmtNum(rows.length)}</button>` : '';
+  if(more.firstChild) more.firstChild.onclick = ()=>{ st.limit = Infinity; drawCandidateTable(); };
+  const asRows = ()=>[['Candidate name','Employee Number',cat.dateLabel,'Recruiter','Branch',...(cat.dup?['Already counted under']:[])], ...rows.map(r=>[r.name, r.eid, r.date, r.recruiter, r.branch, ...(cat.dup?[r.keptWith.recruiter+' · '+r.keptWith.date]:[])])];
+  const copyText = (text, el, label)=> navigator.clipboard.writeText(text).then(()=>{ if(el){ el.classList.add('copied'); setTimeout(()=>el.classList.remove('copied'), 900); } showToast('Copied '+label); }).catch(()=>showToast('Clipboard blocked by the browser.'));
+  table.querySelectorAll('.copy-cell').forEach(b=>b.onclick=()=>copyText(b.dataset.copy, b, '“'+b.dataset.copy+'”'));
+  table.querySelectorAll('.copy-row').forEach(b=>b.onclick=()=>{ const r=shown[+b.dataset.row]; copyText(r.name+'\t'+r.eid, b, r.name+' · '+r.eid); });
+  document.getElementById('candCopy').onclick = ()=> navigator.clipboard.writeText(asRows().map(r=>r.join('\t')).join('\n')).then(()=>showToast('Copied '+rows.length+' rows — paste into Excel.')).catch(()=>showToast('Clipboard blocked by the browser.'));
+  document.getElementById('candExcel').onclick = ()=>{ const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(asRows()), cat.label.slice(0,30).replace(/[\\\/?*\[\]:]/g,'')); XLSX.writeFile(wb, 'candidates-'+cat.key+'-'+st.week+'.xlsx'); };
+}
+
 /* ------------------------------------ NUMBER CHECK ------------------------------------ */
 // The server recounts every week straight from the master sheet; any week where the stored
 // dashboard numbers differ is rebuilt. Runs automatically for uploaders, and on demand.
@@ -6757,7 +6897,7 @@ async function renderUploadHistory(){
 }
 
 /* ============================= INIT ============================= */
-const APP_VERSION = 'Version 4.4.0';
+const APP_VERSION = 'Version 4.5.0';
 async function init(){
   document.getElementById('versionLabelInline').textContent = APP_VERSION;
   document.getElementById('footerVersionLabel').textContent = APP_VERSION;
@@ -6808,8 +6948,9 @@ document.addEventListener('keydown', e=>{
   const icons = {performance:'<path d="M4 20V12M10 20V5M16 20V9M22 20V3"/>',
     recruiters:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><circle cx="17.5" cy="9" r="2.5"/><path d="M16.8 14.6c2.4.3 4 2 4.7 4.9"/>',
     branches:'<path d="M3 21V9l9-5 9 5v12"/><path d="M9 21v-6h6v6"/>',
-    master:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10"/>'};
-  const short = {performance:'Summary', recruiters:'Recruiters', branches:'Branches', master:'Master'};
+    master:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10"/>',
+    candidates:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2.2"/><path d="M5.8 16c.6-1.6 1.8-2.4 3.2-2.4s2.6.8 3.2 2.4M14.5 10h4M14.5 13.5h3"/>'};
+  const short = {performance:'Summary', recruiters:'Recruiters', branches:'Branches', master:'Master', candidates:'Names'};
   document.querySelectorAll('#navList button[data-view]').forEach(b=>{
     const v=b.dataset.view; if(!icons[v]) return;
     [...b.childNodes].forEach(n=>{ if(n.nodeType===3 && n.textContent.trim()){ const s=document.createElement('span'); s.className='nav-full'; s.textContent=n.textContent; b.replaceChild(s,n); } });
