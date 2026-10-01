@@ -488,6 +488,7 @@ th .col-filter-btn.active{background:#175967;color:#fff}
 #cloudSettings .field{margin-bottom:12px}
 .upload-result{margin:12px 0 0;padding:0;list-style:none;font-size:12.5px;line-height:1.5}.upload-result li{padding:4px 0;border-top:1px solid var(--border)}.upload-result li.bad strong{color:var(--red)}
 .dedupe-seg button{font-size:12px;padding:7px 11px;min-height:36px}.dedupe-seg button[aria-pressed="true"]{background:#17666c;color:#fff}
+.num-bad{color:var(--red);font-weight:700}.num-bad em{font-style:normal;font-weight:500;color:var(--text-tertiary);font-size:11px}
 .import-panel .import-row{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
 @media(max-width:700px){.master-scroll{max-height:none}.remark-td{min-width:130px}}
 
@@ -655,7 +656,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
     <div class="brand">
       <div>
         <h1 id="dashboardTitle" title="Click to go home">Performance Dashboard</h1>
-        <p><span id="versionLabelInline">Version 4.3.1</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
+        <p><span id="versionLabelInline">Version 4.4.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
       </div>
     </div>
     <nav class="nav" id="navList">
@@ -728,7 +729,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       </div>
       <div class="muted-note" id="storageModeNote" style="text-align:center;margin-top:24px;">Data stored locally in this browser.</div>
       <div class="muted-note" style="text-align:center;margin-top:4px;opacity:.65;">
-        <span id="footerVersionLabel">Version 4.3.1</span> &middot; &copy; <span id="footerCopyrightYear"></span>
+        <span id="footerVersionLabel">Version 4.4.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
       </div>
     </div>
   </main>
@@ -844,6 +845,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
             </div>
           </div>
           <div id="view-folderUploads"></div>
+          <div id="numberCheck"></div>
           <div id="uploadHistory"></div>
         </div>
         <div id="settingsPane-divisions" class="hidden"><div id="divisionNameSettings"></div></div><div id="settingsPane-recruiters" class="hidden"><p class="hint">Checked recruiters are visible. Changes save automatically.</p><div id="settingsRecruiterVisibilityList"></div></div><div id="settingsPane-fetched" class="hidden"><div id="view-manage"></div></div>
@@ -2818,6 +2820,7 @@ let settingsModalOpen = false;
 function renderSettingsModalContent(){
   renderFolderUploadExplainer();
   renderUploadHistory();
+  renderNumberCheck();
   renderMyAccount();
   if(Server.can('settings')) renderManageView();
   renderBranchDivisionsView();
@@ -3196,7 +3199,7 @@ async function renderWeeklyView(){
   if(revision!==weeklyRenderRevision || currentView!=='performance') return;
   const goalReachPct = teamGoal>0 ? pct(t.schedules, teamGoal) : null;
 
-  function deltaHtml(curr, prevVal, higherIsBetter=true){
+  function deltaHtml(curr, prevVal, higherIsBetter=true, isRate=false){
     if(isAllWeeks) return '<span class="delta flat">All weeks combined</span>';
     if(isMultiSelectMode) return '<span class="delta flat">Selected weeks combined</span>';
     if(prev===null || prevVal===undefined) return '<span class="delta flat">No prior week</span>';
@@ -3205,7 +3208,8 @@ async function renderWeeklyView(){
     const good = higherIsBetter ? diff>0 : diff<0;
     const cls = good ? 'up' : 'down';
     const sign = diff>0 ? '+' : '';
-    return '<span class="delta '+cls+'">'+sign+diff.toFixed(1)+' vs prior week</span>';
+    const shown = isRate ? (Math.abs(diff)).toFixed(1)+' pts' : fmtNum(Math.abs(Math.round(diff)));
+    return '<span class="delta '+cls+'">'+(diff>0?'+':'−')+shown+' vs prior week</span>';
   }
 
   const prevT = prev ? computeDivisionFilteredTotals(prev, universalDivision, prev.weekEndDate) : null;
@@ -3242,8 +3246,8 @@ async function renderWeeklyView(){
       <div class="kpi-card has-mini-pie"><div class="kpi-mini-pie"><canvas id="weeklyMini_shows" role="img" aria-label="Shows by division"></canvas></div><div class="label">Shows</div><div class="value">${fmtNum(t.shows)}</div>${deltaHtml(t.shows, prevT? prevT.shows: undefined)}</div>
       <div class="kpi-card has-mini-pie"><div class="kpi-mini-pie"><canvas id="weeklyMini_noshows" role="img" aria-label="No Shows by division"></canvas></div><div class="label">No Shows</div><div class="value">${fmtNum(t.noShows)}</div>${deltaHtml(t.noShows, prevT? prevT.noShows: undefined, false)}</div>
       <div class="kpi-card"><div class="label">Goal Reach %</div><div class="value">${goalReachPct!==null?goalReachPct.toFixed(1)+'%':'\u2013'}</div><div class="delta flat">${isMultiWeekMode?'Combined':'This week'}</div></div>
-      <div class="kpi-card"><div class="label">Show Rate %</div><div class="value">${(!isMultiWeekMode && weekIsFullyPending(week.weekEndDate)) ? 'Pending' : fmtPct(t.shows,t.scheduledDateOf)}</div>${(!isMultiWeekMode && weekIsFullyPending(week.weekEndDate)) ? '<div class="delta flat">Week hasn\u2019t happened yet</div>' : deltaHtml(showRate, prevShowRate)}</div>
-      <div class="kpi-card"><div class="label">No Show %</div><div class="value">${(!isMultiWeekMode && weekIsFullyPending(week.weekEndDate)) ? 'Pending' : fmtPct(t.noShows,t.scheduledDateOf)}</div>${(!isMultiWeekMode && weekIsFullyPending(week.weekEndDate)) ? '<div class="delta flat">Week hasn\u2019t happened yet</div>' : deltaHtml(noShowRate, prevNoShowRate, false)}</div>
+      <div class="kpi-card"><div class="label">Show Rate %</div><div class="value">${(!isMultiWeekMode && weekIsFullyPending(week.weekEndDate)) ? 'Pending' : fmtPct(t.shows,t.scheduledDateOf)}</div>${(!isMultiWeekMode && weekIsFullyPending(week.weekEndDate)) ? '<div class="delta flat">Week hasn\u2019t happened yet</div>' : deltaHtml(showRate, prevShowRate, true, true)}</div>
+      <div class="kpi-card"><div class="label">No Show %</div><div class="value">${(!isMultiWeekMode && weekIsFullyPending(week.weekEndDate)) ? 'Pending' : fmtPct(t.noShows,t.scheduledDateOf)}</div>${(!isMultiWeekMode && weekIsFullyPending(week.weekEndDate)) ? '<div class="delta flat">Week hasn\u2019t happened yet</div>' : deltaHtml(noShowRate, prevNoShowRate, false, true)}</div>
     </div>
 
     <div class="section-divider">Trends</div>
@@ -5936,7 +5940,7 @@ async function afterLogin(boot){
     refreshUI();
     setLoading(null);
     if(boot) Server.startPollingFrom(Server.since); else await Server.startPolling();
-    setTimeout(()=>Server.loadListsInBackground(), 300);
+    setTimeout(async ()=>{ await Server.loadListsInBackground(); setTimeout(()=>autoVerifyWeeks(true), 500); }, 300);
     if(Server.isAdmin() && Server.user.default_password) showToast('You are still using the setup password. Change it in Settings → My account.');
   }catch(e){
     console.error(e);
@@ -6093,6 +6097,7 @@ async function ingestFiles(entries, {interactive=true}={}){
     if(!imported.length && !goalSheets.length){ showToast('Nothing imported — see Settings → Data Sync Details for what was found in each file.'); return; }
     if(allWeeks.size) await rebuildWeeks([...allWeeks], localRows, importProgress);
     if(goalSheets.length){ await loadAllWeeks(); await importGoalSheets(goalSheets); }
+    if(allWeeks.size){ importProgress('Checking the numbers…'); await autoVerifyWeeks(true); }
     // Raw files are deleted only after their rows are safely on the server.
     let deleted=0;
     if(deleteSourceFilesAfterImport){
@@ -6113,7 +6118,7 @@ async function ingestFiles(entries, {interactive=true}={}){
     setLoading(null);
     const u=document.getElementById('uploadFilesBtn'); if(u) u.textContent='Upload Excel files';
     const f=document.getElementById('folderSyncNowBtn'); if(f) f.textContent='Sync Now';
-    if(settingsModalOpen){ renderFolderUploadExplainer(); renderUploadHistory(); }
+    if(settingsModalOpen){ renderFolderUploadExplainer(); renderUploadHistory(); renderNumberCheck(); }
     if(currentView==='master') drawMasterTable();
   }
 }
@@ -6692,6 +6697,56 @@ function renderMyAccount(){
     catch(e){ msg.textContent = cleanErr(e); }
   };
 }
+/* ------------------------------------ NUMBER CHECK ------------------------------------ */
+// The server recounts every week straight from the master sheet; any week where the stored
+// dashboard numbers differ is rebuilt. Runs automatically for uploaders, and on demand.
+async function checkWeeklyNumbers(){
+  const rows = await Server.rpc('dash_week_check');
+  return rows.map(r=>{
+    const v = KV.get('weekly:'+r.week);
+    const d = v && (v.deduped||v).totals, raw = v && (v.raw||v).totals;
+    const dash = {sched_raw: raw?raw.schedules:0, sched_dedup: d?d.schedules:0, int_raw: raw?raw.scheduledDateOf:0, int_dedup: d?d.scheduledDateOf:0};
+    const ok = dash.sched_raw===r.sched_raw && dash.sched_dedup===r.sched_dedup && dash.int_raw===r.int_raw && dash.int_dedup===r.int_dedup;
+    return {...r, dash, ok};
+  });
+}
+let numberCheckRunning = false;
+async function autoVerifyWeeks(silent){
+  if(numberCheckRunning || !(Server.can('upload') || Server.can('master_edit'))) return null;
+  numberCheckRunning = true;
+  try{
+    const res = await checkWeeklyNumbers();
+    const bad = res.filter(r=>!r.ok).map(r=>r.week);
+    if(bad.length){
+      Server.ownMasterUntil = Date.now()+10*60*1000;
+      await rebuildWeeks(bad, null, silent ? null : setLoading);
+      await loadAllWeeks(); refreshUI();
+      showToast('Corrected the numbers for '+bad.length+' week'+(bad.length===1?'':'s')+' to match the master sheet.');
+    }
+    return bad.length;
+  }catch(e){ if(!/Could not find|schema cache|does not exist/i.test(e.message)) console.warn('number check failed', e); return null; }
+  finally{ numberCheckRunning=false; Server.ownMasterUntil = Date.now()+8000; if(!silent) setLoading(null); }
+}
+async function renderNumberCheck(){
+  const host = document.getElementById('numberCheck'); if(!host) return;
+  if(!(Server.can('upload') || Server.can('master_edit') || Server.can('settings'))){ host.innerHTML=''; return; }
+  host.innerHTML = '<div class="panel"><h3 style="margin:0 0 6px;">Check numbers</h3><p class="hint">Recounting every week on the server…</p></div>';
+  let res;
+  try{ res = await checkWeeklyNumbers(); }
+  catch(e){ host.innerHTML = '<div class="panel"><h3 style="margin:0 0 6px;">Check numbers</h3><p class="hint">'+(/Could not find|schema cache|does not exist/i.test(e.message)?'Run the latest supabase_setup.sql in Supabase to enable this check.':escapeHtml(cleanErr(e)))+'</p></div>'; return; }
+  const bad = res.filter(r=>!r.ok);
+  const fmtCell = (srv, dash)=> srv===dash ? fmtNum(srv) : `<span class="num-bad" title="Dashboard shows ${fmtNum(dash)}">${fmtNum(srv)} <em>(shows ${fmtNum(dash)})</em></span>`;
+  host.innerHTML = `<div class="panel">
+    <div class="panel-head"><div><h3 style="margin:0 0 4px;">Check numbers</h3><span class="hint">The server recounts each week from the master sheet. Raw = every row; Deduped = each Employee Number once per week.</span></div>
+      <div style="display:flex;gap:8px;">${bad.length && (Server.can('upload')||Server.can('master_edit')) ? `<button class="btn btn-primary btn-sm" id="fixWeeksBtn">Fix ${bad.length} week${bad.length===1?'':'s'}</button>` : ''}<button class="btn btn-secondary btn-sm" id="recheckBtn">Check again</button></div></div>
+    <p class="${bad.length?'warn-note':'hint'}" style="margin:0 0 10px;">${bad.length ? bad.length+' week'+(bad.length===1?'':'s')+' on the dashboard differ from the master sheet.' : '✓ All '+res.length+' weeks match the master sheet.'}</p>
+    <div style="overflow-x:auto;max-height:340px;"><table class="users-table"><thead><tr><th>Week</th><th>Schedules · Raw</th><th>Schedules · Deduped</th><th>Interviews · Raw</th><th>Interviews · Deduped</th><th>Latest Created On</th><th></th></tr></thead><tbody>
+    ${res.slice(0,20).map(r=>`<tr><td style="white-space:nowrap;">Wk ${isoWeekNumber(new Date(r.week+'T00:00:00'))} · ${fmtDate(r.week)}</td><td>${fmtCell(r.sched_raw,r.dash.sched_raw)}</td><td>${fmtCell(r.sched_dedup,r.dash.sched_dedup)}</td><td>${fmtCell(r.int_raw,r.dash.int_raw)}</td><td>${fmtCell(r.int_dedup,r.dash.int_dedup)}</td><td class="hint" style="white-space:nowrap;">${r.last_created?escapeHtml(String(r.last_created).slice(0,16)):'—'}</td><td>${r.ok?'✓':'<strong style="color:var(--red)">✗</strong>'}</td></tr>`).join('')}
+    </tbody></table></div></div>`;
+  host.querySelector('#recheckBtn').onclick = renderNumberCheck;
+  const fix = host.querySelector('#fixWeeksBtn');
+  if(fix) fix.onclick = async ()=>{ fix.disabled=true; await autoVerifyWeeks(false); renderNumberCheck(); };
+}
 async function renderUploadHistory(){
   const host = document.getElementById('uploadHistory'); if(!host) return;
   if(!Server.can('upload') && !Server.can('settings')){ host.innerHTML=''; return; }
@@ -6702,7 +6757,7 @@ async function renderUploadHistory(){
 }
 
 /* ============================= INIT ============================= */
-const APP_VERSION = 'Version 4.3.1';
+const APP_VERSION = 'Version 4.4.0';
 async function init(){
   document.getElementById('versionLabelInline').textContent = APP_VERSION;
   document.getElementById('footerVersionLabel').textContent = APP_VERSION;
