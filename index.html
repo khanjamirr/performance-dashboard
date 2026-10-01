@@ -550,7 +550,7 @@ body.no-views #dashboardViews::before{content:"Your account has no modules yet. 
     <div class="brand">
       <div>
         <h1 id="dashboardTitle" title="Click to go home">Performance Dashboard</h1>
-        <p><span id="versionLabelInline">Version 4.0.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
+        <p><span id="versionLabelInline">Version 4.1.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
       </div>
     </div>
     <nav class="nav" id="navList">
@@ -622,7 +622,7 @@ body.no-views #dashboardViews::before{content:"Your account has no modules yet. 
       </div>
       <div class="muted-note" id="storageModeNote" style="text-align:center;margin-top:24px;">Data stored locally in this browser.</div>
       <div class="muted-note" style="text-align:center;margin-top:4px;opacity:.65;">
-        <span id="footerVersionLabel">Version 4.0.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
+        <span id="footerVersionLabel">Version 4.1.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
       </div>
     </div>
   </main>
@@ -974,7 +974,7 @@ async function storageDelete(key){
   try{ await Server.kvDelete(key); return true; }
   catch(e){ showToast('Could not delete on the server: '+cleanErr(e)); return null; }
 }
-async function storageListKeys(prefix){ return [...KV.keys()].filter(k=>!prefix || k.indexOf(prefix)===0).sort(); }
+async function storageListKeys(prefix){ return [...KV.keys()].filter(k=>(!prefix || k.indexOf(prefix)===0) && !k.endsWith('|lists')).sort(); }
 
 // Older saved weeks (before Show/No-Show Rate switched to the Date-Of-based denominator)
 // don't have `scheduledDateOf` on their totals/byRecruiter/byBranch objects. Rather than
@@ -5435,6 +5435,31 @@ async function decodeKvValue(key, val){
   if(val && typeof val==='object' && typeof val.gz==='string') return JSON.parse(await gunzipB64(val.gz));
   return val;
 }
+// Weekly summaries are stored in two parts so sign-in is fast: the numbers (weekly:DATE) load
+// first; the candidate name lists behind each number (weekly:DATE|lists) follow in the background.
+const LISTS_SUFFIX = '|lists';
+const LIST_KEYS = ['schedulesList','interviewsList','showsList','noShowsList','i9List','placedList'];
+function splitWeekly(val){
+  const summary = JSON.parse(JSON.stringify(val)); const lists = {};
+  const parts = summary.deduped || summary.raw ? ['deduped','raw'] : ['flat'];
+  parts.forEach(part=>{
+    const by = part==='flat' ? summary.byRecruiter : (summary[part]||{}).byRecruiter;
+    if(!by) return; lists[part] = {};
+    Object.entries(by).forEach(([name, rec])=>{ const l={}; LIST_KEYS.forEach(k=>{ if(rec[k] && rec[k].length) l[k]=rec[k]; delete rec[k]; }); if(Object.keys(l).length) lists[part][name]=l; });
+  });
+  summary.listsSplit = true;
+  return {summary, lists};
+}
+function mergeWeeklyLists(summary, lists){
+  if(!summary || !lists) return summary;
+  Object.entries(lists).forEach(([part, byName])=>{
+    const by = part==='flat' ? summary.byRecruiter : (summary[part]||{}).byRecruiter;
+    if(by) Object.entries(byName).forEach(([name,l])=>{ if(by[name]) Object.assign(by[name], l); });
+  });
+  summary.listsLoaded = true;
+  return summary;
+}
+function hasInlineLists(val){ return !!val && !val.listsSplit && JSON.stringify(val).indexOf('List":[')>-1; }
 
 /* ------------------------------------------ SERVER ------------------------------------------ */
 const KV = new Map();
@@ -5500,25 +5525,62 @@ const Server = {
   },
   async loadKv(progress){
     KV.clear();
-    let after='', n=0;
+    let after='', n=0, fn='dash_kv_page_light';
+    const listsFound = new Map();
     for(;;){
-      const rows = await this.rpc('dash_kv_page', {p_after:after, p_limit:25});
-      for(const r of rows){ KV.set(r.key, await decodeKvValue(r.key, r.value)); n++; }
+      let rows;
+      try{ rows = await this.rpc(fn, {p_after:after, p_limit:fn==='dash_kv_page_light'?100:25}); }
+      catch(e){ if(fn==='dash_kv_page_light' && /Could not find|schema cache|does not exist/i.test(e.message)){ fn='dash_kv_page'; continue; } throw e; }
+      for(const r of rows){
+        if(r.key.endsWith(LISTS_SUFFIX)){ listsFound.set(r.key.slice(0,-LISTS_SUFFIX.length), r.value); continue; } // only with the old SQL
+        KV.set(r.key, await decodeKvValue(r.key, r.value)); n++;
+      }
       if(progress) progress('Loading data… '+n+' item'+(n===1?'':'s'));
       if(!rows.length) break;
       after = rows[rows.length-1].key;
     }
+    for(const [k,v] of listsFound){ if(KV.has(k)) mergeWeeklyLists(KV.get(k), await decodeKvValue(k, v)); }
+  },
+  // Fetches the candidate lists for weeks loaded without them, then refreshes quietly.
+  listsLoading:false,
+  async loadListsInBackground(){
+    if(this.listsLoading) return; this.listsLoading = true;
+    try{
+      const pending = [...KV.entries()].filter(([k,v])=>k.startsWith('weekly:') && v && v.listsSplit && !v.listsLoaded).map(([k])=>k).sort().reverse();
+      for(let i=0;i<pending.length;i+=4){
+        const chunk = pending.slice(i,i+4);
+        const got = await this.rpc('dash_kv_get', {p_keys:chunk.map(k=>k+LISTS_SUFFIX)});
+        for(const r of got){ const k=r.key.slice(0,-LISTS_SUFFIX.length); if(KV.has(k)) mergeWeeklyLists(KV.get(k), await decodeKvValue(r.key, r.value)); }
+        chunk.forEach(k=>{ const v=KV.get(k); if(v) v.listsLoaded=true; });
+      }
+      if(pending.length){ await loadAllWeeks(); LiveReload.schedule([]); }
+      // one-time conversion of weeks saved in the older all-in-one format
+      if(Server.can('upload') || Server.can('master_edit')){
+        const old = [...KV.entries()].filter(([k,v])=>k.startsWith('weekly:') && hasInlineLists(v)).map(([k])=>k);
+        for(const k of old){ try{ await this.kvSet(k, KV.get(k)); }catch(e){ break; } }
+      }
+    }catch(e){ console.warn('background list load failed', e); }
+    finally{ this.listsLoading=false; }
   },
   markOwn(key){ this.own.set(key, Date.now()); },
   isOwn(key){ const t=this.own.get(key); return !!t && Date.now()-t<20000; },
   async kvSet(key, val){
     this.markOwn('kv:'+key);
+    if(key.startsWith('weekly:') && !key.endsWith(LISTS_SUFFIX) && canCompress){
+      const {summary, lists} = splitWeekly(val);
+      this.markOwn('kv:'+key+LISTS_SUFFIX);
+      await this.rpc('dash_kv_set', {p_key:key+LISTS_SUFFIX, p_value:{v:4, gz: await gzipB64(JSON.stringify(lists))}});
+      await this.rpc('dash_kv_set', {p_key:key, p_value: await encodeKvValue(key, summary)});
+      val.listsSplit = true; val.listsLoaded = true;
+      KV.set(key, val); return;
+    }
     await this.rpc('dash_kv_set', {p_key:key, p_value: await encodeKvValue(key, val)});
     KV.set(key, val);
   },
   async kvDelete(key){
     this.markOwn('kv:'+key);
     await this.rpc('dash_kv_delete', {p_key:key});
+    if(key.startsWith('weekly:')){ this.markOwn('kv:'+key+LISTS_SUFFIX); await this.rpc('dash_kv_delete', {p_key:key+LISTS_SUFFIX}).catch(()=>{}); }
     KV.delete(key);
   },
   setStatus(s, detail){
@@ -5559,13 +5621,19 @@ const Server = {
       else if(r.tbl==='users'){ users=true; }
     });
     if(kvKeys.size){
-      const keys=[...kvKeys];
+      // a changed week also needs its candidate lists; a changed lists key updates its week
+      [...kvKeys].forEach(k=>{ if(k.startsWith('weekly:') && !k.endsWith(LISTS_SUFFIX)) kvKeys.add(k+LISTS_SUFFIX); });
+      const keys=[...kvKeys].sort((a,b)=> (a.endsWith(LISTS_SUFFIX)?1:0)-(b.endsWith(LISTS_SUFFIX)?1:0));
       for(let i=0;i<keys.length;i+=40){
         const chunk = keys.slice(i,i+40);
         const got = await this.rpc('dash_kv_get', {p_keys:chunk});
         const seen = new Set();
-        for(const r of got){ KV.set(r.key, await decodeKvValue(r.key, r.value)); seen.add(r.key); }
-        chunk.forEach(k=>{ if(!seen.has(k)) KV.delete(k); });
+        for(const r of got){
+          seen.add(r.key);
+          if(r.key.endsWith(LISTS_SUFFIX)){ const k=r.key.slice(0,-LISTS_SUFFIX.length); if(KV.has(k)) mergeWeeklyLists(KV.get(k), await decodeKvValue(r.key, r.value)); }
+          else KV.set(r.key, await decodeKvValue(r.key, r.value));
+        }
+        chunk.forEach(k=>{ if(!seen.has(k) && !k.endsWith(LISTS_SUFFIX)) KV.delete(k); });
       }
     }
     if(remarks) await Remarks.load().catch(()=>{});
@@ -5721,6 +5789,7 @@ async function afterLogin(){
     document.getElementById('storageModeNote').textContent = 'Signed in as '+Server.user.name+' · data is stored securely on the server.';
     refreshUI();
     await Server.startPolling();
+    setTimeout(()=>Server.loadListsInBackground(), 300);
     if(Server.isAdmin() && Server.user.default_password) showToast('You are still using the setup password. Change it in Settings → My account.');
   }catch(e){
     console.error(e);
@@ -6486,7 +6555,7 @@ async function renderUploadHistory(){
 }
 
 /* ============================= INIT ============================= */
-const APP_VERSION = 'Version 4.0.0';
+const APP_VERSION = 'Version 4.1.0';
 async function init(){
   document.getElementById('versionLabelInline').textContent = APP_VERSION;
   document.getElementById('footerVersionLabel').textContent = APP_VERSION;
