@@ -359,8 +359,6 @@
 
   ::-webkit-scrollbar{height:8px;width:8px;}
   ::-webkit-scrollbar-thumb{background:#D8DEE8;border-radius:8px;}
-.nl-short{display:none}
-@media (max-width:1700px){.nav .nl-full{display:none}.nav .nl-short{display:inline}}
 </style>
 <style id="executive-design">
 :root{--bg:#f2f5f6;--surface:#fff;--border:#dfe7e9;--navy:#102c3b;--navy-2:#193e4d;--indigo:#146f78;--indigo-light:#e7f3f3;--teal:#17775c;--teal-light:#e8f5ee;--amber:#94671b;--amber-light:#fbf2df;--red:#bb4d50;--red-light:#fbecee;--text:#183442;--text-secondary:#5b707c;--text-tertiary:#687e89;--radius:12px;--radius-lg:18px;--shadow:0 3px 16px #17374405}
@@ -656,37 +654,142 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
   /* phones don't need the scroll-shrink (header already scrolls away) */
   body.scrolled .topbar h2{font-size:21px!important}
 }
-</style></head>
+</style><style id="left-sidebar">
+/* ---------- Desktop: menu on the left ---------- */
+.brand-mark,.side-collapse,.side-label{display:none}
+.rb-ico{display:none;width:17px;height:17px;flex:0 0 17px}
+@media (min-width:761px){
+  :root{--side-w:244px}
+  body.side-collapsed{--side-w:76px}
+  #app{flex-direction:row!important;align-items:stretch}
+  .sidebar{position:sticky!important;top:0;align-self:flex-start;height:100vh;height:100dvh;width:var(--side-w);flex:0 0 var(--side-w);
+    display:flex!important;flex-direction:column!important;flex-wrap:nowrap!important;align-items:stretch!important;gap:0!important;
+    padding:20px 14px 16px!important;min-height:0!important;overflow-y:auto;overflow-x:hidden;z-index:90!important;
+    background:linear-gradient(180deg,#1d4655 0%,#163845 55%,#122f3b 100%)!important;border-bottom:0!important;border-right:1px solid #0d2731;
+    box-shadow:4px 0 24px #12303c14!important;transition:width .2s ease,flex-basis .2s ease}
+  .sidebar .brand{display:flex!important;align-items:center;gap:11px!important;padding:2px 6px 18px!important;margin-bottom:6px;border-bottom:1px solid #ffffff14!important}
+  .brand-mark{display:grid;place-items:center;width:36px;height:36px;flex:0 0 36px;border-radius:10px;background:linear-gradient(135deg,#63d4c2,#2f9c96);color:#0f3440;box-shadow:0 4px 14px #63d4c233}
+  .brand-mark svg{width:19px;height:19px}
+  .brand-text{min-width:0}
+  .sidebar .brand h1{font-size:14.5px!important;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;margin:0}
+  .sidebar .brand p{margin-top:5px!important;display:flex;align-items:center;gap:6px;white-space:nowrap}
+  .side-collapse{display:grid;place-items:center;position:absolute;top:26px;right:10px;width:26px;height:26px;border-radius:8px;border:1px solid #ffffff22;background:#ffffff0d;color:#cfe1e7;cursor:pointer;transition:transform .2s ease,background .15s}
+  .side-collapse:hover{background:#ffffff22;color:#fff}
+  .side-collapse svg{width:14px;height:14px}
+  .sidebar .brand{padding-right:34px!important}
+  .side-label{display:block;font-size:9.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#8fb0bb;padding:16px 10px 8px;white-space:nowrap}
+  .side-label-tools{margin-top:auto;padding-top:22px}
+  .nav{flex:0 0 auto!important;flex-direction:column!important;align-items:stretch!important;gap:3px!important;overflow:visible!important;padding:0!important;min-width:0}
+  .nav .divider,.nav .dot{display:none!important}
+  .nav button{position:relative;width:100%;display:flex!important;align-items:center;gap:12px!important;padding:10px 12px!important;border-radius:10px!important;border:1px solid transparent!important;
+    font-size:13px!important;font-weight:500;color:#c8dbe2!important;background:transparent!important;white-space:nowrap;transition:background .15s,color .15s}
+  .nav button:hover{background:#ffffff10!important;color:#fff!important}
+  .nav button.active{background:#ffffff!important;color:#123c48!important;font-weight:650;box-shadow:0 6px 18px #0b232d33}
+  .nav button.active::before{content:'';position:absolute;left:-14px;top:9px;bottom:9px;width:4px;border-radius:0 4px 4px 0;background:#63d4c2}
+  .nav button.active .nav-ico{color:#1f8a84}
+  .nav-ico{display:block!important;width:19px;height:19px;flex:0 0 19px;opacity:.95}
+  .nav-short{display:none!important}
+  .nav-full{display:inline!important;overflow:hidden;text-overflow:ellipsis}
+  .ribbon-actions{flex-direction:column!important;align-items:stretch!important;gap:4px!important;margin:0!important;flex-shrink:0}
+  .ribbon-actions .ribbon-btn{width:100%;display:flex;align-items:center;gap:12px;justify-content:flex-start;padding:9px 12px!important;font-size:12.5px!important;border-radius:10px;
+    background:transparent!important;border:1px solid transparent!important;color:#c8dbe2!important;white-space:nowrap}
+  .ribbon-actions .ribbon-btn:hover{background:#ffffff10!important;color:#fff!important}
+  .rb-ico{display:block}
+  .download-dropdown-wrap{position:relative}
+  .download-dropdown-menu{top:auto!important;bottom:calc(100% + 4px)!important;left:0!important;right:auto!important;min-width:200px}
+  .user-chip-wrap{display:flex;flex-direction:column;gap:4px;margin-top:8px;padding-top:10px;border-top:1px solid #ffffff14}
+  .user-chip-wrap.hidden{display:none!important}
+  .ribbon-actions .user-chip{background:#ffffff0c!important;border-color:#ffffff1a!important;padding:8px 10px!important}
+  .user-name{display:inline!important;max-width:150px}
+  .user-dot{flex:0 0 auto}
+  .mobile-menu-btn{display:none!important}
+  .main{flex:1 1 auto;min-width:0}
+  .topbar{top:0!important}
+  /* collapsed: icons only */
+  body.side-collapsed .sidebar{padding-left:10px!important;padding-right:10px!important}
+  body.side-collapsed .brand-text,body.side-collapsed .side-label,body.side-collapsed .nav-full,body.side-collapsed .rb-label,body.side-collapsed .user-name{display:none!important}
+  body.side-collapsed .sidebar .brand{justify-content:center;padding:2px 0 50px!important}
+  body.side-collapsed .side-collapse{top:66px;right:50%;transform:translateX(50%) rotate(180deg)}
+  body.side-collapsed .nav{margin-top:10px}
+  body.side-collapsed .nav button,body.side-collapsed .ribbon-actions .ribbon-btn{justify-content:center;padding:11px 0!important}
+  body.side-collapsed .nav button.active::before{left:-10px}
+  body.side-collapsed .ribbon-actions{margin-top:auto!important}
+  body.side-collapsed .user-chip{justify-content:center}
+}
+@media (min-width:761px) and (max-width:1180px){ :root{--side-w:216px} }
+@media print{.sidebar{display:none!important}}
+/* ---------- smarter cards & header (v4.6) ---------- */
+.kpi-v2{grid-template-columns:repeat(7,minmax(0,1fr))!important;gap:12px!important}
+@media (max-width:1320px){.kpi-v2{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+.kpi-v2 .kpi-card{display:flex;flex-direction:column;min-height:0!important;padding:16px 16px 14px!important;background:#fff!important;color:var(--text)!important;border:1px solid #e1eaed!important;border-radius:16px!important;box-shadow:0 1px 2px #1834420a,0 8px 24px #1834420a!important;transition:transform .15s ease,box-shadow .15s ease;overflow:hidden}
+.kpi-v2 .kpi-card:hover{transform:translateY(-2px);box-shadow:0 2px 4px #1834420d,0 14px 30px #18344214!important}
+.kpi-v2 .kpi-card:before{content:'';position:absolute;left:0;top:0;right:0;height:3px;width:auto!important;margin:0!important;border-radius:0!important;background:var(--accent)!important;opacity:.85}
+.kpi-v2 .kpi-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.kpi-v2 .label{font-size:10.5px!important;letter-spacing:.08em!important;min-height:0!important;color:#5d7480!important;font-weight:700;text-transform:uppercase;padding:0!important}
+.kpi-v2 .kpi-ico{display:grid;place-items:center;width:28px;height:28px;flex:0 0 28px;border-radius:8px;color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,#fff)}
+.kpi-v2 .kpi-ico svg{width:15px;height:15px}
+.kpi-v2 .value{font-size:clamp(24px,2.1vw,34px)!important;margin-top:10px!important;line-height:1.1!important;letter-spacing:-1px;color:#132f3b}
+.kpi-v2 .delta{margin-top:6px!important;font-size:11px!important;color:#6b818c}
+.kpi-v2 .delta.up{color:#17845c!important}.kpi-v2 .delta.down{color:#c0444e!important}
+.kpi-foot{display:flex;align-items:flex-end;gap:8px;margin-top:auto;padding-top:12px}
+.kpi-spark{flex:1;width:100%;height:34px;display:block;overflow:visible}
+.kpi-foot-lbl{font-size:9.5px;color:#8a9ca5;white-space:nowrap;font-weight:600}
+.kpi-bar-wrap{align-items:center}
+.kpi-bar{position:relative;flex:1;height:7px;border-radius:7px;background:#edf2f4}
+.kpi-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:7px}
+.kpi-bar b{position:absolute;top:-4px;bottom:-4px;width:2px;margin-left:-1px;background:#304a55;border-radius:2px}
+@media (min-width:761px){
+  :root{--side-w:256px}
+  .nav button .nav-ico{order:-1}
+  .sidebar .brand h1{white-space:normal!important;overflow:visible!important;line-height:1.2!important}
+  .topbar{display:flex!important;flex-wrap:wrap;align-items:center!important;gap:12px 18px!important;padding:18px 32px!important}
+  .topbar>div:first-child{flex:1 1 260px;min-width:0}
+  #topbarCenter{flex:0 1 auto!important;justify-content:flex-end!important}
+  #topbarExtra{flex:0 1 auto!important;justify-content:flex-end!important;margin-left:0}
+  #topbarExtra .header-search{flex:1 1 320px;min-width:260px}
+  .topbar h2{font-size:30px!important;letter-spacing:-.5px}
+  .content{padding-left:32px!important;padding-right:32px!important}
+  body.scrolled .topbar{padding-top:10px!important;padding-bottom:10px!important}
+}
+@media (min-width:761px) and (max-width:1180px){ :root{--side-w:224px} .nav button{font-size:12.5px!important;gap:10px!important;padding:10px!important} .topbar,.content{padding-left:20px!important;padding-right:20px!important} }
+@media (max-width:760px){ .kpi-v2{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important} .kpi-v2 .kpi-card{padding:12px!important} .kpi-v2 .kpi-ico{width:24px;height:24px;flex-basis:24px} .kpi-spark{height:26px} }
+
+</style>
+</head>
 <body class="locked">
 <div id="appLoading" class="app-loading"><div class="spinner" aria-hidden="true"></div><p>Loading dashboard…</p></div>
 <div id="app">
 
   <header class="sidebar">
     <div class="brand">
-      <div>
+      <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V12M10 20V5M16 20V9M22 20V3"/></svg></div>
+      <div class="brand-text">
         <h1 id="dashboardTitle" title="Click to go home">Performance Dashboard</h1>
-        <p><span id="versionLabelInline">Version 4.5.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
+        <p><span id="versionLabelInline">Version 4.6.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
       </div>
     </div>
+    <button type="button" class="side-collapse" id="sideCollapseBtn" aria-label="Collapse menu" title="Collapse menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <div class="side-label">Views</div>
     <nav class="nav" id="navList">
-      <button data-view="performance" class="active"><span class="dot"></span><span class="nl-full">Performance Summary</span><span class="nl-short">Summary</span></button>
+      <button data-view="performance" class="active"><span class="dot"></span>Performance Summary</button>
       <div class="divider"></div>
-      <button data-view="recruiters"><span class="dot"></span><span class="nl-full">Recruiter Performance</span><span class="nl-short">Recruiters</span></button>
-      <button data-view="branches"><span class="dot"></span><span class="nl-full">Branch Performance</span><span class="nl-short">Branches</span></button>
-      <button data-view="master"><span class="dot"></span><span class="nl-full">Master Data</span><span class="nl-short">Master</span></button>
-      <button data-view="candidates"><span class="dot"></span><span class="nl-full">Candidates</span><span class="nl-short">Candidates</span></button>
+      <button data-view="recruiters"><span class="dot"></span>Recruiter Performance</button>
+      <button data-view="branches"><span class="dot"></span>Branch Performance</button>
+      <button data-view="master"><span class="dot"></span>Master Data</button>
+      <button data-view="candidates"><span class="dot"></span>Candidates</button>
     </nav>
+    <div class="side-label side-label-tools">Tools</div>
     <div class="ribbon-actions">
-      <button class="ribbon-btn" id="clearAllFiltersBtn" title="Reset every dashboard filter and selection to the latest available week">Clear all filters</button>
+      <button class="ribbon-btn" id="clearAllFiltersBtn" title="Reset every dashboard filter and selection to the latest available week"><svg class="rb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8z"/><path d="M17 3l4 4M21 3l-4 4"/></svg><span class="rb-label">Clear all filters</span></button>
       <div class="download-dropdown-wrap hidden" id="downloadDropdownWrap">
-        <button class="ribbon-btn" id="downloadDropdownBtn">Download &#9662;</button>
+        <button class="ribbon-btn" id="downloadDropdownBtn"><svg class="rb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg><span class="rb-label">Download &#9662;</span></button>
         <div class="download-dropdown-menu hidden" id="downloadDropdownMenu">
           <button id="downloadAsPdfBtn">Download as PDF</button>
           <button id="downloadAsWordBtn">Download as Word</button>
         </div>
       </div>
-      <button data-view="uploads" class="ribbon-btn" id="settingsNavBtn">&#9881; Settings</button>
-      <div class="user-chip-wrap hidden" id="userChipWrap"><button type="button" class="ribbon-btn user-chip" id="userChip" title="My account"></button><button type="button" class="ribbon-btn" id="signOutBtn" title="Sign out">Sign out</button></div>
+      <button data-view="uploads" class="ribbon-btn" id="settingsNavBtn"><svg class="rb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span class="rb-label">Settings</span></button>
+      <div class="user-chip-wrap hidden" id="userChipWrap"><button type="button" class="ribbon-btn user-chip" id="userChip" title="My account"></button><button type="button" class="ribbon-btn" id="signOutBtn" title="Sign out"><svg class="rb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg><span class="rb-label">Sign out</span></button></div>
     </div>
   </header>
 
@@ -740,7 +843,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       </div>
       <div class="muted-note" id="storageModeNote" style="text-align:center;margin-top:24px;">Data stored locally in this browser.</div>
       <div class="muted-note" style="text-align:center;margin-top:4px;opacity:.65;">
-        <span id="footerVersionLabel">Version 4.5.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
+        <span id="footerVersionLabel">Version 4.6.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
       </div>
     </div>
   </main>
@@ -2749,7 +2852,7 @@ document.getElementById('signOutBtn').addEventListener('click', ()=>signOut());
 function goToHome(){
   currentView = 'performance';
   performancePeriodType = 'weekly';
-  currentWeekEndDate = weeksData.length ? weeksData[weeksData.length-1].weekEndDate : null;
+  currentWeekEndDate = defaultWeekEnd();
 
   periodSelectedGroup = {};
   periodSelectedDivision = {};
@@ -2818,7 +2921,7 @@ async function refreshUI(){
   if(!hasData){ if(showDashboardViews) renderMasterView(); return; }
 
   if(!currentWeekEndDate || (currentWeekEndDate!=='all-weeks' && !weeksData.find(w=>w.weekEndDate===currentWeekEndDate))){
-    currentWeekEndDate = weeksData[weeksData.length-1].weekEndDate;
+    currentWeekEndDate = defaultWeekEnd();
   }
   renderPeriodPickerButton();
 
@@ -2997,7 +3100,7 @@ function togglePeriodWeek(weekEndDate){
   if(currentWeekEndDate==='all-weeks') currentWeekEndDate = null;
   if(selectedWeekEndDates.includes(weekEndDate)) selectedWeekEndDates = selectedWeekEndDates.filter(d=>d!==weekEndDate);
   else selectedWeekEndDates = [...selectedWeekEndDates, weekEndDate];
-  if(selectedWeekEndDates.length===0) currentWeekEndDate = weeksData.length ? weeksData[weeksData.length-1].weekEndDate : null;
+  if(selectedWeekEndDates.length===0) currentWeekEndDate = defaultWeekEnd();
   applyPeriodSelection();
   renderPeriodPickerList(document.getElementById('periodPickerSearch').value);
 }
@@ -3009,13 +3112,13 @@ function togglePeriodGroup(weekEndDates){
     const toAdd = weekEndDates.filter(d=> !selectedWeekEndDates.includes(d));
     selectedWeekEndDates = [...selectedWeekEndDates, ...toAdd];
   }
-  if(selectedWeekEndDates.length===0) currentWeekEndDate = weeksData.length ? weeksData[weeksData.length-1].weekEndDate : null;
+  if(selectedWeekEndDates.length===0) currentWeekEndDate = defaultWeekEnd();
   applyPeriodSelection();
   renderPeriodPickerList(document.getElementById('periodPickerSearch').value);
 }
 function clearPeriodSelection(){
   selectedWeekEndDates = [];
-  currentWeekEndDate = weeksData.length ? weeksData[weeksData.length-1].weekEndDate : null;
+  currentWeekEndDate = defaultWeekEnd();
   applyPeriodSelection();
   renderPeriodPickerList(document.getElementById('periodPickerSearch').value);
 }
@@ -3254,14 +3357,14 @@ async function renderWeeklyView(){
   container.innerHTML = `
     ${universalDivision ? `<div class="hint" style="margin-bottom:10px;">Viewing <strong>${escapeHtml(universalDivision)}</strong> only</div>` : ''}
 
-    <div class="kpi-grid">
-      <div class="kpi-card has-mini-pie"><div class="kpi-mini-pie"><canvas id="weeklyMini_schedules" role="img" aria-label="Schedules by division"></canvas></div><div class="label">Schedules</div><div class="value">${fmtNum(t.schedules)}</div><div class="delta flat">${isMultiWeekMode?'Combined':'Created that week'}</div></div>
-      <div class="kpi-card has-mini-pie"><div class="kpi-mini-pie"><canvas id="weeklyMini_interviews" role="img" aria-label="Interviews by division"></canvas></div><div class="label">Interviews</div><div class="value">${fmtNum(t.scheduledDateOf)}</div>${deltaHtml(t.scheduledDateOf, prevT? prevT.scheduledDateOf: undefined)}</div>
-      <div class="kpi-card has-mini-pie"><div class="kpi-mini-pie"><canvas id="weeklyMini_shows" role="img" aria-label="Shows by division"></canvas></div><div class="label">Shows</div><div class="value">${fmtNum(t.shows)}</div>${deltaHtml(t.shows, prevT? prevT.shows: undefined)}</div>
-      <div class="kpi-card has-mini-pie"><div class="kpi-mini-pie"><canvas id="weeklyMini_noshows" role="img" aria-label="No Shows by division"></canvas></div><div class="label">No Shows</div><div class="value">${fmtNum(t.noShows)}</div>${deltaHtml(t.noShows, prevT? prevT.noShows: undefined, false)}</div>
-      <div class="kpi-card"><div class="label">Goal Reach %</div><div class="value">${goalReachPct!==null?goalReachPct.toFixed(1)+'%':'\u2013'}</div><div class="delta flat">${isMultiWeekMode?'Combined':'This week'}</div></div>
-      <div class="kpi-card"><div class="label">Show Rate %</div><div class="value">${(!isMultiWeekMode && weekIsFullyPending(week.weekEndDate)) ? 'Pending' : fmtPct(t.shows,t.scheduledDateOf)}</div>${(!isMultiWeekMode && weekIsFullyPending(week.weekEndDate)) ? '<div class="delta flat">Week hasn\u2019t happened yet</div>' : deltaHtml(showRate, prevShowRate, true, true)}</div>
-      <div class="kpi-card"><div class="label">No Show %</div><div class="value">${(!isMultiWeekMode && weekIsFullyPending(week.weekEndDate)) ? 'Pending' : fmtPct(t.noShows,t.scheduledDateOf)}</div>${(!isMultiWeekMode && weekIsFullyPending(week.weekEndDate)) ? '<div class="delta flat">Week hasn\u2019t happened yet</div>' : deltaHtml(noShowRate, prevNoShowRate, false, true)}</div>
+    <div class="kpi-grid kpi-v2">
+      ${kpiCardHtml({label:'Schedules', icon:'cal', accent:'#2f8f8a', value:fmtNum(t.schedules), delta:'<div class="delta flat">'+(isMultiWeekMode?'Combined':'Created that week')+'</div>', spark:kpiSeries(week, w=>w.schedules)})}
+      ${kpiCardHtml({label:'Interviews', icon:'chat', accent:'#4a78c8', value:fmtNum(t.scheduledDateOf), delta:deltaHtml(t.scheduledDateOf, prevT? prevT.scheduledDateOf: undefined), spark:kpiSeries(week, w=>w.scheduledDateOf)})}
+      ${kpiCardHtml({label:'Shows', icon:'check', accent:'#1f9a6c', value:fmtNum(t.shows), delta:deltaHtml(t.shows, prevT? prevT.shows: undefined), spark:kpiSeries(week, w=>w.shows, true)})}
+      ${kpiCardHtml({label:'No Shows', icon:'x', accent:'#c4565f', value:fmtNum(t.noShows), delta:deltaHtml(t.noShows, prevT? prevT.noShows: undefined, false), spark:kpiSeries(week, w=>w.noShows, true)})}
+      ${kpiCardHtml({label:'Goal Reach', icon:'target', accent:'#a67c2e', value:goalReachPct!==null?goalReachPct.toFixed(1)+'%':'\u2013', delta:'<div class="delta flat">'+(isMultiWeekMode?'Combined':'Target 100%')+'</div>', bar:goalReachPct!==null?{v:goalReachPct, target:100, good:'up'}:null})}
+      ${(()=>{ const pend=!isMultiWeekMode && weekIsFullyPending(week.weekEndDate); return kpiCardHtml({label:'Show Rate', icon:'trend', accent:'#1f8a84', value:pend?'Pending':fmtPct(t.shows,t.scheduledDateOf), delta:pend?'<div class="delta flat">Week hasn\u2019t happened yet</div>':deltaHtml(showRate, prevShowRate, true, true), bar:pend||!t.scheduledDateOf?null:{v:showRate, target:60, good:'up'}})
+        + kpiCardHtml({label:'No Show Rate', icon:'down', accent:'#c4565f', value:pend?'Pending':fmtPct(t.noShows,t.scheduledDateOf), delta:pend?'<div class="delta flat">Week hasn\u2019t happened yet</div>':deltaHtml(noShowRate, prevNoShowRate, false, true), bar:pend||!t.scheduledDateOf?null:{v:noShowRate, target:40, good:'down'}}); })()}
     </div>
 
     <div class="section-divider">Trends</div>
@@ -3372,6 +3475,13 @@ function weekStartDate(weekEndDate){
   start.setDate(start.getDate()-6);
   return start;
 }
+// The week to open on: the most recent week that has already started (future weeks that only
+// hold upcoming interviews are still selectable, just not the default).
+function defaultWeekEnd(){
+  if(!weeksData.length) return null;
+  for(let i=weeksData.length-1;i>=0;i--) if(!weekIsFullyPending(weeksData[i].weekEndDate)) return weeksData[i].weekEndDate;
+  return weeksData[weeksData.length-1].weekEndDate;
+}
 function weekIsFullyPending(weekEndDate){
   // True when NONE of this week's days have happened yet, so a 0% show rate would be
   // misleading \u2014 there's simply nothing to measure yet, not a bad outcome.
@@ -3407,7 +3517,7 @@ function drawPrevSixWeeksTable(){
   table.querySelectorAll('tr[data-week-end]').forEach(row=>{
     row.addEventListener('click', e=>{
       selectedWeekEndDates=selectRows(selectedWeekEndDates,row.dataset.weekEnd,e.ctrlKey||e.metaKey);
-      currentWeekEndDate=selectedWeekEndDates.length===1?selectedWeekEndDates[0]:selectedWeekEndDates.length?null:(weeksData.at(-1)?.weekEndDate||null);
+      currentWeekEndDate=selectedWeekEndDates.length===1?selectedWeekEndDates[0]:selectedWeekEndDates.length?null:defaultWeekEnd();
       renderPeriodPickerButton();
       renderWeeklyView();
     });
@@ -3456,6 +3566,36 @@ async function renderWeeklyTopPerformers(week, suppliedGoals){
     const rows = computeSnapshotRows(week.byBranch||{}, false, null, branchDivisions);
     drawTop5Performers('branches', rows, 'weeklyTopPerformersTable');
   }
+}
+
+/* ---------- KPI cards: value, change, 8-week sparkline or target bar ---------- */
+const KPI_ICONS={cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',chat:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',check:'<path d="M20 6L9 17l-5-5"/>',x:'<path d="M18 6L6 18M6 6l12 12"/>',target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',trend:'<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',down:'<path d="M3 7l6 6 4-4 8 8"/><path d="M15 17h6v-6"/>'};
+// last 8 weeks up to the selected one, scoped to the selected division
+function kpiSeries(week, pick, skipPending){
+  const end = week && week.weekEndDate && /^\d{4}-/.test(week.weekEndDate) ? week.weekEndDate : (weeksData.at(-1)||{}).weekEndDate;
+  return weeksData.filter(w=>w.weekEndDate<=end && !(skipPending && weekIsFullyPending(w.weekEndDate))).slice(-8)
+    .map(w=>({x:w.weekNumber, y:pick(computeDivisionFilteredTotals(w, universalDivision, w.weekEndDate))||0}));
+}
+function sparkSvg(pts, color){
+  if(!pts || pts.length<2) return '';
+  const W=120,H=34,P=3, ys=pts.map(p=>p.y), mn=Math.min(...ys), mx=Math.max(...ys), r=(mx-mn)||1;
+  const xy=pts.map((p,i)=>[P+i*(W-2*P)/(pts.length-1), H-P-(p.y-mn)/r*(H-2*P)]);
+  const line=xy.map((q,i)=>(i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1)).join(' ');
+  const last=xy[xy.length-1];
+  const tip=pts.map(p=>'Wk '+p.x+': '+fmtNum(p.y)).join(' · ');
+  return `<svg class="kpi-spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Last ${pts.length} weeks: ${tip}"><title>${tip}</title>
+    <path d="${line} L${last[0].toFixed(1)} ${H} L${P} ${H} Z" fill="${color}" opacity=".10"/>
+    <path d="${line}" fill="none" stroke="${color}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+    <circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="2.6" fill="${color}"/></svg>`;
+}
+function kpiCardHtml(o){
+  let foot='';
+  if(o.spark && o.spark.length>1) foot = `<div class="kpi-foot">${sparkSvg(o.spark, o.accent)}</div>`;
+  else if(o.bar){
+    const v=Math.max(0,Math.min(100,o.bar.v)), ok = o.bar.good==='up' ? o.bar.v>=o.bar.target : o.bar.v<=o.bar.target;
+    foot = `<div class="kpi-foot kpi-bar-wrap" title="Target ${o.bar.good==='up'?'≥':'≤'} ${o.bar.target}%"><div class="kpi-bar"><i style="width:${v}%;background:${ok?'#1f9a6c':'#d0776f'}"></i><b style="left:${Math.min(100,o.bar.target)}%"></b></div><span class="kpi-foot-lbl">${o.bar.good==='up'?'≥':'≤'} ${o.bar.target}%</span></div>`;
+  }
+  return `<div class="kpi-card" style="--accent:${o.accent}"><div class="kpi-top"><div class="label">${o.label}</div><span class="kpi-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${KPI_ICONS[o.icon]||''}</svg></span></div><div class="value">${o.value}</div>${o.delta||''}${foot}</div>`;
 }
 function drawKpiMiniPies(weeks){
   const totals=computeDivisionBreakdown(weeks);
@@ -3680,7 +3820,7 @@ function drawDivisionBreakdown(weeksList, chartId, onDivisionClick, selectedDivi
     if(selectedDivision && onDivisionClick){
       const html = `<div class="hint" style="margin-top:10px;" id="${clearId}_wrap">Filtering to <strong>${escapeHtml(selectedDivision)}</strong>. <a href="#" id="${clearId}">Clear filter</a></div>`;
       tableEl.insertAdjacentHTML('afterend', html);
-      document.getElementById(clearId).addEventListener('click', (e)=>{ e.preventDefault(); universalDivision='';selectedWeekEndDates=[];currentWeekEndDate=weeksData.at(-1)?.weekEndDate||null;renderPeriodPickerButton();renderWeeklyView(); });
+      document.getElementById(clearId).addEventListener('click', (e)=>{ e.preventDefault(); universalDivision='';selectedWeekEndDates=[];currentWeekEndDate=defaultWeekEnd();renderPeriodPickerButton();renderWeeklyView(); });
     } else if(clearEl){
       clearEl.closest('div').remove();
     }
@@ -4007,7 +4147,7 @@ function renderClientIntelligence(weeks){
  host.innerHTML='<div class="narrative-heading"><span>PERFORMANCE RECAP</span><p>'+escapeHtml(periodName)+' · '+escapeHtml(scope)+'</p></div><section><h3>What went well</h3>'+wins.map(paragraph).join('')+'</section><section><h3>What needs attention</h3>'+concerns.map(paragraph).join('')+'</section><p class="narrative-note">'+escapeHtml(note)+'Volume comparisons use averages per selected week; rates use combined counts. Only selected weeks and divisions contribute to the recap. Incomplete future weeks are excluded. Findings describe patterns, not proven causes.</p>';
 }
 function clearAllDashboardFilters(){
- universalDivision='';selectedWeekEndDates=[];currentWeekEndDate=weeksData.at(-1)?.weekEndDate||null;
+ universalDivision='';selectedWeekEndDates=[];currentWeekEndDate=defaultWeekEnd();
  periodSelectedGroup={};periodSelectedDivision={};selectedPieTargets={recruiters:[],branches:[]};pieCleared={recruiters:true,branches:true};
  peopleSearchTerms.recruiters='';peopleSearchTerms.branches='';peoplePeriodValue=currentWeekEndDate?'week:'+currentWeekEndDate:'all';
  snapshotSortState={};clientIntelligenceMode='breakthrough';trendGranularity='weeks';
@@ -4508,7 +4648,7 @@ async function renderPeopleView(mode){
   const container = document.getElementById(containerId);
   const byField = mode==='recruiters' ? 'byRecruiter' : 'byBranch';
   if(peoplePeriodValue===null){
-    peoplePeriodValue = weeksData.length ? 'week:'+weeksData[weeksData.length-1].weekEndDate : 'all';
+    peoplePeriodValue = weeksData.length ? 'week:'+defaultWeekEnd() : 'all';
   }
   const opts = buildPeriodOptions();
 
@@ -5031,6 +5171,7 @@ function renderManageView(){
         </tbody>
       </table>
     </div>
+    <div id="removedWeeksPanel"></div>
   `;
   if(isSnapshotMode) return;
   const shareBtn = document.getElementById('shareHtmlSnapshotBtn');
@@ -5045,16 +5186,58 @@ function renderManageView(){
     });
   });
   container.querySelectorAll('[data-remove]').forEach(btn=>{
-    btn.addEventListener('click', async ()=>{
-      const date = btn.dataset.remove;
-      const wk = weeksData.find(w=>w.weekEndDate===date);
-      if(!confirm('Remove data for Week '+(wk?wk.weekNumber:'')+' (ending '+fmtDate(date)+')? This cannot be undone.')) return;
-      await storageDelete('weekly:'+date);
-      await loadAllWeeks();
-      if(currentWeekEndDate===date) currentWeekEndDate = null;
-      refreshUI();
-      showToast('Week removed.');
-    });
+    btn.addEventListener('click', ()=>removeWeekForGood(btn.dataset.remove));
+  });
+  renderRemovedWeeks();
+}
+// Removes a week from the master database itself (not just its stored numbers), and blocks
+// the week so re-uploading the same export does not bring it back. Reversible via Restore.
+async function removeWeekForGood(date){
+  const wk = weeksData.find(w=>w.weekEndDate===date);
+  const wn = wk ? wk.weekNumber : isoWeekNumber(new Date(date+'T00:00:00'));
+  const start = new Date(date+'T00:00:00'); start.setDate(start.getDate()-6);
+  const range = fmtDate(toIsoDateOnly(start))+' – '+fmtDate(date);
+  const notOver = new Date(date+'T23:59:59') >= new Date();
+  const msg = 'Remove Week '+wn+' ('+range+') from the database?\n\n'
+    + '• Its rows are deleted from the master sheet (Schedules created that week, interviews dated that week). Other weeks are not changed.\n'
+    + '• Future uploads will skip rows that fall in this week, so it will not come back.\n'
+    + (notOver ? '• This week has not finished yet — real data for it will also be skipped until you restore it.\n' : '')
+    + '\nYou can undo the block later under “Removed weeks” → Restore, then upload again.';
+  if(!confirm(msg)) return;
+  Server.ownMasterUntil = Date.now()+60*1000;
+  try{
+    setLoading('Removing Week '+wn+' from the database…');
+    const r = await Server.rpc('dash_remove_week', {p_week:date});
+    KV.delete('weekly:'+date);
+    if(currentWeekEndDate===date) currentWeekEndDate = null;
+    candState.cache.clear();
+    await loadAllWeeks(); refreshUI();
+    showToast('Week '+wn+' removed from the database · '+fmtNum((r.schedules||0)+(r.interviews||0))+' row(s) deleted. It will not come back on future uploads.');
+  }catch(e){
+    if(/Could not find|schema cache|does not exist/i.test(e.message)){
+      showToast('Run the latest supabase_setup.sql in Supabase first — removing a week from the database needs it.');
+    } else showToast('Could not remove the week: '+cleanErr(e));
+  }finally{
+    setLoading(null); Server.ownMasterUntil = Date.now()+8000;
+    if(settingsModalOpen) renderManageView();
+  }
+}
+async function renderRemovedWeeks(){
+  const host = document.getElementById('removedWeeksPanel'); if(!host) return;
+  let list;
+  try{ list = await Server.rpc('dash_removed_weeks'); }catch(e){ host.innerHTML=''; return; }
+  if(!list.length){ host.innerHTML=''; return; }
+  const canEdit = Server.can('upload') || Server.can('master_edit');
+  host.innerHTML = `<div class="panel">
+    <div class="panel-head"><div><h3 style="margin:0 0 4px;">Removed weeks</h3><span class="hint">Uploads skip rows in these weeks. Restore a week, then upload its files again to bring it back.</span></div></div>
+    <table class="users-table"><thead><tr><th>Week #</th><th>Week</th><th>Rows removed</th><th>Removed by</th><th>When</th>${canEdit?'<th></th>':''}</tr></thead><tbody>
+    ${list.map(r=>{ const st=new Date(r.week+'T00:00:00'); st.setDate(st.getDate()-6); return `<tr><td>${isoWeekNumber(new Date(r.week+'T00:00:00'))}</td><td style="white-space:nowrap;">${fmtDate(toIsoDateOnly(st))} – ${fmtDate(r.week)}</td><td>${fmtNum(r.rows_removed||0)}</td><td>${escapeHtml(r.removed_by||'')}</td><td style="white-space:nowrap;">${new Date(r.removed_at).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</td>${canEdit?`<td><button class="btn btn-secondary btn-sm" data-restore-week="${r.week}">Restore</button></td>`:''}</tr>`; }).join('')}
+    </tbody></table></div>`;
+  host.querySelectorAll('[data-restore-week]').forEach(b=>b.onclick=async()=>{
+    b.disabled=true;
+    try{ await Server.rpc('dash_restore_week', {p_week:b.dataset.restoreWeek}); showToast('Week restored — upload its Created On / Date Of files again to bring the data back.'); }
+    catch(e){ showToast('Could not restore: '+cleanErr(e)); }
+    renderRemovedWeeks();
   });
 }
 
@@ -6045,7 +6228,7 @@ async function ingestFiles(entries, {interactive=true}={}){
   const imported = [], goalSheets = [];
   const localRows = new Map();
   const allWeeks = new Set();
-  let totalRows = 0, totalSkipped = 0;
+  let totalRows = 0, totalSkipped = 0, totalBlocked = 0;
   Server.ownMasterUntil = Date.now() + 10*60*1000;
   try{
     for(const entry of entries){
@@ -6098,15 +6281,17 @@ async function ingestFiles(entries, {interactive=true}={}){
           localRows.set(id, out);
         });
         const importId = await Server.rpc('dash_import_begin', {p_source:source, p_file_name:entry.name+(sheets.length>1?' / '+sh.name:'')});
+        let savedRows = 0;
         for(let i=0;i<batch.length;i+=IMPORT_BATCH){
           importProgress('Saving '+entry.name+': '+fmtNum(Math.min(i+IMPORT_BATCH, batch.length))+' / '+fmtNum(batch.length)+' rows…');
-          await Server.rpc('dash_import_rows', {p_import_id:importId, p_source:source, p_rows:batch.slice(i,i+IMPORT_BATCH)});
+          savedRows += Number(await Server.rpc('dash_import_rows', {p_import_id:importId, p_source:source, p_rows:batch.slice(i,i+IMPORT_BATCH)}))||0;
         }
+        const blocked = Math.max(0, batch.length - savedRows); totalBlocked += blocked;
         const fin = await Server.rpc('dash_import_finish', {p_import_id:importId, p_source:source, p_from:null, p_to:null, p_rows_read:sh.rows.length, p_removed_columns:removed});
         (fin.weeks||[]).forEach(w=>allWeeks.add(w));
-        totalRows += batch.length; totalSkipped += skipped;
+        totalRows += batch.length - blocked; totalSkipped += skipped;
         if(!imported.some(x=>x.entry===entry)) imported.push({entry, source, rows:batch.length, removed}); else imported.find(x=>x.entry===entry).rows += batch.length;
-        lastFolderScanLog.push({name:entry.name+(sheets.length>1?' / '+sh.name:''), status:source==='schedules'?'file1':'file2', detail:fmtNum(batch.length)+' rows'+(skipped?' ('+fmtNum(skipped)+' without a date skipped)':'')+' · '+(removed.length?'removed contact column(s): '+removed.join(', '):'no contact columns found')+(fin.cleared?' · '+fmtNum(fin.cleared)+' outdated row(s) replaced':'')});
+        lastFolderScanLog.push({name:entry.name+(sheets.length>1?' / '+sh.name:''), status:source==='schedules'?'file1':'file2', detail:fmtNum(batch.length)+' rows'+(skipped?' ('+fmtNum(skipped)+' without a date skipped)':'')+' · '+(removed.length?'removed contact column(s): '+removed.join(', '):'no contact columns found')+(fin.cleared?' · '+fmtNum(fin.cleared)+' outdated row(s) replaced':'')+(blocked?' · '+fmtNum(blocked)+' row(s) skipped (removed weeks)':'')});
       }
       if(!usedSheet && !lastFolderScanLog.some(l=>l.name===entry.name)) lastFolderScanLog.push({name:entry.name, status:'unclassified', detail:'no Created On / Date Of / goals sheet found'});
     }
@@ -6125,7 +6310,7 @@ async function ingestFiles(entries, {interactive=true}={}){
     }
     lastSuccessfulSyncAt = new Date(); resetSyncCountdown();
     await loadAllWeeks(); refreshUI();
-    if(imported.length) showToast('Imported '+fmtNum(totalRows)+' rows from '+imported.length+' file'+(imported.length===1?'':'s')+' into the master sheet'+(allWeeks.size?' · '+allWeeks.size+' week'+(allWeeks.size===1?'':'s')+' recalculated':'')+(deleted?' · '+deleted+' source file'+(deleted===1?'':'s')+' deleted':'')+'.');
+    if(imported.length) showToast('Imported '+fmtNum(totalRows)+' rows from '+imported.length+' file'+(imported.length===1?'':'s')+' into the master sheet'+(allWeeks.size?' · '+allWeeks.size+' week'+(allWeeks.size===1?'':'s')+' recalculated':'')+(deleted?' · '+deleted+' source file'+(deleted===1?'':'s')+' deleted':'')+(totalBlocked?' · '+fmtNum(totalBlocked)+' row'+(totalBlocked===1?'':'s')+' skipped because their week was removed (Settings → Fetched Data → Removed weeks)':'')+'.');
   }catch(e){
     console.error(e);
     showToast('Import stopped: '+cleanErr(e)+'. Your files were not deleted — you can run the import again safely.');
@@ -6897,7 +7082,7 @@ async function renderUploadHistory(){
 }
 
 /* ============================= INIT ============================= */
-const APP_VERSION = 'Version 4.5.0';
+const APP_VERSION = 'Version 4.6.0';
 async function init(){
   document.getElementById('versionLabelInline').textContent = APP_VERSION;
   document.getElementById('footerVersionLabel').textContent = APP_VERSION;
@@ -6920,13 +7105,23 @@ async function init(){
 const menu=document.querySelector('.sidebar');
 const pageHeader=document.querySelector('.topbar');
 const updateStickyHeights=()=>{
-  const menuHeight=menu.getBoundingClientRect().height;
+  const menuHeight=window.matchMedia('(min-width:761px)').matches ? 0 : menu.getBoundingClientRect().height;
   const headerHeight=pageHeader.getBoundingClientRect().height;
   document.documentElement.style.setProperty('--menu-height',menuHeight+'px');
   document.documentElement.style.setProperty('--frozen-header-height',(menuHeight+headerHeight)+'px');
 };
 const headerObserver=new ResizeObserver(updateStickyHeights);
 headerObserver.observe(menu);headerObserver.observe(pageHeader);
+window.addEventListener('resize', updateStickyHeights);
+(function setupSideCollapse(){
+  const btn=document.getElementById('sideCollapseBtn'); if(!btn) return;
+  const apply=c=>{ document.body.classList.toggle('side-collapsed', c); btn.setAttribute('aria-label', c?'Expand menu':'Collapse menu'); btn.title=c?'Expand menu':'Collapse menu';
+    document.querySelectorAll('#navList button[data-view], .ribbon-actions .ribbon-btn').forEach(b=>{ if(c){ if(!b.title) { b.title=(b.textContent||'').replace('\u25BE','').trim(); b.dataset.autoTitle='1'; } } else if(b.dataset.autoTitle){ b.removeAttribute('title'); delete b.dataset.autoTitle; } });
+    setTimeout(()=>window.dispatchEvent(new Event('resize')), 220); };
+  let saved=false; try{ saved = localStorage.getItem('ipd_side_collapsed')==='1'; }catch(e){}
+  apply(saved);
+  btn.addEventListener('click', ()=>{ const c=!document.body.classList.contains('side-collapsed'); apply(c); try{ localStorage.setItem('ipd_side_collapsed', c?'1':'0'); }catch(e){} });
+})();
 updateStickyHeights();
 document.addEventListener('keydown', e=>{
   if(e.key!=='/' || e.ctrlKey || e.metaKey) return;
