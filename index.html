@@ -718,6 +718,18 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
 }
 @media (min-width:761px) and (max-width:1180px){ :root{--side-w:216px} }
 @media print{.sidebar{display:none!important}}
+/* ---------- Settings as a full page ---------- */
+.settings-page{background:#fff;border:1px solid #e1eaed;border-radius:16px;box-shadow:0 1px 2px #1834420a,0 8px 24px #1834420a;margin-bottom:28px}
+.settings-page .settings-tabs{position:sticky;top:var(--frozen-header-height,0px);z-index:40;background:#fff;border-radius:16px 16px 0 0;padding:0 18px;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:thin}
+.settings-page .settings-tab{white-space:nowrap;flex:0 0 auto}
+.settings-page .settings-only h3{font-size:16px!important;line-height:1.3}
+.settings-page .settings-only .hint{font-size:12px!important;color:var(--text-secondary);line-height:1.5}
+.settings-page .panel h3{font-size:16px}
+.settings-page .settings-tab-content{max-height:none!important;overflow:visible!important;padding:22px 24px 26px}
+.settings-page #manageWeeksTable th{position:sticky;top:calc(var(--frozen-header-height,0px) + 43px);z-index:5;background:#f5f8f9}
+.ribbon-actions .ribbon-btn.active{background:#ffffff!important;color:#123c48!important;font-weight:650;box-shadow:0 6px 18px #0b232d33}
+@media (max-width:760px){.settings-page{border-radius:14px;margin:0 0 16px}.settings-page .settings-tabs{top:0;padding:0 8px}.settings-page .settings-tab-content{padding:14px 12px 18px}.settings-page #manageWeeksTable th{top:47px}.settings-page .panel:has(table){overflow-x:auto}}
+
 /* ---------- smarter cards & header (v4.6) ---------- */
 .kpi-v2{grid-template-columns:repeat(7,minmax(0,1fr))!important;gap:12px!important}
 @media (max-width:1320px){.kpi-v2{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
@@ -765,7 +777,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V12M10 20V5M16 20V9M22 20V3"/></svg></div>
       <div class="brand-text">
         <h1 id="dashboardTitle" title="Click to go home">Performance Dashboard</h1>
-        <p><span id="versionLabelInline">Version 4.6.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
+        <p><span id="versionLabelInline">Version 4.7.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
       </div>
     </div>
     <button type="button" class="side-collapse" id="sideCollapseBtn" aria-label="Collapse menu" title="Collapse menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
@@ -820,6 +832,35 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
     </div>
 
     <div class="content">
+      <div id="view-settings" class="hidden settings-page">
+      <div class="settings-tabs" id="settingsTabs">
+        <button class="settings-tab active" data-tab="sync">Data Sync Details</button>
+        <button class="settings-tab" data-tab="fetched">Fetched Data</button>
+        <button class="settings-tab" data-tab="divisions">Division Names</button><button class="settings-tab" data-tab="branches">Branch Divisions</button><button class="settings-tab" data-tab="recruiters">Show/Hide Recruiters</button><button class="settings-tab" data-tab="users">Users &amp; Access</button><button class="settings-tab" data-tab="activity">Activity</button><button class="settings-tab" data-tab="account">My account</button>
+      </div>
+      <div class="settings-tab-content">
+        <div id="settingsPane-sync">
+          <div class="panel settings-only" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+            <div>
+              <h3 style="margin:0 0 4px 0;">Dashboard Preferences</h3>
+              <span class="hint">Settings that affect how data is shown across the whole dashboard.</span>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn btn-secondary btn-sm" id="settingsPerformerHighlightBtn">Performer Highlights</button>
+              <button class="btn btn-secondary btn-sm" id="settingsDedupeToggleBtn">Dedupe setting</button>
+            </div>
+          </div>
+          <div id="view-folderUploads"></div>
+          <div id="numberCheck"></div>
+          <div id="uploadHistory"></div>
+        </div>
+        <div id="settingsPane-divisions" class="hidden"><div id="divisionNameSettings"></div></div><div id="settingsPane-recruiters" class="hidden"><p class="hint">Checked recruiters are visible. Changes save automatically.</p><div id="settingsRecruiterVisibilityList"></div></div><div id="settingsPane-fetched" class="hidden"><div id="view-manage"></div></div>
+        <div id="settingsPane-branches" class="hidden"><div id="view-branchDivisions"></div></div>
+        <div id="settingsPane-users" class="hidden"><div id="usersAdmin"></div></div>
+        <div id="settingsPane-activity" class="hidden"><div id="activityLog"></div></div>
+        <div id="settingsPane-account" class="hidden"><div id="myAccount"></div></div>
+        </div>
+      </div>
       <div id="emptyState" class="empty-state">
         <div class="icon" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19V11M10 19V5M16 19V9M22 19V2"/></svg></div><div class="welcome-eyebrow">CLARITY. ALIGNMENT. PERFORMANCE.</div>
         <h3>A clearer view of<br>your recruiting performance.</h3>
@@ -843,7 +884,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       </div>
       <div class="muted-note" id="storageModeNote" style="text-align:center;margin-top:24px;">Data stored locally in this browser.</div>
       <div class="muted-note" style="text-align:center;margin-top:4px;opacity:.65;">
-        <span id="footerVersionLabel">Version 4.6.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
+        <span id="footerVersionLabel">Version 4.7.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
       </div>
     </div>
   </main>
@@ -929,45 +970,6 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
     <div class="modal-footer">
       <button class="btn btn-secondary" id="cancelMonthlyUploadBtn">Cancel</button>
       <button class="btn btn-primary" id="saveMonthBtn" disabled>Save All Weeks</button>
-    </div>
-  </div>
-</div>
-
-<!-- Settings Modal -->
-<div id="settingsModal" class="modal-overlay hidden">
-  <div class="modal modal-lg">
-    <div class="modal-header">
-      <h3>Settings</h3>
-      <button class="modal-close" id="closeSettingsModalBtn">&times;</button>
-    </div>
-    <div class="modal-body" style="padding:0;">
-      <div class="settings-tabs" id="settingsTabs">
-        <button class="settings-tab active" data-tab="sync">Data Sync Details</button>
-        <button class="settings-tab" data-tab="fetched">Fetched Data</button>
-        <button class="settings-tab" data-tab="divisions">Division Names</button><button class="settings-tab" data-tab="branches">Branch Divisions</button><button class="settings-tab" data-tab="recruiters">Show/Hide Recruiters</button><button class="settings-tab" data-tab="users">Users &amp; Access</button><button class="settings-tab" data-tab="activity">Activity</button><button class="settings-tab" data-tab="account">My account</button>
-      </div>
-      <div class="settings-tab-content">
-        <div id="settingsPane-sync">
-          <div class="panel settings-only" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
-            <div>
-              <h3 style="margin:0 0 4px 0;">Dashboard Preferences</h3>
-              <span class="hint">Settings that affect how data is shown across the whole dashboard.</span>
-            </div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-              <button class="btn btn-secondary btn-sm" id="settingsPerformerHighlightBtn">Performer Highlights</button>
-              <button class="btn btn-secondary btn-sm" id="settingsDedupeToggleBtn">Dedupe setting</button>
-            </div>
-          </div>
-          <div id="view-folderUploads"></div>
-          <div id="numberCheck"></div>
-          <div id="uploadHistory"></div>
-        </div>
-        <div id="settingsPane-divisions" class="hidden"><div id="divisionNameSettings"></div></div><div id="settingsPane-recruiters" class="hidden"><p class="hint">Checked recruiters are visible. Changes save automatically.</p><div id="settingsRecruiterVisibilityList"></div></div><div id="settingsPane-fetched" class="hidden"><div id="view-manage"></div></div>
-        <div id="settingsPane-branches" class="hidden"><div id="view-branchDivisions"></div></div>
-        <div id="settingsPane-users" class="hidden"><div id="usersAdmin"></div></div>
-        <div id="settingsPane-activity" class="hidden"><div id="activityLog"></div></div>
-        <div id="settingsPane-account" class="hidden"><div id="myAccount"></div></div>
-      </div>
     </div>
   </div>
 </div>
@@ -2566,6 +2568,14 @@ function showOverlapModal(weekEndDate, existingWeekNumber, isMonth){
 }
 
 /* ============================= AGGREGATION ============================= */
+// Rows with neither a Candidate Name nor an Employee Number are not counted anywhere
+// (Raw or Deduped) — there is no candidate to attribute them to.
+function rowHasCandidate(row, mapping){
+  if(!mapping.candidateName && !mapping.employeeNumber) return true; // file has neither column — nothing to judge by
+  const eid = mapping.employeeNumber ? normalizeEmployeeNumber(row[mapping.employeeNumber]) : '';
+  const name = mapping.candidateName ? (row[mapping.candidateName]??'').toString().trim() : '';
+  return !!(eid || name);
+}
 // File 1 ("Created On" file): counts Interview Schedules only, bucketed by Created On.
 function processFile1(rows, mapping, weekEndDate, dedupeFlag, rangeCheckFn){
   const inRange = rangeCheckFn || ((d)=> inWeekRange(d, weekEndDate));
@@ -2574,6 +2584,7 @@ function processFile1(rows, mapping, weekEndDate, dedupeFlag, rangeCheckFn){
   rows.forEach(row=>{
     const d = toDateVal(row[mapping.createdOn]);
     if(!d || !inRange(d)) return;
+    if(!rowHasCandidate(row, mapping)) return;
 
     if(dedupeFlag){
       // Employee Number is the primary dedup key. But when it's blank on a given row (common
@@ -2660,6 +2671,7 @@ function processFile2(rows, mapping, weekEndDate, dedupeFlag, rangeCheckFn){
     const dateOfVal = toDateVal(row[mapping.dateOf]);
     const dateOfInWeek = dateOfVal && inRange(dateOfVal);
     if(!dateOfInWeek) return; // this row's interview didn't happen in this week — never counted here
+    if(!rowHasCandidate(row, mapping)) return;
 
     if(dedupeFlag){
       const empNum = mapping.employeeNumber ? normalizeEmployeeNumber(row[mapping.employeeNumber]) : '';
@@ -2878,6 +2890,7 @@ const VIEW_META = {
   branches:{title:'Branch Performance', sub:'Show rates and outcomes by branch'},
   candidates:{title:'Candidates', sub:'Who is counted in each category, by week'},
   master:{title:'Master Data', sub:'Every candidate row from every import, in one sheet — filter any column, exclude or include candidates'},
+  settings:{title:'Settings', sub:'Uploads, saved weeks, divisions, users and your account'},
   uploads:{title:'Uploads', sub:'Manage uploaded weeks and recruiter goals & divisions'},
 };
 const PERFORMANCE_TYPE_META = {
@@ -2890,6 +2903,22 @@ let uploadType = 'weekly'; // 'weekly' | 'monthly' — Uploads section sub-selec
 async function refreshUI(){
   closeEntityPopover();
   const hasData = weeksData.length>0;
+  const onSettings = currentView==='settings';
+  settingsModalOpen = onSettings;
+  document.getElementById('view-settings').classList.toggle('hidden', !onSettings);
+  document.getElementById('settingsNavBtn').classList.toggle('active', onSettings);
+  document.body.classList.toggle('on-settings', onSettings);
+  if(onSettings){
+    document.getElementById('emptyState').classList.add('hidden');
+    document.getElementById('dashboardViews').classList.add('hidden');
+    document.getElementById('topbarCenter').classList.add('hidden');
+    const extra = document.getElementById('topbarExtra'); if(extra) extra.innerHTML = '';
+    document.getElementById('downloadDropdownWrap').classList.toggle('hidden', !hasData);
+    document.getElementById('viewTitle').textContent = VIEW_META.settings.title;
+    document.getElementById('viewSub').textContent = VIEW_META.settings.sub;
+    closePeriodPicker();
+    return;
+  }
   // The Uploads page must stay reachable even with zero weeks saved — it's the page you use
   // to add the first one — so it's treated as always-showable, unlike Performance/Recruiter/
   // Branch which genuinely have nothing to render without data.
@@ -2997,21 +3026,24 @@ function switchSettingsTab(tabName){
     document.getElementById('settingsPane-'+t).classList.toggle('hidden', t!==tabName);
   });
 }
+// Settings is a full page like the other sections (it used to be a pop-up dialog).
+let viewBeforeSettings = 'performance';
 function openSettingsModal(tabName){
-  settingsModalOpen = true;
-  document.getElementById('settingsModal').classList.remove('hidden');
+  if(currentView!=='settings') viewBeforeSettings = currentView;
+  currentView = 'settings';
+  document.querySelectorAll('#navList button').forEach(b=>b.classList.remove('active'));
+  refreshUI();
+  window.scrollTo(0,0);
   renderSettingsModalContent();
   const visible=[...document.querySelectorAll('#settingsTabs .settings-tab:not(.hidden)')].map(t=>t.dataset.tab);
   switchSettingsTab(visible.includes(tabName||'sync') ? (tabName||'sync') : (visible[0]||'account'));
 }
 function closeSettingsModal(){
-  settingsModalOpen = false;
-  document.getElementById('settingsModal').classList.add('hidden');
+  if(currentView!=='settings') return;
+  currentView = viewBeforeSettings && viewBeforeSettings!=='settings' ? viewBeforeSettings : 'performance';
+  document.querySelectorAll('#navList button').forEach(b=>b.classList.toggle('active', b.dataset.view===currentView));
+  refreshUI();
 }
-document.getElementById('closeSettingsModalBtn').addEventListener('click', closeSettingsModal);
-document.getElementById('settingsModal').addEventListener('click', (e)=>{
-  if(e.target.id==='settingsModal') closeSettingsModal(); // click on the dim overlay itself
-});
 document.getElementById('settingsTabs').addEventListener('click', (e)=>{
   const btn = e.target.closest('.settings-tab');
   if(btn) switchSettingsTab(btn.dataset.tab);
@@ -6001,7 +6033,7 @@ function applyPermissions(){
   const u = Server.user; if(!u) return;
   document.querySelectorAll('#navList button[data-view]').forEach(b=>{ b.classList.toggle('hidden', !Server.can(VIEW_MODULE[b.dataset.view])); });
   const allowedViews = Object.keys(VIEW_MODULE).filter(v=>Server.can(VIEW_MODULE[v]));
-  if(!allowedViews.includes(currentView) && allowedViews.length){
+  if(currentView!=='settings' && !allowedViews.includes(currentView) && allowedViews.length){
     currentView = allowedViews[0];
     document.querySelectorAll('#navList button').forEach(b=>b.classList.toggle('active', b.dataset.view===currentView));
   }
@@ -7082,7 +7114,7 @@ async function renderUploadHistory(){
 }
 
 /* ============================= INIT ============================= */
-const APP_VERSION = 'Version 4.6.0';
+const APP_VERSION = 'Version 4.7.0';
 async function init(){
   document.getElementById('versionLabelInline').textContent = APP_VERSION;
   document.getElementById('footerVersionLabel').textContent = APP_VERSION;
@@ -7111,7 +7143,8 @@ const updateStickyHeights=()=>{
   document.documentElement.style.setProperty('--frozen-header-height',(menuHeight+headerHeight)+'px');
 };
 const headerObserver=new ResizeObserver(updateStickyHeights);
-headerObserver.observe(menu);headerObserver.observe(pageHeader);
+headerObserver.observe(menu,{box:'border-box'});headerObserver.observe(pageHeader,{box:'border-box'});
+pageHeader.addEventListener('transitionend', updateStickyHeights);
 window.addEventListener('resize', updateStickyHeights);
 (function setupSideCollapse(){
   const btn=document.getElementById('sideCollapseBtn'); if(!btn) return;
