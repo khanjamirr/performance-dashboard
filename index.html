@@ -6,10 +6,14 @@
 <title>Performance Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
   :root{
     --bg:#F3F5F8;
@@ -543,14 +547,15 @@ body.no-views #dashboardViews::before{content:"Your account has no modules yet. 
 #myAccount .hint,#usersAdmin .hint,#activityLog .hint,#uploadHistory .hint{font-size:12px;color:var(--text-tertiary)}
 @media(max-width:700px){.user-name{display:none}.auth-card{padding:22px 18px}}
 </style></head>
-<body>
+<body class="locked">
+<div id="appLoading" class="app-loading"><div class="spinner" aria-hidden="true"></div><p>Loading dashboard…</p></div>
 <div id="app">
 
   <header class="sidebar">
     <div class="brand">
       <div>
         <h1 id="dashboardTitle" title="Click to go home">Performance Dashboard</h1>
-        <p><span id="versionLabelInline">Version 4.1.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
+        <p><span id="versionLabelInline">Version 4.2.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
       </div>
     </div>
     <nav class="nav" id="navList">
@@ -622,7 +627,7 @@ body.no-views #dashboardViews::before{content:"Your account has no modules yet. 
       </div>
       <div class="muted-note" id="storageModeNote" style="text-align:center;margin-top:24px;">Data stored locally in this browser.</div>
       <div class="muted-note" style="text-align:center;margin-top:4px;opacity:.65;">
-        <span id="footerVersionLabel">Version 4.1.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
+        <span id="footerVersionLabel">Version 4.2.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
       </div>
     </div>
   </main>
@@ -5592,7 +5597,10 @@ const Server = {
   },
   async startPolling(){
     const head = await this.rpc('dash_changes', {p_since:0});
-    this.since = head && head[0] ? Number(head[0].id) : 0;
+    this.startPollingFrom(head && head[0] ? Number(head[0].id) : 0);
+  },
+  startPollingFrom(since){
+    this.since = since||0;
     this.setStatus('live');
     clearInterval(this.pollTimer);
     this.pollTimer = setInterval(()=>this.poll(), LIVE_POLL_MS);
@@ -5691,7 +5699,7 @@ function applyPermissions(){
 /* ------------------------------------------ SIGN-IN GATE ------------------------------------------ */
 function setLocked(locked){ document.body.classList.toggle('locked', locked); }
 function showAuthGate(mode, message){
-  setLocked(true);
+  setLocked(true); setLoading(null);
   document.getElementById('authGate')?.remove();
   const gate = document.createElement('div');
   gate.id='authGate'; gate.className='auth-gate';
@@ -5750,6 +5758,18 @@ function showAuthGate(mode, message){
   setTimeout(()=>gate.querySelector('input')?.focus(), 30);
 }
 async function startAuthFlow(){
+  // Fast path on refresh: a saved session opens the dashboard with a single server call.
+  const savedToken = lsGet(TOKEN_LS_KEY);
+  if(savedToken && !startAuthFlow.triedFast){
+    startAuthFlow.triedFast = true;
+    Server.token = savedToken;
+    try{ const boot = await Server.rpc('dash_bootstrap'); await afterLogin(boot); return; }
+    catch(e){
+      document.getElementById('authGate')?.remove(); setLocked(true);
+      if(/SESSION_EXPIRED/.test(e.message)){ Server.token=null; lsDel(TOKEN_LS_KEY); }
+      else Server.token = lsGet(TOKEN_LS_KEY); // e.g. older SQL without dash_bootstrap → normal path below
+    }
+  }
   let status;
   try{ status = await Server.call('dash_status'); }
   catch(e){
@@ -5776,19 +5796,29 @@ function setLoading(text){
   if(!el){ el=document.createElement('div'); el.id='appLoading'; el.className='app-loading'; el.innerHTML='<div class="spinner" aria-hidden="true"></div><p></p>'; document.body.appendChild(el); }
   el.querySelector('p').textContent = text;
 }
-async function afterLogin(){
+async function afterLogin(boot){
   setLocked(false);
   setLoading('Loading dashboard…');
   try{
-    await Server.loadKv(t=>setLoading(t));
-    await Remarks.load().catch(()=>{});
+    if(!boot){ try{ boot = await Server.rpc('dash_bootstrap'); }catch(e){ if(!/Could not find|schema cache|does not exist/i.test(e.message+' '+(e.code||''))) throw e; } }
+    if(boot){
+      Server.user = boot.me;
+      KV.clear();
+      await Promise.all((boot.kv||[]).map(async r=>{ KV.set(r.key, await decodeKvValue(r.key, r.value)); }));
+      Remarks.list = boot.remarks || [];
+      Server.since = Number(boot.since)||0;
+    } else {
+      await Server.loadKv(t=>setLoading(t));
+      await Remarks.load().catch(()=>{});
+    }
     await loadDivisionNames(); await loadAllWeeks(); await loadExcludedRecruiters(); await loadExcludedBranches();
     await loadRecruiterDivisions(); await loadBranchDivisions(); await loadDedupeSetting(); await loadPerformerHighlightSetting();
     deleteSourceFilesAfterImport = lsGet('ipd_delete_sources')!=='0';
     applyPermissions();
     document.getElementById('storageModeNote').textContent = 'Signed in as '+Server.user.name+' · data is stored securely on the server.';
     refreshUI();
-    await Server.startPolling();
+    setLoading(null);
+    if(boot) Server.startPollingFrom(Server.since); else await Server.startPolling();
     setTimeout(()=>Server.loadListsInBackground(), 300);
     if(Server.isAdmin() && Server.user.default_password) showToast('You are still using the setup password. Change it in Settings → My account.');
   }catch(e){
@@ -6555,13 +6585,13 @@ async function renderUploadHistory(){
 }
 
 /* ============================= INIT ============================= */
-const APP_VERSION = 'Version 4.1.0';
+const APP_VERSION = 'Version 4.2.0';
 async function init(){
   document.getElementById('versionLabelInline').textContent = APP_VERSION;
   document.getElementById('footerVersionLabel').textContent = APP_VERSION;
   document.getElementById('footerCopyrightYear').textContent = new Date().getFullYear();
   if(EMBEDDED_WEEKS && Array.isArray(EMBEDDED_WEEKS) && EMBEDDED_WEEKS.length){
-    isSnapshotMode = true;
+    isSnapshotMode = true; setLocked(false); setLoading(null);
     weeksData = EMBEDDED_WEEKS.slice().map(normalizeWeekRecord).sort((a,b)=> a.weekEndDate.localeCompare(b.weekEndDate));
     document.getElementById('storageModeNote').textContent = 'Viewing a shared snapshot (read-only) \u2014 data baked in at export time.';
     ['emptyUploadFolderBtn','emptyUploadFilesBtn','settingsNavBtn','userChipWrap','liveBadge'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));
@@ -6591,7 +6621,8 @@ document.addEventListener('keydown', e=>{
   const t=e.target; if(t && (t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable)) return;
   const search=document.querySelector('#topbarExtra input[type="search"]'); if(search){ e.preventDefault(); search.focus(); }
 });
-init();
+// libraries load in parallel (defer); start as soon as they are ready
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init); else init();
 </script>
 </body>
 </html>
