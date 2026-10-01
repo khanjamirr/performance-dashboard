@@ -2253,9 +2253,10 @@ function renderFolderUploadExplainer(){
   const box = document.createElement('div');
   box.className = 'panel import-panel';
   box.innerHTML = `<div class="import-row"><div><h3 style="margin:0 0 4px;">Import raw spreadsheets</h3><span class="hint">Contact-number columns are stripped, rows merge into the single master sheet, weeks recalculate for everyone. Uploaded files are never stored — only the extracted rows. Goals files are imported and kept.</span></div>
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><label class="hint" style="display:flex;gap:6px;align-items:center;cursor:pointer;"><input type="checkbox" id="deleteSourcesToggle" ${deleteSourceFilesAfterImport?'checked':''}> Delete source files from the linked folder after import</label><button class="btn btn-primary" id="uploadFilesBtn">Upload spreadsheets</button></div></div>`;
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><label class="hint" style="display:flex;gap:6px;align-items:center;cursor:pointer;"><input type="checkbox" id="deleteSourcesToggle" ${deleteSourceFilesAfterImport?'checked':''}> Delete source files from the linked folder after import</label>${Server.isAdmin()?'<button class="btn btn-secondary" id="recalcAllBtn" title="Rebuild every weekly summary from the master sheet on the server — no upload needed">Recalculate all weeks</button>':''}<button class="btn btn-primary" id="uploadFilesBtn">Upload spreadsheets</button></div></div>`;
   container.prepend(box);
   box.querySelector('#uploadFilesBtn').onclick = pickSpreadsheetsToUpload;
+  box.querySelector('#recalcAllBtn')?.addEventListener('click', recalculateAllWeeks);
   box.querySelector('#deleteSourcesToggle').onchange = async (e)=>{ deleteSourceFilesAfterImport = e.target.checked; lsSet('ipd_delete_sources', deleteSourceFilesAfterImport?'1':'0'); showToast(deleteSourceFilesAfterImport?'Source files will be deleted after each import (the browser will ask for edit access to the folder once).':'Source files will be kept in the folder.'); };
 }
 function renderFolderUploadExplainerInner(){
@@ -5513,7 +5514,7 @@ const Server = {
       const rows = await this.rpc('dash_kv_page', {p_after:after, p_limit:25});
       for(const r of rows){ KV.set(r.key, await decodeKvValue(r.key, r.value)); n++; }
       if(progress) progress('Loading data… '+n+' item'+(n===1?'':'s'));
-      if(rows.length<25) break;
+      if(!rows.length) break;
       after = rows[rows.length-1].key;
     }
   },
@@ -5941,8 +5942,8 @@ async function rebuildWeeks(weeks, localRows, progress){
   const index = []; let after='';
   for(;;){
     if(progress) progress('Collecting rows for '+list.length+' week'+(list.length===1?'':'s')+'… '+fmtNum(index.length));
-    const page = await Server.rpc('dash_week_index', {p_weeks:list, p_after:after, p_limit:5000});
-    index.push(...page); if(page.length<5000) break; after = page[page.length-1].id;
+    const page = await Server.rpc('dash_week_index', {p_weeks:list, p_after:after, p_limit:1000});
+    if(!page.length) break; index.push(...page); after = page[page.length-1].id;
   }
   const need = index.filter(r=>!localRows || !localRows.has(r.id)).map(r=>r.id);
   const data = new Map();
@@ -5972,6 +5973,24 @@ async function rebuildWeeks(weeks, localRows, progress){
       raw:{totals:raw.totals, byRecruiter:raw.byRecruiter, byBranch:raw.byBranch, diagnostics:raw.diagnostics}});
     await new Promise(r=>setTimeout(r,0));
   }
+}
+// Rebuilds every week from the master sheet already on the server (also refreshes interviews
+// that were still in the future at import time and have since happened).
+async function recalculateAllWeeks(){
+  if(!Server.isAdmin()) return;
+  if(!confirm('Recalculate every week from the master sheet on the server?\n\nThis takes a minute or two. Keep this tab open.')) return;
+  Server.ownMasterUntil = Date.now()+10*60*1000;
+  try{
+    setLoading('Finding all weeks in the master sheet…');
+    const days = new Set();
+    for(const col of ['Created On','Date Of']) (await Server.rpc('dash_master_distinct', {q:{}, p_column:col})).forEach(v=>{ if(/^\d{4}-\d{2}-\d{2}$/.test(v.value)) days.add(v.value); });
+    const weeks = new Set([...days].map(d=>toIsoDateOnly(saturdayOnOrAfter(new Date(d+'T00:00:00')))));
+    [...KV.keys()].filter(k=>k.startsWith('weekly:')).forEach(k=>weeks.add(k.slice(7)));
+    await rebuildWeeks([...weeks], null, setLoading);
+    await loadAllWeeks(); refreshUI();
+    showToast('Recalculated '+weeks.size+' week'+(weeks.size===1?'':'s')+' from the master sheet.');
+  }catch(e){ showToast('Recalculation stopped: '+cleanErr(e)); }
+  finally{ Server.ownMasterUntil = Date.now()+8000; setLoading(null); if(settingsModalOpen) renderFolderUploadExplainer(); }
 }
 async function syncFromFolder(e){
   if(!linkedFolderHandle){ showToast('Link a folder first.'); return; }
@@ -6294,7 +6313,7 @@ async function downloadMasterSheet(){
   if(!Server.can('export')){ showToast('Your account cannot download data.'); return; }
   try{
     const rows=[]; let after='';
-    for(;;){ setLoading('Preparing the master sheet… '+fmtNum(rows.length)+' rows'); const page = await Server.rpc('dash_master_export', {p_after:after, p_limit:5000}); rows.push(...page); if(page.length<5000) break; after=page[page.length-1].id; }
+    for(;;){ setLoading('Preparing the master sheet… '+fmtNum(rows.length)+' rows'); const page = await Server.rpc('dash_master_export', {p_after:after, p_limit:1000}); if(!page.length) break; rows.push(...page); after=page[page.length-1].id; }
     setLoading('Building the Excel file…'); await new Promise(r=>setTimeout(r,30));
     const cols = masterColumnsList().filter(c=>!c.key.startsWith('__'));
     const aoa = [['Status','In files',...cols.map(c=>c.label)], ...rows.map(r=>[r.excluded?'Excluded':'Included', r.s&&r.v?'Both':r.s?'Created On':'Date Of', ...cols.map(c=>fmtMasterCell(r.data[c.key]))])];
