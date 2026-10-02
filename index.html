@@ -558,7 +558,7 @@ body.no-views #dashboardViews::before{content:"Your account has no modules yet. 
 @media(min-width:761px) and (max-width:1600px){.user-name{display:none}.user-chip{padding-right:6px!important}}
 
 /* ---------- v4.3: smaller frozen header on scroll (all screens) ---------- */
-.topbar,.sidebar{transition:padding .18s ease, min-height .18s ease}
+.sidebar{transition:padding .18s ease, min-height .18s ease}.topbar{transition:none!important}
 body.scrolled .topbar{padding-top:8px!important;padding-bottom:8px!important;margin-bottom:12px!important}
 body.scrolled .topbar>div:first-child:before,body.scrolled .topbar .sub{display:none!important}
 body.scrolled .topbar h2{font-size:18px!important;line-height:1.2}
@@ -719,6 +719,16 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
 }
 @media (min-width:761px) and (max-width:1180px){ :root{--side-w:216px} }
 @media print{.sidebar{display:none!important}}
+.goals-tools{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:flex-end}
+.goals-tools select,.goals-tools input{padding:8px 10px;border:1px solid #cfdde2;border-radius:8px;font:inherit;font-size:13px;background:#fff}
+.goals-bulk{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap}
+.goals-bulk input{width:90px}
+.goal-input{width:100px;padding:6px 8px;border:1px solid #cfdde2;border-radius:7px;font:inherit;font-size:13px}
+.goal-input::placeholder{color:#9aaab2}
+.goals-table td{padding-top:8px!important;padding-bottom:8px!important;vertical-align:middle!important}
+#goalsEditor .hint{font-size:12px!important;color:var(--text-secondary)}
+.goals-actions{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:12px}
+
 .uw-label{display:block;font-size:12px;font-weight:700;color:#3b5562;margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
 #uwDate{width:100%;font-size:15px;padding:10px 12px;background:#fff;border:1px solid #cfdde2;border-radius:9px;box-sizing:border-box;font-family:inherit}
 .uw-week{margin:12px 0 10px;padding:12px 14px;border-radius:10px;background:#eef6f5;font-size:14px;line-height:1.5}
@@ -798,7 +808,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V12M10 20V5M16 20V9M22 20V3"/></svg></div>
       <div class="brand-text">
         <h1 id="dashboardTitle" title="Click to go home">Performance Dashboard</h1>
-        <p><span id="versionLabelInline">Version 4.15.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
+        <p><span id="versionLabelInline">Version 4.16.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
       </div>
     </div>
     <button type="button" class="side-collapse" id="sideCollapseBtn" aria-label="Collapse menu" title="Collapse menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
@@ -857,7 +867,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       <div class="settings-tabs" id="settingsTabs">
         <button class="settings-tab active" data-tab="sync">Data Sync Details</button>
         <button class="settings-tab" data-tab="fetched">Fetched Data</button>
-        <button class="settings-tab" data-tab="divisions">Division Names</button><button class="settings-tab" data-tab="branches">Branch Divisions</button><button class="settings-tab" data-tab="recruiters">Show/Hide Recruiters</button><button class="settings-tab" data-tab="users">Users &amp; Access</button><button class="settings-tab" data-tab="activity">Activity</button><button class="settings-tab" data-tab="account">My account</button>
+        <button class="settings-tab" data-tab="divisions">Division Names</button><button class="settings-tab" data-tab="branches">Branch Divisions</button><button class="settings-tab" data-tab="recruiters">Show/Hide Recruiters</button><button class="settings-tab" data-tab="goals">Recruiter Goals</button><button class="settings-tab" data-tab="users">Users &amp; Access</button><button class="settings-tab" data-tab="activity">Activity</button><button class="settings-tab" data-tab="account">My account</button>
       </div>
       <div class="settings-tab-content">
         <div id="settingsPane-sync">
@@ -877,6 +887,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
         </div>
         <div id="settingsPane-divisions" class="hidden"><div id="divisionNameSettings"></div></div><div id="settingsPane-recruiters" class="hidden"><p class="hint">Checked recruiters are visible. Changes save automatically.</p><div id="settingsRecruiterVisibilityList"></div></div><div id="settingsPane-fetched" class="hidden"><div id="view-manage"></div></div>
         <div id="settingsPane-branches" class="hidden"><div id="view-branchDivisions"></div></div>
+        <div id="settingsPane-goals" class="hidden"><div id="goalsEditor"></div></div>
         <div id="settingsPane-users" class="hidden"><div id="usersAdmin"></div></div>
         <div id="settingsPane-activity" class="hidden"><div id="activityLog"></div></div>
         <div id="settingsPane-account" class="hidden"><div id="myAccount"></div></div>
@@ -905,7 +916,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       </div>
       <div class="muted-note" id="storageModeNote" style="text-align:center;margin-top:24px;">Data stored locally in this browser.</div>
       <div class="muted-note" style="text-align:center;margin-top:4px;opacity:.65;">
-        <span id="footerVersionLabel">Version 4.15.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
+        <span id="footerVersionLabel">Version 4.16.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
       </div>
     </div>
   </main>
@@ -3026,6 +3037,61 @@ function renderDivisionNameSettings(){
   host.querySelectorAll('[data-division-remove]').forEach(b=>b.onclick=()=>run(DIVISIONS[+b.dataset.divisionRemove],''));
   host.querySelector('#addDivisionName').onclick=()=>run('',host.querySelector('#newDivisionName').value);
 }
+// Weekly schedule goals per recruiter. Any recruiter/week without a saved goal uses
+// DEFAULT_WEEKLY_GOAL (50). Saved as goals:<week-ending Saturday>.
+const goalsEditorState = {week:null};
+function renderGoalsEditor(){
+  const host = document.getElementById('goalsEditor'); if(!host) return;
+  const st = goalsEditorState;
+  const thisSat = toIsoDateOnly(saturdayOnOrAfter(new Date()));
+  const sats = new Set(weeksData.map(w=>w.weekEndDate));
+  for(let i=-4;i<=12;i++){ const d=new Date(thisSat+'T00:00:00'); d.setDate(d.getDate()-7*i); sats.add(toIsoDateOnly(d)); }
+  [...KV.keys()].filter(k=>k.startsWith('goals:')).forEach(k=>sats.add(k.slice(6)));
+  const weeks = [...sats].filter(d=>/^\d{4}-\d{2}-\d{2}$/.test(d)).sort().reverse();
+  if(!st.week || !weeks.includes(st.week)) st.week = thisSat;
+  const saved = KV.get('goals:'+st.week) || {};
+  // recruiters: anyone active that week, in the 4 weeks before it, or with a saved goal
+  const names = new Set(Object.keys(saved));
+  weeksData.filter(w=>w.weekEndDate<=st.week).slice(-5).forEach(w=>Object.keys(w.byRecruiter||{}).forEach(n=>{ if(n && n!=='Unassigned') names.add(n); }));
+  const list = [...names].filter(n=>typeof isRecruiterHidden!=='function' || !isRecruiterHidden(n)).sort((a,b)=>a.localeCompare(b));
+  const canEdit = Server.can('settings') || Server.can('upload');
+  const w = weekOfDate(st.week);
+  host.innerHTML = `<div class="panel">
+    <div class="panel-head"><div><h3 style="margin:0 0 4px;">Recruiter goals (schedules per week)</h3><span class="hint">Recruiters without a goal for a week use the default of <strong>${DEFAULT_WEEKLY_GOAL}</strong>. Goal Reach % = Schedules ÷ goal.</span></div></div>
+    <div class="goals-tools">
+      <label class="cand-field"><span>Week ending (Saturday)</span><select id="geWeek">${weeks.map(d=>`<option value="${d}" ${d===st.week?'selected':''}>Sat ${fmtDate(d)} · Week ${weekOfDate(d).number}${d===thisSat?' (this week)':''}${KV.has('goals:'+d)?' · goals set':''}</option>`).join('')}</select></label>
+      ${canEdit?`<div class="goals-bulk"><label class="cand-field"><span>Set every recruiter to</span><input type="number" id="geAll" min="0" step="1" value="${DEFAULT_WEEKLY_GOAL}"></label><button class="btn btn-secondary btn-sm" id="geApplyAll">Apply</button><button class="btn btn-secondary btn-sm" id="geCopyPrev">Copy previous week</button></div>`:''}
+    </div>
+    <p class="hint" style="margin:6px 0 10px;">Week ${w.number}: Sun ${fmtDate(w.weekStart)} – Sat ${fmtDate(w.weekEnd)} · ${list.length} recruiter${list.length===1?'':'s'}</p>
+    <div style="overflow-x:auto;max-height:520px;"><table class="users-table goals-table"><thead><tr><th>Recruiter</th><th>Division</th><th style="width:140px;">Goal</th><th>Schedules that week</th></tr></thead><tbody>
+    ${list.map(n=>{ const has = saved[n]!==undefined && saved[n]!==null && saved[n]!==''; const wk = weeksData.find(x=>x.weekEndDate===st.week); const sch = wk && wk.byRecruiter && wk.byRecruiter[n] ? fmtNum(wk.byRecruiter[n].schedules||0) : '–';
+      return `<tr><td>${escapeHtml(n)}</td><td class="hint">${escapeHtml(getEffectiveRecruiterDivision(n, st.week)||'Unassigned')}</td><td><input type="number" min="0" step="1" class="goal-input" data-name="${escapeHtml(n)}" value="${has?Number(saved[n]):''}" placeholder="${DEFAULT_WEEKLY_GOAL}" ${canEdit?'':'disabled'} aria-label="Goal for ${escapeHtml(n)}"></td><td>${sch}</td></tr>`; }).join('') || '<tr><td colspan="4" class="hint" style="padding:14px;">No recruiters yet — upload data first.</td></tr>'}
+    </tbody></table></div>
+    ${canEdit && list.length?`<div class="goals-actions"><span class="hint" id="geMsg"></span><button class="btn btn-primary btn-sm" id="geSave">Save goals for week ${w.number}</button></div>`:''}
+  </div>`;
+  host.querySelector('#geWeek').onchange = e=>{ st.week = e.target.value; renderGoalsEditor(); };
+  if(!canEdit) return;
+  const inputs = ()=>[...host.querySelectorAll('.goal-input')];
+  const dirty = ()=>{ const m=host.querySelector('#geMsg'); if(m) m.textContent='Unsaved changes'; };
+  inputs().forEach(i=>i.addEventListener('input', dirty));
+  host.querySelector('#geApplyAll').onclick = ()=>{ const v = host.querySelector('#geAll').value; if(v==='' || Number(v)<0) return; inputs().forEach(i=>i.value = String(Math.round(Number(v)))); dirty(); };
+  host.querySelector('#geCopyPrev').onclick = ()=>{
+    const prev = weeks.filter(d=>d<st.week && KV.has('goals:'+d))[0];
+    if(!prev){ showToast('No earlier week has goals saved — the default of '+DEFAULT_WEEKLY_GOAL+' applies.'); return; }
+    const g = KV.get('goals:'+prev) || {};
+    inputs().forEach(i=>{ const v=g[i.dataset.name]; i.value = (v!==undefined && v!==null && v!=='') ? String(v) : ''; });
+    dirty(); showToast('Copied goals from the week ending '+fmtDate(prev)+' — click Save to keep them.');
+  };
+  const save = host.querySelector('#geSave');
+  if(save) save.onclick = async ()=>{
+    const out = {};
+    for(const i of inputs()){ if(i.value==='') continue; const v = Number(i.value); if(!Number.isFinite(v) || v<0){ i.focus(); showToast('Goals must be 0 or more.'); return; } out[i.dataset.name] = Math.round(v); }
+    save.disabled = true;
+    const ok = await storageSet('goals:'+st.week, out);
+    save.disabled = false;
+    if(ok){ showToast('Goals saved for week '+w.number+' ('+Object.keys(out).length+' set · others use '+DEFAULT_WEEKLY_GOAL+').'); renderGoalsEditor(); refreshUI(); }
+  };
+}
 function switchSettingsTab(tabName){
   if(tabName==='divisions')renderDivisionNameSettings();
   if(tabName==='recruiters') renderRecruiterVisibility('settingsRecruiterVisibilityList');
@@ -3033,7 +3099,8 @@ function switchSettingsTab(tabName){
   if(tabName==='users'){ editingUserId=null; renderUsersAdmin(); }
   if(tabName==='activity') renderActivityLog();
   if(tabName==='account') renderMyAccount();
-  ['sync','fetched','branches','recruiters','divisions','users','activity','account'].forEach(t=>{
+  if(tabName==='goals') renderGoalsEditor();
+  ['sync','fetched','branches','recruiters','divisions','goals','users','activity','account'].forEach(t=>{
     document.getElementById('settingsPane-'+t).classList.toggle('hidden', t!==tabName);
   });
 }
@@ -6112,7 +6179,7 @@ function applyPermissions(){
   document.body.classList.toggle('no-upload', !Server.can('upload'));
   document.body.classList.toggle('no-settings', !Server.can('settings'));
   document.body.classList.toggle('no-views', !allowedViews.length);
-  const tabs = {sync: Server.can('upload')||Server.can('settings'), fetched: Server.can('settings'), divisions: Server.can('settings'), branches: Server.can('settings'), recruiters: Server.can('settings'), users: Server.isAdmin(), activity: Server.isAdmin(), account: true};
+  const tabs = {sync: Server.can('upload')||Server.can('settings'), fetched: Server.can('settings'), divisions: Server.can('settings'), branches: Server.can('settings'), recruiters: Server.can('settings'), goals: Server.can('settings')||Server.can('upload'), users: Server.isAdmin(), activity: Server.isAdmin(), account: true};
   document.querySelectorAll('#settingsTabs .settings-tab').forEach(t=>t.classList.toggle('hidden', tabs[t.dataset.tab]===false));
   const chip = document.getElementById('userChip');
   if(chip) chip.innerHTML = `<span class="user-dot" aria-hidden="true">${escapeHtml((u.name||'?').trim().charAt(0).toUpperCase())}</span><span class="user-name">${escapeHtml(u.name)}</span>`;
@@ -7397,7 +7464,7 @@ async function renderUploadHistory(){
 }
 
 /* ============================= INIT ============================= */
-const APP_VERSION = 'Version 4.15.0';
+const APP_VERSION = 'Version 4.16.0';
 async function init(){
   document.getElementById('versionLabelInline').textContent = APP_VERSION;
   document.getElementById('footerVersionLabel').textContent = APP_VERSION;
@@ -7470,7 +7537,22 @@ document.addEventListener('keydown', e=>{
   });
   // compact the frozen header once the page is scrolled
   let ticking=false;
-  window.addEventListener('scroll', ()=>{ if(ticking) return; ticking=true; requestAnimationFrame(()=>{ const y=window.scrollY, on=document.body.classList.contains('scrolled'); if(!on && y>80) document.body.classList.add('scrolled'); else if(on && y<20) document.body.classList.remove('scrolled'); ticking=false; }); }, {passive:true});
+  // The compact header is shorter; the difference is added below it as margin so the page keeps
+  // exactly the same height. Otherwise, near the threshold, shrinking the header shortened the
+  // page, the browser pulled the scroll position back, the header grew again… (flicker).
+  const tb = document.querySelector('.topbar');
+  const setScrolled = on=>{
+    if(document.body.classList.contains('scrolled')===on) return;
+    tb.style.removeProperty('margin-bottom');
+    const before = tb.offsetHeight + (parseFloat(getComputedStyle(tb).marginBottom)||0); // full-size header incl. its gap
+    document.body.classList.toggle('scrolled', on);
+    if(on && window.matchMedia('(min-width:761px)').matches){
+      const after = tb.offsetHeight;
+      if(before>after) tb.style.setProperty('margin-bottom', (before - after)+'px', 'important');
+    }
+    updateStickyHeights();
+  };
+  window.addEventListener('scroll', ()=>{ if(ticking) return; ticking=true; requestAnimationFrame(()=>{ const y=window.scrollY, on=document.body.classList.contains('scrolled'); if(!on && y>120) setScrolled(true); else if(on && y<8) setScrolled(false); ticking=false; }); }, {passive:true});
 })();
 // libraries load in parallel (defer); start as soon as they are ready
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init); else init();
