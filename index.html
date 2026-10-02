@@ -788,7 +788,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V12M10 20V5M16 20V9M22 20V3"/></svg></div>
       <div class="brand-text">
         <h1 id="dashboardTitle" title="Click to go home">Performance Dashboard</h1>
-        <p><span id="versionLabelInline">Version 4.12.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
+        <p><span id="versionLabelInline">Version 4.13.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
       </div>
     </div>
     <button type="button" class="side-collapse" id="sideCollapseBtn" aria-label="Collapse menu" title="Collapse menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
@@ -895,7 +895,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       </div>
       <div class="muted-note" id="storageModeNote" style="text-align:center;margin-top:24px;">Data stored locally in this browser.</div>
       <div class="muted-note" style="text-align:center;margin-top:4px;opacity:.65;">
-        <span id="footerVersionLabel">Version 4.12.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
+        <span id="footerVersionLabel">Version 4.13.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
       </div>
     </div>
   </main>
@@ -2661,6 +2661,32 @@ function processFile1(rows, mapping, weekEndDate, dedupeFlag, rangeCheckFn){
 // Attendance value says otherwise — the computed signal takes precedence.
 // I9 Complete / Placed are evaluated directly on this same week's rows (by current status),
 // not on a separate Finalized-On-based week bucket.
+// "Final visited" procedure for the Date Of file (v4.13), applied per row in this order, exactly
+// as done by hand in Excel:
+//  1. Attendance = Checked-In / Auto Checked-In                     → Checked In = Yes
+//  2. Finalized On on or after the Monday of the week                → Checked In = Yes, I-9 Status = I-9 Complete
+//  3. Background Screening Status not blank and not "Not Ordered"   → Checked In = Yes
+//  4. Status Reason = Assigned or Available                          → Checked In = Yes, I-9 Status = I-9 Complete
+//  5. I-9 Status = I-9 Complete (after 2 and 4)                      → Checked In = Yes
+// Then: Show = Checked In is Yes · Hire (finalized) = I-9 Status is I-9 Complete · Placed = Status Reason is Assigned.
+function finalVisitFlags(row, mapping, weekEndDate){
+  const low = v=>(v==null?'':String(v)).trim().toLowerCase();
+  const squash = v=>low(v).replace(/[\s_-]+/g,'');
+  const ci = mapping.checkedIn ? row[mapping.checkedIn] : '';
+  const steps = [];
+  if(ci===true || ['yes','true','1','y'].includes(low(ci))) steps.push(0);
+  const att = squash(row[mapping.attendance]);
+  if(att==='checkedin' || att==='autocheckedin' || att==='autochekedin') steps.push(1);
+  let i9 = mapping.i9Status ? low(row[mapping.i9Status])===I9_COMPLETE_VALUE : false;
+  const fin = mapping.finalizedOn ? toDateVal(row[mapping.finalizedOn]) : null;
+  if(fin && weekEndDate){ const mon = new Date(weekEndDate+'T00:00:00'); mon.setDate(mon.getDate()-5); if(toIsoDateOnly(fin) >= toIsoDateOnly(mon)){ steps.push(2); i9 = true; } }
+  const bg = mapping.backgroundScreening ? low(row[mapping.backgroundScreening]) : '';
+  if(mapping.backgroundScreening && !BG_EXCLUDED_VALUES.includes(bg)) steps.push(3);
+  const reason = mapping.statusReason ? low(row[mapping.statusReason]) : '';
+  if(reason==='assigned' || reason==='available'){ steps.push(4); i9 = true; }
+  if(i9) steps.push(5);
+  return {show: steps.length>0, firstStep: steps.length ? steps[0] : -1, i9Complete: i9, placed: reason===PLACED_STATUS_REASON_VALUE};
+}
 function processFile2(rows, mapping, weekEndDate, dedupeFlag, rangeCheckFn){
   const inRange = rangeCheckFn || ((d)=> inWeekRange(d, weekEndDate));
   const byRecruiter = {};
@@ -2677,22 +2703,17 @@ function processFile2(rows, mapping, weekEndDate, dedupeFlag, rangeCheckFn){
     const eidRaw = mapping.employeeNumber ? (row[mapping.employeeNumber]||'').toString().trim() : '';
     const eid = normalizeEmployeeNumber(eidRaw);
     const day = toIsoDateOnly(dateOfVal);
-    const checkedIn = mapping.checkedIn ? row[mapping.checkedIn] : '';
-    const i9Completed = mapping.i9Completed ? low(row[mapping.i9Completed]) : '';
-    const i9Status = mapping.i9Status ? low(row[mapping.i9Status]) : '';
+    const fv = finalVisitFlags(row, mapping, weekEndDate);
     const it = {
       key: eid ? 'eid:'+eid : (candName ? 'name:'+candName.toLowerCase()+'|'+day : 'row:'+items.length),
       recruiter: (row[mapping.recruiter]||'').toString().trim() || 'Unassigned',
       branch: (row[mapping.branch]||'').toString().trim() || 'Unassigned',
       day, candidate: (candName || eidRaw) ? {name: candName || 'Unknown', eid: eidRaw || '–', date: day} : null,
-      // Show = the "Checked In" column is Yes. Nothing else is used.
-      show: checkedIn===true || ['yes','true','1','y'].includes(low(checkedIn)),
-      // No Show = Attendance is a no-show value, the date has passed, and the candidate didn't check in
+      show: fv.show,                       // final Checked In = Yes
+      // No Show = Attendance is a no-show, the date has passed, and the final Checked In is not Yes
       noShow: hasDatePassed(dateOfVal) && NOSHOW_ATTENDANCE_VALUES.includes(low(row[mapping.attendance])),
-      // Hire = the I-9 Yes/No dropdown is Yes
-      hire: i9Completed===I9_COMPLETED_YES_VALUE || i9Status==='yes',
-      // Placed = Status Reason is Assigned
-      placed: mapping.statusReason ? low(row[mapping.statusReason])===PLACED_STATUS_REASON_VALUE : false,
+      hire: fv.i9Complete,                 // final I-9 Status = I-9 Complete ("finalized")
+      placed: fv.placed,                   // Status Reason = Assigned
     };
     items.push(it);
     diag.totalInWeek++; if(it.show) diag.checkedInYes++; if(it.noShow) diag.rawNoShowAttendance++; if(it.hire) diag.hireYes++; if(it.placed) diag.placedAssigned++;
@@ -6389,7 +6410,8 @@ async function importGoalSheets(goalSheets){
 //  4 = Shows = Checked In is Yes (nothing else); Hires / Placed counted for every interview in the
 //      week, including days that haven't happened yet
 //  5 = Deduped: a candidate counts as a show / hire / placement if ANY of their rows that week is one
-const COUNT_RULES = 5;
+//  6 = "Final visited" procedure (see finalVisitFlags)
+const COUNT_RULES = 6;
 // Recalculates the stored weekly summaries for the given weeks from the server's master sheet.
 async function rebuildWeeks(weeks, localRows, progress){
   const list = [...new Set(weeks)].filter(Boolean).sort();
@@ -7106,13 +7128,14 @@ async function renderCountBreakdown(){
   const low = v=>(v==null?'':String(v)).trim().toLowerCase();
   const sRows = data.s.filter(r=>{ const d=toDateVal(r['Created On']); return d && inWeekRange(d, week); });
   const vRows = data.v.filter(r=>{ const d=toDateVal(r['Date Of']); return d && inWeekRange(d, week); });
-  const isShow = r=>r['Checked In']===true || ['yes','true','1','y'].includes(low(r['Checked In']));
+  const fvCache = new Map(); const fv = r=>{ let f=fvCache.get(r); if(!f){ f=finalVisitFlags(r, MAP2, week); fvCache.set(r,f); } return f; };
+  const isShow = r=>fv(r).show;
   const rules = [
     {label:'Schedules', rule:'Created On is in this week', rows:sRows, match:()=>true, key:'schedules', map:MAP1},
     {label:'Interviews', rule:'Date Of is in this week', rows:vRows, match:()=>true, key:'scheduledDateOf'},
-    {label:'Shows', rule:'Checked In = Yes', rows:vRows, match:isShow, key:'shows'},
+    {label:'Shows', rule:'Checked In = Yes after the 5 update steps below', rows:vRows, match:isShow, key:'shows'},
     {label:'No Shows', rule:'Attendance is a no-show, the date has passed, and Checked In is not Yes', rows:vRows, match:r=>!isShow(r) && NOSHOW_ATTENDANCE_VALUES.includes(low(r['Attendance'])) && hasDatePassed(toDateVal(r['Date Of'])), key:'noShows'},
-    {label:'Hires', rule:'I-9 Completed (Yes/No dropdown) = Yes', rows:vRows, match:r=>low(r['I-9 Completed'])==='yes' || low(r['I-9 Status'])==='yes', key:'i9'},
+    {label:'Hires (finalized)', rule:'I-9 Status = I-9 Complete after steps 2 and 4', rows:vRows, match:r=>fv(r).i9Complete, key:'i9'},
     {label:'Placed', rule:'Status Reason = Assigned', rows:vRows, match:r=>low(r['Status Reason'])===PLACED_STATUS_REASON_VALUE, key:'placed'},
   ];
   const sum = (by, k)=>Object.values(by).reduce((n,o)=>n+(o[k]||0),0);
@@ -7131,12 +7154,18 @@ async function renderCountBreakdown(){
     <div class="cand-explain-head"><strong>How ${escapeHtml(wkLabel)} is counted</strong><span class="hint">from ${fmtNum(sRows.length)} Created On rows and ${fmtNum(vRows.length)} Date Of rows on the server for this week</span></div>
     <div style="overflow-x:auto"><table class="users-table"><thead><tr><th>Number</th><th>Rule (column in the export)</th><th>Rows matching</th><th>− no name or Employee Number</th><th>= Raw</th><th>− repeat Employee Numbers</th><th>= Deduped</th></tr></thead>
     <tbody>${lines.map(l=>`<tr><td><strong>${l.label}</strong></td><td class="hint">${escapeHtml(l.rule)}</td><td>${fmtNum(l.matching)}</td><td>${l.missing?'−'+fmtNum(l.missing):'0'}</td><td><strong>${fmtNum(l.raw)}</strong></td><td>${l.raw-l.ded?'−'+fmtNum(l.raw-l.ded):'0'}</td><td><strong>${fmtNum(l.ded)}</strong></td></tr>`).join('')}</tbody></table></div>
+    ${(()=>{ const mon=new Date(week+'T00:00:00'); mon.setDate(mon.getDate()-5);
+      const steps=[['Checked In was already Yes in the export'],['1 · Attendance = Checked-In / Auto Checked-In'],['2 · Finalized On on or after Monday '+fmtDate(toIsoDateOnly(mon))+' (also sets I-9 Complete)'],['3 · Background Screening Status not blank / not “Not Ordered”'],['4 · Status Reason = Assigned or Available (also sets I-9 Complete)'],['5 · I-9 Status = I-9 Complete']];
+      let cum=0; const rowsHtml=steps.map((st,k)=>{ const added=vRows.filter(r=>fv(r).firstStep===k).length; cum+=added; return '<tr><td>'+escapeHtml(st[0])+'</td><td>+'+fmtNum(added)+'</td><td><strong>'+fmtNum(cum)+'</strong></td></tr>'; }).join('');
+      return '<p class="hint" style="margin:12px 0 4px;">“Final visited” — Checked In = Yes after each step (all '+fmtNum(vRows.length)+' Date Of rows of the week, before removing blanks or repeats):</p><div style="overflow-x:auto"><table class="users-table"><thead><tr><th>Step</th><th>Rows newly Yes</th><th>Checked In = Yes so far</th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>'; })()}
     <p class="hint" style="margin:10px 0 4px;">Values in the Date Of rows for this week — useful when checking against a filter in Excel:</p>
     <ul class="cand-explain-dist">
       <li><b>Checked In:</b> ${dist('Checked In', vRows)}</li>
       <li><b>I-9 Completed:</b> ${dist('I-9 Completed', vRows)}</li>
       <li><b>I-9 Status:</b> ${dist('I-9 Status', vRows)}</li>
       <li><b>Status Reason:</b> ${dist('Status Reason', vRows)}</li>
+      <li><b>Attendance:</b> ${dist('Attendance', vRows)}</li>
+      <li><b>Background Screening Status:</b> ${dist('Background Screening Status', vRows)}</li>
     </ul></div>`;
 }
 function candFiltered(){
@@ -7239,7 +7268,7 @@ async function renderUploadHistory(){
 }
 
 /* ============================= INIT ============================= */
-const APP_VERSION = 'Version 4.12.0';
+const APP_VERSION = 'Version 4.13.0';
 async function init(){
   document.getElementById('versionLabelInline').textContent = APP_VERSION;
   document.getElementById('footerVersionLabel').textContent = APP_VERSION;
