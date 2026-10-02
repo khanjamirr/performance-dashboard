@@ -779,7 +779,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V12M10 20V5M16 20V9M22 20V3"/></svg></div>
       <div class="brand-text">
         <h1 id="dashboardTitle" title="Click to go home">Performance Dashboard</h1>
-        <p><span id="versionLabelInline">Version 4.10.1</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
+        <p><span id="versionLabelInline">Version 4.11.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
       </div>
     </div>
     <button type="button" class="side-collapse" id="sideCollapseBtn" aria-label="Collapse menu" title="Collapse menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
@@ -886,7 +886,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       </div>
       <div class="muted-note" id="storageModeNote" style="text-align:center;margin-top:24px;">Data stored locally in this browser.</div>
       <div class="muted-note" style="text-align:center;margin-top:4px;opacity:.65;">
-        <span id="footerVersionLabel">Version 4.10.1</span> &middot; &copy; <span id="footerCopyrightYear"></span>
+        <span id="footerVersionLabel">Version 4.11.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
       </div>
     </div>
   </main>
@@ -1845,6 +1845,7 @@ const FILE2_COLUMN_SPECS = [
   {key:'statusReason', label:'Status Reason', exact:['status reason (employee) (employee)','status reason'], required:false},
   {key:'i9Status', label:'I-9 Status', exact:['i-9 status (employee) (employee)','i-9 status','i9 status'], required:false},
   {key:'i9Completed', label:'I-9 Completed (Yes/No)', exact:['i-9 completed (employee) (employee)','i-9 completed','i9 completed'], required:false},
+  {key:'checkedIn', label:'Checked In (Yes/No)', exact:['checked in','checked-in','checkedin'], required:false},
 ];
 
 // Fixed matching values, exactly as specified — not configurable in the UI.
@@ -2727,7 +2728,9 @@ function processFile2(rows, mapping, weekEndDate, dedupeFlag, rangeCheckFn){
     // actually occurred \u2014 a future-dated row stays "pending" (counted in Interviews,
     // not yet a Show or a No Show) even if a status field carries a stray value early.
     const dateOccurred = hasDatePassed(dateOfVal);
-    const systemCheckedIn = dateOccurred && (attendanceMatch || finalizedInWeek || bgMatch || reasonMatch || i9StatusMatch || i9CompletedMatch);
+    // Show = the "Checked In" column says Yes — nothing else is used (v4.11).
+    const checkedInRaw = mapping.checkedIn ? row[mapping.checkedIn] : '';
+    const systemCheckedIn = checkedInRaw===true || ['yes','true','1','y'].includes(String(checkedInRaw??'').trim().toLowerCase());
 
     if(attendanceMatch) diag.attendanceMatch++;
     if(finalizedInWeek) diag.finalizedMatch++;
@@ -2749,8 +2752,8 @@ function processFile2(rows, mapping, weekEndDate, dedupeFlag, rangeCheckFn){
 
     // Hires = the I-9 Yes/No dropdown is Yes ("I-9 Completed (Employee) (Employee)"; a Yes in "I-9 Status" counts too)
     const isHire = i9CompletedMatch || i9Val === 'yes';
-    if(dateOccurred && isHire){ day.i9++; byRecruiter[recruiter].i9++; if(candidate) byRecruiter[recruiter].i9List.push(candidate); }
-    if(dateOccurred && reasonVal===PLACED_STATUS_REASON_VALUE){ day.placed++; byRecruiter[recruiter].placed++; if(candidate) byRecruiter[recruiter].placedList.push(candidate); }
+    if(isHire){ day.i9++; byRecruiter[recruiter].i9++; if(candidate) byRecruiter[recruiter].i9List.push(candidate); }
+    if(reasonVal===PLACED_STATUS_REASON_VALUE){ day.placed++; byRecruiter[recruiter].placed++; if(candidate) byRecruiter[recruiter].placedList.push(candidate); }
   });
   return {byRecruiter, diag};
 }
@@ -6243,10 +6246,10 @@ function findContactColumns(headers, rows, protectedHeaders){
 // One row per interview. Both exports carry the same columns, so a row found in both files is
 // stored once and flagged as being in each. Schedules count by Created On, shows by Date Of.
 const CANON = {createdOn:'Created On', dateOf:'Date Of', recruiter:'Created By', branch:'Branch', attendance:'Attendance', employeeNumber:'Employee Number', candidateName:'Candidate Name',
-  finalizedOn:'Finalized On', backgroundScreening:'Background Screening Status', statusReason:'Status Reason', i9Status:'I-9 Status', i9Completed:'I-9 Completed'};
+  finalizedOn:'Finalized On', backgroundScreening:'Background Screening Status', statusReason:'Status Reason', i9Status:'I-9 Status', i9Completed:'I-9 Completed', checkedIn:'Checked In'};
 const ALL_SPECS = [...FILE2_COLUMN_SPECS, ...FILE1_COLUMN_SPECS.filter(s=>s.key==='createdOn')];
 const MAP1 = {createdOn:'Created On', recruiter:'Created By', branch:'Branch', employeeNumber:'Employee Number', candidateName:'Candidate Name'};
-const MAP2 = {dateOf:'Date Of', recruiter:'Created By', branch:'Branch', attendance:'Attendance', employeeNumber:'Employee Number', candidateName:'Candidate Name', finalizedOn:'Finalized On', backgroundScreening:'Background Screening Status', statusReason:'Status Reason', i9Status:'I-9 Status', i9Completed:'I-9 Completed'};
+const MAP2 = {dateOf:'Date Of', recruiter:'Created By', branch:'Branch', attendance:'Attendance', employeeNumber:'Employee Number', candidateName:'Candidate Name', finalizedOn:'Finalized On', backgroundScreening:'Background Screening Status', statusReason:'Status Reason', i9Status:'I-9 Status', i9Completed:'I-9 Completed', checkedIn:'Checked In'};
 const SOURCE_LABEL = {schedules:'Created On (schedules)', shows:'Date Of (shows)'};
 const IMPORT_BATCH = 1000;
 let deleteSourceFilesAfterImport = true;
@@ -6419,7 +6422,9 @@ async function importGoalSheets(goalSheets){
 // Bumped whenever a counting rule changes; weeks saved under an older rule are recounted
 // automatically the next time someone with upload rights signs in.
 //  3 = Hires from the I-9 Yes dropdown; rows need both a name and an Employee Number
-const COUNT_RULES = 3;
+//  4 = Shows = Checked In is Yes (nothing else); Hires / Placed counted for every interview in the
+//      week, including days that haven't happened yet
+const COUNT_RULES = 4;
 // Recalculates the stored weekly summaries for the given weeks from the server's master sheet.
 async function rebuildWeeks(weeks, localRows, progress){
   const list = [...new Set(weeks)].filter(Boolean).sort();
@@ -7211,7 +7216,7 @@ async function renderUploadHistory(){
 }
 
 /* ============================= INIT ============================= */
-const APP_VERSION = 'Version 4.10.1';
+const APP_VERSION = 'Version 4.11.0';
 async function init(){
   document.getElementById('versionLabelInline').textContent = APP_VERSION;
   document.getElementById('footerVersionLabel').textContent = APP_VERSION;
