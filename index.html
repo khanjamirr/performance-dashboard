@@ -779,7 +779,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V12M10 20V5M16 20V9M22 20V3"/></svg></div>
       <div class="brand-text">
         <h1 id="dashboardTitle" title="Click to go home">Performance Dashboard</h1>
-        <p><span id="versionLabelInline">Version 4.10.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
+        <p><span id="versionLabelInline">Version 4.10.1</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
       </div>
     </div>
     <button type="button" class="side-collapse" id="sideCollapseBtn" aria-label="Collapse menu" title="Collapse menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
@@ -886,7 +886,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       </div>
       <div class="muted-note" id="storageModeNote" style="text-align:center;margin-top:24px;">Data stored locally in this browser.</div>
       <div class="muted-note" style="text-align:center;margin-top:4px;opacity:.65;">
-        <span id="footerVersionLabel">Version 4.10.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
+        <span id="footerVersionLabel">Version 4.10.1</span> &middot; &copy; <span id="footerCopyrightYear"></span>
       </div>
     </div>
   </main>
@@ -2970,6 +2970,9 @@ async function refreshUI(){
 /* ============================= SETTINGS MODAL ============================= */
 let settingsModalOpen = false;
 function renderSettingsModalContent(){
+  const stale = document.getElementById('schemaStaleNote');
+  if(stale) stale.remove();
+  if(databaseSchemaStale) document.getElementById('settingsPane-sync')?.insertAdjacentHTML('afterbegin', '<div class="panel warn-note" id="schemaStaleNote" style="margin-bottom:16px;"><strong>Database setup is out of date.</strong> This page (v'+APP_VERSION.replace('Version ','')+') needs the matching <code>supabase_setup.sql</code>. Open Supabase → SQL Editor → New query, paste the whole file, click <em>Run</em>, and check it finishes with “Success”. Until then, newer features (for example the Candidates right for users) won’t work.</div>');
   renderFolderUploadExplainer();
   renderUploadHistory();
   renderNumberCheck();
@@ -6009,7 +6012,7 @@ const Server = {
     }
     if(remarks) await Remarks.load().catch(()=>{});
     if(users){
-      try{ const me = await this.rpc('dash_me'); const changed = JSON.stringify(me.modules)!==JSON.stringify(this.user.modules) || me.name!==this.user.name; this.user=me; if(changed){ applyPermissions(); showToast('Your access rights were updated.'); } }catch(e){}
+      try{ const me = await this.rpc('dash_me'); const changed = JSON.stringify(me.modules)!==JSON.stringify(this.user.modules) || me.name!==this.user.name; this.user=me; if(changed){ applyPermissions(); refreshUI(); showToast('Your access rights were updated.'); } }catch(e){}
       if(settingsModalOpen && !document.getElementById('settingsPane-users')?.classList.contains('hidden')) renderUsersAdmin();
     }
     if(master){ candState.cache.clear(); if(currentView==='candidates') renderCandidatesView(); }
@@ -6041,6 +6044,25 @@ async function reloadAllFromStorage(){
 }
 
 /* ------------------------------------------ PERMISSIONS ------------------------------------------ */
+document.addEventListener('visibilitychange', async ()=>{
+  if(document.visibilityState!=='visible' || !Server.token || !Server.user) return;
+  try{ const me = await Server.rpc('dash_me'); const changed = JSON.stringify(me.modules)!==JSON.stringify(Server.user.modules); Server.user = me; if(changed){ applyPermissions(); refreshUI(); showToast('Your access rights were updated.'); } }catch(e){}
+});
+// The page needs the database functions from the matching supabase_setup.sql. If the super
+// admin hasn't run the latest one (or the run failed), new features such as new user rights
+// silently don't work — so say so plainly.
+const REQUIRED_SCHEMA = 10;
+let databaseSchemaStale = false;
+async function checkDatabaseSchema(){
+  try{
+    const st = await Server.call('dash_status');
+    databaseSchemaStale = !st || (Number(st.schema)||0) < REQUIRED_SCHEMA;
+  }catch(e){ databaseSchemaStale = false; }
+  if(databaseSchemaStale){
+    setTimeout(()=>showToast('Your database setup is out of date — run the latest supabase_setup.sql in Supabase (Settings shows how).'), 4000);
+    if(settingsModalOpen) renderSettingsModalContent();
+  }
+}
 function applyPermissions(){
   const u = Server.user; if(!u) return;
   document.querySelectorAll('#navList button[data-view]').forEach(b=>{ b.classList.toggle('hidden', !Server.can(VIEW_MODULE[b.dataset.view])); });
@@ -6185,6 +6207,7 @@ async function afterLogin(boot){
     if(boot) Server.startPollingFrom(Server.since); else await Server.startPolling();
     setTimeout(async ()=>{ await Server.loadListsInBackground(); setTimeout(()=>autoVerifyWeeks(true), 500); }, 300);
     if(Server.isAdmin() && Server.user.default_password) showToast('You are still using the setup password. Change it in Settings → My account.');
+    if(Server.isAdmin()) checkDatabaseSchema();
   }catch(e){
     console.error(e);
     if(Server.token) showToast('Could not load the dashboard: '+cleanErr(e));
@@ -6919,8 +6942,14 @@ function drawUserForm(){
     if(!sa){ p.modules = [...host.querySelectorAll('.mod-grid input:checked')].map(i=>i.value); p.active = host.querySelector('#ufActive').checked; }
     if(isNew && !pw){ host.querySelector('#ufMsg').textContent='Set a password (or click Generate).'; return; }
     try{
-      await Server.rpc('dash_user_save', {p});
-      showToast(isNew ? 'User created. Share the name and password with '+p.name+' privately.' : 'Saved.');
+      const saved = await Server.rpc('dash_user_save', {p});
+      // the server keeps only rights it knows; if one was dropped its SQL is out of date
+      const dropped = (p.modules||[]).filter(m=>saved && Array.isArray(saved.modules) && !saved.modules.includes(m));
+      if(dropped.length){
+        const names = dropped.map(k=>(MODULES.find(m=>m.key===k)||{label:k}).label).join(', ');
+        alert('The database did not accept these rights: '+names+'.\n\nIts setup is older than this page. Open Supabase → SQL Editor, paste the latest supabase_setup.sql, click Run, then tick the rights again.');
+      }
+      showToast(isNew ? 'User created. Share the name and password with '+p.name+' privately.' : 'Saved.'+(dropped.length?' Some rights were not accepted — see the message.':' '+p.name+' sees the change within a few seconds.'));
       if(isNew && pw) host.insertAdjacentHTML('afterend','');
       editingUserId=null; renderUsersAdmin();
       if(!isNew && u.id===Server.user.id){ Server.user = await Server.rpc('dash_me'); applyPermissions(); }
@@ -7182,7 +7211,7 @@ async function renderUploadHistory(){
 }
 
 /* ============================= INIT ============================= */
-const APP_VERSION = 'Version 4.10.0';
+const APP_VERSION = 'Version 4.10.1';
 async function init(){
   document.getElementById('versionLabelInline').textContent = APP_VERSION;
   document.getElementById('footerVersionLabel').textContent = APP_VERSION;
