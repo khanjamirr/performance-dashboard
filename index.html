@@ -750,9 +750,10 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
 @media (max-width:760px){.settings-page{border-radius:14px;margin:0 0 16px}.settings-page .settings-tabs{top:0;padding:0 8px}.settings-page .settings-tab-content{padding:14px 12px 18px}.settings-page #manageWeeksTable th{top:47px}.settings-page .panel:has(table){overflow-x:auto}}
 
 /* ---------- smarter cards & header (v4.6) ---------- */
-.kpi-v2{grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:12px!important}
-.kpi-v2 .kpi-rate{grid-column:span 2}
-@media (max-width:1320px){.kpi-v2{grid-template-columns:repeat(3,minmax(0,1fr))!important}.kpi-v2 .kpi-rate{grid-column:auto}}
+.kpi-v2{grid-template-columns:repeat(12,minmax(0,1fr))!important;gap:12px!important}
+.kpi-v2 .kpi-card{grid-column:span 2}
+.kpi-v2 .kpi-rate{grid-column:span 3}
+@media (max-width:1320px){.kpi-v2{grid-template-columns:repeat(6,minmax(0,1fr))!important}.kpi-v2 .kpi-card{grid-column:span 2}.kpi-v2 .kpi-rate{grid-column:span 3}}
 .kpi-v2 .kpi-card{display:flex;flex-direction:column;min-height:0!important;padding:16px 16px 14px!important;background:#fff!important;color:var(--text)!important;border:1px solid #e1eaed!important;border-radius:16px!important;box-shadow:0 1px 2px #1834420a,0 8px 24px #1834420a!important;transition:transform .15s ease,box-shadow .15s ease;overflow:hidden}
 .kpi-v2 .kpi-card:hover{transform:translateY(-2px);box-shadow:0 2px 4px #1834420d,0 14px 30px #18344214!important}
 .kpi-v2 .kpi-card:before{content:'';position:absolute;left:0;top:0;right:0;height:3px;width:auto!important;margin:0!important;border-radius:0!important;background:var(--accent)!important;opacity:.85}
@@ -784,7 +785,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
   body.scrolled .topbar{padding-top:10px!important;padding-bottom:10px!important}
 }
 @media (min-width:761px) and (max-width:1180px){ :root{--side-w:224px} .nav button{font-size:12.5px!important;gap:10px!important;padding:10px!important} .topbar,.content{padding-left:20px!important;padding-right:20px!important} }
-@media (max-width:760px){ .kpi-v2{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important} .kpi-v2 .kpi-card{padding:12px!important} .kpi-v2 .kpi-ico{width:24px;height:24px;flex-basis:24px} .kpi-spark{height:26px} }
+@media (max-width:760px){ .kpi-v2{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important} .kpi-v2 .kpi-card,.kpi-v2 .kpi-rate{grid-column:auto!important} .kpi-v2 .kpi-card{padding:12px!important} .kpi-v2 .kpi-ico{width:24px;height:24px;flex-basis:24px} .kpi-spark{height:26px} }
 
 </style>
 </head>
@@ -797,7 +798,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V12M10 20V5M16 20V9M22 20V3"/></svg></div>
       <div class="brand-text">
         <h1 id="dashboardTitle" title="Click to go home">Performance Dashboard</h1>
-        <p><span id="versionLabelInline">Version 4.14.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
+        <p><span id="versionLabelInline">Version 4.15.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
       </div>
     </div>
     <button type="button" class="side-collapse" id="sideCollapseBtn" aria-label="Collapse menu" title="Collapse menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
@@ -904,7 +905,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       </div>
       <div class="muted-note" id="storageModeNote" style="text-align:center;margin-top:24px;">Data stored locally in this browser.</div>
       <div class="muted-note" style="text-align:center;margin-top:4px;opacity:.65;">
-        <span id="footerVersionLabel">Version 4.14.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
+        <span id="footerVersionLabel">Version 4.15.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
       </div>
     </div>
   </main>
@@ -3406,6 +3407,12 @@ async function renderWeeklyView(){
       ${kpiCardHtml({label:'No Shows', icon:'x', accent:'#c4565f', value:fmtNum(t.noShows), delta:deltaHtml(t.noShows, prevT? prevT.noShows: undefined, false), spark:kpiSeries(week, w=>w.noShows, true)})}
       ${kpiCardHtml({label:'Hires', icon:'hire', accent:'#7a5fb8', value:fmtNum(t.i9), delta:deltaHtml(t.i9, prevT? prevT.i9: undefined), spark:kpiSeries(week, w=>w.i9, true), title:'Interviews this week whose I-9 dropdown is Yes'})}
       ${kpiCardHtml({label:'Placed', icon:'brief', accent:'#b07a2a', value:fmtNum(t.placed), delta:deltaHtml(t.placed, prevT? prevT.placed: undefined), spark:kpiSeries(week, w=>w.placed, true), title:'Interviews this week whose Status Reason is Assigned'})}
+      ${(()=>{ const hpr = hiresPerRecruiter(scopedWeeksForSummary), prevHpr = prev && !isMultiWeekMode ? hiresPerRecruiter([scopeWeekToDivision(prev, universalDivision)]) : null;
+        const d = (hpr.value!=null && prevHpr && prevHpr.value!=null) ? hpr.value-prevHpr.value : null;
+        return kpiCardHtml({rate:true, label:'Hires per Recruiter', icon:'hire', accent:'#7a5fb8', value: hpr.value==null?'\u2013':hpr.value.toFixed(1),
+          delta: d==null ? '<div class="delta flat">'+fmtNum(hpr.hires)+' hires ÷ '+fmtNum(hpr.recruiters)+' recruiters</div>' : '<span class="delta '+(d>=0?'up':'down')+'">'+(d>=0?'+':'−')+Math.abs(d).toFixed(1)+' vs prior week · '+fmtNum(hpr.hires)+' ÷ '+fmtNum(hpr.recruiters)+'</span>',
+          bar: hpr.value==null ? null : {v:hpr.value, target:HIRES_PER_RECRUITER_TARGET, max:HIRES_PER_RECRUITER_TARGET*1.5, good:'up', unit:''},
+          title:'Total hires ÷ number of recruiters with activity'+(isMultiWeekMode?' (per recruiter per week)':' this week')}); })()}
       ${kpiCardHtml({rate:true, label:'Goal Reach', icon:'target', accent:'#a67c2e', value:goalReachPct!==null?goalReachPct.toFixed(1)+'%':'\u2013', delta:'<div class="delta flat">'+(isMultiWeekMode?'Combined':'Target 100%')+'</div>', bar:goalReachPct!==null?{v:goalReachPct, target:100, good:'up'}:null})}
       ${(()=>{ const pend=!isMultiWeekMode && weekIsFullyPending(week.weekEndDate); return kpiCardHtml({label:'Show Rate', icon:'trend', rate:true, accent:'#1f8a84', value:pend?'Pending':fmtPct(t.shows,t.scheduledDateOf), delta:pend?'<div class="delta flat">Week hasn\u2019t happened yet</div>':deltaHtml(showRate, prevShowRate, true, true), bar:pend||!t.scheduledDateOf?null:{v:showRate, target:60, good:'up'}})
         + kpiCardHtml({rate:true, label:'No Show Rate', icon:'down', accent:'#c4565f', value:pend?'Pending':fmtPct(t.noShows,t.scheduledDateOf), delta:pend?'<div class="delta flat">Week hasn\u2019t happened yet</div>':deltaHtml(noShowRate, prevNoShowRate, false, true), bar:pend||!t.scheduledDateOf?null:{v:noShowRate, target:40, good:'down'}}); })()}
@@ -3613,6 +3620,14 @@ async function renderWeeklyTopPerformers(week, suppliedGoals){
 }
 
 /* ---------- KPI cards: value, change, 8-week sparkline or target bar ---------- */
+const HIRES_PER_RECRUITER_TARGET = 12; // same target as the "Hires per Recruiter" trend chart
+// Total hires ÷ number of recruiters with any activity, summed over the weeks given (so for
+// several weeks it is hires per recruiter per week).
+function hiresPerRecruiter(weeks){
+  let hires=0, recruiters=0;
+  (weeks||[]).forEach(w=>{ if(!w) return; hires += (w.totals&&w.totals.i9)||0; recruiters += Object.values(w.byRecruiter||{}).filter(r=>(r.schedules||0)+(r.scheduledDateOf||0)+(r.shows||0)+(r.i9||0)+(r.placed||0)>0).length; });
+  return {hires, recruiters, value: recruiters ? hires/recruiters : null};
+}
 const KPI_ICONS={hire:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5 1.6 0 3 .5 4.1 1.4"/><path d="M15.5 17.5l2 2 4-4.5"/>',brief:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"/>',cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',chat:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',check:'<path d="M20 6L9 17l-5-5"/>',x:'<path d="M18 6L6 18M6 6l12 12"/>',target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',trend:'<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',down:'<path d="M3 7l6 6 4-4 8 8"/><path d="M15 17h6v-6"/>'};
 // last 8 weeks up to the selected one, scoped to the selected division
 function kpiSeries(week, pick, skipPending){
@@ -3636,8 +3651,9 @@ function kpiCardHtml(o){
   let foot='';
   if(o.spark && o.spark.length>1) foot = `<div class="kpi-foot">${sparkSvg(o.spark, o.accent)}</div>`;
   else if(o.bar){
-    const v=Math.max(0,Math.min(100,o.bar.v)), ok = o.bar.good==='up' ? o.bar.v>=o.bar.target : o.bar.v<=o.bar.target;
-    foot = `<div class="kpi-foot kpi-bar-wrap" title="Target ${o.bar.good==='up'?'≥':'≤'} ${o.bar.target}%"><div class="kpi-bar"><i style="width:${v}%;background:${ok?'#1f9a6c':'#d0776f'}"></i><b style="left:${Math.min(100,o.bar.target)}%"></b></div><span class="kpi-foot-lbl">${o.bar.good==='up'?'≥':'≤'} ${o.bar.target}%</span></div>`;
+    const max=o.bar.max||100, unit=o.bar.unit==null?'%':o.bar.unit, scale=x=>Math.max(0,Math.min(100,x/max*100));
+    const ok = o.bar.good==='up' ? o.bar.v>=o.bar.target : o.bar.v<=o.bar.target;
+    foot = `<div class="kpi-foot kpi-bar-wrap" title="Target ${o.bar.good==='up'?'≥':'≤'} ${o.bar.target}${unit}"><div class="kpi-bar"><i style="width:${scale(o.bar.v)}%;background:${ok?'#1f9a6c':'#d0776f'}"></i><b style="left:${scale(o.bar.target)}%"></b></div><span class="kpi-foot-lbl">${o.bar.good==='up'?'≥':'≤'} ${o.bar.target}${unit}</span></div>`;
   }
   return `<div class="kpi-card${o.rate?' kpi-rate':''}" style="--accent:${o.accent}"${o.title?` title="${escapeHtml(o.title)}"`:''}><div class="kpi-top"><div class="label">${o.label}</div><span class="kpi-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${KPI_ICONS[o.icon]||''}</svg></span></div><div class="value">${o.value}</div>${o.delta||''}${foot}</div>`;
 }
@@ -7381,7 +7397,7 @@ async function renderUploadHistory(){
 }
 
 /* ============================= INIT ============================= */
-const APP_VERSION = 'Version 4.14.0';
+const APP_VERSION = 'Version 4.15.0';
 async function init(){
   document.getElementById('versionLabelInline').textContent = APP_VERSION;
   document.getElementById('footerVersionLabel').textContent = APP_VERSION;
