@@ -719,7 +719,26 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
 }
 @media (min-width:761px) and (max-width:1180px){ :root{--side-w:216px} }
 @media print{.sidebar{display:none!important}}
+.set-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.set-stats>div{background:#fff;border:1px solid #e1eaed;border-radius:14px;padding:14px 16px}
+.set-stats span{display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6b818c}
+.set-stats strong{display:block;font-size:20px;color:#132f3b;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.set-stats small{display:block;font-size:11.5px;font-weight:500;color:var(--text-secondary);margin-top:2px}
+.wk-strip-head{display:flex;justify-content:space-between;align-items:center;margin:16px 0 8px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6b818c}
+.wk-missing{color:#c0444e;letter-spacing:0;text-transform:none;font-size:12px}.wk-ok{color:#17845c;letter-spacing:0;text-transform:none;font-size:12px}
+.wk-strip{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:8px}
+.wk-chip{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:9px 10px;border-radius:10px;border:1px solid #e1eaed;background:#f8fbfb;cursor:pointer;text-align:left;font:inherit;min-width:0}
+.wk-chip b{font-size:12.5px;color:#132f3b}.wk-chip span{font-size:10.5px;color:#6b818c;white-space:nowrap}
+.wk-chip i{font-style:normal;font-size:10.5px;font-weight:700;margin-top:3px}
+.wk-chip.has i{color:#17845c}.wk-chip.missing{background:#fff6f6;border-color:#f0caca}.wk-chip.missing i{color:#c0444e}
+.wk-chip.now{border-color:#9fd0cb}.wk-chip.now i{color:#1f6f8a}
+.wk-chip:hover:not([disabled]){border-color:#1f8a84;box-shadow:0 2px 8px #1834421a}
+.wk-chip[disabled]{cursor:default}
+@media (max-width:1300px){.wk-strip{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media (max-width:760px){.set-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.wk-strip{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
 /* ---------- Settings: grouped side menu, minimal cards (v4.17) ---------- */
+#view-settings.hidden,.settings-page.hidden{display:none!important}
 .settings-group{display:none}
 .st-ico{width:17px;height:17px;flex:0 0 17px;opacity:.85}
 .set-card{padding:18px 22px!important}
@@ -852,7 +871,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V12M10 20V5M16 20V9M22 20V3"/></svg></div>
       <div class="brand-text">
         <h1 id="dashboardTitle" title="Click to go home">Performance Dashboard</h1>
-        <p><span id="versionLabelInline">Version 4.17.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
+        <p><span id="versionLabelInline">Version 4.17.1</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
       </div>
     </div>
     <button type="button" class="side-collapse" id="sideCollapseBtn" aria-label="Collapse menu" title="Collapse menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
@@ -911,14 +930,14 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       <nav class="settings-tabs" id="settingsTabs" aria-label="Settings sections"><div class="settings-group">Data</div><button class="settings-tab active" data-tab="sync"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg><span>Uploads</span></button><button class="settings-tab" data-tab="fetched"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Saved weeks</span></button><div class="settings-group">Team</div><button class="settings-tab" data-tab="goals"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span>Goals</span></button><button class="settings-tab" data-tab="recruiters"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M17 11l2 2 4-4"/></svg><span>Recruiters</span></button><button class="settings-tab" data-tab="divisions"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Divisions</span></button><button class="settings-tab" data-tab="branches"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21V9l9-5 9 5v12"/><path d="M9 21v-6h6v6"/></svg><span>Branches</span></button><div class="settings-group">Access</div><button class="settings-tab" data-tab="users"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><circle cx="17.5" cy="9" r="2.5"/><path d="M16.8 14.6c2.4.3 4 2 4.7 4.9"/></svg><span>Users</span></button><button class="settings-tab" data-tab="activity"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg><span>Activity</span></button><button class="settings-tab" data-tab="account"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.2-4 4.2-6 8-6s6.8 2 8 6"/></svg><span>My account</span></button></nav>
       <div class="settings-tab-content">
         <div id="settingsPane-sync">
+          <div id="view-folderUploads"></div>
+          <div id="numberCheck"></div>
+          <div id="uploadHistory"></div>
           <div class="panel set-card settings-only">
             <h3 class="set-title">Preferences</h3>
             <div class="set-row"><div><strong>Performer highlights</strong><span>Badges for top and star performers in the recruiter and branch tables</span></div><button type="button" class="switch" role="switch" id="settingsPerformerHighlightBtn" aria-checked="false"><i></i></button></div>
             <div class="set-row"><div><strong>Remove repeat Employee Numbers</strong><span id="dedupePrefText">Deduped — each candidate counts once per week (your view only)</span></div><button type="button" class="switch" role="switch" id="settingsDedupeToggleBtn" aria-checked="true"><i></i></button></div>
           </div>
-          <div id="view-folderUploads"></div>
-          <div id="numberCheck"></div>
-          <div id="uploadHistory"></div>
         </div>
         <div id="settingsPane-divisions" class="hidden"><div id="divisionNameSettings"></div></div><div id="settingsPane-recruiters" class="hidden"><p class="hint">Checked recruiters are visible. Changes save automatically.</p><div id="settingsRecruiterVisibilityList"></div></div><div id="settingsPane-fetched" class="hidden"><div id="view-manage"></div></div>
         <div id="settingsPane-branches" class="hidden"><div id="view-branchDivisions"></div></div>
@@ -951,7 +970,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       </div>
       <div class="muted-note" id="storageModeNote" style="text-align:center;margin-top:24px;">Data stored locally in this browser.</div>
       <div class="muted-note" style="text-align:center;margin-top:4px;opacity:.65;">
-        <span id="footerVersionLabel">Version 4.17.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
+        <span id="footerVersionLabel">Version 4.17.1</span> &middot; &copy; <span id="footerCopyrightYear"></span>
       </div>
     </div>
   </main>
@@ -2555,13 +2574,31 @@ function parseGoalsColumnHeader(header){
 function renderFolderUploadExplainer(){
   const container = document.getElementById('view-folderUploads');
   if(!container || isSnapshotMode) return;
-  if(!Server.can('upload')){ container.innerHTML = '<div class="panel"><span class="hint">Your account cannot upload data. Ask the super admin for the “Upload spreadsheets” right.</span></div>'; return; }
+  const canUpload = Server.can('upload');
   const log = lastFolderScanLog.length ? `<ul class="upload-result">${lastFolderScanLog.map(l=>`<li class="${/file1|file2|goals/.test(l.status)?'ok':'bad'}"><strong>${escapeHtml(l.name)}</strong> — ${escapeHtml(l.detail)}</li>`).join('')}</ul>` : '';
-  container.innerHTML = `<div class="panel import-panel set-card"><div class="import-row">
-      <div><h3 class="set-title" style="margin:0 0 4px;">Upload data</h3><span class="hint">Created On, Date Of or goals files — you choose the week first; that week is replaced. Contact numbers are removed and the files aren’t kept.</span><span class="hint" style="display:none">Upload the Created On and Date Of exports (separately or together) and the goals file. Rows with the same dates and details replace the existing ones; anything new is added. Contact numbers are removed and the files themselves are not kept.</span></div>
-      <button class="btn btn-primary" id="uploadFilesBtn">Upload Excel files</button>
-    </div>${log}</div>`;
-  container.querySelector('#uploadFilesBtn').onclick = ()=>pickSpreadsheetsToUpload();
+  // last 10 weeks (Sun–Sat), newest first: which have data, which are missing
+  const thisSat = toIsoDateOnly(saturdayOnOrAfter(new Date()));
+  const cover = []; for(let i=0;i<10;i++){ const d=new Date(thisSat+'T00:00:00'); d.setDate(d.getDate()-7*i); cover.push(toIsoDateOnly(d)); }
+  const chip = we=>{ const w=weekOfDate(we), rec=KV.get('weekly:'+we), has=!!rec, saved=rec&&rec.savedAt?new Date(rec.savedAt).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'';
+    const t=rec?((rec.deduped||rec).totals||{}):{};
+    return `<button type="button" class="wk-chip ${has?'has':'missing'}${we===thisSat?' now':''}" data-upload-week="${we}" ${canUpload?'':'disabled'} title="${has?'Saved '+escapeHtml(saved)+' · '+fmtNum(t.schedules||0)+' schedules · '+fmtNum(t.scheduledDateOf||0)+' interviews — click to replace':'No data — click to upload'}"><b>Wk ${w.number}</b><span>${fmtDate(w.weekStart).replace(/, \d{4}$/,'')} – ${fmtDate(we).replace(/, \d{4}$/,'')}</span><i>${has?(we===thisSat?'In progress':'Saved'):'Missing'}</i></button>`; };
+  const missing = cover.slice(1).filter(we=>!KV.has('weekly:'+we)).length;
+  container.innerHTML = `<div class="set-stats" id="setStats">
+      <div><span>Weeks saved</span><strong>${fmtNum(weeksData.length)}</strong></div>
+      <div><span>Latest week</span><strong>${weeksData.length?'Wk '+weeksData[weeksData.length-1].weekNumber:'–'}</strong></div>
+      <div><span>Master sheet</span><strong id="statRows">…</strong></div>
+      <div><span>Last upload</span><strong id="statLast">…</strong></div>
+    </div>
+    <div class="panel import-panel set-card">
+      <div class="import-row"><div><h3 class="set-title" style="margin:0 0 4px;">Upload data</h3><span class="hint">${canUpload?'Pick the week, then the Created On / Date Of / goals files. That week is replaced; rows from other weeks are rejected.':'Your account can’t upload — ask the super admin for the “Upload spreadsheets” right.'}</span></div>
+        ${canUpload?'<button class="btn btn-primary" id="uploadFilesBtn">Upload Excel files</button>':''}</div>
+      <div class="wk-strip-head"><span>Last 10 weeks</span>${missing?`<span class="wk-missing">${missing} week${missing===1?'':'s'} missing</span>`:'<span class="wk-ok">✓ no gaps</span>'}</div>
+      <div class="wk-strip">${cover.map(chip).join('')}</div>
+      ${log}</div>`;
+  container.querySelector('#uploadFilesBtn')?.addEventListener('click', ()=>pickSpreadsheetsToUpload());
+  container.querySelectorAll('[data-upload-week]').forEach(b=>b.onclick=()=>pickSpreadsheetsToUpload(b.dataset.uploadWeek));
+  Server.rpc('dash_master_stats').then(st=>{ const el=document.getElementById('statRows'); if(el) el.textContent = fmtNum(st.rows||0)+' rows'; }).catch(()=>{ const el=document.getElementById('statRows'); if(el) el.textContent='–'; });
+  (Server.can('upload')||Server.can('settings') ? Server.rpc('dash_upload_log', {p_limit:1}) : Promise.resolve([])).then(l=>{ const el=document.getElementById('statLast'); if(!el) return; const x=l&&l[0]; el.textContent = x ? new Date(x.uploaded_at).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) : '–'; if(x) el.title = (x.uploaded_by||'')+' · '+(x.file_name||''); if(x && x.uploaded_by) el.insertAdjacentHTML('beforeend','<small>'+escapeHtml(x.uploaded_by)+'</small>'); }).catch(()=>{ const el=document.getElementById('statLast'); if(el) el.textContent='–'; });
 }
 function renderFolderUploadExplainerInner(){
   const container = document.getElementById('view-folderUploads');
@@ -4308,6 +4345,7 @@ function renderClientIntelligence(weeks){
  host.innerHTML='<div class="narrative-heading"><span>PERFORMANCE RECAP</span><p>'+escapeHtml(periodName)+' · '+escapeHtml(scope)+'</p></div><section><h3>What went well</h3>'+wins.map(paragraph).join('')+'</section><section><h3>What needs attention</h3>'+concerns.map(paragraph).join('')+'</section><p class="narrative-note">'+escapeHtml(note)+'Volume comparisons use averages per selected week; rates use combined counts. Only selected weeks and divisions contribute to the recap. Incomplete future weeks are excluded. Findings describe patterns, not proven causes.</p>';
 }
 function clearAllDashboardFilters(){
+ if(currentView==='settings') closeSettingsModal();
  universalDivision='';selectedWeekEndDates=[];currentWeekEndDate=defaultWeekEnd();
  periodSelectedGroup={};periodSelectedDivision={};selectedPieTargets={recruiters:[],branches:[]};pieCleared={recruiters:true,branches:true};
  peopleSearchTerms.recruiters='';peopleSearchTerms.branches='';peoplePeriodValue=currentWeekEndDate?'week:'+currentWeekEndDate:'all';
@@ -7500,7 +7538,7 @@ async function renderUploadHistory(){
 }
 
 /* ============================= INIT ============================= */
-const APP_VERSION = 'Version 4.17.0';
+const APP_VERSION = 'Version 4.17.1';
 async function init(){
   document.getElementById('versionLabelInline').textContent = APP_VERSION;
   document.getElementById('footerVersionLabel').textContent = APP_VERSION;
