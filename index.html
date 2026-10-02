@@ -719,6 +719,62 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
 }
 @media (min-width:761px) and (max-width:1180px){ :root{--side-w:216px} }
 @media print{.sidebar{display:none!important}}
+/* ---------- Alerts module + remark approval + section access (v4.18) ---------- */
+.al-toolbar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:flex-end;margin-bottom:14px}
+.al-toolbar select{padding:8px 10px;border:1px solid #cfdde2;border-radius:8px;font:inherit;font-size:13px;background:#fff;min-width:260px}
+.al-basis{margin:0 0 4px!important;font-size:12.5px!important;max-width:620px}
+.al-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.al-tile{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:14px 16px;border-radius:14px;border:1px solid #e1eaed;background:#fff;text-align:left;font:inherit;cursor:default;box-shadow:0 1px 2px #1834420a}
+button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #18344214}
+.al-tile span{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6b818c}
+.al-tile strong{font-size:28px;line-height:1.15;color:#132f3b}
+.al-tile em{font-style:normal;font-size:12px;color:var(--text-secondary)}
+.al-tile.bad{border-color:#f0c2c2;background:#fff6f6}.al-tile.bad strong{color:#c0444e}
+.al-tile.warn{border-color:#f0dfae;background:#fffaf0}.al-tile.warn strong{color:#a66a00}
+.al-tile.good strong{color:#17845c}
+.al-section h3{display:flex;align-items:center;gap:8px;margin:0}
+.al-section details>summary{list-style:none;cursor:pointer}.al-section details>summary::-webkit-details-marker{display:none}
+.al-count{font-size:12px;font-weight:700;padding:2px 8px;border-radius:10px;background:#eef3f5;color:#4a6370}
+.al-dot{width:10px;height:10px;border-radius:50%;display:inline-block}.al-dot.bad{background:#d64545}.al-dot.warn{background:#e0a020}
+.al-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.al-grid.compact{margin-top:12px}
+.al-card{border:1px solid #e1eaed;border-left:4px solid #d64545;border-radius:12px;padding:12px 14px;background:#fff;display:flex;flex-direction:column;gap:6px}
+.al-card.warn{border-left-color:#e0a020}
+.al-card.bad{background:linear-gradient(90deg,#fff5f5,#fff 40%)}
+.al-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.al-name{background:none;border:0;padding:0;font:inherit;font-weight:700;font-size:14px;color:#132f3b;cursor:pointer;text-align:left}
+.al-name:hover{text-decoration:underline}
+.al-pct{font-weight:800;font-size:18px;color:#c0444e}.al-card.warn .al-pct{color:#a66a00}
+.al-sub{font-size:11.5px;color:var(--text-secondary);margin-top:-4px}
+.al-bar{position:relative;height:8px;border-radius:8px;background:#edf2f4;margin:2px 0}
+.al-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:8px;background:#d64545}.al-card.warn .al-bar i{background:#e0a020}
+.al-bar b{position:absolute;top:-3px;bottom:-3px;width:2px;background:#304a55;margin-left:-1px}
+.al-bar u{position:absolute;top:-3px;bottom:-3px;width:2px;background:#1f8a84;margin-left:-1px;text-decoration:none}
+.al-facts{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--text-secondary)}
+.al-facts strong{color:#132f3b}
+.al-remark{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;border-top:1px dashed #e1eaed;padding-top:6px}
+.al-remark-text{color:#304a55}.al-remark-text em{color:var(--text-secondary)}.al-remark-none{color:#9aaab2}
+.al-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.al-signals{display:flex;flex-direction:column;gap:6px}
+.al-sig{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 12px;border-radius:10px;border:1px solid #edf2f4;border-left:3px solid #d64545;font-size:13px}
+.al-sig.warn{border-left-color:#e0a020}.al-sig.good{border-left-color:#1f9a6c}
+.al-sig-text{color:var(--text-secondary);flex:1;min-width:200px}
+.al-approvals{display:flex;flex-direction:column;gap:10px}
+.al-appr{border:1px solid #f0dfae;background:#fffaf0;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.al-appr-meta{font-size:12px;color:var(--text-secondary)}.al-appr-meta strong{color:#132f3b}
+.al-appr-text{font-size:13.5px;line-height:1.5;white-space:pre-wrap}
+.rm-badge{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:10px;margin:2px 0}
+.rm-badge.pending{background:#fff1d6;color:#8a5a00}.rm-badge.rejected{background:#fde3e3;color:#a12d36}.rm-badge.approved{background:#e3f4ee;color:#17684a}
+.link-btn.ok{color:#17845c!important}
+.sec-grid{border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-top:10px}
+.sec-grid legend{font-weight:700;font-size:12.5px;padding:0 6px}
+.sec-page{border-top:1px solid #edf2f4;padding:6px 0}.sec-page:first-of-type{border-top:0}
+.sec-page summary{cursor:pointer;font-size:13px;font-weight:600;padding:4px 0}
+.sec-count{font-weight:500;color:var(--text-secondary);font-size:12px;margin-left:6px}
+.sec-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:4px 14px;padding:4px 0 6px 6px}
+.sec-opt{display:flex;gap:7px;align-items:center;font-size:12.5px}.sec-opt.sub{padding-left:16px;color:var(--text-secondary)}
+@media (max-width:1100px){.al-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
 .set-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
 .set-stats>div{background:#fff;border:1px solid #e1eaed;border-radius:14px;padding:14px 16px}
 .set-stats span{display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6b818c}
@@ -871,7 +927,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V12M10 20V5M16 20V9M22 20V3"/></svg></div>
       <div class="brand-text">
         <h1 id="dashboardTitle" title="Click to go home">Performance Dashboard</h1>
-        <p><span id="versionLabelInline">Version 4.17.1</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
+        <p><span id="versionLabelInline">Version 4.18.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
       </div>
     </div>
     <button type="button" class="side-collapse" id="sideCollapseBtn" aria-label="Collapse menu" title="Collapse menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
@@ -883,6 +939,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       <button data-view="branches"><span class="dot"></span>Branch Performance</button>
       <button data-view="master"><span class="dot"></span>Master Data</button>
       <button data-view="candidates"><span class="dot"></span>Candidates</button>
+      <button data-view="alerts"><span class="dot"></span>Alerts</button>
     </nav>
     <div class="side-label side-label-tools">Tools</div>
     <div class="ribbon-actions">
@@ -967,10 +1024,11 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
         <div id="view-branches" class="hidden"></div>
         <div id="view-master" class="hidden"></div>
         <div id="view-candidates" class="hidden"></div>
+        <div id="view-alerts" class="hidden"></div>
       </div>
       <div class="muted-note" id="storageModeNote" style="text-align:center;margin-top:24px;">Data stored locally in this browser.</div>
       <div class="muted-note" style="text-align:center;margin-top:4px;opacity:.65;">
-        <span id="footerVersionLabel">Version 4.17.1</span> &middot; &copy; <span id="footerCopyrightYear"></span>
+        <span id="footerVersionLabel">Version 4.18.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
       </div>
     </div>
   </main>
@@ -2979,6 +3037,7 @@ const VIEW_META = {
   recruiters:{title:'Recruiter Performance', sub:'Show rates and outcomes by recruiter'},
   branches:{title:'Branch Performance', sub:'Show rates and outcomes by branch'},
   candidates:{title:'Candidates', sub:'Who is counted in each category, by week'},
+  alerts:{title:'Alerts', sub:'Who needs attention this week — below 50% of goal first'},
   master:{title:'Master Data', sub:'Every candidate row from every import, in one sheet — filter any column, exclude or include candidates'},
   settings:{title:'Settings', sub:'Uploads, saved weeks, divisions, users and your account'},
   uploads:{title:'Uploads', sub:'Manage uploaded weeks and recruiter goals & divisions'},
@@ -3021,13 +3080,13 @@ async function refreshUI(){
   document.getElementById('viewTitle').textContent = meta.title;
   document.getElementById('viewSub').textContent = showDashboardViews ? meta.sub : 'No data uploaded yet';
 
-  ['performance','recruiters','branches','master','candidates'].forEach(v=>{
+  ['performance','recruiters','branches','master','candidates','alerts'].forEach(v=>{
     document.getElementById('view-'+v).classList.toggle('hidden', v!==currentView);
   });
 
   document.getElementById('topbarCenter').classList.toggle('hidden', !showDashboardViews);
 
-  if(currentView!=='recruiters' && currentView!=='branches' && currentView!=='master' && currentView!=='candidates'){
+  if(currentView!=='recruiters' && currentView!=='branches' && currentView!=='master' && currentView!=='candidates' && currentView!=='alerts'){
     const extra = document.getElementById('topbarExtra');
     if(extra) extra.innerHTML = '';
   }
@@ -3035,7 +3094,7 @@ async function refreshUI(){
   renderPeriodPickerButton();
   closePeriodPicker();
   syncDedupeControls();
-  document.getElementById('periodPicker')?.classList.toggle('hidden', currentView==='candidates');
+  document.getElementById('periodPicker')?.classList.toggle('hidden', currentView==='candidates' || currentView==='alerts');
   ['weeklyDivisionSelect','weeklyDivisionSelectLbl'].forEach(id=>document.getElementById(id).classList.toggle('hidden',currentView!=='performance'));
   if(!hasData){ if(showDashboardViews) renderMasterView(); return; }
 
@@ -3049,6 +3108,7 @@ async function refreshUI(){
   else if(currentView==='branches') renderPeopleView('branches');
   else if(currentView==='master') renderMasterView();
   else if(currentView==='candidates') renderCandidatesView();
+  else if(currentView==='alerts') renderAlertsView();
 }
 
 /* ============================= SETTINGS MODAL ============================= */
@@ -3538,7 +3598,7 @@ async function renderWeeklyView(){
   container.innerHTML = `
     ${universalDivision ? `<div class="hint" style="margin-bottom:10px;">Viewing <strong>${escapeHtml(universalDivision)}</strong> only</div>` : ''}
 
-    <div class="kpi-grid kpi-v2">
+    <div class="kpi-grid kpi-v2" data-section="perf.kpis">
       ${kpiCardHtml({label:'Schedules', icon:'cal', accent:'#2f8f8a', value:fmtNum(t.schedules), delta:'<div class="delta flat">'+(isMultiWeekMode?'Combined':'Created that week')+'</div>', spark:kpiSeries(week, w=>w.schedules)})}
       ${kpiCardHtml({label:'Interviews', icon:'chat', accent:'#4a78c8', value:fmtNum(t.scheduledDateOf), delta:deltaHtml(t.scheduledDateOf, prevT? prevT.scheduledDateOf: undefined), spark:kpiSeries(week, w=>w.scheduledDateOf)})}
       ${kpiCardHtml({label:'Shows', icon:'check', accent:'#1f9a6c', value:fmtNum(t.shows), delta:deltaHtml(t.shows, prevT? prevT.shows: undefined), spark:kpiSeries(week, w=>w.shows, true)})}
@@ -3556,9 +3616,9 @@ async function renderWeeklyView(){
         + kpiCardHtml({rate:true, label:'No Show Rate', icon:'down', accent:'#c4565f', value:pend?'Pending':fmtPct(t.noShows,t.scheduledDateOf), delta:pend?'<div class="delta flat">Week hasn\u2019t happened yet</div>':deltaHtml(noShowRate, prevNoShowRate, false, true), bar:pend||!t.scheduledDateOf?null:{v:noShowRate, target:40, good:'down'}}); })()}
     </div>
 
-    <div class="section-divider">Trends</div>
-    ${trendExplorerHtml()}
-    <div class="section-divider">Leaderboards</div>
+    <section data-section="perf.trends"><div class="section-divider">Trends</div>
+    ${trendExplorerHtml()}</section>
+    <section data-section="perf.leaderboards"><div class="section-divider">Leaderboards</div>
     <div class="row-2col">
       <div class="panel">
         <div class="panel-head"><h3>Recruiter Snapshot</h3><div style="display:flex;align-items:center;gap:10px;"><span class="hint">${Object.keys(week.byRecruiter).length} recruiters</span>${copyBtnHtml('weeklyRecruiterMiniTable')}${downloadBtnHtml('weeklyRecruiterMiniTable','weekly-recruiter-snapshot.xlsx')}</div></div>
@@ -3568,24 +3628,24 @@ async function renderWeeklyView(){
         <div class="panel-head"><h3>Branch Snapshot</h3><div style="display:flex;align-items:center;gap:10px;"><span class="hint">${Object.keys(week.byBranch).length} branches</span>${copyBtnHtml('weeklyBranchMiniTable')}${downloadBtnHtml('weeklyBranchMiniTable','weekly-branch-snapshot.xlsx')}</div></div>
         ${renderSnapshotHtml('weeklyBranchMiniTable', false)}
       </div>
-    </div>
+    </div></section>
 
-    <div class="section-divider">Division Breakdown</div>
+    <section data-section="perf.divisions"><div class="section-divider">Division Breakdown</div>
     ${divisionChartsHtml('chartWeeklyDivision', (universalDivision ? 'Viewing '+universalDivision+' \u2014 ' : '')+(isMultiWeekMode ? weekLabel+'. Click a division to filter this page.' : weekLabel+'. Click a division to filter this page.'))}
-    ${divisionDetailTableHtml('chartWeeklyDivision')}
+    ${divisionDetailTableHtml('chartWeeklyDivision')}</section>
 
-    <div class="section-divider">Historical Reference</div>
+    <section data-section="perf.history"><div class="section-divider">Historical Reference</div>
     <div class="panel">
       <div class="panel-head"><h3>Previous 6 Weeks</h3><div style="display:flex;align-items:center;gap:10px;"><span class="hint">Click a row (or several) to combine them into the charts above</span><button class="btn btn-secondary btn-sm" id="copyPrevWeeksBtn">&#128203; Copy</button></div></div>
       <table id="prevSixWeeksTable"></table>
-    </div>
+    </div></section>
 
-    <div class="section-divider">Insights</div>
+    <section data-section="perf.insights"><div class="section-divider">Insights</div>
 
     <div class="panel">
       <div class="panel-head"><h3>Recruiting Intelligence</h3><div style="display:flex;align-items:center;gap:10px;"><span class="hint">${isMultiWeekMode?'Auto-generated insights across '+(isAllWeeks?'all weeks':'the selected weeks'):'Auto-generated insights for this week'}</span><button class="btn btn-secondary btn-sm" data-copy-list="weeklyInsights" title="Copy this performance recap to clipboard">&#128203; Copy recap</button></div></div>
       <div class="insight-list" id="weeklyInsights"></div>
-    </div>
+    </div></section>
   `;
 
   drawSnapshotTable('weeklyRecruiterMiniTable', true);
@@ -3793,7 +3853,7 @@ function kpiCardHtml(o){
     const ok = o.bar.good==='up' ? o.bar.v>=o.bar.target : o.bar.v<=o.bar.target;
     foot = `<div class="kpi-foot kpi-bar-wrap" title="Target ${o.bar.good==='up'?'≥':'≤'} ${o.bar.target}${unit}"><div class="kpi-bar"><i style="width:${scale(o.bar.v)}%;background:${ok?'#1f9a6c':'#d0776f'}"></i><b style="left:${scale(o.bar.target)}%"></b></div><span class="kpi-foot-lbl">${o.bar.good==='up'?'≥':'≤'} ${o.bar.target}${unit}</span></div>`;
   }
-  return `<div class="kpi-card${o.rate?' kpi-rate':''}" style="--accent:${o.accent}"${o.title?` title="${escapeHtml(o.title)}"`:''}><div class="kpi-top"><div class="label">${o.label}</div><span class="kpi-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${KPI_ICONS[o.icon]||''}</svg></span></div><div class="value">${o.value}</div>${o.delta||''}${foot}</div>`;
+  return `<div class="kpi-card${o.rate?' kpi-rate':''}" data-section="perf.kpi.${o.label.toLowerCase().replace(/[^a-z]+/g,'_').replace(/^_|_$/g,'')}" style="--accent:${o.accent}"${o.title?` title="${escapeHtml(o.title)}"`:''}><div class="kpi-top"><div class="label">${o.label}</div><span class="kpi-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${KPI_ICONS[o.icon]||''}</svg></span></div><div class="value">${o.value}</div>${o.delta||''}${foot}</div>`;
 }
 function drawKpiMiniPies(weeks){
   const totals=computeDivisionBreakdown(weeks);
@@ -4440,7 +4500,7 @@ async function renderPeriodView(containerId, groups, unitLabel){
   const selectedDivision = periodSelectedDivision[containerId] || null;
 
   container.innerHTML = `
-    <div class="kpi-grid">
+    <div class="kpi-grid" data-section="perf.kpis">
       <div class="kpi-card"><div class="label">Total Schedules</div><div class="value">${fmtNum(grand.schedules)}</div><div class="delta flat">All-time</div></div>
       <div class="kpi-card"><div class="label">Total Shows</div><div class="value">${fmtNum(grand.shows)}</div><div class="delta flat">All-time</div></div>
       <div class="kpi-card"><div class="label">No Call/No Show</div><div class="value">${fmtNum(grand.noShows)}</div><div class="delta flat">All-time</div></div>
@@ -4449,10 +4509,10 @@ async function renderPeriodView(containerId, groups, unitLabel){
       <div class="kpi-card"><div class="label">Show Rate</div><div class="value">${fmtPct(grand.shows,grand.scheduledDateOf)}</div><div class="delta flat">All-time</div></div>
     </div>
 
-    <div class="section-divider">Composition</div>
-    ${combinedPiesHtml(containerId+'_pies')}
+    <section data-section="perf.composition"><div class="section-divider">Composition</div>
+    ${combinedPiesHtml(containerId+'_pies')}</section>
 
-    <div class="section-divider">Trends</div>
+    <section data-section="perf.trends"><div class="section-divider">Trends</div>
     <div class="panel">
       <div class="panel-head"><h3>${unitLabel}ly Trend &mdash; All Categories</h3><span class="hint">Schedules, shows, no shows, hires, placed &amp; show rate by ${unitLabel.toLowerCase()} &middot; dashed red line = 60% target</span></div>
       <div class="chart-wrap tall"><canvas id="chartPeriod_${containerId}"></canvas></div>
@@ -4475,9 +4535,9 @@ async function renderPeriodView(containerId, groups, unitLabel){
         </tbody>
       </table>
       ${selectedGroupLabel ? `<div class="hint" style="margin-top:10px;">Filtering below to <strong>${escapeHtml(selectedGroupLabel)}</strong>${selectedDivision?' &mdash; <strong>'+escapeHtml(selectedDivision)+'</strong>':''}. <a href="#" id="${containerId}_clearFilter" style="color:var(--indigo);">Clear filter</a></div>` : ''}
-    </div>
+    </div></section>
 
-    <div class="section-divider">Leaderboards</div>
+    <section data-section="perf.leaderboards"><div class="section-divider">Leaderboards</div>
     <div class="row-2col">
       <div class="panel">
         <div class="panel-head"><h3>Recruiter Snapshot</h3><div style="display:flex;align-items:center;gap:10px;"><span class="hint">${selectedGroupLabel ? escapeHtml(selectedGroupLabel) : 'Across all '+unitLabel.toLowerCase()+'s shown above'}</span>${copyBtnHtml(containerId+'_recruiterSnapshot')}${downloadBtnHtml(containerId+'_recruiterSnapshot', unitLabel.toLowerCase()+'-recruiter-snapshot.xlsx')}</div></div>
@@ -4487,17 +4547,17 @@ async function renderPeriodView(containerId, groups, unitLabel){
         <div class="panel-head"><h3>Branch Snapshot</h3><div style="display:flex;align-items:center;gap:10px;"><span class="hint">${selectedGroupLabel ? escapeHtml(selectedGroupLabel) : 'Across all '+unitLabel.toLowerCase()+'s shown above'}</span>${copyBtnHtml(containerId+'_branchSnapshot')}${downloadBtnHtml(containerId+'_branchSnapshot', unitLabel.toLowerCase()+'-branch-snapshot.xlsx')}</div></div>
         ${renderSnapshotHtml(containerId+'_branchSnapshot', false)}
       </div>
-    </div>
+    </div></section>
 
-    <div class="section-divider">Division Breakdown</div>
+    <section data-section="perf.divisions"><div class="section-divider">Division Breakdown</div>
     ${divisionChartsHtml('chartDivision_'+containerId, selectedGroupLabel ? escapeHtml(selectedGroupLabel)+', by division. Click a division to filter further.' : 'Across all '+unitLabel.toLowerCase()+'s shown above, by division. Click a division to filter.')}
-    ${divisionDetailTableHtml('chartDivision_'+containerId)}
+    ${divisionDetailTableHtml('chartDivision_'+containerId)}</section>
 
-    <div class="section-divider">Insights</div>
+    <section data-section="perf.insights"><div class="section-divider">Insights</div>
     <div class="panel">
       <div class="panel-head"><h3>${unitLabel}ly Intelligence</h3><span class="hint">Auto-generated insights for ${selectedGroupLabel ? escapeHtml(selectedGroupLabel) : 'all '+unitLabel.toLowerCase()+'s shown above'}</span></div>
       <ul class="insight-list" id="${containerId}_insights"></ul>
-    </div>
+    </div></section>
   `;
 
   container.querySelectorAll('tr[data-group]').forEach(row=>{
@@ -4886,8 +4946,7 @@ async function renderPeopleView(mode){
   container.innerHTML = `
     <div class="people-layout-grid">
       <div>
-        ${mode==='recruiters'?'<div id="smartAlertsHost"></div>':''}
-        <div class="panel">
+        <div class="panel" data-section="${mode==='recruiters'?'rec.table':'br.table'}">
           <div class="panel-head"><h3>${mode==='recruiters'?'Recruiter':'Branch'} Detail</h3><div style="display:flex;align-items:center;gap:10px;"><span class="hint">Click a row for its trend · Ctrl/Cmd-click to compare · click a column to sort · &#9660; to filter${mode==='recruiters'?' · Remarks are saved per week':''}</span>${copyBtnHtml('peopleTable_'+mode)}${downloadBtnHtml('peopleTable_'+mode, (mode==='recruiters'?'recruiter':'branch')+'-performance.xlsx')}</div></div>
           <table id="peopleTable_${mode}"></table>
         </div>
@@ -5924,17 +5983,19 @@ const TOKEN_LS_KEY = 'ipd_session_v4';
 const LIVE_POLL_MS = 4000;
 const MODULES = [
   {key:'performance', label:'Performance Summary', hint:'Weekly, monthly and quarterly overview'},
-  {key:'recruiters',  label:'Recruiter Performance', hint:'Recruiter table, trends, smart alerts, reading remarks'},
+  {key:'recruiters',  label:'Recruiter Performance', hint:'Recruiter table, trends, reading remarks'},
   {key:'branches',    label:'Branch Performance', hint:'Branch table and trends'},
   {key:'candidates',  label:'Candidates', hint:'Names and Employee Numbers behind each count, by week and category'},
+  {key:'alerts',      label:'Alerts', hint:'Recruiters below 50% of their goal, other signals and remarks'},
   {key:'master',      label:'Master Data — view', hint:'Browse and filter every candidate row'},
   {key:'master_edit', label:'Master Data — exclude / include', hint:'Remove candidates from the metrics or bring them back'},
   {key:'upload',      label:'Upload spreadsheets', hint:'Import Created On / Date Of / goals files, folder sync'},
-  {key:'remarks',     label:'Write remarks', hint:'Add and edit their own weekly remarks'},
+  {key:'remarks',     label:'Remarks — add', hint:'Add remarks; they wait for an approver (can edit their own while pending)'},
+  {key:'remarks_approve', label:'Remarks — approve & edit', hint:'Approve or reject remarks, edit or delete anyone’s remark'},
   {key:'settings',    label:'Settings', hint:'Divisions, branch divisions, show/hide recruiters, saved weeks'},
   {key:'export',      label:'Download & share', hint:'Excel, PDF, Word, master sheet download, snapshots'},
 ];
-const VIEW_MODULE = {performance:'performance', recruiters:'recruiters', branches:'branches', master:'master', candidates:'candidates'};
+const VIEW_MODULE = {performance:'performance', recruiters:'recruiters', branches:'branches', master:'master', candidates:'candidates', alerts:'alerts'};
 
 function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
 function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
@@ -6145,7 +6206,7 @@ const Server = {
     let remarks=false, master=false, users=false;
     rows.forEach(r=>{
       if(r.tbl==='kv'){ if(!this.isOwn('kv:'+r.key)){ kvKeys.add(r.key); if(r.by_name) authors.add(r.by_name); } }
-      else if(r.tbl==='remarks'){ if(!Remarks.ownIds.has(r.key)){ remarks=true; if(r.by_name) authors.add(r.by_name); } }
+      else if(r.tbl==='remarks'){ if(!Remarks.ownIds.has(r.key) || r.by_name!==(Server.user&&Server.user.name)){ remarks=true; if(r.by_name) authors.add(r.by_name); } }
       else if(r.tbl==='master'){ if(Date.now()>this.ownMasterUntil){ master=true; if(r.by_name) authors.add(r.by_name); } }
       else if(r.tbl==='users'){ users=true; }
       else if(r.tbl==='alerts'){ if(Server.isAdmin()) loadUploadAlerts(r.key!=='ack' && r.by_name!==Server.user.name); }
@@ -6166,7 +6227,7 @@ const Server = {
         chunk.forEach(k=>{ if(!seen.has(k) && !k.endsWith(LISTS_SUFFIX)) KV.delete(k); });
       }
     }
-    if(remarks) await Remarks.load().catch(()=>{});
+    if(remarks){ await Remarks.load().catch(()=>{}); if(currentView==='alerts') renderAlertsView(); }
     if(users){
       try{ const me = await this.rpc('dash_me'); const changed = JSON.stringify(me.modules)!==JSON.stringify(this.user.modules) || me.name!==this.user.name; this.user=me; if(changed){ applyPermissions(); refreshUI(); showToast('Your access rights were updated.'); } }catch(e){}
       if(settingsModalOpen && !document.getElementById('settingsPane-users')?.classList.contains('hidden')) renderUsersAdmin();
@@ -6207,7 +6268,7 @@ document.addEventListener('visibilitychange', async ()=>{
 // The page needs the database functions from the matching supabase_setup.sql. If the super
 // admin hasn't run the latest one (or the run failed), new features such as new user rights
 // silently don't work — so say so plainly.
-const REQUIRED_SCHEMA = 12;
+const REQUIRED_SCHEMA = 13;
 let databaseSchemaStale = false;
 async function checkDatabaseSchema(){
   try{
@@ -6239,7 +6300,26 @@ function renderUploadAlerts(){
     <ul>${uploadAlerts.map(a=>`<li><strong>${escapeHtml(a.user_name||'')}</strong> · ${new Date(a.at).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}<br><span>${escapeHtml((a.detail&&a.detail.summary)||'')}</span></li>`).join('')}</ul></div>`);
   pane.querySelector('#ackAllAlerts').onclick = async ()=>{ try{ await Server.rpc('dash_alerts_ack', {p_ids:uploadAlerts.map(a=>a.id)}); }catch(e){} loadUploadAlerts(false); };
 }
+// Page sections each user can see (the super admin always sees everything). Hidden sections are
+// stored per user as a deny-list; hiding is done with one generated stylesheet, so it also covers
+// anything re-rendered later.
+const PAGE_SECTIONS = {
+  performance:[['perf.kpis','KPI cards (all)'],['perf.kpi.schedules','· Schedules card'],['perf.kpi.interviews','· Interviews card'],['perf.kpi.shows','· Shows card'],['perf.kpi.no_shows','· No Shows card'],['perf.kpi.hires','· Hires card'],['perf.kpi.placed','· Placed card'],['perf.kpi.hires_per_recruiter','· Hires per Recruiter card'],['perf.kpi.goal_reach','· Goal Reach card'],['perf.kpi.show_rate','· Show Rate card'],['perf.kpi.no_show_rate','· No Show Rate card'],
+                ['perf.trends','Trends charts'],['perf.leaderboards','Leaderboards (recruiter & branch snapshots)'],['perf.divisions','Division breakdown'],['perf.history','Previous 6 weeks table'],['perf.insights','Insights'],['perf.composition','Composition pies (monthly / quarterly)']],
+  recruiters:[['rec.table','Recruiter table']],
+  branches:[['br.table','Branch table']],
+  candidates:[['cand.list','Category boxes and candidate list'],['cand.explain','“How are these counted?” breakdown']],
+  alerts:[['alerts.summary','Summary tiles'],['alerts.below','Below 50% of goal'],['alerts.watch','50–79% of goal'],['alerts.signals','Other signals & wins'],['alerts.approvals','Remarks awaiting approval (approvers only)']],
+};
+function applySectionAccess(){
+  let st = document.getElementById('sectionAccessStyle');
+  if(!st){ st = document.createElement('style'); st.id='sectionAccessStyle'; document.head.appendChild(st); }
+  const hidden = (Server.user && Server.user.role!=='super_admin' && Array.isArray(Server.user.hidden_sections)) ? Server.user.hidden_sections : [];
+  st.textContent = hidden.filter(k=>/^[a-z0-9_.-]+$/.test(k)).map(k=>`[data-section="${k}"]`).join(',') + (hidden.length ? '{display:none!important}' : '');
+}
+function canSeeSection(k){ return !(Server.user && Server.user.role!=='super_admin' && (Server.user.hidden_sections||[]).includes(k)); }
 function applyPermissions(){
+  applySectionAccess();
   const u = Server.user; if(!u) return;
   document.querySelectorAll('#navList button[data-view]').forEach(b=>{ b.classList.toggle('hidden', !Server.can(VIEW_MODULE[b.dataset.view])); });
   const allowedViews = Object.keys(VIEW_MODULE).filter(v=>Server.can(VIEW_MODULE[v]));
@@ -6788,10 +6868,14 @@ async function removeFolderSync(){
 /* ------------------------------------------ REMARKS ------------------------------------------ */
 const Remarks = {
   list:[], ownIds:new Set(),
-  async load(){ this.list = (Server.can('recruiters')||Server.can('remarks')) ? (await Server.rpc('dash_remarks_list'))||[] : []; },
+  async load(){ this.list = (Server.can('recruiters')||Server.can('remarks')||Server.can('alerts')||Server.can('remarks_approve')) ? (await Server.rpc('dash_remarks_list'))||[] : []; },
+  canAdd(){ return Server.can('remarks') || Server.can('remarks_approve'); },
+  canApprove(){ return Server.can('remarks_approve'); },
+  pending(){ return this.list.filter(r=>r.status==='pending'); },
+  async review(id, approve){ this.ownIds.add(id); const r = await Server.rpc('dash_remark_review', {p_id:id, p_approve:!!approve}); this.list = this.list.map(x=>x.id===id?r:x); return r; },
   forRecruiter(name){ return this.list.filter(r=>r.recruiter===name).sort((a,b)=> b.week_end_date.localeCompare(a.week_end_date) || b.remark_date.localeCompare(a.remark_date) || String(b.created_at).localeCompare(String(a.created_at))); },
   forWeek(name, week){ return this.forRecruiter(name).filter(r=>r.week_end_date===week); },
-  canEdit(r){ return Server.can('remarks') && (Server.isAdmin() || (r && r.author===Server.user.name)); },
+  canEdit(r){ if(!r) return false; if(this.canApprove()) return true; return Server.can('remarks') && (r.mine || r.author===Server.user.name) && (r.status||'approved')==='pending'; },
   async add(f){ const r = await Server.rpc('dash_remark_save', {p:{recruiter:f.recruiter, week_end_date:f.week_end_date, remark_date:f.remark_date, remark:f.remark}}); this.ownIds.add(r.id); this.list.push(r); },
   async update(id, f){ const r = await Server.rpc('dash_remark_save', {p:{id, ...f}}); this.ownIds.add(id); this.list = this.list.map(x=>x.id===id?r:x); },
   async remove(id){ this.ownIds.add(id); await Server.rpc('dash_remark_delete', {p_id:id}); this.list = this.list.filter(r=>r.id!==id); },
@@ -6808,7 +6892,7 @@ function openRemarksModal(recruiter, weekEndDate, suggestion){
   closeEntityPopover();
   document.getElementById('remarksModal')?.remove();
   remarksModalState = {recruiter, week: weekEndDate || toIsoDateOnly(saturdayOnOrAfter(new Date())), editing:null, scope:'all'};
-  const canWrite = Server.can('remarks');
+  const canWrite = Remarks.canAdd();
   const wrap = document.createElement('div');
   wrap.id='remarksModal'; wrap.className='modal-overlay';
   wrap.innerHTML = `<div class="modal" role="dialog" aria-modal="true" aria-labelledby="remarksTitle">
@@ -6820,7 +6904,7 @@ function openRemarksModal(recruiter, weekEndDate, suggestion){
           <div class="field"><label for="remarkDate">Date</label><input type="date" id="remarkDate" value="${toIsoDateOnly(new Date())}"></div>
         </div>
         <div class="field"><label for="remarkText">Remark</label><textarea id="remarkText" rows="3" maxlength="4000" placeholder="What happened this week, what was agreed, next steps…">${escapeHtml(suggestion||'')}</textarea></div>
-        <div class="remark-form-actions"><span class="hint">Saved as ${escapeHtml(Server.user.name)} · visible to everyone with Recruiter Performance access.</span><div><button class="btn btn-secondary btn-sm hidden" id="remarkCancelEdit">Cancel edit</button> <button class="btn btn-primary btn-sm" id="remarkSave">Add remark</button></div></div>
+        <div class="remark-form-actions"><span class="hint">${Remarks.canApprove()?'Saved as '+escapeHtml(Server.user.name)+' and approved straight away.':'Sent to an approver — until it’s approved only you and the approvers can see it. You can edit it while it’s pending.'}</span><div><button class="btn btn-secondary btn-sm hidden" id="remarkCancelEdit">Cancel edit</button> <button class="btn btn-primary btn-sm" id="remarkSave">Add remark</button></div></div>
       </div>`:''}
       <div class="remark-list-head"><h4>History</h4><div class="remark-scope"><button class="btn btn-sm" data-scope="all">All weeks</button><button class="btn btn-sm" data-scope="week">${canWrite?'Selected week':'Current week'}</button></div></div>
       <div id="remarkList"></div>
@@ -6852,7 +6936,8 @@ async function saveRemarkFromModal(){
     remarksModalState.editing=null; m.querySelector('#remarkText').value='';
     renderRemarksModalBody();
     if(currentView==='recruiters') renderPeopleView('recruiters');
-    showToast('Remark saved.');
+    showToast(Remarks.canApprove() ? 'Remark saved.' : 'Remark sent for approval.');
+    if(currentView==='alerts') renderAlertsView();
   }catch(e){ showToast('Could not save the remark: '+cleanErr(e)); }
   finally{ btn.disabled=false; }
 }
@@ -6868,7 +6953,7 @@ function renderRemarksModalBody(){
   let last=null;
   host.innerHTML = items.map(r=>{
     const head = r.week_end_date!==last ? `<div class="remark-week">Wk ${isoWeekNumber(new Date(r.week_end_date+'T00:00:00'))} · week ending ${fmtDate(r.week_end_date)}</div>` : ''; last=r.week_end_date;
-    return head+`<div class="remark-item" data-id="${escapeHtml(r.id)}"><div class="remark-meta"><strong>${fmtDate(r.remark_date)}</strong>${r.author?' · '+escapeHtml(r.author):''}${r.updated_at && r.created_at && r.updated_at.slice(0,16)!==r.created_at.slice(0,16)?' · edited':''}</div><div class="remark-text">${escapeHtml(r.remark)}</div>${Remarks.canEdit(r)?`<div class="remark-actions"><button class="link-btn" data-edit>Edit</button><button class="link-btn danger" data-del>Delete</button></div>`:''}</div>`;
+    return head+`<div class="remark-item" data-id="${escapeHtml(r.id)}"><div class="remark-meta"><strong>${fmtDate(r.remark_date)}</strong>${r.author?' · '+escapeHtml(r.author):''}${r.updated_at && r.created_at && r.updated_at.slice(0,16)!==r.created_at.slice(0,16)?' · edited':''}</div>${remarkStatusHtml(r)}<div class="remark-text">${escapeHtml(r.remark)}</div>${(Remarks.canApprove() && r.status!=='approved') || Remarks.canEdit(r) ? `<div class="remark-actions">${Remarks.canApprove() && r.status!=='approved'?'<button class="link-btn ok" data-approve>Approve</button>':''}${Remarks.canApprove() && r.status==='pending'?'<button class="link-btn danger" data-reject>Reject</button>':''}${Remarks.canEdit(r)?'<button class="link-btn" data-edit>Edit</button><button class="link-btn danger" data-del>Delete</button>':''}</div>`:''}</div>`;
   }).join('');
   host.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>{
     const r = Remarks.list.find(x=>x.id===b.closest('.remark-item').dataset.id); if(!r) return;
@@ -6877,18 +6962,30 @@ function renderRemarksModalBody(){
     m.querySelector('#remarkDate').value = r.remark_date; m.querySelector('#remarkText').value = r.remark; m.querySelector('#remarkText').focus();
     renderRemarksModalBody();
   }));
+  host.querySelectorAll('[data-approve],[data-reject]').forEach(b=>b.addEventListener('click', async ()=>{
+    try{ await Remarks.review(b.closest('.remark-item').dataset.id, b.hasAttribute('data-approve')); renderRemarksModalBody(); if(currentView==='recruiters') renderPeopleView('recruiters'); if(currentView==='alerts') renderAlertsView(); showToast(b.hasAttribute('data-approve')?'Remark approved.':'Remark rejected.'); }
+    catch(e){ showToast('Could not update: '+cleanErr(e)); }
+  }));
   host.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click', async ()=>{
     if(!confirm('Delete this remark?')) return;
     try{ await Remarks.remove(b.closest('.remark-item').dataset.id); renderRemarksModalBody(); if(currentView==='recruiters') renderPeopleView('recruiters'); }
     catch(e){ showToast('Could not delete: '+cleanErr(e)); }
   }));
 }
+function remarkStatusHtml(r){
+  const st = r.status||'approved';
+  if(st==='pending') return '<span class="rm-badge pending">Awaiting approval</span>';
+  if(st==='rejected') return '<span class="rm-badge rejected">Rejected'+(r.approved_by?' by '+escapeHtml(r.approved_by):'')+'</span>';
+  return r.approved_by && r.approved_by!==r.author ? '<span class="rm-badge approved">Approved by '+escapeHtml(r.approved_by)+(r.edited_by?' · edited by '+escapeHtml(r.edited_by):'')+'</span>' : (r.edited_by?'<span class="rm-badge approved">Edited by '+escapeHtml(r.edited_by)+'</span>':'');
+}
 function remarksCellHtml(name, week){
-  const inWeek = week ? Remarks.forWeek(name, week) : [];
+  const inWeekAll = week ? Remarks.forWeek(name, week) : [];
+  const inWeek = inWeekAll.filter(r=>(r.status||'approved')==='approved');
+  const pendingN = inWeekAll.filter(r=>r.status==='pending').length;
   const total = Remarks.forRecruiter(name).length;
-  const latest = inWeek[0];
-  if(latest) return `<button type="button" class="remark-cell" data-remarks="${escapeHtml(name)}" title="${escapeHtml(latest.remark)}"><span class="remark-snippet">${escapeHtml(latest.remark.length>46?latest.remark.slice(0,46)+'…':latest.remark)}</span><span class="remark-count">${escapeHtml(latest.author||'')} · ${fmtDate(latest.remark_date).replace(/, \d{4}$/,'')}${inWeek.length>1?' · +'+(inWeek.length-1):''}</span></button>`;
-  return `<button type="button" class="remark-cell empty" data-remarks="${escapeHtml(name)}">${Server.can('remarks')?'+ Add':'—'}${total?` <span class="remark-count">${total} earlier</span>`:''}</button>`;
+  const latest = inWeek[0] || inWeekAll[0];
+  if(latest) return `<button type="button" class="remark-cell" data-remarks="${escapeHtml(name)}" title="${escapeHtml(latest.remark)}">${pendingN?'<span class="rm-badge pending">'+pendingN+' awaiting approval</span>':''}<span class="remark-snippet">${escapeHtml(latest.remark.length>46?latest.remark.slice(0,46)+'…':latest.remark)}</span><span class="remark-count">${escapeHtml(latest.author||'')} · ${fmtDate(latest.remark_date).replace(/, \d{4}$/,'')}${inWeek.length>1?' · +'+(inWeek.length-1):''}</span></button>`;
+  return `<button type="button" class="remark-cell empty" data-remarks="${escapeHtml(name)}">${Remarks.canAdd()?'+ Add':'—'}${total?` <span class="remark-count">${total} earlier</span>`:''}</button>`;
 }
 
 /* ------------------------------- EXCEL-STYLE COLUMN FILTER ------------------------------- */
@@ -7089,6 +7186,103 @@ async function downloadMasterSheet(){
   finally{ setLoading(null); }
 }
 
+
+/* ------------------------------------------ ALERTS MODULE ------------------------------------------ */
+// Who needs attention in a week. Main list: recruiters below 50% of their schedule goal (for the
+// week in progress: below 50% of where they should be by today). Then 50–79%, other signals
+// (show rate drops, no-shows, inactivity, wins), and remarks waiting for approval.
+const alertsState = {week:null, signals:'attention', search:''};
+function alertsGoalRows(weekEnd){
+  const week = weeksData.find(w=>w.weekEndDate===weekEnd); if(!week) return {rows:[], inProgress:false, elapsed:7};
+  const goals = KV.get('goals:'+weekEnd) || {};
+  const today = startOfToday(), end = new Date(weekEnd+'T00:00:00'), start = new Date(end); start.setDate(start.getDate()-6);
+  const inProgress = today>=start && today<=end;
+  const elapsed = inProgress ? Math.min(7, Math.max(1, Math.round((today-start)/86400000)+1)) : 7;
+  const rows = Object.entries(week.byRecruiter||{}).filter(([n])=>n && n!=='Unassigned' && !excludedRecruitersSet.has(n)).map(([name,r])=>{
+    const g = goals[name]; const goal = (g!==undefined && g!==null && g!=='') ? Number(g) : DEFAULT_WEEKLY_GOAL;
+    const sched = r.schedules||0, pct = goal>0 ? sched/goal*100 : null;
+    const expected = goal*elapsed/7, pace = goal>0 ? sched/expected*100 : null;
+    const score = inProgress ? pace : pct;
+    return {name, branch:r.branch||'', division:getEffectiveRecruiterDivision(name, weekEnd)||'Unassigned', sched, goal, pct, pace, score, projected: inProgress ? Math.round(sched/elapsed*7) : sched,
+      shows:r.shows||0, interviews:r.scheduledDateOf||0, hires:r.i9||0};
+  }).filter(r=>r.goal>0);
+  return {rows, inProgress, elapsed};
+}
+function alertsRemarkLine(name, week){
+  const all = Remarks.forWeek(name, week);
+  const ap = all.filter(r=>(r.status||'approved')==='approved'), pend = all.filter(r=>r.status==='pending');
+  const latest = ap[0];
+  return `<div class="al-remark">${latest?`<span class="al-remark-text" title="${escapeHtml(latest.remark)}">“${escapeHtml(latest.remark.length>90?latest.remark.slice(0,90)+'…':latest.remark)}” <em>— ${escapeHtml(latest.author||'')}</em></span>`:'<span class="al-remark-none">No remark yet</span>'}${pend.length?`<span class="rm-badge pending">${pend.length} awaiting approval</span>`:''}</div>`;
+}
+async function renderAlertsView(){
+  const host = document.getElementById('view-alerts'); if(!host) return;
+  const st = alertsState;
+  const weeks = [...weeksData].map(w=>w.weekEndDate).sort().reverse();
+  if(!weeks.length){ host.innerHTML='<div class="panel"><p class="hint" style="margin:0;">No weeks yet — upload data first.</p></div>'; return; }
+  if(!st.week || !weeks.includes(st.week)) st.week = defaultWeekEnd() || weeks[0];
+  const extra = document.getElementById('topbarExtra');
+  if(extra && !document.getElementById('alertsSearch')){
+    extra.innerHTML = `<div class="header-search"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input type="search" id="alertsSearch" aria-label="Search recruiter" placeholder="Search recruiter…" autocomplete="off"></div>`;
+    const sIn = document.getElementById('alertsSearch'); sIn.value = st.search;
+    let t; sIn.addEventListener('input', ()=>{ clearTimeout(t); t=setTimeout(()=>{ st.search=sIn.value; renderAlertsView(); }, 200); });
+  }
+  const {rows, inProgress, elapsed} = alertsGoalRows(st.week);
+  const q = st.search.trim().toLowerCase();
+  const match = r=>!q || r.name.toLowerCase().includes(q) || String(r.branch).toLowerCase().includes(q);
+  const below = rows.filter(r=>r.score<50).sort((a,b)=>a.score-b.score);
+  const watch = rows.filter(r=>r.score>=50 && r.score<80).sort((a,b)=>a.score-b.score);
+  const onTrack = rows.filter(r=>r.score>=80);
+  const signals = (await computeSmartAlerts(st.week, rows.map(r=>r.name))).filter(a=>a.kind!=='Pace' && a.kind!=='Goal');
+  if(currentView!=='alerts') return;
+  const attention = signals.filter(a=>a.sev!=='good'), wins = signals.filter(a=>a.sev==='good');
+  const pending = Remarks.canApprove() ? Remarks.pending().sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at))) : [];
+  const noRemark = below.filter(r=>!Remarks.forWeek(r.name, st.week).some(x=>(x.status||'approved')==='approved')).length;
+  const w = weekOfDate(st.week);
+  const bar = r=>{ const v=Math.min(100, r.pct||0); return `<div class="al-bar" title="${fmtNum(r.sched)} of ${fmtNum(r.goal)} schedules"><i style="width:${v}%"></i>${inProgress?`<u style="left:${Math.min(100, elapsed/7*100)}%" title="Where they should be by today"></u>`:''}<b style="left:50%"></b></div>`; };
+  const card = (r, sev)=>`<div class="al-card ${sev}">
+      <div class="al-head"><button type="button" class="al-name" data-al-remarks="${escapeHtml(r.name)}">${escapeHtml(r.name)}</button><span class="al-pct">${Math.round(r.pct)}%</span></div>
+      <div class="al-sub">${escapeHtml(r.division)}${r.branch?' · '+escapeHtml(r.branch):''}</div>
+      ${bar(r)}
+      <div class="al-facts"><span><strong>${fmtNum(r.sched)}</strong> / ${fmtNum(r.goal)} schedules</span>${inProgress?`<span>pace ${Math.round(r.pace)}% · on track for ~${fmtNum(r.projected)}</span>`:`<span>${fmtNum(r.shows)} shows · ${fmtNum(r.hires)} hires</span>`}</div>
+      ${alertsRemarkLine(r.name, st.week)}
+      <div class="al-actions">${Remarks.canAdd()?`<button class="btn btn-secondary btn-sm" data-al-add="${escapeHtml(r.name)}">Add remark</button>`:''}<button class="link-btn" data-al-remarks="${escapeHtml(r.name)}">${Remarks.forRecruiter(r.name).length?'Remarks ('+Remarks.forRecruiter(r.name).length+')':'History'}</button></div>
+    </div>`;
+  const belowShown = below.filter(match), watchShown = watch.filter(match);
+  const sigList = (st.signals==='wins'?wins:attention).filter(a=>!q || a.name.toLowerCase().includes(q));
+  host.innerHTML = `
+    <div class="al-toolbar">
+      <label class="cand-field"><span>Week</span><select id="alWeek">${weeks.map(d=>`<option value="${d}" ${d===st.week?'selected':''}>Wk ${weekOfDate(d).number} · ${fmtDate(weekOfDate(d).weekStart).replace(/, \d{4}$/,'')} – ${fmtDate(d)}${d===toIsoDateOnly(saturdayOnOrAfter(new Date()))?' (this week)':''}</option>`).join('')}</select></label>
+      <p class="hint al-basis">${inProgress?`Week in progress — day ${elapsed} of 7. Recruiters are compared with where they should be by today (goal × ${elapsed}/7).`:`Completed week — schedules compared with each recruiter’s weekly goal (default ${DEFAULT_WEEKLY_GOAL}).`}</p>
+    </div>
+    <div class="al-tiles" data-section="alerts.summary">
+      <button type="button" class="al-tile bad" data-jump="alBelow"><span>Below 50% of goal</span><strong>${below.length}</strong><em>${noRemark?noRemark+' without a remark':'all have remarks'}</em></button>
+      <button type="button" class="al-tile warn" data-jump="alWatch"><span>50–79% of goal</span><strong>${watch.length}</strong><em>keep an eye on</em></button>
+      <div class="al-tile good"><span>On track (80%+)</span><strong>${onTrack.length}</strong><em>of ${rows.length} recruiters</em></div>
+      ${Remarks.canApprove()?`<button type="button" class="al-tile ${pending.length?'warn':''}" data-jump="alApprovals" data-section="alerts.approvals"><span>Remarks to approve</span><strong>${pending.length}</strong><em>${pending.length?'waiting for you':'all caught up'}</em></button>`:`<div class="al-tile"><span>Other signals</span><strong>${attention.length}</strong><em>show rate, no-shows, activity</em></div>`}
+    </div>
+    ${pending.length?`<section class="panel al-section" id="alApprovals" data-section="alerts.approvals"><div class="panel-head"><div><h3>Remarks awaiting approval</h3><span class="hint">Only you and the author can see these until they’re approved.</span></div></div>
+      <div class="al-approvals">${pending.map(r=>`<div class="al-appr" data-id="${escapeHtml(r.id)}"><div class="al-appr-meta"><strong>${escapeHtml(r.recruiter)}</strong> · Wk ${weekOfDate(r.week_end_date).number} · by ${escapeHtml(r.author||'')} · ${new Date(r.created_at).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</div><div class="al-appr-text">${escapeHtml(r.remark)}</div><div class="al-actions"><button class="btn btn-primary btn-sm" data-appr="1">Approve</button><button class="btn btn-secondary btn-sm" data-appr="0">Reject</button><button class="link-btn" data-appr-edit="${escapeHtml(r.recruiter)}" data-week="${r.week_end_date}">Edit…</button></div></div>`).join('')}</div></section>`:''}
+    <section class="panel al-section" id="alBelow" data-section="alerts.below">
+      <div class="panel-head"><div><h3><span class="al-dot bad"></span>Below 50% of goal <span class="al-count">${belowShown.length}</span></h3><span class="hint">Lowest first. Click a name for the remark history.</span></div></div>
+      ${belowShown.length?`<div class="al-grid">${belowShown.map(r=>card(r,'bad')).join('')}</div>`:`<p class="hint" style="margin:0;">${q?'No match.':'Nobody is below 50% of goal this week. 🎉'}</p>`}
+    </section>
+    <section class="panel al-section" id="alWatch" data-section="alerts.watch">
+      <details ${watchShown.length && watchShown.length<=12?'open':''}><summary><h3><span class="al-dot warn"></span>50–79% of goal <span class="al-count">${watchShown.length}</span></h3></summary>
+      ${watchShown.length?`<div class="al-grid compact">${watchShown.map(r=>card(r,'warn')).join('')}</div>`:'<p class="hint" style="margin:8px 0 0;">Nobody in this range.</p>'}</details>
+    </section>
+    <section class="panel al-section" data-section="alerts.signals">
+      <div class="panel-head"><div><h3>Other signals</h3><span class="hint">Compared with each recruiter’s previous 4 weeks</span></div><div class="seg"><button type="button" data-sig="attention" aria-pressed="${st.signals==='attention'}">Needs attention (${attention.length})</button><button type="button" data-sig="wins" aria-pressed="${st.signals==='wins'}">Wins (${wins.length})</button></div></div>
+      ${sigList.length?`<div class="al-signals">${sigList.slice(0,40).map(a=>`<div class="al-sig ${a.sev}"><span class="alert-kind">${escapeHtml(a.kind)}</span><button type="button" class="al-name" data-al-remarks="${escapeHtml(a.name)}">${escapeHtml(a.name)}</button><span class="al-sig-text">${escapeHtml(a.text)}</span>${a.remark && Remarks.canAdd()?`<button class="link-btn" data-al-add="${escapeHtml(a.name)}" data-suggest="${escapeHtml(a.remark)}">Add remark →</button>`:''}</div>`).join('')}</div>${sigList.length>40?`<p class="hint">+${sigList.length-40} more</p>`:''}`:`<p class="hint" style="margin:0;">${st.signals==='wins'?'No standout wins yet.':'Nothing else needs attention.'}</p>`}
+    </section>`;
+  host.querySelector('#alWeek').onchange = e=>{ st.week=e.target.value; renderAlertsView(); };
+  host.querySelectorAll('[data-jump]').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.jump)?.scrollIntoView({behavior:'smooth', block:'start'}));
+  host.querySelectorAll('[data-sig]').forEach(b=>b.onclick=()=>{ st.signals=b.dataset.sig; renderAlertsView(); });
+  host.querySelectorAll('[data-al-remarks]').forEach(b=>b.onclick=()=>openRemarksModal(b.dataset.alRemarks, st.week));
+  host.querySelectorAll('[data-al-add]').forEach(b=>b.onclick=()=>{ const r = rows.find(x=>x.name===b.dataset.alAdd); openRemarksModal(b.dataset.alAdd, st.week, b.dataset.suggest || (r ? `${r.sched} of ${r.goal} schedules (${Math.round(r.pct)}%)${inProgress?' after '+elapsed+' day'+(elapsed===1?'':'s'):''}. Reason / plan: ` : '')); });
+  host.querySelectorAll('[data-appr]').forEach(b=>b.onclick=async ()=>{ const id=b.closest('.al-appr').dataset.id; b.disabled=true; try{ await Remarks.review(id, b.dataset.appr==='1'); showToast(b.dataset.appr==='1'?'Remark approved.':'Remark rejected.'); }catch(e){ showToast('Could not update: '+cleanErr(e)); } renderAlertsView(); });
+  host.querySelectorAll('[data-appr-edit]').forEach(b=>b.onclick=()=>openRemarksModal(b.dataset.apprEdit, b.dataset.week));
+}
+
 /* ------------------------------------------ SMART ALERTS ------------------------------------------ */
 async function computeSmartAlerts(latestWeekEnd, names){
   const idx = weeksData.findIndex(w=>w.weekEndDate===latestWeekEnd); if(idx<0) return [];
@@ -7163,7 +7357,7 @@ async function renderUsersAdmin(){
     <div style="overflow-x:auto"><table class="users-table"><thead><tr><th>Name</th><th>Access</th><th>Status</th><th>Last sign-in</th><th></th></tr></thead><tbody>
     ${usersCache.map(u=>`<tr>
       <td><strong>${escapeHtml(u.name)}</strong>${u.role==='super_admin'?' <span class="pill good">Super admin</span>':''}${u.online?' <span class="online-dot" title="Online now"></span>':''}</td>
-      <td class="mod-chips">${u.role==='super_admin'?'<span class="hint">Everything</span>':(u.modules.length?u.modules.map(m=>`<span class="mod-chip">${escapeHtml(modLabel(m))}</span>`).join(''):'<span class="hint">No modules</span>')}</td>
+      <td class="mod-chips">${u.role==='super_admin'?'<span class="hint">Everything</span>':(u.modules.length?u.modules.map(m=>`<span class="mod-chip">${escapeHtml(modLabel(m))}</span>`).join(''):'<span class="hint">No modules</span>')}${u.role!=='super_admin' && (u.hidden_sections||[]).length?`<span class="hint" style="display:block;margin-top:4px;">${u.hidden_sections.length} section${u.hidden_sections.length===1?'':'s'} hidden</span>`:''}</td>
       <td>${u.active?'Active':'<span class="pill bad">Disabled</span>'}</td>
       <td>${u.last_login_at?new Date(u.last_login_at).toLocaleString():'Never'}</td>
       <td style="white-space:nowrap;text-align:right;"><button class="btn btn-secondary btn-sm" data-edit-user="${u.id}">Edit</button>${u.role==='super_admin'?'':` <button class="btn btn-danger btn-sm" data-del-user="${u.id}">Delete</button>`}</td>
@@ -7180,7 +7374,7 @@ async function renderUsersAdmin(){
 function drawUserForm(){
   const host = document.getElementById('userForm'); if(!host) return;
   const isNew = editingUserId==='new';
-  const u = isNew ? {name:'', modules:['performance','recruiters','branches'], active:true, role:'user'} : usersCache.find(x=>x.id===editingUserId);
+  const u = isNew ? {name:'', modules:['performance','recruiters','branches'], hidden_sections:[], active:true, role:'user'} : usersCache.find(x=>x.id===editingUserId);
   if(!u){ host.innerHTML=''; return; }
   const sa = u.role==='super_admin';
   host.innerHTML = `<div class="user-form">
@@ -7190,17 +7384,21 @@ function drawUserForm(){
       <div class="field"><label for="ufPw">${isNew?'Password':'New password (leave blank to keep)'}</label><div class="pw-wrap"><input id="ufPw" type="text" autocomplete="new-password" placeholder="${isNew?'At least 8 characters, letters and numbers':''}" ${sa?'disabled':''}><button type="button" class="pw-toggle" id="ufGen" ${sa?'disabled':''}>Generate</button></div>${sa?'<span class="hint">Change your own password under My account.</span>':''}</div>
     </div>
     ${sa?'<p class="hint">The super admin always has every right.</p>':`<fieldset class="mod-grid"><legend>Modules this person can open</legend>${MODULES.map(m=>`<label class="mod-opt"><input type="checkbox" value="${m.key}" ${u.modules.includes(m.key)?'checked':''}><span><strong>${escapeHtml(m.label)}</strong><em>${escapeHtml(m.hint)}</em></span></label>`).join('')}</fieldset>
+    <fieldset class="sec-grid"><legend>What this person sees on each page <span class="hint">(untick to hide a card or section)</span></legend>${Object.entries(PAGE_SECTIONS).map(([mod,secs])=>`<details class="sec-page" data-sec-mod="${mod}" ${u.modules.includes(mod)?'':'hidden'}><summary>${escapeHtml((MODULES.find(m=>m.key===mod)||{label:mod}).label)} <span class="sec-count"></span></summary><div class="sec-list">${secs.map(([k,l])=>`<label class="sec-opt${l.startsWith('·')?' sub':''}"><input type="checkbox" data-sec="${k}" ${(u.hidden_sections||[]).includes(k)?'':'checked'}> ${escapeHtml(l.replace(/^· /,''))}</label>`).join('')}</div></details>`).join('')}</fieldset>
     <label class="mod-opt" style="margin-top:6px;"><input type="checkbox" id="ufActive" ${u.active?'checked':''}><span><strong>Account active</strong><em>Untick to block sign-in without deleting the account</em></span></label>`}
     <p class="auth-msg" id="ufMsg" role="alert"></p>
     <div class="user-form-actions"><button class="btn btn-secondary btn-sm" id="ufCancel">Cancel</button><button class="btn btn-primary btn-sm" id="ufSave">${isNew?'Create user':'Save changes'}</button></div>
   </div>`;
   host.querySelector('#ufGen')?.addEventListener('click', ()=>{ host.querySelector('#ufPw').value = genPassword(); });
+  const secCount = ()=>host.querySelectorAll('.sec-page').forEach(d=>{ const all=d.querySelectorAll('[data-sec]').length, on=d.querySelectorAll('[data-sec]:checked').length; d.querySelector('.sec-count').textContent = on===all ? 'everything' : on+' of '+all+' shown'; });
+  host.querySelectorAll('.mod-grid input').forEach(cb=>cb.addEventListener('change', ()=>{ const d=host.querySelector('.sec-page[data-sec-mod="'+cb.value+'"]'); if(d) d.hidden=!cb.checked; }));
+  host.querySelectorAll('[data-sec]').forEach(cb=>cb.addEventListener('change', secCount)); secCount();
   host.querySelector('#ufCancel').onclick=()=>{ editingUserId=null; host.innerHTML=''; };
   host.querySelector('#ufSave').onclick=async ()=>{
     const p = {name:host.querySelector('#ufName').value.trim()};
     if(!isNew) p.id = u.id;
     const pw = host.querySelector('#ufPw').value; if(pw) p.password = pw;
-    if(!sa){ p.modules = [...host.querySelectorAll('.mod-grid input:checked')].map(i=>i.value); p.active = host.querySelector('#ufActive').checked; }
+    if(!sa){ p.modules = [...host.querySelectorAll('.mod-grid input:checked')].map(i=>i.value); p.active = host.querySelector('#ufActive').checked; p.hidden_sections = [...host.querySelectorAll('[data-sec]:not(:checked)')].map(i=>i.dataset.sec); }
     if(isNew && !pw){ host.querySelector('#ufMsg').textContent='Set a password (or click Generate).'; return; }
     try{
       const saved = await Server.rpc('dash_user_save', {p});
@@ -7352,13 +7550,13 @@ async function renderCandidatesView(){
     <div class="cand-controls">
       <label class="cand-field"><span>Week</span><select id="candWeek">${weeks.map(w=>`<option value="${w}" ${w===st.week?'selected':''}>Wk ${isoWeekNumber(new Date(w+'T00:00:00'))} · ${fmtDate(toIsoDateOnly(new Date(new Date(w+'T00:00:00').getTime()-6*86400000))).replace(/, \d{4}$/,'')} – ${fmtDate(w)}</option>`).join('')}</select></label>
       <label class="cand-field"><span>Recruiter</span><select id="candRecruiter"><option value="">All recruiters</option></select></label>
-      <button type="button" class="btn btn-secondary btn-sm cand-explain-btn" id="candExplainBtn" aria-expanded="false">How are these counted?</button>
+      <button type="button" class="btn btn-secondary btn-sm cand-explain-btn" id="candExplainBtn" aria-expanded="false" data-section="cand.explain">How are these counted?</button>
     </div>
-    <div id="candExplain" class="hidden"></div>
-    <div class="cand-cats" id="candCats" role="tablist" aria-label="Category"><span class="hint">Loading week…</span></div>
+    <div id="candExplain" class="hidden" data-section="cand.explain"></div>
+    <div data-section="cand.list"><div class="cand-cats" id="candCats" role="tablist" aria-label="Category"><span class="hint">Loading week…</span></div>
     <div class="cand-summary" id="candSummary"></div>
     <div class="cand-scroll"><table id="candTable" class="users-table cand-table"></table></div>
-    <div id="candMore" style="text-align:center;margin-top:10px;"></div>
+    <div id="candMore" style="text-align:center;margin-top:10px;"></div></div>
   </div>`;
   container.querySelector('#candExplainBtn').onclick = ()=>toggleCountBreakdown();
   container.querySelector('#candWeek').onchange = e=>{ st.week = e.target.value; st.recruiter=''; st.limit=500; renderCandidatesView(); };
@@ -7538,7 +7736,7 @@ async function renderUploadHistory(){
 }
 
 /* ============================= INIT ============================= */
-const APP_VERSION = 'Version 4.17.1';
+const APP_VERSION = 'Version 4.18.0';
 async function init(){
   document.getElementById('versionLabelInline').textContent = APP_VERSION;
   document.getElementById('footerVersionLabel').textContent = APP_VERSION;
@@ -7601,8 +7799,9 @@ document.addEventListener('keydown', e=>{
     recruiters:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><circle cx="17.5" cy="9" r="2.5"/><path d="M16.8 14.6c2.4.3 4 2 4.7 4.9"/>',
     branches:'<path d="M3 21V9l9-5 9 5v12"/><path d="M9 21v-6h6v6"/>',
     master:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10"/>',
+    alerts:'<path d="M12 3l9.5 16.5h-19z"/><path d="M12 10v4M12 17.5v.5"/>',
     candidates:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2.2"/><path d="M5.8 16c.6-1.6 1.8-2.4 3.2-2.4s2.6.8 3.2 2.4M14.5 10h4M14.5 13.5h3"/>'};
-  const short = {performance:'Summary', recruiters:'Recruiters', branches:'Branches', master:'Master', candidates:'Names'};
+  const short = {performance:'Summary', recruiters:'Recruiters', branches:'Branches', master:'Master', candidates:'Names', alerts:'Alerts'};
   document.querySelectorAll('#navList button[data-view]').forEach(b=>{
     const v=b.dataset.view; if(!icons[v]) return;
     [...b.childNodes].forEach(n=>{ if(n.nodeType===3 && n.textContent.trim()){ const s=document.createElement('span'); s.className='nav-full'; s.textContent=n.textContent; b.replaceChild(s,n); } });
