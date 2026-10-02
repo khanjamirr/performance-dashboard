@@ -683,6 +683,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
   .nav .divider,.nav .dot{display:none!important}
   .nav button{position:relative;width:100%;display:flex!important;align-items:center;gap:12px!important;padding:10px 12px!important;border-radius:10px!important;border:1px solid transparent!important;
     font-size:13px!important;font-weight:500;color:#c8dbe2!important;background:transparent!important;white-space:nowrap;transition:background .15s,color .15s}
+  .nav button.hidden,.ribbon-actions .hidden{display:none!important}
   .nav button:hover{background:#ffffff10!important;color:#fff!important}
   .nav button.active{background:#ffffff!important;color:#123c48!important;font-weight:650;box-shadow:0 6px 18px #0b232d33}
   .nav button.active::before{content:'';position:absolute;left:-14px;top:9px;bottom:9px;width:4px;border-radius:0 4px 4px 0;background:#63d4c2}
@@ -731,8 +732,9 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
 @media (max-width:760px){.settings-page{border-radius:14px;margin:0 0 16px}.settings-page .settings-tabs{top:0;padding:0 8px}.settings-page .settings-tab-content{padding:14px 12px 18px}.settings-page #manageWeeksTable th{top:47px}.settings-page .panel:has(table){overflow-x:auto}}
 
 /* ---------- smarter cards & header (v4.6) ---------- */
-.kpi-v2{grid-template-columns:repeat(7,minmax(0,1fr))!important;gap:12px!important}
-@media (max-width:1320px){.kpi-v2{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+.kpi-v2{grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:12px!important}
+.kpi-v2 .kpi-rate{grid-column:span 2}
+@media (max-width:1320px){.kpi-v2{grid-template-columns:repeat(3,minmax(0,1fr))!important}.kpi-v2 .kpi-rate{grid-column:auto}}
 .kpi-v2 .kpi-card{display:flex;flex-direction:column;min-height:0!important;padding:16px 16px 14px!important;background:#fff!important;color:var(--text)!important;border:1px solid #e1eaed!important;border-radius:16px!important;box-shadow:0 1px 2px #1834420a,0 8px 24px #1834420a!important;transition:transform .15s ease,box-shadow .15s ease;overflow:hidden}
 .kpi-v2 .kpi-card:hover{transform:translateY(-2px);box-shadow:0 2px 4px #1834420d,0 14px 30px #18344214!important}
 .kpi-v2 .kpi-card:before{content:'';position:absolute;left:0;top:0;right:0;height:3px;width:auto!important;margin:0!important;border-radius:0!important;background:var(--accent)!important;opacity:.85}
@@ -777,7 +779,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V12M10 20V5M16 20V9M22 20V3"/></svg></div>
       <div class="brand-text">
         <h1 id="dashboardTitle" title="Click to go home">Performance Dashboard</h1>
-        <p><span id="versionLabelInline">Version 4.7.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
+        <p><span id="versionLabelInline">Version 4.10.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
       </div>
     </div>
     <button type="button" class="side-collapse" id="sideCollapseBtn" aria-label="Collapse menu" title="Collapse menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
@@ -884,7 +886,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       </div>
       <div class="muted-note" id="storageModeNote" style="text-align:center;margin-top:24px;">Data stored locally in this browser.</div>
       <div class="muted-note" style="text-align:center;margin-top:4px;opacity:.65;">
-        <span id="footerVersionLabel">Version 4.7.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
+        <span id="footerVersionLabel">Version 4.10.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
       </div>
     </div>
   </main>
@@ -1433,7 +1435,7 @@ function buildCandidateListHtml(list, metricLabel, entityName){
     <tbody>${rows}</tbody></table>`;
 }
 const CANDIDATE_METRIC_LABELS = {
-  schedules:'Schedules', scheduledDateOf:'Interviews', shows:'Shows', noShows:'No Shows', i9:'I9 Complete', placed:'Placed'
+  schedules:'Schedules', scheduledDateOf:'Interviews', shows:'Shows', noShows:'No Shows', i9:'Hires', placed:'Placed'
 };
 const CANDIDATE_METRIC_LIST_KEYS = {
   schedules:'schedulesList', scheduledDateOf:'interviewsList', shows:'showsList', noShows:'noShowsList', i9:'i9List', placed:'placedList'
@@ -2568,13 +2570,15 @@ function showOverlapModal(weekEndDate, existingWeekNumber, isMonth){
 }
 
 /* ============================= AGGREGATION ============================= */
-// Rows with neither a Candidate Name nor an Employee Number are not counted anywhere
-// (Raw or Deduped) — there is no candidate to attribute them to.
+// A row is only counted when it has BOTH a Candidate Name and an Employee Number. Rows with
+// either one blank (or a placeholder such as "-", "N/A", "#N/A", "0") are ignored everywhere —
+// Raw and Deduped, every category, the Candidates lists and the server's number check.
+const BLANK_IDENT_RE = /^(?:[-\u2013\u2014.\s]*|n\/?a|#n\/a|null|none|unknown|0)$/i;
+function isBlankIdent(v){ return BLANK_IDENT_RE.test(String(v==null?'':v).trim()); }
 function rowHasCandidate(row, mapping){
-  if(!mapping.candidateName && !mapping.employeeNumber) return true; // file has neither column — nothing to judge by
-  const eid = mapping.employeeNumber ? normalizeEmployeeNumber(row[mapping.employeeNumber]) : '';
-  const name = mapping.candidateName ? (row[mapping.candidateName]??'').toString().trim() : '';
-  return !!(eid || name);
+  if(mapping.employeeNumber && isBlankIdent(normalizeEmployeeNumber(row[mapping.employeeNumber]))) return false;
+  if(mapping.candidateName && isBlankIdent(row[mapping.candidateName])) return false;
+  return true;
 }
 // File 1 ("Created On" file): counts Interview Schedules only, bucketed by Created On.
 function processFile1(rows, mapping, weekEndDate, dedupeFlag, rangeCheckFn){
@@ -2743,7 +2747,9 @@ function processFile2(rows, mapping, weekEndDate, dedupeFlag, rangeCheckFn){
       if(candidate) byRecruiter[recruiter].noShowsList.push(candidate);
     }
 
-    if(dateOccurred && i9StatusMatch){ day.i9++; byRecruiter[recruiter].i9++; if(candidate) byRecruiter[recruiter].i9List.push(candidate); }
+    // Hires = the I-9 Yes/No dropdown is Yes ("I-9 Completed (Employee) (Employee)"; a Yes in "I-9 Status" counts too)
+    const isHire = i9CompletedMatch || i9Val === 'yes';
+    if(dateOccurred && isHire){ day.i9++; byRecruiter[recruiter].i9++; if(candidate) byRecruiter[recruiter].i9List.push(candidate); }
     if(dateOccurred && reasonVal===PLACED_STATUS_REASON_VALUE){ day.placed++; byRecruiter[recruiter].placed++; if(candidate) byRecruiter[recruiter].placedList.push(candidate); }
   });
   return {byRecruiter, diag};
@@ -3394,9 +3400,11 @@ async function renderWeeklyView(){
       ${kpiCardHtml({label:'Interviews', icon:'chat', accent:'#4a78c8', value:fmtNum(t.scheduledDateOf), delta:deltaHtml(t.scheduledDateOf, prevT? prevT.scheduledDateOf: undefined), spark:kpiSeries(week, w=>w.scheduledDateOf)})}
       ${kpiCardHtml({label:'Shows', icon:'check', accent:'#1f9a6c', value:fmtNum(t.shows), delta:deltaHtml(t.shows, prevT? prevT.shows: undefined), spark:kpiSeries(week, w=>w.shows, true)})}
       ${kpiCardHtml({label:'No Shows', icon:'x', accent:'#c4565f', value:fmtNum(t.noShows), delta:deltaHtml(t.noShows, prevT? prevT.noShows: undefined, false), spark:kpiSeries(week, w=>w.noShows, true)})}
-      ${kpiCardHtml({label:'Goal Reach', icon:'target', accent:'#a67c2e', value:goalReachPct!==null?goalReachPct.toFixed(1)+'%':'\u2013', delta:'<div class="delta flat">'+(isMultiWeekMode?'Combined':'Target 100%')+'</div>', bar:goalReachPct!==null?{v:goalReachPct, target:100, good:'up'}:null})}
-      ${(()=>{ const pend=!isMultiWeekMode && weekIsFullyPending(week.weekEndDate); return kpiCardHtml({label:'Show Rate', icon:'trend', accent:'#1f8a84', value:pend?'Pending':fmtPct(t.shows,t.scheduledDateOf), delta:pend?'<div class="delta flat">Week hasn\u2019t happened yet</div>':deltaHtml(showRate, prevShowRate, true, true), bar:pend||!t.scheduledDateOf?null:{v:showRate, target:60, good:'up'}})
-        + kpiCardHtml({label:'No Show Rate', icon:'down', accent:'#c4565f', value:pend?'Pending':fmtPct(t.noShows,t.scheduledDateOf), delta:pend?'<div class="delta flat">Week hasn\u2019t happened yet</div>':deltaHtml(noShowRate, prevNoShowRate, false, true), bar:pend||!t.scheduledDateOf?null:{v:noShowRate, target:40, good:'down'}}); })()}
+      ${kpiCardHtml({label:'Hires', icon:'hire', accent:'#7a5fb8', value:fmtNum(t.i9), delta:deltaHtml(t.i9, prevT? prevT.i9: undefined), spark:kpiSeries(week, w=>w.i9, true), title:'Interviews this week whose I-9 dropdown is Yes'})}
+      ${kpiCardHtml({label:'Placed', icon:'brief', accent:'#b07a2a', value:fmtNum(t.placed), delta:deltaHtml(t.placed, prevT? prevT.placed: undefined), spark:kpiSeries(week, w=>w.placed, true), title:'Interviews this week whose Status Reason is Assigned'})}
+      ${kpiCardHtml({rate:true, label:'Goal Reach', icon:'target', accent:'#a67c2e', value:goalReachPct!==null?goalReachPct.toFixed(1)+'%':'\u2013', delta:'<div class="delta flat">'+(isMultiWeekMode?'Combined':'Target 100%')+'</div>', bar:goalReachPct!==null?{v:goalReachPct, target:100, good:'up'}:null})}
+      ${(()=>{ const pend=!isMultiWeekMode && weekIsFullyPending(week.weekEndDate); return kpiCardHtml({label:'Show Rate', icon:'trend', rate:true, accent:'#1f8a84', value:pend?'Pending':fmtPct(t.shows,t.scheduledDateOf), delta:pend?'<div class="delta flat">Week hasn\u2019t happened yet</div>':deltaHtml(showRate, prevShowRate, true, true), bar:pend||!t.scheduledDateOf?null:{v:showRate, target:60, good:'up'}})
+        + kpiCardHtml({rate:true, label:'No Show Rate', icon:'down', accent:'#c4565f', value:pend?'Pending':fmtPct(t.noShows,t.scheduledDateOf), delta:pend?'<div class="delta flat">Week hasn\u2019t happened yet</div>':deltaHtml(noShowRate, prevNoShowRate, false, true), bar:pend||!t.scheduledDateOf?null:{v:noShowRate, target:40, good:'down'}}); })()}
     </div>
 
     <div class="section-divider">Trends</div>
@@ -3528,7 +3536,7 @@ function drawPrevSixWeeksTable(){
   if(!table) return;
   const last6 = weeksData.slice(-6).reverse().map(w=>scopeWeekToDivision(w,universalDivision));
   if(last6.length===0){ table.innerHTML = '<tbody><tr><td style="padding:14px;color:var(--text-tertiary);">No prior weeks yet.</td></tr></tbody>'; wireCopyPrevWeeksBtn(); return; }
-  const headers = ['Week','Week Ending','Schedules','Interviews','Shows','No Shows','I9 Complete','Placed','Show Rate'];
+  const headers = ['Week','Week Ending','Schedules','Interviews','Shows','No Shows','Hires','Placed','Show Rate'];
   table.innerHTML = `<thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
     <tbody>${last6.map(w=>{
       const t = w.totals;
@@ -3572,7 +3580,7 @@ function wireCopyPrevWeeksBtn(){
     const target = selectedWeekEndDates.length ? selectedWeekEndDates : weeksData.slice(-6).map(w=>w.weekEndDate);
     const rows = target.map(wed=>weeksData.find(w=>w.weekEndDate===wed)).filter(Boolean);
     if(rows.length===0){ showToast('No weeks to copy yet.'); return; }
-    const header = ['Week','Week Ending','Schedules','Interviews','Shows','No Shows','I9 Complete','Placed','Show Rate %'].join('\t');
+    const header = ['Week','Week Ending','Schedules','Interviews','Shows','No Shows','Hires','Placed','Show Rate %'].join('\t');
     const lines = rows.map(w=>{
       const t = w.totals;
       return [w.weekNumber, fmtDate(w.weekEndDate), t.schedules, t.scheduledDateOf, t.shows, t.noShows, t.i9, t.placed, pct(t.shows,t.scheduledDateOf).toFixed(1)+'%'].join('\t');
@@ -3601,7 +3609,7 @@ async function renderWeeklyTopPerformers(week, suppliedGoals){
 }
 
 /* ---------- KPI cards: value, change, 8-week sparkline or target bar ---------- */
-const KPI_ICONS={cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',chat:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',check:'<path d="M20 6L9 17l-5-5"/>',x:'<path d="M18 6L6 18M6 6l12 12"/>',target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',trend:'<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',down:'<path d="M3 7l6 6 4-4 8 8"/><path d="M15 17h6v-6"/>'};
+const KPI_ICONS={hire:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5 1.6 0 3 .5 4.1 1.4"/><path d="M15.5 17.5l2 2 4-4.5"/>',brief:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"/>',cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',chat:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',check:'<path d="M20 6L9 17l-5-5"/>',x:'<path d="M18 6L6 18M6 6l12 12"/>',target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',trend:'<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',down:'<path d="M3 7l6 6 4-4 8 8"/><path d="M15 17h6v-6"/>'};
 // last 8 weeks up to the selected one, scoped to the selected division
 function kpiSeries(week, pick, skipPending){
   const end = week && week.weekEndDate && /^\d{4}-/.test(week.weekEndDate) ? week.weekEndDate : (weeksData.at(-1)||{}).weekEndDate;
@@ -3627,7 +3635,7 @@ function kpiCardHtml(o){
     const v=Math.max(0,Math.min(100,o.bar.v)), ok = o.bar.good==='up' ? o.bar.v>=o.bar.target : o.bar.v<=o.bar.target;
     foot = `<div class="kpi-foot kpi-bar-wrap" title="Target ${o.bar.good==='up'?'≥':'≤'} ${o.bar.target}%"><div class="kpi-bar"><i style="width:${v}%;background:${ok?'#1f9a6c':'#d0776f'}"></i><b style="left:${Math.min(100,o.bar.target)}%"></b></div><span class="kpi-foot-lbl">${o.bar.good==='up'?'≥':'≤'} ${o.bar.target}%</span></div>`;
   }
-  return `<div class="kpi-card" style="--accent:${o.accent}"><div class="kpi-top"><div class="label">${o.label}</div><span class="kpi-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${KPI_ICONS[o.icon]||''}</svg></span></div><div class="value">${o.value}</div>${o.delta||''}${foot}</div>`;
+  return `<div class="kpi-card${o.rate?' kpi-rate':''}" style="--accent:${o.accent}"${o.title?` title="${escapeHtml(o.title)}"`:''}><div class="kpi-top"><div class="label">${o.label}</div><span class="kpi-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${KPI_ICONS[o.icon]||''}</svg></span></div><div class="value">${o.value}</div>${o.delta||''}${foot}</div>`;
 }
 function drawKpiMiniPies(weeks){
   const totals=computeDivisionBreakdown(weeks);
@@ -3894,14 +3902,14 @@ function renderTrendExplorer(weeks){
  slider.oninput=draw;draw();
 }
 function allWeeksQualityHtml(){
-  return '<div class="row-2col"><div class="panel"><div class="panel-head"><h3>Show Rate</h3><span class="hint">Weekly result · dotted line = 60% minimum</span></div><div class="chart-wrap tall"><canvas id="allWeeksShowRate"></canvas></div></div><div class="panel"><div class="panel-head"><h3>Hires per Recruiter</h3><span class="hint">Weekly I9 complete ÷ recruiters recorded in that week, for the selected division</span></div><div class="chart-wrap tall"><canvas id="allWeeksHires"></canvas></div></div></div>';
+  return '<div class="row-2col"><div class="panel"><div class="panel-head"><h3>Show Rate</h3><span class="hint">Weekly result · dotted line = 60% minimum</span></div><div class="chart-wrap tall"><canvas id="allWeeksShowRate"></canvas></div></div><div class="panel"><div class="panel-head"><h3>Hires per Recruiter</h3><span class="hint">Weekly hires ÷ recruiters recorded in that week, for the selected division</span></div><div class="chart-wrap tall"><canvas id="allWeeksHires"></canvas></div></div></div>';
 }
 function drawAllWeeksQuality(weeks){
   const labels=weeks.map(w=>'Wk '+w.weekNumber);
   for(const id of ['allWeeksShowRate','allWeeksHires'])destroyChart(id);
   const options=(title,max)=>({responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true,...(max?{max}:{}),title:{display:true,text:title}},x:{grid:{display:false}}}});
   charts.allWeeksShowRate=safeChart(document.getElementById('allWeeksShowRate'),{type:'line',data:{labels,datasets:[{label:'Show rate %',data:weeks.map(w=>weekIsFullyPending(w.weekEndDate)||!w.totals.scheduledDateOf?null:100*w.totals.shows/w.totals.scheduledDateOf),borderColor:'#218778',tension:.2},{label:'Minimum target 60%',data:weeks.map(()=>60),borderColor:'#a67b38',borderDash:[2,5],pointRadius:0}]},options:options('Show rate %',100)});
-  charts.allWeeksHires=safeChart(document.getElementById('allWeeksHires'),{type:'line',data:{labels,datasets:[{label:'Hires per recruiter',data:weeks.map(w=>{const count=Object.keys(w.byRecruiter||{}).length;return count&&!weekIsFullyPending(w.weekEndDate)?w.totals.i9/count:null;}),borderColor:'#8a68b2',tension:.2}]},options:options('I9 complete per recruiter')});
+  charts.allWeeksHires=safeChart(document.getElementById('allWeeksHires'),{type:'line',data:{labels,datasets:[{label:'Hires per recruiter',data:weeks.map(w=>{const count=Object.keys(w.byRecruiter||{}).length;return count&&!weekIsFullyPending(w.weekEndDate)?w.totals.i9/count:null;}),borderColor:'#8a68b2',tension:.2}]},options:options('Hires per recruiter')});
 }
 function drawAllCategoriesTrend(weeksList, chartId, divisionFilter, goalTotals=[]){
   destroyChart(chartId);
@@ -3915,7 +3923,7 @@ function drawAllCategoriesTrend(weeksList, chartId, divisionFilter, goalTotals=[
     daily.missing=daily.missing.filter(k=>['schedules','scheduledDateOf','shows'].includes(k));
     if(daily.missing.length){
       const note=document.createElement('div');note.className='hint daily-detail-note';
-      const names={scheduledDateOf:'Interviews',schedules:'Schedules',shows:'Shows',noShows:'No Shows',i9:'I9 Complete',placed:'Placed'};
+      const names={scheduledDateOf:'Interviews',schedules:'Schedules',shows:'Shows',noShows:'No Shows',i9:'Hires',placed:'Placed'};
       note.textContent='Daily detail unavailable for '+daily.missing.map(k=>names[k]).join(', ')+'. Re-sync the source folder to restore it. Weekly totals are unchanged.';
       ctx.parentElement.after(note);
     }
@@ -4103,12 +4111,12 @@ function intelligenceFindings(weeks,priorWeeks,mode){
   const wins=[],risks=[];
   for(const r of rows){
     const old=prior[r.name],rate=r.scheduledDateOf?100*r.shows/r.scheduledDateOf:null;
-    if(r.i9>0)wins.push({score:r.i9,text:r.name+' delivered '+fmtNum(r.i9)+' I9 completions from '+fmtNum(r.shows)+' shows.'});
+    if(r.i9>0)wins.push({score:r.i9,text:r.name+' delivered '+fmtNum(r.i9)+' hires from '+fmtNum(r.shows)+' shows.'});
     if(r.scheduledDateOf>=10&&rate>=60)wins.push({score:rate,text:r.name+' achieved a '+rate.toFixed(1)+'% show rate across '+fmtNum(r.scheduledDateOf)+' interviews, meeting the 60% minimum.'});
     if(old&&old.schedules>0&&weeks.length===priorWeeks.length){const change=100*(r.schedules-old.schedules)/old.schedules;if(change>0)wins.push({score:change,text:r.name+' increased schedules '+change.toFixed(1)+'% ('+fmtNum(old.schedules)+' → '+fmtNum(r.schedules)+') versus the preceding '+priorWeeks.length+' available weeks.'});if(change<=-20)risks.push(r.name+': schedules fell '+(-change).toFixed(1)+'% versus the preceding period. Review pipeline and scheduling capacity.');}
     if(r.scheduledDateOf>=10&&rate<60)risks.push(r.name+': '+rate.toFixed(1)+'% show rate, '+(60-rate).toFixed(1)+' points below the 60% minimum. Review confirmations and attendance follow-up.');
     if(r.scheduledDateOf>=10&&r.noShows/r.scheduledDateOf>.3)risks.push(r.name+': '+(100*r.noShows/r.scheduledDateOf).toFixed(1)+'% no-show rate. Review the '+fmtNum(r.noShows)+' missed interviews.');
-    if(r.shows>=10&&r.i9/r.shows<.6)risks.push(r.name+': '+fmtNum(r.i9)+' I9 completions / '+fmtNum(r.shows)+' shows ('+(100*r.i9/r.shows).toFixed(1)+'%). Review outstanding onboarding; this is a period ratio, not a cohort conversion rate.');
+    if(r.shows>=10&&r.i9/r.shows<.6)risks.push(r.name+': '+fmtNum(r.i9)+' hires / '+fmtNum(r.shows)+' shows ('+(100*r.i9/r.shows).toFixed(1)+'%). Review outstanding onboarding; this is a period ratio, not a cohort conversion rate.');
   }
   const combine=(texts)=>{
     const grouped=new Map();
@@ -4143,9 +4151,9 @@ function renderClientIntelligence(weeks){
  const oldNoRate=old.scheduledDateOf?100*old.noShows/old.scheduledDateOf:null;
  const baseline=prior.length===6?'the preceding six-week baseline':'the available '+prior.length+'-week baseline';
  const change=k=>prior.length&&old[k]>0?100*((t[k]/valid.length)/(old[k]/prior.length)-1):null;
- wins.push('For '+periodName+', the team recorded '+fmtNum(t.schedules)+' schedules, '+fmtNum(t.scheduledDateOf)+' interviews, '+fmtNum(t.shows)+' candidate shows and '+fmtNum(t.i9)+' I9 completions.');
+ wins.push('For '+periodName+', the team recorded '+fmtNum(t.schedules)+' schedules, '+fmtNum(t.scheduledDateOf)+' interviews, '+fmtNum(t.shows)+' candidate shows and '+fmtNum(t.i9)+' hires.');
  const gains=[],declines=[];
- for(const [key,label] of [['schedules','scheduling'],['shows','candidate attendance'],['i9','I9 completions']]){
+ for(const [key,label] of [['schedules','scheduling'],['shows','candidate attendance'],['i9','hires']]){
   const value=change(key);if(value===null)continue;
   if(value>0.05)gains.push(label+' increased '+value.toFixed(1)+'%');
   else if(value<-.05)declines.push(label+' decreased '+Math.abs(value).toFixed(1)+'%');
@@ -4158,15 +4166,15 @@ function renderClientIntelligence(weeks){
  if(rate!==null&&rate<60)concerns.push('Attendance remains an opportunity: the '+rate.toFixed(1)+'% show rate is '+(60-rate).toFixed(1)+' percentage points below the 60% minimum. A consistent confirmation and reminder process should be a shared priority.');
  if(rate!==null&&oldRate!==null&&rate<oldRate-.05)concerns.push('Show rate declined '+(oldRate-rate).toFixed(1)+' percentage points from '+baseline+' ('+oldRate.toFixed(1)+'% to '+rate.toFixed(1)+'%).');
  if(noRate!==null&&(noRate>30||(oldNoRate!==null&&noRate>oldNoRate+.05)))concerns.push('No-shows represented '+noRate.toFixed(1)+'% of interviews ('+fmtNum(t.noShows)+')'+(oldNoRate!==null?', compared with '+oldNoRate.toFixed(1)+'% in '+baseline:'')+'. Review recurring attendance barriers and timely rescheduling.');
- if(t.shows>=10&&t.i9/t.shows<.6)concerns.push('I9 completions totaled '+fmtNum(t.i9)+' against '+fmtNum(t.shows)+' shows. Review outstanding onboarding across the operation; these period totals do not establish candidate-level conversion.');
+ if(t.shows>=10&&t.i9/t.shows<.6)concerns.push('Hires totaled '+fmtNum(t.i9)+' against '+fmtNum(t.shows)+' shows. Review outstanding onboarding across the operation; these period totals do not establish candidate-level conversion.');
  if(!concerns.length)concerns.push('No material decline or team-level attendance threshold was identified in the available comparison. Continue monitoring scheduling consistency, attendance and onboarding completion.');
  const average=k=>fmtNum(Math.round(t[k]/valid.length));
- if(valid.length>1)wins.push('Across '+periodName+', weekly output averaged '+average('schedules')+' schedules, '+average('shows')+' candidate shows and '+average('i9')+' I9 completions. These averages show the delivery volume sustained across '+valid.length+' recorded weeks.');
+ if(valid.length>1)wins.push('Across '+periodName+', weekly output averaged '+average('schedules')+' schedules, '+average('shows')+' candidate shows and '+average('i9')+' hires. These averages show the delivery volume sustained across '+valid.length+' recorded weeks.');
  if(t.placed>0){const growth=change('placed');wins.push('The team recorded '+fmtNum(t.placed)+' placements in '+periodName+(growth!==null&&growth>0.05?', with weekly placement volume '+growth.toFixed(1)+'% above '+baseline:'')+'. This adds a downstream outcome measure alongside interview and onboarding activity.');}
  const productiveWeeks=valid.filter(w=>w.totals.i9>0).length;
  const targetWeeks=valid.filter(w=>w.totals.scheduledDateOf>0&&w.totals.shows/w.totals.scheduledDateOf>=.6).length;
  if(valid.length>1&&targetWeeks)wins.push('The 60% attendance minimum was achieved in '+targetWeeks+' of '+valid.length+' recorded weeks during '+periodName+'. Those weeks provide useful internal examples to review for repeatable attendance practices.');
- else if(valid.length>1&&productiveWeeks)wins.push('I9 completions were recorded in '+productiveWeeks+' of '+valid.length+' weeks during '+periodName+', showing '+(productiveWeeks===valid.length?'continuous':'recurring')+' onboarding activity throughout the reporting window.');
+ else if(valid.length>1&&productiveWeeks)wins.push('Hires were recorded in '+productiveWeeks+' of '+valid.length+' weeks during '+periodName+', showing '+(productiveWeeks===valid.length?'continuous':'recurring')+' onboarding activity throughout the reporting window.');
  const coverage=['byRecruiter','byBranch'].map((field,i)=>{
   const rows=aggregateAcrossWeeks(valid,field).filter(r=>r.schedules||r.scheduledDateOf||r.shows||r.i9||r.placed);
   const contributing=rows.filter(r=>r.i9>0).length;
@@ -4277,7 +4285,7 @@ async function renderPeriodView(containerId, groups, unitLabel){
       <div class="kpi-card"><div class="label">Total Schedules</div><div class="value">${fmtNum(grand.schedules)}</div><div class="delta flat">All-time</div></div>
       <div class="kpi-card"><div class="label">Total Shows</div><div class="value">${fmtNum(grand.shows)}</div><div class="delta flat">All-time</div></div>
       <div class="kpi-card"><div class="label">No Call/No Show</div><div class="value">${fmtNum(grand.noShows)}</div><div class="delta flat">All-time</div></div>
-      <div class="kpi-card"><div class="label">I9 Complete</div><div class="value">${fmtNum(grand.i9)}</div><div class="delta flat">All-time</div></div>
+      <div class="kpi-card"><div class="label">Hires</div><div class="value">${fmtNum(grand.i9)}</div><div class="delta flat">All-time</div></div>
       <div class="kpi-card"><div class="label">Placed</div><div class="value">${fmtNum(grand.placed)}</div><div class="delta flat">All-time</div></div>
       <div class="kpi-card"><div class="label">Show Rate</div><div class="value">${fmtPct(grand.shows,grand.scheduledDateOf)}</div><div class="delta flat">All-time</div></div>
     </div>
@@ -4287,13 +4295,13 @@ async function renderPeriodView(containerId, groups, unitLabel){
 
     <div class="section-divider">Trends</div>
     <div class="panel">
-      <div class="panel-head"><h3>${unitLabel}ly Trend &mdash; All Categories</h3><span class="hint">Schedules, shows, no shows, I9 complete, placed &amp; show rate by ${unitLabel.toLowerCase()} &middot; dashed red line = 60% target</span></div>
+      <div class="panel-head"><h3>${unitLabel}ly Trend &mdash; All Categories</h3><span class="hint">Schedules, shows, no shows, hires, placed &amp; show rate by ${unitLabel.toLowerCase()} &middot; dashed red line = 60% target</span></div>
       <div class="chart-wrap tall"><canvas id="chartPeriod_${containerId}"></canvas></div>
     </div>
     <div class="panel">
       <div class="panel-head"><h3>${unitLabel}ly Summary</h3><div style="display:flex;align-items:center;gap:10px;"><span class="hint">Click a row to filter the sections below to just that ${unitLabel.toLowerCase()}</span>${copyBtnHtml(containerId+'_summaryTable')}${downloadBtnHtml(containerId+'_summaryTable', unitLabel.toLowerCase()+'ly-summary.xlsx')}</div></div>
       <table id="${containerId}_summaryTable">
-        <thead><tr><th>${unitLabel}</th><th>Weeks</th><th>Schedules</th><th>Shows</th><th>No Shows</th><th>I9 Complete</th><th>Placed</th><th>Show Rate</th></tr></thead>
+        <thead><tr><th>${unitLabel}</th><th>Weeks</th><th>Schedules</th><th>Shows</th><th>No Shows</th><th>Hires</th><th>Placed</th><th>Show Rate</th></tr></thead>
         <tbody>
           ${totalsByGroup.map(g=>`<tr data-group="${escapeHtml(g.label)}" style="cursor:pointer;${g.label===selectedGroupLabel?'background:var(--indigo-light);':''}">
             <td><strong>${g.label}</strong>${g.label===selectedGroupLabel?' <span class="pill good">Selected</span>':''}</td>
@@ -4359,7 +4367,7 @@ async function renderPeriodView(containerId, groups, unitLabel){
         {type:'bar', label:'Schedules', data: totalsByGroup.map(g=>g.totals.schedules), backgroundColor:'#3E7BD6', borderRadius:4, maxBarThickness:26, yAxisID:'y'},
         {type:'bar', label:'Shows', data: totalsByGroup.map(g=>g.totals.shows), backgroundColor:'#0F8A6E', borderRadius:4, maxBarThickness:26, yAxisID:'y'},
         {type:'bar', label:'No Shows', data: totalsByGroup.map(g=>g.totals.noShows), backgroundColor:'#D6433B', borderRadius:4, maxBarThickness:26, yAxisID:'y'},
-        {type:'bar', label:'I9 Complete', data: totalsByGroup.map(g=>g.totals.i9), backgroundColor:'#A6790F', borderRadius:4, maxBarThickness:26, yAxisID:'y'},
+        {type:'bar', label:'Hires', data: totalsByGroup.map(g=>g.totals.i9), backgroundColor:'#A6790F', borderRadius:4, maxBarThickness:26, yAxisID:'y'},
         {type:'bar', label:'Placed', data: totalsByGroup.map(g=>g.totals.placed), backgroundColor:'#6B5FBD', borderRadius:4, maxBarThickness:26, yAxisID:'y'},
         {type:'line', label:'Show Rate %', data: totalsByGroup.map(g=>+pct(g.totals.shows,g.totals.scheduledDateOf).toFixed(1)), borderColor:'#1B2430', backgroundColor:'rgba(27,36,48,0.06)', yAxisID:'y1', tension:.35, pointRadius:4, pointHoverRadius:6, borderWidth:2.5, fill:true}
       ]
@@ -4943,7 +4951,8 @@ function renderPeopleTable(mode, allRows, displayRows){
     {key:'scheduledDateOf', label:'Interviews This Week'},
     {key:'shows', label:'Shows'},
     {key:'noShows', label:'No Shows'},
-    {key:'i9', label:'I9 Complete'},
+    {key:'i9', label:'Hires'},
+    {key:'placed', label:'Placed'},
     {key:'goalPct', label:'Goal Reach %'},
     {key:'rate', label:'Show Rate %'},
     {key:'noShowRate', label:'No Show Rate %'},
@@ -4955,7 +4964,7 @@ function renderPeopleTable(mode, allRows, displayRows){
     {key:'scheduledDateOf', label:'Interviews This Week'},
     {key:'shows', label:'Shows'},
     {key:'noShows', label:'No Shows'},
-    {key:'i9', label:'I9 Complete'},
+    {key:'i9', label:'Hires'},
     {key:'placed', label:'Placed'},
     {key:'rate', label:'Show Rate'},
   ];
@@ -4975,7 +4984,7 @@ function renderPeopleTable(mode, allRows, displayRows){
         {label:'Highest Interviews', key:'scheduledDateOf', dir:'max'},
         {label:'Highest Shows', key:'shows', dir:'max'},
         {label:'Fewest No Shows', key:'noShows', dir:'min'},
-        {label:'Highest I9 Complete', key:'i9', dir:'max'},
+        {label:'Most Hires', key:'i9', dir:'max'},
       ];
       categoryDefs.forEach(cat=>{
         const best = [...eligible].sort((a,b)=> cat.dir==='max' ? b[cat.key]-a[cat.key] : a[cat.key]-b[cat.key])[0];
@@ -5018,6 +5027,7 @@ function renderPeopleTable(mode, allRows, displayRows){
     const totalShows = allRows.reduce((s,r)=>s+r.shows,0);
     const totalNoShows = allRows.reduce((s,r)=>s+r.noShows,0);
     const totalI9 = allRows.reduce((s,r)=>s+r.i9,0);
+    const totalPlacedR = allRows.reduce((s,r)=>s+(r.placed||0),0);
     const totalGoal = allRows.reduce((s,r)=> s+(r.goal!==undefined ? r.goal : 0), 0);
     const anyGoal = allRows.some(r=>r.goal!==undefined);
     const totalGoalPct = (anyGoal && totalGoal>0) ? pct(totalSchedules, totalGoal) : null;
@@ -5033,6 +5043,7 @@ function renderPeopleTable(mode, allRows, displayRows){
       <td>${fmtNum(totalShows)}</td>
       <td>${fmtNum(totalNoShows)}</td>
       <td>${fmtNum(totalI9)}</td>
+      <td>${fmtNum(totalPlacedR)}</td>
       <td>${totalGoalPct!==null ? goalPill(totalGoalPct) : '\u2013'}</td>
       <td>${ratePill(totalRate)}</td>
       <td>${noShowRatePill(totalNoShowRate)}</td>
@@ -5045,7 +5056,7 @@ function renderPeopleTable(mode, allRows, displayRows){
     const totalNoShows = allRows.reduce((s,r)=>s+r.noShows,0);
     const totalI9 = allRows.reduce((s,r)=>s+r.i9,0);
     const totalPlaced = allRows.reduce((s,r)=>s+r.placed,0);
-    const totalRate = pct(totalShows, totalSchedules);
+    const totalRate = pct(totalShows, totalScheduledDateOf);
     totalRowHtml = `<tr style="font-weight:700;background:#F7F9FC;border-top:2px solid var(--border);">
       <td>Team Total</td>
       <td>\u2013</td>
@@ -5076,6 +5087,7 @@ function renderPeopleTable(mode, allRows, displayRows){
       <td>${candidateCellHtml(r.shows, r.showsList, 'shows', r.name)}</td>
       <td>${candidateCellHtml(r.noShows, r.noShowsList, 'noShows', r.name)}</td>
       <td>${candidateCellHtml(r.i9, r.i9List, 'i9', r.name)}</td>
+      <td>${candidateCellHtml(r.placed||0, r.placedList, 'placed', r.name)}</td>
       <td>${r.goalPct!==null && r.goalPct!==undefined ? goalPill(r.goalPct) : '\u2013'}</td>
       <td>${ratePill(r.rate)}</td>
       <td>${noShowRatePill(r.noShowRate)}</td>
@@ -5312,7 +5324,7 @@ async function buildFullExportTables(){
       const t=map[name] ||= {name,...emptyTotals()};for(const k of Object.keys(emptyTotals()))t[k]+=Number(r[k])||0;
     }
     const recruiter=field==='byRecruiter';
-    const headers=[recruiter?'Recruiter':'Branch','Division',...(recruiter?['Goals']:[]),'Schedules','Interviews','Shows','No Shows','I9 Complete','Placed','Show Rate'];
+    const headers=[recruiter?'Recruiter':'Branch','Division',...(recruiter?['Goals']:[]),'Schedules','Interviews','Shows','No Shows','Hires','Placed','Show Rate'];
     const rows=Object.values(map).sort((a,b)=>a.name.localeCompare(b.name)).map(r=>[r.name,(recruiter?getEffectiveRecruiterDivision(r.name,weeks.at(-1)?.weekEndDate):branchDivisions[r.name])||'Unassigned',...(recruiter?[fmtNum(goals[r.name]||0)]:[]),...['schedules','scheduledDateOf','shows','noShows','i9','placed'].map(k=>fmtNum(r[k])),r.scheduledDateOf?fmtPct(r.shows,r.scheduledDateOf):'—']);
     const t=Object.values(map).reduce((out,r)=>{for(const k of Object.keys(out))out[k]+=r[k];return out;},emptyTotals());
     if(rows.length)rows.push(['Total','',...(recruiter?[fmtNum(Object.keys(map).reduce((n,name)=>n+(goals[name]||0),0))]:[]),...['schedules','scheduledDateOf','shows','noShows','i9','placed'].map(k=>fmtNum(t[k])),t.scheduledDateOf?fmtPct(t.shows,t.scheduledDateOf):'—']);
@@ -6001,7 +6013,7 @@ const Server = {
       if(settingsModalOpen && !document.getElementById('settingsPane-users')?.classList.contains('hidden')) renderUsersAdmin();
     }
     if(master){ candState.cache.clear(); if(currentView==='candidates') renderCandidatesView(); }
-    if(master && currentView==='master') drawMasterTable();
+    if(master && currentView==='master') drawMasterTable(true);
     if(kvKeys.size || remarks) LiveReload.schedule([...authors]);
     else if(master && authors.size) showToast('Master sheet updated by '+[...authors].join(', '));
   },
@@ -6352,7 +6364,7 @@ async function ingestFiles(entries, {interactive=true}={}){
     const u=document.getElementById('uploadFilesBtn'); if(u) u.textContent='Upload Excel files';
     const f=document.getElementById('folderSyncNowBtn'); if(f) f.textContent='Sync Now';
     if(settingsModalOpen){ renderFolderUploadExplainer(); renderUploadHistory(); renderNumberCheck(); }
-    if(currentView==='master') drawMasterTable();
+    if(currentView==='master') drawMasterTable(true);
     candState.cache.clear();
   }
 }
@@ -6381,6 +6393,10 @@ async function importGoalSheets(goalSheets){
   }
   if(written) showToast('Goals saved: '+written+' value(s) across '+weeks.length+' week(s).');
 }
+// Bumped whenever a counting rule changes; weeks saved under an older rule are recounted
+// automatically the next time someone with upload rights signs in.
+//  3 = Hires from the I-9 Yes dropdown; rows need both a name and an Employee Number
+const COUNT_RULES = 3;
 // Recalculates the stored weekly summaries for the given weeks from the server's master sheet.
 async function rebuildWeeks(weeks, localRows, progress){
   const list = [...new Set(weeks)].filter(Boolean).sort();
@@ -6414,7 +6430,7 @@ async function rebuildWeeks(weeks, localRows, progress){
     const raw = buildWeekRecord(wed, wn, processFile1(rows1, MAP1, wed, false), processFile2(rows2, MAP2, wed, false));
     const empty = !ded.totals.schedules && !ded.totals.scheduledDateOf && !raw.totals.schedules && !raw.totals.scheduledDateOf;
     if(empty){ if(KV.has('weekly:'+wed)) await storageDelete('weekly:'+wed); }
-    else await storageSet('weekly:'+wed, {weekEndDate:wed, weekNumber:wn, savedAt:new Date().toISOString(), source:'master',
+    else await storageSet('weekly:'+wed, {weekEndDate:wed, weekNumber:wn, savedAt:new Date().toISOString(), source:'master', rules:COUNT_RULES,
       deduped:{totals:ded.totals, byRecruiter:ded.byRecruiter, byBranch:ded.byBranch, diagnostics:ded.diagnostics},
       raw:{totals:raw.totals, byRecruiter:raw.byRecruiter, byBranch:raw.byBranch, diagnostics:raw.diagnostics}});
     await new Promise(r=>setTimeout(r,0));
@@ -6675,23 +6691,46 @@ async function renderMasterView(){
   container.querySelector('#masterClearFilters').onclick=()=>{ st.filters={}; st.search=''; st.offset=0; const s=document.getElementById('masterSearch'); if(s) s.value=''; drawMasterTable(); };
   container.querySelector('#masterDownload').onclick=downloadMasterSheet;
   container.querySelector('[data-upload-raw]').onclick=pickSpreadsheetsToUpload;
-  try{ st.columns = await Server.rpc('dash_master_columns'); }catch(e){ st.columns=[]; }
-  drawMasterTable();
+  drawMasterTable(true);
 }
-async function drawMasterTable(){
+// The page of rows and the row count are fetched separately and in parallel: the table shows as
+// soon as its 100 rows arrive, and the count (only re-asked when the filters change) fills in.
+function drawMasterCounts(){
+  const st = masterViewState;
+  const el = document.getElementById('masterCounts');
+  if(el) el.textContent = st.total==null ? 'Counting rows…' : fmtNum(st.total)+' row'+(st.total===1?'':'s')+(st.excluded?' · '+fmtNum(st.excluded)+' excluded from metrics':'')+' · one row per interview · contact numbers removed on import';
+  const pager = document.getElementById('masterPager'); if(!pager) return;
+  const n = st.pageRows||0;
+  const from = n ? st.offset+1 : 0, to = st.offset+n;
+  const hasNext = st.total==null ? n>=st.limit : to<st.total;
+  pager.innerHTML = `<span class="hint">Rows ${fmtNum(from)}–${fmtNum(to)} of ${st.total==null?'…':fmtNum(st.total)}</span><div><button class="btn btn-secondary btn-sm" data-pg="-1" ${st.offset<=0?'disabled':''}>‹ Previous</button> <button class="btn btn-secondary btn-sm" data-pg="1" ${hasNext?'':'disabled'}>Next ›</button></div>`;
+  pager.querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>{ st.offset=Math.max(0, st.offset + Number(b.dataset.pg)*st.limit); drawMasterTable(); });
+  drawMasterSelBar();
+}
+async function drawMasterTable(freshCount){
   const st = masterViewState;
   const table = document.getElementById('masterTable'); if(!table) return;
   const rev = ++st.rev;
+  const q = masterQuery();
+  const countKey = JSON.stringify({...q, offset:0, limit:0, sort:'', dir:''});
+  if(freshCount || st.countKey!==countKey){
+    st.countKey = countKey; st.total = null; st.excluded = 0;
+    Server.rpc('dash_master_query', {q:{...q, rows:false}}).then(c=>{
+      if(st.countKey!==countKey) return;
+      st.total = c.total; st.excluded = c.excluded; drawMasterCounts();
+    }).catch(()=>{ if(st.countKey===countKey) st.countKey=null; });
+  }
   let res;
-  try{ res = await Server.rpc('dash_master_query', {q:masterQuery()}); }
+  // the column list (first time only) loads in parallel with the page of rows
+  const colsP = (!st.columns || !st.columns.length) ? Server.rpc('dash_master_columns').then(c=>{ st.columns=c; }).catch(()=>{}) : null;
+  try{ res = await Server.rpc('dash_master_query', {q:{...q, count:false}}); if(colsP) await colsP; }
   catch(e){ if(rev===st.rev) document.getElementById('masterCounts').textContent='Could not load: '+cleanErr(e); return; }
   if(rev!==st.rev || !document.getElementById('masterTable')) return;
-  st.total = res.total;
-  if(!st.columns || !st.columns.length){ try{ st.columns = await Server.rpc('dash_master_columns'); }catch(e){} }
+  if(res.total!=null && st.total==null){ st.total = res.total; st.excluded = res.excluded; } // older SQL always counts
   const cols = masterColumnsList();
   const rows = res.rows || [];
-  document.getElementById('masterCounts').textContent = fmtNum(res.total)+' row'+(res.total===1?'':'s')+(res.excluded?' · '+fmtNum(res.excluded)+' excluded from metrics':'')+' · one row per interview · contact numbers removed on import';
-  if(!res.total && !Object.keys(st.filters).length && !st.search && st.files==='all' && !st.periodOnly){
+  st.pageRows = rows.length;
+  if(!rows.length && !st.offset && !Object.keys(st.filters).length && !st.search && st.files==='all' && !st.periodOnly){
     table.innerHTML = `<tbody><tr><td class="master-empty-cell"><h3>The master sheet is empty</h3><p class="hint">${Server.can('upload')?'Upload your Created On and Date Of exports (and the goals file). Contact numbers are removed, rows are merged into this single sheet on the server, and the uploaded files are discarded.':'Ask someone with upload rights to import the latest exports.'}</p>${Server.can('upload')?'<button class="btn btn-primary" data-upload-raw2>Upload Excel files</button>':''}</td></tr></tbody>`;
     table.querySelector('[data-upload-raw2]')?.addEventListener('click', pickSpreadsheetsToUpload);
     document.getElementById('masterPager').innerHTML=''; drawMasterSelBar(); return;
@@ -6703,10 +6742,7 @@ async function drawMasterTable(){
       if(c.key==='__status') return `<td><span class="pill ${r.excluded?'bad':'good'}">${r.excluded?'Excluded':'Included'}</span></td>`;
       if(c.key==='__files') return `<td>${r.s&&r.v?'Both':r.s?'Created On':'Date Of'}</td>`;
       return `<td>${escapeHtml(fmtMasterCell(r.data[c.key]))}</td>`; }).join('')}</tr>`; }).join('') || `<tr><td colspan="${cols.length+1}" class="muted-note" style="padding:18px;">No rows match these filters.</td></tr>`}</tbody>`;
-  const pager = document.getElementById('masterPager');
-  const from = res.total ? st.offset+1 : 0, to = Math.min(st.offset+st.limit, res.total);
-  pager.innerHTML = `<span class="hint">Rows ${fmtNum(from)}–${fmtNum(to)} of ${fmtNum(res.total)}</span><div><button class="btn btn-secondary btn-sm" data-pg="-1" ${st.offset<=0?'disabled':''}>‹ Previous</button> <button class="btn btn-secondary btn-sm" data-pg="1" ${to>=res.total?'disabled':''}>Next ›</button></div>`;
-  pager.querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>{ st.offset=Math.max(0, st.offset + Number(b.dataset.pg)*st.limit); drawMasterTable(); });
+  drawMasterCounts();
   const sa = table.querySelector('#masterSelAll');
   if(sa) sa.onchange=e=>{ if(st.allMatching){ st.allMatching=false; st.selected.clear(); } else rows.forEach(r=> e.target.checked ? st.selected.add(r.id) : st.selected.delete(r.id)); drawMasterTable(); };
   table.querySelectorAll('tbody tr[data-key]').forEach(tr=>{
@@ -6753,7 +6789,7 @@ async function masterSelectionAction(act){
     st.selected.clear(); st.allMatching=false;
     showToast((excluded?'Excluded ':'Included ')+fmtNum(res.count)+' row'+(res.count===1?'':'s')+(res.weeks?.length?' · '+res.weeks.length+' week'+(res.weeks.length===1?'':'s')+' recalculated':'')+'.');
   }catch(e){ showToast('Could not update: '+cleanErr(e)); }
-  finally{ Server.ownMasterUntil=Date.now()+8000; setLoading(null); drawMasterTable(); }
+  finally{ Server.ownMasterUntil=Date.now()+8000; setLoading(null); drawMasterTable(true); }
 }
 async function downloadMasterSheet(){
   if(!Server.can('export')){ showToast('Your account cannot download data.'); return; }
@@ -6940,7 +6976,7 @@ const CAND_CATEGORIES = [
   {key:'interviews', label:'Interviews',   src:'v', list:'interviewsList', dateCol:'Date Of', dateLabel:'Date Of'},
   {key:'shows',      label:'Shows',        src:'v', list:'showsList',     dateCol:'Date Of', dateLabel:'Date Of'},
   {key:'noShows',    label:'No-shows',     src:'v', list:'noShowsList',   dateCol:'Date Of', dateLabel:'Date Of'},
-  {key:'i9',         label:'I-9 Complete', src:'v', list:'i9List',        dateCol:'Date Of', dateLabel:'Date Of'},
+  {key:'i9',         label:'Hires', src:'v', list:'i9List',        dateCol:'Date Of', dateLabel:'Date Of'},
   {key:'placed',     label:'Placed',       src:'v', list:'placedList',    dateCol:'Date Of', dateLabel:'Date Of'},
   {key:'dupSchedules',  label:'Duplicates removed · Schedules',  src:'s', dup:true, dateCol:'Created On', dateLabel:'Created On'},
   {key:'dupInterviews', label:'Duplicates removed · Interviews', src:'v', dup:true, dateCol:'Date Of', dateLabel:'Date Of'},
@@ -6954,6 +6990,34 @@ async function loadCandidateWeek(week){
   const data = {s, v};
   candState.cache.set(week, data);
   return data;
+}
+// Fast path: the weekly record already holds who was counted in each category (Deduped and Raw
+// lists, loaded in the background after sign-in), so the module needs no extra download.
+// "Duplicates removed" = the Raw list minus the Deduped list.
+async function candFromWeekLists(week){
+  const key = 'weekly:'+week, v = KV.get(key);
+  if(!v || !v.deduped || !v.raw || !v.deduped.byRecruiter || !v.raw.byRecruiter) return null;
+  if(v.listsSplit && !v.listsLoaded){
+    const got = await Server.rpc('dash_kv_get', {p_keys:[key+LISTS_SUFFIX]});
+    for(const r of got) mergeWeeklyLists(v, await decodeKvValue(r.key, r.value));
+    v.listsLoaded = true;
+  }
+  const flat = (part, list)=> Object.entries(v[part].byRecruiter).flatMap(([rec,o])=>(o[list]||[]).map(c=>({...c, recruiter:rec, branch:o.branch||'Unassigned'})));
+  const mode = dedupeByEmployeeNumber ? 'deduped' : 'raw', T = v[mode].totals || {};
+  const totals = {schedules:T.schedules||0, interviews:T.scheduledDateOf||0, shows:T.shows||0, noShows:T.noShows||0, i9:T.i9||0, placed:T.placed||0};
+  const lists = {}, counted = {};
+  const idKey = c=>{ const e = c.eid && c.eid!=='\u2013' ? normalizeEmployeeNumber(c.eid) : ''; return e ? 'eid:'+e : 'name:'+String(c.name||'').toLowerCase()+'|'+c.date; };
+  const dupsOf = list=>{
+    const kept = flat('deduped', list), left = new Map(), byId = new Map();
+    kept.forEach(c=>{ const t=c.recruiter+'|'+c.name+'|'+c.eid+'|'+c.date; left.set(t,(left.get(t)||0)+1); if(!byId.has(idKey(c))) byId.set(idKey(c), c); });
+    return flat('raw', list).filter(c=>{ const t=c.recruiter+'|'+c.name+'|'+c.eid+'|'+c.date; const n=left.get(t)||0; if(n>0){ left.set(t,n-1); return false; } return true; })
+      .map(c=>({...c, keptWith: byId.get(idKey(c)) || {recruiter:'–', date:''}}));
+  };
+  CAND_CATEGORIES.forEach(c=>{
+    if(c.dup){ lists[c.key] = dupsOf(c.src==='s' ? 'schedulesList' : 'interviewsList'); counted[c.key] = lists[c.key].length; }
+    else { lists[c.key] = flat(mode, c.list); counted[c.key] = totals[c.key]; }
+  });
+  return {lists, counted};
 }
 function candDuplicates(rows, week, dateCol){
   const seen = new Map(), dups = [];
@@ -7005,11 +7069,13 @@ async function renderCandidatesView(){
     <div id="candMore" style="text-align:center;margin-top:10px;"></div>
   </div>`;
   container.querySelector('#candWeek').onchange = e=>{ st.week = e.target.value; st.recruiter=''; st.limit=500; renderCandidatesView(); };
-  let data;
-  try{ data = await loadCandidateWeek(st.week); }
-  catch(e){ if(rev===st.rev) container.querySelector('#candCats').innerHTML = '<span class="hint">'+(/Could not find|schema cache|does not exist/i.test(e.message)?'Run the latest supabase_setup.sql in Supabase to enable this module.':escapeHtml(cleanErr(e)))+'</span>'; return; }
+  let computed = null;
+  try{
+    computed = await candFromWeekLists(st.week).catch(()=>null);
+    if(!computed) computed = candCompute(await loadCandidateWeek(st.week), st.week); // older weeks: rebuild from the master sheet
+  }catch(e){ if(rev===st.rev) container.querySelector('#candCats').innerHTML = '<span class="hint">'+(/Could not find|schema cache|does not exist/i.test(e.message)?'Run the latest supabase_setup.sql in Supabase to enable this module.':escapeHtml(cleanErr(e)))+'</span>'; return; }
   if(rev!==st.rev) return;
-  st.computed = candCompute(data, st.week);
+  st.computed = computed;
   const recs = [...new Set(Object.values(st.computed.lists).flat().map(r=>r.recruiter))].sort();
   const rs = container.querySelector('#candRecruiter');
   rs.innerHTML = '<option value="">All recruiters</option>'+recs.map(r=>`<option ${r===st.recruiter?'selected':''}>${escapeHtml(r)}</option>`).join('');
@@ -7074,6 +7140,8 @@ async function autoVerifyWeeks(silent){
   try{
     const res = await checkWeeklyNumbers();
     const bad = res.filter(r=>!r.ok).map(r=>r.week);
+    const known = new Set(res.map(r=>r.week));
+    [...KV.entries()].forEach(([k,v])=>{ if(k.startsWith('weekly:') && !k.endsWith(LISTS_SUFFIX) && v && (v.rules||0) < COUNT_RULES){ const w=k.slice(7); if(known.has(w) && !bad.includes(w)) bad.push(w); } });
     if(bad.length){
       Server.ownMasterUntil = Date.now()+10*60*1000;
       await rebuildWeeks(bad, null, silent ? null : setLoading);
@@ -7114,7 +7182,7 @@ async function renderUploadHistory(){
 }
 
 /* ============================= INIT ============================= */
-const APP_VERSION = 'Version 4.7.0';
+const APP_VERSION = 'Version 4.10.0';
 async function init(){
   document.getElementById('versionLabelInline').textContent = APP_VERSION;
   document.getElementById('footerVersionLabel').textContent = APP_VERSION;
