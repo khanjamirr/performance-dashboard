@@ -719,6 +719,15 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
 }
 @media (min-width:761px) and (max-width:1180px){ :root{--side-w:216px} }
 @media print{.sidebar{display:none!important}}
+.uw-label{display:block;font-size:12px;font-weight:700;color:#3b5562;margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
+#uwDate{width:100%;font-size:15px;padding:10px 12px;background:#fff;border:1px solid #cfdde2;border-radius:9px;box-sizing:border-box;font-family:inherit}
+.uw-week{margin:12px 0 10px;padding:12px 14px;border-radius:10px;background:#eef6f5;font-size:14px;line-height:1.5}
+.uw-rules{margin:0;padding-left:18px;font-size:12.5px;line-height:1.6;color:var(--text-secondary)}
+.alert-badge{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;margin-left:auto;border-radius:9px;background:#d64545;color:#fff;font-size:11px;font-weight:700}
+.upload-alerts{border-color:#f0c2c2!important;background:#fff6f6!important}
+.upload-alerts ul{margin:8px 0 0;padding-left:18px;font-size:13px;line-height:1.55}
+.upload-alerts li{margin-bottom:8px}
+
 .cand-explain-btn{align-self:flex-end;margin-left:auto}
 .cand-explain{border:1px solid #e1eaed;border-radius:12px;background:#f8fbfb;padding:14px 16px;margin:0 0 14px}
 .cand-explain-head{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline;margin-bottom:8px}
@@ -788,7 +797,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V12M10 20V5M16 20V9M22 20V3"/></svg></div>
       <div class="brand-text">
         <h1 id="dashboardTitle" title="Click to go home">Performance Dashboard</h1>
-        <p><span id="versionLabelInline">Version 4.13.2</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
+        <p><span id="versionLabelInline">Version 4.14.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
       </div>
     </div>
     <button type="button" class="side-collapse" id="sideCollapseBtn" aria-label="Collapse menu" title="Collapse menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
@@ -895,7 +904,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       </div>
       <div class="muted-note" id="storageModeNote" style="text-align:center;margin-top:24px;">Data stored locally in this browser.</div>
       <div class="muted-note" style="text-align:center;margin-top:4px;opacity:.65;">
-        <span id="footerVersionLabel">Version 4.13.2</span> &middot; &copy; <span id="footerCopyrightYear"></span>
+        <span id="footerVersionLabel">Version 4.14.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
       </div>
     </div>
   </main>
@@ -2505,7 +2514,7 @@ function renderFolderUploadExplainer(){
       <div><h3 style="margin:0 0 4px;">Upload data</h3><span class="hint">Upload the Created On and Date Of exports (separately or together) and the goals file. Rows with the same dates and details replace the existing ones; anything new is added. Contact numbers are removed and the files themselves are not kept.</span></div>
       <button class="btn btn-primary" id="uploadFilesBtn">Upload Excel files</button>
     </div>${log}</div>`;
-  container.querySelector('#uploadFilesBtn').onclick = pickSpreadsheetsToUpload;
+  container.querySelector('#uploadFilesBtn').onclick = ()=>pickSpreadsheetsToUpload();
 }
 function renderFolderUploadExplainerInner(){
   const container = document.getElementById('view-folderUploads');
@@ -2961,6 +2970,7 @@ async function refreshUI(){
 /* ============================= SETTINGS MODAL ============================= */
 let settingsModalOpen = false;
 function renderSettingsModalContent(){
+  setTimeout(renderUploadAlerts, 0);
   const stale = document.getElementById('schemaStaleNote');
   if(stale) stale.remove();
   if(databaseSchemaStale) document.getElementById('settingsPane-sync')?.insertAdjacentHTML('afterbegin', '<div class="panel warn-note" id="schemaStaleNote" style="margin-bottom:16px;"><strong>Database setup is out of date.</strong> This page (v'+APP_VERSION.replace('Version ','')+') needs the matching <code>supabase_setup.sql</code>. Open Supabase → SQL Editor → New query, paste the whole file, click <em>Run</em>, and check it finishes with “Success”. Until then, newer features (for example the Candidates right for users) won’t work.</div>');
@@ -5219,8 +5229,7 @@ function renderManageView(){
       const date = btn.dataset.replace;
       const wk = weeksData.find(w=>w.weekEndDate===date);
       if(!wk) return;
-      closeSettingsModal(); // avoid stacking two modal overlays — the upload modal should be the only one visible
-      openUploadModal(wk);
+      pickSpreadsheetsToUpload(date);
     });
   });
   container.querySelectorAll('[data-remove]').forEach(btn=>{
@@ -5984,6 +5993,7 @@ const Server = {
       else if(r.tbl==='remarks'){ if(!Remarks.ownIds.has(r.key)){ remarks=true; if(r.by_name) authors.add(r.by_name); } }
       else if(r.tbl==='master'){ if(Date.now()>this.ownMasterUntil){ master=true; if(r.by_name) authors.add(r.by_name); } }
       else if(r.tbl==='users'){ users=true; }
+      else if(r.tbl==='alerts'){ if(Server.isAdmin()) loadUploadAlerts(r.key!=='ack' && r.by_name!==Server.user.name); }
     });
     if(kvKeys.size){
       // a changed week also needs its candidate lists; a changed lists key updates its week
@@ -6042,7 +6052,7 @@ document.addEventListener('visibilitychange', async ()=>{
 // The page needs the database functions from the matching supabase_setup.sql. If the super
 // admin hasn't run the latest one (or the run failed), new features such as new user rights
 // silently don't work — so say so plainly.
-const REQUIRED_SCHEMA = 11;
+const REQUIRED_SCHEMA = 12;
 let databaseSchemaStale = false;
 async function checkDatabaseSchema(){
   try{
@@ -6053,6 +6063,26 @@ async function checkDatabaseSchema(){
     setTimeout(()=>showToast('Your database setup is out of date — run the latest supabase_setup.sql in Supabase (Settings shows how).'), 4000);
     if(settingsModalOpen) renderSettingsModalContent();
   }
+}
+// Rejected uploads waiting for the super admin: a red count on Settings, a list at the top of
+// Settings → Data Sync Details, and a toast when one arrives.
+let uploadAlerts = [];
+async function loadUploadAlerts(announce){
+  try{ uploadAlerts = await Server.rpc('dash_alerts'); }catch(e){ uploadAlerts = []; }
+  const btn = document.getElementById('settingsNavBtn');
+  btn?.querySelector('.alert-badge')?.remove();
+  if(uploadAlerts.length) btn?.insertAdjacentHTML('beforeend', '<span class="alert-badge" title="Rejected uploads">'+uploadAlerts.length+'</span>');
+  if(announce && uploadAlerts.length) showToast(uploadAlerts.length===1 ? 'Upload rejected: '+(uploadAlerts[0].user_name||'someone')+' tried to upload data outside the chosen week. See Settings.' : uploadAlerts.length+' rejected uploads need a look — see Settings.');
+  renderUploadAlerts();
+}
+function renderUploadAlerts(){
+  const pane = document.getElementById('settingsPane-sync'); if(!pane) return;
+  pane.querySelector('#uploadAlertsPanel')?.remove();
+  if(!uploadAlerts.length || !Server.isAdmin()) return;
+  pane.insertAdjacentHTML('afterbegin', `<div class="panel upload-alerts" id="uploadAlertsPanel">
+    <div class="panel-head"><div><h3 style="margin:0 0 4px;">Rejected uploads</h3><span class="hint">Files that held rows from more than the week the uploader chose. Nothing from them was saved.</span></div><button class="btn btn-secondary btn-sm" id="ackAllAlerts">Mark all as seen</button></div>
+    <ul>${uploadAlerts.map(a=>`<li><strong>${escapeHtml(a.user_name||'')}</strong> · ${new Date(a.at).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}<br><span>${escapeHtml((a.detail&&a.detail.summary)||'')}</span></li>`).join('')}</ul></div>`);
+  pane.querySelector('#ackAllAlerts').onclick = async ()=>{ try{ await Server.rpc('dash_alerts_ack', {p_ids:uploadAlerts.map(a=>a.id)}); }catch(e){} loadUploadAlerts(false); };
 }
 function applyPermissions(){
   const u = Server.user; if(!u) return;
@@ -6198,7 +6228,7 @@ async function afterLogin(boot){
     if(boot) Server.startPollingFrom(Server.since); else await Server.startPolling();
     setTimeout(async ()=>{ await Server.loadListsInBackground(); setTimeout(()=>autoVerifyWeeks(true), 500); }, 300);
     if(Server.isAdmin() && Server.user.default_password) showToast('You are still using the setup password. Change it in Settings → My account.');
-    if(Server.isAdmin()) checkDatabaseSchema();
+    if(Server.isAdmin()){ checkDatabaseSchema(); loadUploadAlerts(true); }
   }catch(e){
     console.error(e);
     if(Server.token) showToast('Could not load the dashboard: '+cleanErr(e));
@@ -6280,8 +6310,12 @@ function importProgress(text){
 }
 
 // entries: [{name, getFile: ()=>Promise<File>, remove: null | ()=>Promise}]
-async function ingestFiles(entries, {interactive=true}={}){
+async function ingestFiles(entries, {interactive=true, week=null}={}){
   if(!Server.can('upload')){ showToast('Your account cannot upload data.'); return; }
+  if(!week){ showToast('Choose which week this data is for first.'); return; }
+  const weekStart = toIsoDateOnly(new Date(new Date(week+'T00:00:00').getTime()-6*86400000));
+  const weekLabel = 'Week '+isoWeekNumber(new Date(week+'T00:00:00'))+' ('+fmtDate(weekStart)+' – '+fmtDate(week)+')';
+  const prepared = [];
   lastFolderScanLog = [];
   const imported = [], goalSheets = [];
   const localRows = new Map();
@@ -6338,20 +6372,40 @@ async function ingestFiles(entries, {interactive=true}={}){
             employee_number:eid||null, candidate_name:String(out['Candidate Name']||'').trim()||null, ord:idx, data:out});
           localRows.set(id, out);
         });
-        const importId = await Server.rpc('dash_import_begin', {p_source:source, p_file_name:entry.name+(sheets.length>1?' / '+sh.name:'')});
-        let savedRows = 0;
-        for(let i=0;i<batch.length;i+=IMPORT_BATCH){
-          importProgress('Saving '+entry.name+': '+fmtNum(Math.min(i+IMPORT_BATCH, batch.length))+' / '+fmtNum(batch.length)+' rows…');
-          savedRows += Number(await Server.rpc('dash_import_rows', {p_import_id:importId, p_source:source, p_rows:batch.slice(i,i+IMPORT_BATCH)}))||0;
-        }
-        const blocked = Math.max(0, batch.length - savedRows); totalBlocked += blocked;
-        const fin = await Server.rpc('dash_import_finish', {p_import_id:importId, p_source:source, p_from:null, p_to:null, p_rows_read:sh.rows.length, p_removed_columns:removed});
-        (fin.weeks||[]).forEach(w=>allWeeks.add(w));
-        totalRows += batch.length - blocked; totalSkipped += skipped;
-        if(!imported.some(x=>x.entry===entry)) imported.push({entry, source, rows:batch.length, removed}); else imported.find(x=>x.entry===entry).rows += batch.length;
-        lastFolderScanLog.push({name:entry.name+(sheets.length>1?' / '+sh.name:''), status:source==='schedules'?'file1':'file2', detail:fmtNum(batch.length)+' rows'+(skipped?' ('+fmtNum(skipped)+' without a date skipped)':'')+' · '+(removed.length?'removed contact column(s): '+removed.join(', '):'no contact columns found')+(fin.cleared?' · '+fmtNum(fin.cleared)+' outdated row(s) replaced':'')+(blocked?' · '+fmtNum(blocked)+' row(s) skipped (removed weeks)':'')});
+        const outside = batch.filter(r=>{ const d=String(source==='schedules'?r.created_on:r.date_of).slice(0,10); return d<weekStart || d>week; }).length;
+        prepared.push({entry, sheetLabel:entry.name+(sheets.length>1?' / '+sh.name:''), source, batch, removed, skipped, rowsRead:sh.rows.length, minD, maxD, outside});
       }
       if(!usedSheet && !lastFolderScanLog.some(l=>l.name===entry.name)) lastFolderScanLog.push({name:entry.name, status:'unclassified', detail:'no Created On / Date Of / goals sheet found'});
+    }
+    // Every Created On / Date Of sheet must hold ONLY the chosen week — otherwise nothing is saved
+    // and the super admin is told.
+    const bad = prepared.filter(p=>p.outside>0);
+    if(bad.length){
+      const lines = bad.map(p=>p.sheetLabel+' ('+(p.source==='schedules'?'Created On':'Date Of')+'): '+fmtNum(p.outside)+' of '+fmtNum(p.batch.length)+' rows are outside the week — dates run '+fmtDate(p.minD)+' to '+fmtDate(p.maxD));
+      const summary = 'Upload for '+weekLabel+' rejected — '+lines.join('; ');
+      let notified = true;
+      try{ await Server.rpc('dash_alert_raise', {p_kind:'upload_rejected', p_detail:{summary, week, files:bad.map(p=>({file:p.sheetLabel, source:p.source, rows:p.batch.length, outside:p.outside, from:p.minD, to:p.maxD}))}}); }catch(e){ notified = false; }
+      lastFolderScanLog = bad.map(p=>({name:p.sheetLabel, status:'error', detail:'rejected — '+fmtNum(p.outside)+' rows outside '+weekLabel}));
+      setLoading(null);
+      uploadRejectedDialog(weekLabel, lines, notified);
+      return;
+    }
+    if(!prepared.length && !goalSheets.length){ showToast('Nothing imported — see Settings → Data Sync Details for what was found in each file.'); return; }
+    // Replace the chosen week: rows of that week not in the new file are removed (per file type).
+    for(const p of prepared){
+      const {entry, source, batch, removed, skipped} = p;
+      const importId = await Server.rpc('dash_import_begin', {p_source:source, p_file_name:p.sheetLabel+' · '+weekLabel});
+      let savedRows = 0;
+      for(let i=0;i<batch.length;i+=IMPORT_BATCH){
+        importProgress('Saving '+entry.name+': '+fmtNum(Math.min(i+IMPORT_BATCH, batch.length))+' / '+fmtNum(batch.length)+' rows…');
+        savedRows += Number(await Server.rpc('dash_import_rows', {p_import_id:importId, p_source:source, p_rows:batch.slice(i,i+IMPORT_BATCH)}))||0;
+      }
+      const blocked = Math.max(0, batch.length - savedRows); totalBlocked += blocked;
+      const fin = await Server.rpc('dash_import_finish', {p_import_id:importId, p_source:source, p_from:weekStart, p_to:week, p_rows_read:p.rowsRead, p_removed_columns:removed});
+      (fin.weeks||[]).forEach(w=>allWeeks.add(w)); allWeeks.add(week);
+      totalRows += batch.length - blocked; totalSkipped += skipped;
+      if(!imported.some(x=>x.entry===entry)) imported.push({entry, source, rows:batch.length, removed}); else imported.find(x=>x.entry===entry).rows += batch.length;
+      lastFolderScanLog.push({name:p.sheetLabel, status:source==='schedules'?'file1':'file2', detail:fmtNum(batch.length)+' rows for '+weekLabel+(skipped?' ('+fmtNum(skipped)+' without a date skipped)':'')+' · '+(removed.length?'removed contact column(s): '+removed.join(', '):'no contact columns found')+(fin.cleared?' · '+fmtNum(fin.cleared)+' older row(s) of this week replaced':'')+(blocked?' · '+fmtNum(blocked)+' row(s) skipped (removed weeks)':'')});
     }
     if(!imported.length && !goalSheets.length){ showToast('Nothing imported — see Settings → Data Sync Details for what was found in each file.'); return; }
     if(allWeeks.size) await rebuildWeeks([...allWeeks], localRows, importProgress);
@@ -6368,7 +6422,7 @@ async function ingestFiles(entries, {interactive=true}={}){
     }
     lastSuccessfulSyncAt = new Date(); resetSyncCountdown();
     await loadAllWeeks(); refreshUI();
-    if(imported.length) showToast('Imported '+fmtNum(totalRows)+' rows from '+imported.length+' file'+(imported.length===1?'':'s')+' into the master sheet'+(allWeeks.size?' · '+allWeeks.size+' week'+(allWeeks.size===1?'':'s')+' recalculated':'')+(deleted?' · '+deleted+' source file'+(deleted===1?'':'s')+' deleted':'')+(totalBlocked?' · '+fmtNum(totalBlocked)+' row'+(totalBlocked===1?'':'s')+' skipped because their week was removed (Settings → Fetched Data → Removed weeks)':'')+'.');
+    if(imported.length) showToast(weekLabel+' replaced: '+fmtNum(totalRows)+' rows from '+imported.length+' file'+(imported.length===1?'':'s')+(allWeeks.size?' · '+allWeeks.size+' week'+(allWeeks.size===1?'':'s')+' recalculated':'')+(deleted?' · '+deleted+' source file'+(deleted===1?'':'s')+' deleted':'')+(totalBlocked?' · '+fmtNum(totalBlocked)+' row'+(totalBlocked===1?'':'s')+' skipped because their week was removed (Settings → Fetched Data → Removed weeks)':'')+'.');
   }catch(e){
     console.error(e);
     showToast('Import stopped: '+cleanErr(e)+'. Your files were not deleted — you can run the import again safely.');
@@ -6489,7 +6543,8 @@ async function syncFromFolder(e){
         entries.push({name, getFile:()=>handle.getFile(), remove: mode==='readwrite' ? ()=>linkedFolderHandle.removeEntry(name) : null});
     }
     if(!entries.length){ lastSuccessfulSyncAt=new Date(); resetSyncCountdown(); if(interactive) showToast('No new spreadsheets in the folder.'); return; }
-    await ingestFiles(entries, {interactive});
+    if(!interactive){ return; } // folder uploads also need the week chosen by a person
+    await new Promise(res=>chooseUploadWeekDialog(null, async week=>{ await ingestFiles(entries, {interactive, week}); res(); }));
   }catch(err){ console.error(err); showToast('Folder sync failed: '+cleanErr(err)); }
   finally{ if(btn){ btn.disabled=false; btn.textContent='Sync Now'; } if(settingsModalOpen) renderFolderUploadExplainer(); }
 }
@@ -6500,7 +6555,51 @@ async function ensureFolderPermission(handle, wantWrite, interactive){
   if(wantWrite) return ensureFolderPermission(handle, false, interactive);
   return null;
 }
-function pickSpreadsheetsToUpload(){
+// Every upload starts by choosing the week (Sun–Sat) the files are for. Any date in that week
+// can be picked; the week number and range are shown before the files are chosen.
+let pendingUploadWeek = null;
+function weekOfDate(iso){ const we = toIsoDateOnly(saturdayOnOrAfter(new Date(iso+'T00:00:00'))); const ws = toIsoDateOnly(new Date(new Date(we+'T00:00:00').getTime()-6*86400000)); return {weekEnd:we, weekStart:ws, number:isoWeekNumber(new Date(we+'T00:00:00'))}; }
+function chooseUploadWeekDialog(presetWeekEnd, onChoose){
+  document.getElementById('uploadWeekDialog')?.remove();
+  // weeks run Sunday–Saturday and are picked by their ending Saturday only
+  const thisSat = toIsoDateOnly(saturdayOnOrAfter(new Date()));
+  const sats = []; for(let i=-2;i<=104;i++){ const d=new Date(thisSat+'T00:00:00'); d.setDate(d.getDate()-7*i); sats.push(toIsoDateOnly(d)); }
+  const initial = presetWeekEnd && /^\d{4}-\d{2}-\d{2}$/.test(presetWeekEnd) ? toIsoDateOnly(saturdayOnOrAfter(new Date(presetWeekEnd+'T00:00:00'))) : thisSat;
+  if(!sats.includes(initial)) sats.push(initial);
+  sats.sort().reverse();
+  const wrap = document.createElement('div'); wrap.className='modal-overlay'; wrap.id='uploadWeekDialog';
+  wrap.innerHTML = `<div class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="uwTitle">
+    <div class="modal-header"><h3 id="uwTitle">Which week are you uploading?</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div>
+    <div class="modal-body">
+      <label class="uw-label" for="uwDate">Week ending (Saturday)</label>
+      <select id="uwDate">${sats.map(d=>{ const w=weekOfDate(d); return `<option value="${d}" ${d===initial?'selected':''}>Sat ${fmtDate(d)} · Week ${w.number}${d===thisSat?' (this week)':''}</option>`; }).join('')}</select>
+      <div class="uw-week" id="uwWeek" aria-live="polite"></div>
+      <ul class="uw-rules">
+        <li>The data already saved for this week is <strong>replaced</strong> by the new files (Created On and Date Of separately).</li>
+        <li>Every row must fall inside this week — Created On dates for the Created On export, Date Of dates for the Date Of export. A file with rows from any other week is rejected and the super admin is notified.</li>
+      </ul>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" data-close>Cancel</button><button class="btn btn-primary" id="uwChoose">Choose files</button></div></div>`;
+  document.body.appendChild(wrap);
+  const inp = wrap.querySelector('#uwDate'), out = wrap.querySelector('#uwWeek'), go = wrap.querySelector('#uwChoose');
+  const show = ()=>{ if(!inp.value){ out.textContent='Pick a date.'; go.disabled=true; return; } const w=weekOfDate(inp.value); out.innerHTML = '<strong>Week '+w.number+'</strong> · Sun '+fmtDate(w.weekStart)+' – Sat '+fmtDate(w.weekEnd)+(KV.has('weekly:'+w.weekEnd)?' <span class="pill warn">has data — will be replaced</span>':' <span class="pill good">no data yet</span>'); go.disabled=false; };
+  inp.addEventListener('change', show); show();
+  wrap.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>wrap.remove());
+  go.onclick = ()=>{ const w = weekOfDate(inp.value); wrap.remove(); onChoose(w.weekEnd); }; // still inside the click, so the file picker may open
+  setTimeout(()=>inp.focus(), 30);
+}
+function uploadRejectedDialog(weekLabel, lines, notified){
+  const wrap = document.createElement('div'); wrap.className='modal-overlay'; wrap.id='uploadRejected';
+  wrap.innerHTML = `<div class="modal modal-sm" role="alertdialog" aria-modal="true" aria-labelledby="urTitle">
+    <div class="modal-header"><h3 id="urTitle">Upload rejected — nothing was saved</h3></div>
+    <div class="modal-body"><p style="margin:0 0 10px;font-size:13.5px;line-height:1.6;">You chose <strong>${escapeHtml(weekLabel)}</strong>, but the file contains rows from other weeks:</p>
+      <ul style="margin:0 0 12px;padding-left:18px;font-size:13px;line-height:1.6;">${lines.map(l=>'<li>'+escapeHtml(l)+'</li>').join('')}</ul>
+      <p class="hint" style="margin:0;font-size:12.5px;line-height:1.55;">Export only that week from the CRM (filter Created On or Date Of from Sunday to Saturday) and upload again.${notified?' The super admin has been notified.':''}</p></div>
+    <div class="modal-footer"><button class="btn btn-primary" data-close>OK</button></div></div>`;
+  document.body.appendChild(wrap);
+  wrap.querySelector('[data-close]').onclick = ()=>wrap.remove();
+}
+function pickSpreadsheetsToUpload(presetWeekEnd){
   if(!Server.can('upload')){ showToast('Your account cannot upload data.'); return; }
   let input = document.getElementById('rawFilesInput');
   if(!input){
@@ -6509,10 +6608,19 @@ function pickSpreadsheetsToUpload(){
     document.body.appendChild(input);
     input.addEventListener('change', async ()=>{
       const files=[...input.files]; input.value=''; // released immediately — only the extracted rows are kept, on the server
-      if(files.length) await ingestFiles(files.map(f=>({name:f.name, getFile:async()=>f, remove:null})));
+      const week = pendingUploadWeek; pendingUploadWeek = null;
+      if(files.length && week) await ingestFiles(files.map(f=>({name:f.name, getFile:async()=>f, remove:null})), {week});
     });
   }
-  input.click();
+  chooseUploadWeekDialog(typeof presetWeekEnd==='string' ? presetWeekEnd : null, async week=>{
+    pendingUploadWeek = week;
+    input.click();
+    // a removed week blocks its rows — offer to lift that first
+    try{
+      const removedList = await Server.rpc('dash_removed_weeks');
+      if(removedList.some(r=>r.week===week) && confirm('Week '+isoWeekNumber(new Date(week+'T00:00:00'))+' was removed earlier, so its rows would be skipped. Restore it so this upload is saved?')) await Server.rpc('dash_restore_week', {p_week:week});
+    }catch(e){}
+  });
 }
 async function removeFolderSync(){
   if(!confirm('Unlink this folder?\n\nThe master sheet and all weeks on the server stay intact.')) return;
@@ -6710,7 +6818,7 @@ async function renderMasterView(){
   container.querySelector('#masterPeriodOnly').onchange=e=>{ st.periodOnly=e.target.checked; st.offset=0; drawMasterTable(); };
   container.querySelector('#masterClearFilters').onclick=()=>{ st.filters={}; st.search=''; st.offset=0; const s=document.getElementById('masterSearch'); if(s) s.value=''; drawMasterTable(); };
   container.querySelector('#masterDownload').onclick=downloadMasterSheet;
-  container.querySelector('[data-upload-raw]').onclick=pickSpreadsheetsToUpload;
+  container.querySelector('[data-upload-raw]').onclick=()=>pickSpreadsheetsToUpload();
   drawMasterTable(true);
 }
 // The page of rows and the row count are fetched separately and in parallel: the table shows as
@@ -6752,7 +6860,7 @@ async function drawMasterTable(freshCount){
   st.pageRows = rows.length;
   if(!rows.length && !st.offset && !Object.keys(st.filters).length && !st.search && st.files==='all' && !st.periodOnly){
     table.innerHTML = `<tbody><tr><td class="master-empty-cell"><h3>The master sheet is empty</h3><p class="hint">${Server.can('upload')?'Upload your Created On and Date Of exports (and the goals file). Contact numbers are removed, rows are merged into this single sheet on the server, and the uploaded files are discarded.':'Ask someone with upload rights to import the latest exports.'}</p>${Server.can('upload')?'<button class="btn btn-primary" data-upload-raw2>Upload Excel files</button>':''}</td></tr></tbody>`;
-    table.querySelector('[data-upload-raw2]')?.addEventListener('click', pickSpreadsheetsToUpload);
+    table.querySelector('[data-upload-raw2]')?.addEventListener('click', ()=>pickSpreadsheetsToUpload());
     document.getElementById('masterPager').innerHTML=''; drawMasterSelBar(); return;
   }
   const canEdit = Server.can('master_edit');
@@ -7273,7 +7381,7 @@ async function renderUploadHistory(){
 }
 
 /* ============================= INIT ============================= */
-const APP_VERSION = 'Version 4.13.2';
+const APP_VERSION = 'Version 4.14.0';
 async function init(){
   document.getElementById('versionLabelInline').textContent = APP_VERSION;
   document.getElementById('footerVersionLabel').textContent = APP_VERSION;
