@@ -788,7 +788,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V12M10 20V5M16 20V9M22 20V3"/></svg></div>
       <div class="brand-text">
         <h1 id="dashboardTitle" title="Click to go home">Performance Dashboard</h1>
-        <p><span id="versionLabelInline">Version 4.13.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
+        <p><span id="versionLabelInline">Version 4.13.1</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
       </div>
     </div>
     <button type="button" class="side-collapse" id="sideCollapseBtn" aria-label="Collapse menu" title="Collapse menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
@@ -895,7 +895,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       </div>
       <div class="muted-note" id="storageModeNote" style="text-align:center;margin-top:24px;">Data stored locally in this browser.</div>
       <div class="muted-note" style="text-align:center;margin-top:4px;opacity:.65;">
-        <span id="footerVersionLabel">Version 4.13.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
+        <span id="footerVersionLabel">Version 4.13.1</span> &middot; &copy; <span id="footerCopyrightYear"></span>
       </div>
     </div>
   </main>
@@ -2710,8 +2710,8 @@ function processFile2(rows, mapping, weekEndDate, dedupeFlag, rangeCheckFn){
       branch: (row[mapping.branch]||'').toString().trim() || 'Unassigned',
       day, candidate: (candName || eidRaw) ? {name: candName || 'Unknown', eid: eidRaw || '–', date: day} : null,
       show: fv.show,                       // final Checked In = Yes
-      // No Show = Attendance is a no-show, the date has passed, and the final Checked In is not Yes
-      noShow: hasDatePassed(dateOfVal) && NOSHOW_ATTENDANCE_VALUES.includes(low(row[mapping.attendance])),
+      // No Show = Attendance is a no-show and the final Checked In is not Yes
+      noShow: NOSHOW_ATTENDANCE_VALUES.includes(low(row[mapping.attendance])),
       hire: fv.i9Complete,                 // final I-9 Status = I-9 Complete ("finalized")
       placed: fv.placed,                   // Status Reason = Assigned
     };
@@ -6411,7 +6411,8 @@ async function importGoalSheets(goalSheets){
 //      week, including days that haven't happened yet
 //  5 = Deduped: a candidate counts as a show / hire / placement if ANY of their rows that week is one
 //  6 = "Final visited" procedure (see finalVisitFlags)
-const COUNT_RULES = 6;
+//  7 = No Shows no longer wait for the interview date to pass
+const COUNT_RULES = 7;
 // Recalculates the stored weekly summaries for the given weeks from the server's master sheet.
 async function rebuildWeeks(weeks, localRows, progress){
   const list = [...new Set(weeks)].filter(Boolean).sort();
@@ -7134,7 +7135,7 @@ async function renderCountBreakdown(){
     {label:'Schedules', rule:'Created On is in this week', rows:sRows, match:()=>true, key:'schedules', map:MAP1},
     {label:'Interviews', rule:'Date Of is in this week', rows:vRows, match:()=>true, key:'scheduledDateOf'},
     {label:'Shows', rule:'Checked In = Yes after the 5 update steps below', rows:vRows, match:isShow, key:'shows'},
-    {label:'No Shows', rule:'Attendance is a no-show, the date has passed, and Checked In is not Yes', rows:vRows, match:r=>!isShow(r) && NOSHOW_ATTENDANCE_VALUES.includes(low(r['Attendance'])) && hasDatePassed(toDateVal(r['Date Of'])), key:'noShows'},
+    {label:'No Shows', rule:'Attendance is a no-show and Checked In is not Yes', rows:vRows, match:r=>!isShow(r) && NOSHOW_ATTENDANCE_VALUES.includes(low(r['Attendance'])), key:'noShows'},
     {label:'Hires (finalized)', rule:'I-9 Status = I-9 Complete after steps 2 and 4', rows:vRows, match:r=>fv(r).i9Complete, key:'i9'},
     {label:'Placed', rule:'Status Reason = Assigned', rows:vRows, match:r=>low(r['Status Reason'])===PLACED_STATUS_REASON_VALUE, key:'placed'},
   ];
@@ -7268,7 +7269,7 @@ async function renderUploadHistory(){
 }
 
 /* ============================= INIT ============================= */
-const APP_VERSION = 'Version 4.13.0';
+const APP_VERSION = 'Version 4.13.1';
 async function init(){
   document.getElementById('versionLabelInline').textContent = APP_VERSION;
   document.getElementById('footerVersionLabel').textContent = APP_VERSION;
