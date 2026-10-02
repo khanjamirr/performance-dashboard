@@ -719,6 +719,15 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
 }
 @media (min-width:761px) and (max-width:1180px){ :root{--side-w:216px} }
 @media print{.sidebar{display:none!important}}
+.cand-explain-btn{align-self:flex-end;margin-left:auto}
+.cand-explain{border:1px solid #e1eaed;border-radius:12px;background:#f8fbfb;padding:14px 16px;margin:0 0 14px}
+.cand-explain-head{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline;margin-bottom:8px}
+.cand-explain table td,.cand-explain table th{white-space:nowrap}
+.cand-explain table td.hint{white-space:normal;min-width:220px}
+.cand-explain-dist{margin:0;padding-left:18px;font-size:12px;line-height:1.7;color:var(--text-secondary)}
+.cand-explain-dist b{color:var(--text)}
+.cand-explain-head strong{font-size:14px}.cand-explain .hint{font-size:12px!important;color:var(--text-secondary)}
+
 /* ---------- Settings as a full page ---------- */
 .settings-page{background:#fff;border:1px solid #e1eaed;border-radius:16px;box-shadow:0 1px 2px #1834420a,0 8px 24px #1834420a;margin-bottom:28px}
 .settings-page .settings-tabs{position:sticky;top:var(--frozen-header-height,0px);z-index:40;background:#fff;border-radius:16px 16px 0 0;padding:0 18px;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:thin}
@@ -779,7 +788,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V12M10 20V5M16 20V9M22 20V3"/></svg></div>
       <div class="brand-text">
         <h1 id="dashboardTitle" title="Click to go home">Performance Dashboard</h1>
-        <p><span id="versionLabelInline">Version 4.11.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
+        <p><span id="versionLabelInline">Version 4.12.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
       </div>
     </div>
     <button type="button" class="side-collapse" id="sideCollapseBtn" aria-label="Collapse menu" title="Collapse menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
@@ -886,7 +895,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
       </div>
       <div class="muted-note" id="storageModeNote" style="text-align:center;margin-top:24px;">Data stored locally in this browser.</div>
       <div class="muted-note" style="text-align:center;margin-top:4px;opacity:.65;">
-        <span id="footerVersionLabel">Version 4.11.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
+        <span id="footerVersionLabel">Version 4.12.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
       </div>
     </div>
   </main>
@@ -2655,106 +2664,61 @@ function processFile1(rows, mapping, weekEndDate, dedupeFlag, rangeCheckFn){
 function processFile2(rows, mapping, weekEndDate, dedupeFlag, rangeCheckFn){
   const inRange = rangeCheckFn || ((d)=> inWeekRange(d, weekEndDate));
   const byRecruiter = {};
-  const seenDedupKeys = new Set(); // dedupe repeat candidate records within this week
+  const diag = {totalInWeek:0, checkedInYes:0, rawNoShowAttendance:0, hireYes:0, placedAssigned:0, unionCheckedIn:0, finalNoShow:0};
+  const low = v=> (v==null?'':String(v)).trim().toLowerCase();
 
-  // Diagnostics: how many rows (team-wide, this week) satisfy EACH condition individually,
-  // so it's possible to see which rule is driving the Checked-In total.
-  const diag = {
-    totalInWeek: 0,
-    attendanceMatch: 0,
-    finalizedMatch: 0,
-    bgMatch: 0,
-    reasonMatch: 0,
-    i9StatusMatch: 0,
-    i9CompletedMatch: 0,
-    unionCheckedIn: 0,
-    rawNoShowAttendance: 0,
-    finalNoShow: 0,
-  };
-
+  // 1) every interview in this week that has both a name and an Employee Number
+  const items = [];
   rows.forEach(row=>{
     const dateOfVal = toDateVal(row[mapping.dateOf]);
-    const dateOfInWeek = dateOfVal && inRange(dateOfVal);
-    if(!dateOfInWeek) return; // this row's interview didn't happen in this week — never counted here
+    if(!dateOfVal || !inRange(dateOfVal)) return; // interview not in this week
     if(!rowHasCandidate(row, mapping)) return;
-
-    if(dedupeFlag){
-      const empNum = mapping.employeeNumber ? normalizeEmployeeNumber(row[mapping.employeeNumber]) : '';
-      const candName = mapping.candidateName ? (row[mapping.candidateName]||'').toString().trim().toLowerCase() : '';
-      const dedupKey = empNum ? ('eid:'+empNum) : (candName ? ('name:'+candName+'|'+toIsoDateOnly(dateOfVal)) : '');
-      if(dedupKey){
-        if(seenDedupKeys.has(dedupKey)) return; // duplicate candidate record — skip entirely
-        seenDedupKeys.add(dedupKey);
-      }
-    }
-
-    diag.totalInWeek++;
-
-    const recruiter = (row[mapping.recruiter]||'').toString().trim() || 'Unassigned';
-    const branch = (row[mapping.branch]||'').toString().trim() || 'Unassigned';
-    if(!byRecruiter[recruiter]) byRecruiter[recruiter] = {branch, scheduledDateOf:0, shows:0, noShows:0, i9:0, placed:0,
-      interviewsList:[], showsList:[], noShowsList:[], i9List:[], placedList:[]};
-    byRecruiter[recruiter].branch = branch;
-    byRecruiter[recruiter].scheduledDateOf++; // every row with Date Of in this week, no filters — used as the Show/No-Show Rate denominator
     const candName = mapping.candidateName ? (row[mapping.candidateName]||'').toString().trim() : '';
-    const eid = mapping.employeeNumber ? (row[mapping.employeeNumber]||'').toString().trim() : '';
-    const candidate = (candName || eid) ? {name: candName || 'Unknown', eid: eid || '\u2013', date: toIsoDateOnly(dateOfVal)} : null;
-    if(candidate) byRecruiter[recruiter].interviewsList.push(candidate);
-    const daily = byRecruiter[recruiter].daily ||= {};
-    const day = daily[toIsoDateOnly(dateOfVal)] ||= emptyTotals();
-    day.scheduledDateOf++;
-
-    const attendance = (row[mapping.attendance]||'').toString().trim().toLowerCase();
-    const attendanceMatch = SHOW_ATTENDANCE_VALUES.includes(attendance);
-
-    const finalizedVal = mapping.finalizedOn ? toDateVal(row[mapping.finalizedOn]) : null;
-    const finalizedInWeek = finalizedVal && inRange(finalizedVal);
-
-    const bgVal = mapping.backgroundScreening ? (row[mapping.backgroundScreening]||'').toString().trim().toLowerCase() : '';
-    const bgMatch = mapping.backgroundScreening ? !BG_EXCLUDED_VALUES.includes(bgVal) : false;
-
-    const reasonVal = mapping.statusReason ? (row[mapping.statusReason]||'').toString().trim().toLowerCase() : '';
-    const reasonMatch = CHECKEDIN_STATUS_REASON_VALUES.includes(reasonVal);
-
-    const i9Val = mapping.i9Status ? (row[mapping.i9Status]||'').toString().trim().toLowerCase() : '';
-    const i9StatusMatch = i9Val === I9_COMPLETE_VALUE;
-
-    const i9CompletedVal = mapping.i9Completed ? (row[mapping.i9Completed]||'').toString().trim().toLowerCase() : '';
-    const i9CompletedMatch = i9CompletedVal === I9_COMPLETED_YES_VALUE;
-
-    const isRawNoShow = NOSHOW_ATTENDANCE_VALUES.includes(attendance);
-
-    // None of the above status signals can be trusted until the interview's own date has
-    // actually occurred \u2014 a future-dated row stays "pending" (counted in Interviews,
-    // not yet a Show or a No Show) even if a status field carries a stray value early.
-    const dateOccurred = hasDatePassed(dateOfVal);
-    // Show = the "Checked In" column says Yes — nothing else is used (v4.11).
-    const checkedInRaw = mapping.checkedIn ? row[mapping.checkedIn] : '';
-    const systemCheckedIn = checkedInRaw===true || ['yes','true','1','y'].includes(String(checkedInRaw??'').trim().toLowerCase());
-
-    if(attendanceMatch) diag.attendanceMatch++;
-    if(finalizedInWeek) diag.finalizedMatch++;
-    if(bgMatch) diag.bgMatch++;
-    if(reasonMatch) diag.reasonMatch++;
-    if(i9StatusMatch) diag.i9StatusMatch++;
-    if(i9CompletedMatch) diag.i9CompletedMatch++;
-    if(isRawNoShow) diag.rawNoShowAttendance++;
-
-    if(systemCheckedIn){
-      byRecruiter[recruiter].shows++; day.shows++;
-      diag.unionCheckedIn++;
-      if(candidate) byRecruiter[recruiter].showsList.push(candidate);
-    } else if(dateOccurred && isRawNoShow){
-      byRecruiter[recruiter].noShows++; day.noShows++;
-      diag.finalNoShow++;
-      if(candidate) byRecruiter[recruiter].noShowsList.push(candidate);
-    }
-
-    // Hires = the I-9 Yes/No dropdown is Yes ("I-9 Completed (Employee) (Employee)"; a Yes in "I-9 Status" counts too)
-    const isHire = i9CompletedMatch || i9Val === 'yes';
-    if(isHire){ day.i9++; byRecruiter[recruiter].i9++; if(candidate) byRecruiter[recruiter].i9List.push(candidate); }
-    if(reasonVal===PLACED_STATUS_REASON_VALUE){ day.placed++; byRecruiter[recruiter].placed++; if(candidate) byRecruiter[recruiter].placedList.push(candidate); }
+    const eidRaw = mapping.employeeNumber ? (row[mapping.employeeNumber]||'').toString().trim() : '';
+    const eid = normalizeEmployeeNumber(eidRaw);
+    const day = toIsoDateOnly(dateOfVal);
+    const checkedIn = mapping.checkedIn ? row[mapping.checkedIn] : '';
+    const i9Completed = mapping.i9Completed ? low(row[mapping.i9Completed]) : '';
+    const i9Status = mapping.i9Status ? low(row[mapping.i9Status]) : '';
+    const it = {
+      key: eid ? 'eid:'+eid : (candName ? 'name:'+candName.toLowerCase()+'|'+day : 'row:'+items.length),
+      recruiter: (row[mapping.recruiter]||'').toString().trim() || 'Unassigned',
+      branch: (row[mapping.branch]||'').toString().trim() || 'Unassigned',
+      day, candidate: (candName || eidRaw) ? {name: candName || 'Unknown', eid: eidRaw || '–', date: day} : null,
+      // Show = the "Checked In" column is Yes. Nothing else is used.
+      show: checkedIn===true || ['yes','true','1','y'].includes(low(checkedIn)),
+      // No Show = Attendance is a no-show value, the date has passed, and the candidate didn't check in
+      noShow: hasDatePassed(dateOfVal) && NOSHOW_ATTENDANCE_VALUES.includes(low(row[mapping.attendance])),
+      // Hire = the I-9 Yes/No dropdown is Yes
+      hire: i9Completed===I9_COMPLETED_YES_VALUE || i9Status==='yes',
+      // Placed = Status Reason is Assigned
+      placed: mapping.statusReason ? low(row[mapping.statusReason])===PLACED_STATUS_REASON_VALUE : false,
+    };
+    items.push(it);
+    diag.totalInWeek++; if(it.show) diag.checkedInYes++; if(it.noShow) diag.rawNoShowAttendance++; if(it.hire) diag.hireYes++; if(it.placed) diag.placedAssigned++;
   });
+
+  const rec = it=>{
+    const r = byRecruiter[it.recruiter] ||= {branch:it.branch, scheduledDateOf:0, shows:0, noShows:0, i9:0, placed:0, interviewsList:[], showsList:[], noShowsList:[], i9List:[], placedList:[]};
+    r.branch = it.branch; return r;
+  };
+  const dayOf = it=>{ const r=rec(it); const daily=r.daily ||= {}; return daily[it.day] ||= emptyTotals(); };
+  const add = (it, total, list)=>{ const r=rec(it); r[total]++; dayOf(it)[total]++; if(it.candidate) r[list].push(it.candidate); };
+
+  // 2) Raw counts every row. Deduped counts each candidate (Employee Number) once per week:
+  //    their first interview row for Interviews, and — if ANY of their rows that week is a
+  //    show / hire / placement — the first such row for that metric (so a candidate with two
+  //    appointments who checked in to the second one still counts as a show).
+  const groups = new Map();
+  items.forEach(it=>{ if(dedupeFlag){ const g=groups.get(it.key); if(g) g.push(it); else groups.set(it.key,[it]); } else groups.set('row:'+groups.size,[it]); });
+  for(const g of groups.values()){
+    add(g[0], 'scheduledDateOf', 'interviewsList');
+    const show = g.find(x=>x.show);
+    if(show){ add(show, 'shows', 'showsList'); diag.unionCheckedIn++; }
+    else { const ns = g.find(x=>x.noShow); if(ns){ add(ns, 'noShows', 'noShowsList'); diag.finalNoShow++; } }
+    const hire = g.find(x=>x.hire); if(hire) add(hire, 'i9', 'i9List');
+    const placed = g.find(x=>x.placed); if(placed) add(placed, 'placed', 'placedList');
+  }
   return {byRecruiter, diag};
 }
 function mergeDailyMetrics(a={},b={}){
@@ -6054,7 +6018,7 @@ document.addEventListener('visibilitychange', async ()=>{
 // The page needs the database functions from the matching supabase_setup.sql. If the super
 // admin hasn't run the latest one (or the run failed), new features such as new user rights
 // silently don't work — so say so plainly.
-const REQUIRED_SCHEMA = 10;
+const REQUIRED_SCHEMA = 11;
 let databaseSchemaStale = false;
 async function checkDatabaseSchema(){
   try{
@@ -6424,7 +6388,8 @@ async function importGoalSheets(goalSheets){
 //  3 = Hires from the I-9 Yes dropdown; rows need both a name and an Employee Number
 //  4 = Shows = Checked In is Yes (nothing else); Hires / Placed counted for every interview in the
 //      week, including days that haven't happened yet
-const COUNT_RULES = 4;
+//  5 = Deduped: a candidate counts as a show / hire / placement if ANY of their rows that week is one
+const COUNT_RULES = 5;
 // Recalculates the stored weekly summaries for the given weeks from the server's master sheet.
 async function rebuildWeeks(weeks, localRows, progress){
   const list = [...new Set(weeks)].filter(Boolean).sort();
@@ -7096,13 +7061,18 @@ async function renderCandidatesView(){
     <div class="cand-controls">
       <label class="cand-field"><span>Week</span><select id="candWeek">${weeks.map(w=>`<option value="${w}" ${w===st.week?'selected':''}>Wk ${isoWeekNumber(new Date(w+'T00:00:00'))} · ${fmtDate(toIsoDateOnly(new Date(new Date(w+'T00:00:00').getTime()-6*86400000))).replace(/, \d{4}$/,'')} – ${fmtDate(w)}</option>`).join('')}</select></label>
       <label class="cand-field"><span>Recruiter</span><select id="candRecruiter"><option value="">All recruiters</option></select></label>
+      <button type="button" class="btn btn-secondary btn-sm cand-explain-btn" id="candExplainBtn" aria-expanded="false">How are these counted?</button>
     </div>
+    <div id="candExplain" class="hidden"></div>
     <div class="cand-cats" id="candCats" role="tablist" aria-label="Category"><span class="hint">Loading week…</span></div>
     <div class="cand-summary" id="candSummary"></div>
     <div class="cand-scroll"><table id="candTable" class="users-table cand-table"></table></div>
     <div id="candMore" style="text-align:center;margin-top:10px;"></div>
   </div>`;
+  container.querySelector('#candExplainBtn').onclick = ()=>toggleCountBreakdown();
   container.querySelector('#candWeek').onchange = e=>{ st.week = e.target.value; st.recruiter=''; st.limit=500; renderCandidatesView(); };
+  if(st.explainOpen){ container.querySelector('#candExplain').classList.remove('hidden'); container.querySelector('#candExplainBtn').setAttribute('aria-expanded','true'); renderCountBreakdown(); }
+  container.querySelector('#candExplainBtn').addEventListener('click', ()=>{ st.explainOpen = !document.getElementById('candExplain').classList.contains('hidden'); });
   let computed = null;
   try{
     computed = await candFromWeekLists(st.week).catch(()=>null);
@@ -7115,6 +7085,59 @@ async function renderCandidatesView(){
   rs.innerHTML = '<option value="">All recruiters</option>'+recs.map(r=>`<option ${r===st.recruiter?'selected':''}>${escapeHtml(r)}</option>`).join('');
   rs.onchange = e=>{ st.recruiter = e.target.value; st.limit=500; drawCandidateCats(); drawCandidateTable(); };
   drawCandidateCats(); drawCandidateTable();
+}
+// Step-by-step reconciliation of this week's numbers against the uploaded rows, so any count
+// can be checked against a filter in Excel: rows matching the rule → minus rows missing a
+// name or Employee Number → Raw → minus repeat Employee Numbers → Deduped.
+async function toggleCountBreakdown(){
+  const host = document.getElementById('candExplain'), btn = document.getElementById('candExplainBtn'); if(!host) return;
+  const open = host.classList.contains('hidden');
+  host.classList.toggle('hidden', !open); btn.setAttribute('aria-expanded', String(open));
+  if(open) renderCountBreakdown();
+}
+async function renderCountBreakdown(){
+  const host = document.getElementById('candExplain'); if(!host || host.classList.contains('hidden')) return;
+  const week = candState.week;
+  host.innerHTML = '<div class="cand-explain"><p class="hint" style="margin:0;">Counting the uploaded rows for this week…</p></div>';
+  let data;
+  try{ data = await loadCandidateWeek(week); }
+  catch(e){ host.innerHTML = '<div class="cand-explain"><p class="hint" style="margin:0;">'+(/Could not find|schema cache|does not exist/i.test(e.message)?'Run the latest supabase_setup.sql in Supabase to enable this.':escapeHtml(cleanErr(e)))+'</p></div>'; return; }
+  if(candState.week!==week) return;
+  const low = v=>(v==null?'':String(v)).trim().toLowerCase();
+  const sRows = data.s.filter(r=>{ const d=toDateVal(r['Created On']); return d && inWeekRange(d, week); });
+  const vRows = data.v.filter(r=>{ const d=toDateVal(r['Date Of']); return d && inWeekRange(d, week); });
+  const isShow = r=>r['Checked In']===true || ['yes','true','1','y'].includes(low(r['Checked In']));
+  const rules = [
+    {label:'Schedules', rule:'Created On is in this week', rows:sRows, match:()=>true, key:'schedules', map:MAP1},
+    {label:'Interviews', rule:'Date Of is in this week', rows:vRows, match:()=>true, key:'scheduledDateOf'},
+    {label:'Shows', rule:'Checked In = Yes', rows:vRows, match:isShow, key:'shows'},
+    {label:'No Shows', rule:'Attendance is a no-show, the date has passed, and Checked In is not Yes', rows:vRows, match:r=>!isShow(r) && NOSHOW_ATTENDANCE_VALUES.includes(low(r['Attendance'])) && hasDatePassed(toDateVal(r['Date Of'])), key:'noShows'},
+    {label:'Hires', rule:'I-9 Completed (Yes/No dropdown) = Yes', rows:vRows, match:r=>low(r['I-9 Completed'])==='yes' || low(r['I-9 Status'])==='yes', key:'i9'},
+    {label:'Placed', rule:'Status Reason = Assigned', rows:vRows, match:r=>low(r['Status Reason'])===PLACED_STATUS_REASON_VALUE, key:'placed'},
+  ];
+  const sum = (by, k)=>Object.values(by).reduce((n,o)=>n+(o[k]||0),0);
+  const p1d = processFile1(data.s, MAP1, week, true), p1r = processFile1(data.s, MAP1, week, false);
+  const p2d = processFile2(data.v, MAP2, week, true).byRecruiter, p2r = processFile2(data.v, MAP2, week, false).byRecruiter;
+  const lines = rules.map(r=>{
+    const matching = r.rows.filter(r.match);
+    const missing = matching.filter(x=>!rowHasCandidate(x, r.map||MAP2)).length;
+    const raw = r.key==='schedules' ? sum(p1r,'schedules') : sum(p2r, r.key);
+    const ded = r.key==='schedules' ? sum(p1d,'schedules') : sum(p2d, r.key);
+    return {...r, matching:matching.length, missing, raw, ded};
+  });
+  const dist = (col, rows)=>{ const m=new Map(); rows.forEach(r=>{ const v=String(r[col]??'').trim()||'(blank)'; m.set(v,(m.get(v)||0)+1); }); return [...m.entries()].sort((a,b)=>b[1]-a[1]).map(([v,n])=>escapeHtml(v)+' <strong>'+fmtNum(n)+'</strong>').join(' · '); };
+  const wkLabel = 'Wk '+isoWeekNumber(new Date(week+'T00:00:00'))+' ('+fmtDate(toIsoDateOnly(new Date(new Date(week+'T00:00:00').getTime()-6*86400000)))+' – '+fmtDate(week)+')';
+  host.innerHTML = `<div class="cand-explain">
+    <div class="cand-explain-head"><strong>How ${escapeHtml(wkLabel)} is counted</strong><span class="hint">from ${fmtNum(sRows.length)} Created On rows and ${fmtNum(vRows.length)} Date Of rows on the server for this week</span></div>
+    <div style="overflow-x:auto"><table class="users-table"><thead><tr><th>Number</th><th>Rule (column in the export)</th><th>Rows matching</th><th>− no name or Employee Number</th><th>= Raw</th><th>− repeat Employee Numbers</th><th>= Deduped</th></tr></thead>
+    <tbody>${lines.map(l=>`<tr><td><strong>${l.label}</strong></td><td class="hint">${escapeHtml(l.rule)}</td><td>${fmtNum(l.matching)}</td><td>${l.missing?'−'+fmtNum(l.missing):'0'}</td><td><strong>${fmtNum(l.raw)}</strong></td><td>${l.raw-l.ded?'−'+fmtNum(l.raw-l.ded):'0'}</td><td><strong>${fmtNum(l.ded)}</strong></td></tr>`).join('')}</tbody></table></div>
+    <p class="hint" style="margin:10px 0 4px;">Values in the Date Of rows for this week — useful when checking against a filter in Excel:</p>
+    <ul class="cand-explain-dist">
+      <li><b>Checked In:</b> ${dist('Checked In', vRows)}</li>
+      <li><b>I-9 Completed:</b> ${dist('I-9 Completed', vRows)}</li>
+      <li><b>I-9 Status:</b> ${dist('I-9 Status', vRows)}</li>
+      <li><b>Status Reason:</b> ${dist('Status Reason', vRows)}</li>
+    </ul></div>`;
 }
 function candFiltered(){
   const st = candState; let rows = (st.computed && st.computed.lists[st.cat]) || [];
@@ -7216,7 +7239,7 @@ async function renderUploadHistory(){
 }
 
 /* ============================= INIT ============================= */
-const APP_VERSION = 'Version 4.11.0';
+const APP_VERSION = 'Version 4.12.0';
 async function init(){
   document.getElementById('versionLabelInline').textContent = APP_VERSION;
   document.getElementById('footerVersionLabel').textContent = APP_VERSION;
