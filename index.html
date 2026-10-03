@@ -359,6 +359,10 @@
 
   ::-webkit-scrollbar{height:8px;width:8px;}
   ::-webkit-scrollbar-thumb{background:#D8DEE8;border-radius:8px;}
+body.no-copy-tables [data-copy-table], body.no-copy-tables #historyCopy,
+body.no-copy-tables #historyCandidatesCopy, body.no-copy-tables #candCopy,
+body.no-copy-tables #pvCopy, body.no-copy-tables #pvDrillCopy,
+body.no-copy-tables #copyPrevWeeksBtn, body.no-copy-tables #tooltipCopyBtn {display:none!important;}
 </style>
 <style id="executive-design">
 :root{--bg:#f2f5f6;--surface:#fff;--border:#dfe7e9;--navy:#102c3b;--navy-2:#193e4d;--indigo:#146f78;--indigo-light:#e7f3f3;--teal:#17775c;--teal-light:#e8f5ee;--amber:#94671b;--amber-light:#fbf2df;--red:#bb4d50;--red-light:#fbecee;--text:#183442;--text-secondary:#5b707c;--text-tertiary:#687e89;--radius:12px;--radius-lg:18px;--shadow:0 3px 16px #17374405}
@@ -1597,20 +1601,31 @@ function fmtNum(n){ return (n||0).toLocaleString('en-US'); }
 function downloadBtnHtml(tableId, filename){
   return `<button class="btn btn-secondary btn-sm" data-download-table="${tableId}" data-filename="${filename}" title="Download this table as an Excel file">\u2b07 Excel</button>`;
 }
+function canCopyTables(){ return !!Server.user && (Server.user.role!=='user' || !(Server.user.hidden_sections||[]).includes('copy.tables')); }
 function copyBtnHtml(tableId){
+  if(!canCopyTables()) return ''; 
   return `<button class="btn btn-secondary btn-sm" data-copy-table="${tableId}" title="Copy this table to clipboard">&#128203; Copy</button>`;
 }
+function tableCopyCell(cell){
+  let text;
+  if(cell.hasAttribute('data-copy-value')) text=cell.getAttribute('data-copy-value');
+  else { const clone=cell.cloneNode(true); clone.querySelectorAll('.col-filter-btn,.rank,.remark-count,.rm-badge').forEach(n=>n.remove()); text=clone.textContent; }
+  text=String(text||'').replace(/[\t\r\n]+/g,' ').trim();
+  return /^[=+@-]/.test(text) ? "'"+text : text;
+}
 function copyTableToClipboard(tableEl){
+  if(!canCopyTables()){ showToast('Your account cannot copy tables.'); return; }
   if(!tableEl){ showToast('Nothing to copy yet.'); return; }
   const rows = Array.from(tableEl.querySelectorAll('tr'));
   if(rows.length===0){ showToast('Nothing to copy yet.'); return; }
-  const text = rows.map(tr=> Array.from(tr.children).map(cell=> cell.textContent.trim()).join('\t')).join('\n');
+  const text = rows.map(tr=> Array.from(tr.children).map(cell=> tableCopyCell(cell)).join('\t')).join('\n');
   navigator.clipboard.writeText(text).then(()=>{
     showToast('Table copied \u2014 paste directly into Excel.');
   }).catch(()=>{
     showToast('Could not copy automatically \u2014 your browser may be blocking clipboard access.');
   });
 }
+document.addEventListener('click', e=>{ if(e.target.closest('[data-copy-table],#historyCopy,#historyCandidatesCopy,#candCopy,#pvCopy,#pvDrillCopy,#copyPrevWeeksBtn,#tooltipCopyBtn') && !canCopyTables()){ e.preventDefault(); e.stopImmediatePropagation(); showToast('Your account cannot copy tables.'); } }, true);
 function copyListToClipboard(listEl){
   if(!listEl){ showToast('Nothing to copy yet.'); return; }
   if(listEl.id==='weeklyInsights'){navigator.clipboard.writeText(listEl.innerText).then(()=>showToast('Executive brief copied.')).catch(()=>showToast('Could not copy automatically.'));return;}
@@ -4290,7 +4305,7 @@ function allWeeksQualityHtml(){
   return '<div class="row-2col"><div class="panel"><div class="panel-head"><h3>Show Rate</h3><span class="hint">Weekly result · dotted line = 60% minimum</span></div><div class="chart-wrap tall"><canvas id="allWeeksShowRate"></canvas></div></div><div class="panel"><div class="panel-head"><h3>Hires per Recruiter</h3><span class="hint">Weekly hires ÷ recruiters recorded in that week, for the selected division</span></div><div class="chart-wrap tall"><canvas id="allWeeksHires"></canvas></div></div></div>';
 }
 function drawAllWeeksQuality(weeks){
-  const labels=weeks.map(w=>'Wk '+w.weekNumber);
+  const labels=weeks.map(w=>'Wk '+weekOfDate(w.weekEndDate).number+' · '+fmtDate(w.weekEndDate));
   for(const id of ['allWeeksShowRate','allWeeksHires'])destroyChart(id);
   const options=(title,max)=>({responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true,...(max?{max}:{}),title:{display:true,text:title}},x:{grid:{display:false}}}});
   charts.allWeeksShowRate=safeChart(document.getElementById('allWeeksShowRate'),{type:'line',data:{labels,datasets:[{label:'Show rate %',data:weeks.map(w=>weekIsFullyPending(w.weekEndDate)||!w.totals.scheduledDateOf?null:100*w.totals.shows/w.totals.scheduledDateOf),borderColor:'#218778',tension:.2},{label:'Minimum target 60%',data:weeks.map(()=>60),borderColor:'#a67b38',borderDash:[2,5],pointRadius:0}]},options:options('Show rate %',100)});
@@ -5176,7 +5191,7 @@ let entityPopoverRevision=0;
 let entityPopoverAnchor=null;
 function closeEntityPopover(restoreFocus=false){
   entityPopoverRevision++;
-  destroyChart('entityTrend');
+  destroyChart('entityTrend'); destroyChart('entityTrendBar');
   document.getElementById('entityPopover')?.remove();
   document.getElementById('entityDrawer')?.remove(); document.getElementById('entityDrawerBack')?.remove();
   if(restoreFocus && entityPopoverAnchor?.isConnected) entityPopoverAnchor.focus({preventScroll:true});
@@ -5263,8 +5278,9 @@ async function showPopupWeek(pop,mode,names,date){
   const sum=key=>totals.reduce((n,r)=>n+r.totals[key],0);
   const values=[goals.reduce((a,b)=>a+(b||0),0),sum('schedules'),sum('scheduledDateOf'),sum('shows')];
   pop.querySelectorAll('.entity-metrics strong').forEach((el,i)=>el.textContent=week?fmtNum(values[i]):'—');
-  destroyChart('entityTrend');
+  destroyChart('entityTrend'); destroyChart('entityTrendBar');
   charts.entityTrend=safeChart(document.getElementById('entityTrend'),{type:'bar',data:{labels:names,datasets:[['Schedules','schedules','#467bd1'],['Interviews','scheduledDateOf','#8a68b2'],['Shows','shows','#218778']].map(([label,key,color])=>({label,data:totals.map(t=>week?t.totals[key]:null),backgroundColor:color,borderRadius:4}))},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true,title:{display:true,text:'Count'}},x:{grid:{display:false}}}}});
+  charts.entityTrendBar=safeChart(document.getElementById('entityTrendBar'),{type:'bar',data:{labels:names,datasets:[['Schedules','schedules','#467bd1'],['Interviews','scheduledDateOf','#8a68b2'],['Shows','shows','#218778']].map(([label,key,color])=>({label,data:totals.map(t=>week?t.totals[key]:null),backgroundColor:color,borderRadius:4}))},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true,title:{display:true,text:'Count'}},x:{grid:{display:false}}}}});
   pop.querySelectorAll('#entityHistoryTable tbody tr').forEach(row=>row.classList.toggle('history-active',row.dataset.week===date));
 }
 // Recruiter / branch card: a side panel with the week's numbers on top and tabs below
@@ -5315,7 +5331,7 @@ function renderEntityDrawer(){
   const goalPct = e && e.goal ? e.schedules/e.goal*100 : null;
   const pend = weekIsFullyPending(epState.week);
   const remarks = single && mode==='recruiters' ? Remarks.forRecruiter(name) : [];
-  const tabs = [['trend','Trend'],['weeks','Weeks'], ...(single && mode==='recruiters' ? [['remarks','Remarks'+(remarks.length?' ('+remarks.length+')':'')]] : []), ...(single && canSeeCandidates() ? [['candidates','Candidates']] : [])];
+  const tabs = [['trend','Trend'],['weeks','Weeks'], ...(single && mode==='recruiters' ? [['remarks','Remarks'+(remarks.length?' ('+remarks.length+')':'')]] : [])];
   if(!tabs.some(t=>t[0]===epState.tab)) epState.tab='trend';
   pop.innerHTML = `<header class="ep-head">
       <div><div class="ep-eyebrow">${mode==='recruiters'?'Recruiter':'Branch'}${single?' · '+escapeHtml(div)+(mode==='recruiters'&&e&&e.branch?' · '+escapeHtml(e.branch):''):' · comparing '+names.length}</div>
@@ -5337,10 +5353,10 @@ function renderEntityDrawer(){
   pop.querySelector('#epWeek').onchange=ev=>{ epState.week=ev.target.value; renderEntityDrawer(); };
   pop.querySelector('#epAddRemark')?.addEventListener('click', ()=>openRemarksModal(name, epState.week));
   pop.querySelectorAll('[data-ep-tab]').forEach(b=>b.onclick=()=>{ epState.tab=b.dataset.epTab; renderEntityDrawer(); });
-  const body=pop.querySelector('#epBody'); destroyChart('entityTrend');
+  const body=pop.querySelector('#epBody'); destroyChart('entityTrend'); destroyChart('entityTrendBar');
   if(epState.tab==='trend'){
-    body.innerHTML='<div class="ep-chart"><canvas id="entityTrend"></canvas></div><p class="hint" style="margin:6px 0 0;">Last '+weeks.length+' weeks.</p>';
-    const labels=weeks.map(w=>'Wk '+w.weekNumber);
+    body.innerHTML='<h4>Weekly line trend</h4><div class="ep-chart"><canvas id="entityTrend"></canvas></div><h4>Weekly bar trend</h4><div class="ep-chart"><canvas id="entityTrendBar"></canvas></div><p class="hint" style="margin:6px 0 0;">Last '+weeks.length+' weeks.</p>';
+    const labels=weeks.map(w=>'Wk '+weekOfDate(w.weekEndDate).number+' · '+fmtDate(w.weekEndDate));
     const series = single
       ? [['Schedules','schedules','#2f8f8a'],['Interviews','scheduledDateOf','#4a78c8'],['Shows','shows','#1f9a6c'],['Hires','i9','#7a5fb8']].map(([l,k,c])=>({label:l, data:weeks.map(w=>{ const x=epEntity(w,mode,name); return x?x[k]:0; }), borderColor:c, backgroundColor:c, tension:.25, pointRadius:2.5, borderWidth:2}))
       : names.map((n,i)=>({label:n, data:weeks.map(w=>{ const x=epEntity(w,mode,n); return x?x.schedules:0; }), borderColor:PIVOT_COLORS[i%PIVOT_COLORS.length], backgroundColor:PIVOT_COLORS[i%PIVOT_COLORS.length], tension:.25, pointRadius:2.5, borderWidth:2}));
@@ -5349,22 +5365,13 @@ function renderEntityDrawer(){
     const rowsFor = n=>weeks.slice().reverse().map(w=>{ const x=epEntity(w,mode,n); const gp = x&&x.goal ? Math.round(x.schedules/x.goal*100) : null; return `<tr data-ep-week="${w.weekEndDate}" class="${w.weekEndDate===epState.week?'on':''}"><td>Wk ${w.weekNumber}<small>${fmtDate(w.weekEndDate).replace(/, \d{4}$/,'')}</small></td>${single?'':`<td>${escapeHtml(n)}</td>`}<td>${x?fmtNum(x.goal):'–'}</td><td>${x?fmtNum(x.schedules):'–'}${gp!=null?` <span class="ep-pct ${gp<50?'bad':gp<80?'warn':'good'}">${gp}%</span>`:''}</td><td>${x?fmtNum(x.scheduledDateOf):'–'}</td><td>${x?fmtNum(x.shows):'–'}</td><td>${x&&x.scheduledDateOf?fmtPct(x.shows,x.scheduledDateOf):'–'}</td><td>${x?fmtNum(x.i9):'–'}</td><td>${x?fmtNum(x.placed):'–'}</td></tr>`; }).join('');
     body.innerHTML=`<div class="ep-table-wrap"><table class="ep-table" id="entityHistoryTable"><thead><tr><th>Week</th>${single?'':'<th>Name</th>'}<th>Goal</th><th>Sched.</th><th>Interv.</th><th>Shows</th><th>Show %</th><th>Hires</th><th>Placed</th></tr></thead><tbody>${names.map(rowsFor).join('')}</tbody></table></div><div class="ep-foot"><span class="hint">Last ${weeks.length} weeks · click one to show it above.</span><button class="btn btn-secondary btn-sm" data-copy-table="entityHistoryTable">Copy table</button></div>`;
     body.querySelectorAll('[data-ep-week]').forEach(tr=>tr.onclick=()=>{ epState.week=tr.dataset.epWeek; renderEntityDrawer(); });
-    body.querySelector('[data-copy-table]').onclick=()=>{ const t=body.querySelector('table'); navigator.clipboard.writeText([...t.rows].map(r=>[...r.cells].map(c=>c.innerText.replace(/\s+/g,' ').trim()).join('\t')).join('\n')).then(()=>showToast('Copied — paste into Excel.')).catch(()=>showToast('Clipboard blocked by the browser.')); };
+
   } else if(epState.tab==='remarks'){
     const list = remarks.slice().sort((a,b)=> (a.week_end_date===epState.week?-1:0)-(b.week_end_date===epState.week?-1:0) || b.week_end_date.localeCompare(a.week_end_date) || String(b.created_at).localeCompare(String(a.created_at)));
     body.innerHTML = list.length ? `<div class="ep-remarks">${list.map(r=>`<div class="ep-remark ${r.week_end_date===epState.week?'cur':''}"><div class="ep-remark-meta"><strong>Wk ${weekOfDate(r.week_end_date).number}</strong> · ${fmtDate(r.remark_date)} · ${escapeHtml(r.author||'')} ${remarkStatusHtml(r)}</div><div class="ep-remark-text">${escapeHtml(r.remark)}</div></div>`).join('')}</div><div class="ep-foot"><span class="hint">${Remarks.canApprove()?'Approve or edit in the full view.':''}</span><button class="btn btn-secondary btn-sm" id="epAllRemarks">Open full view</button></div>`
       : `<p class="hint ep-empty">No remarks yet.</p>${Remarks.canAdd()?'<button class="btn btn-primary btn-sm" id="epAllRemarks">Add the first remark</button>':''}`;
     body.querySelector('#epAllRemarks')?.addEventListener('click', ()=>openRemarksModal(name, epState.week));
-  } else if(epState.tab==='candidates' && canSeeCandidates()){
-    const cats=[['schedulesList','Schedules'],['interviewsList','Interviews'],['showsList','Shows'],['noShowsList','No shows'],['i9List','Hires'],['placedList','Placed']];
-    if(!cats.some(c=>c[0]===epState.cat)) epState.cat='showsList';
-    const lists = Object.fromEntries(cats.map(([k])=>[k, epCandidates(week, mode, name, k)]));
-    const cur = lists[epState.cat]||[];
-    body.innerHTML = `<div class="ep-cats">${cats.map(([k,l])=>`<button type="button" data-ep-cat="${k}" aria-pressed="${k===epState.cat}">${l} <b>${fmtNum(lists[k].length)}</b></button>`).join('')}</div>
-      ${week && week.listsSplit && !week.listsLoaded ? '<p class="hint">Loading names…</p>' : (cur.length ? `<div class="ep-table-wrap"><table class="ep-table"><thead><tr><th>Candidate</th><th>Employee #</th><th>Date</th></tr></thead><tbody>${cur.map(c=>`<tr><td>${escapeHtml(c.name)}</td><td class="mono">${escapeHtml(c.eid)}</td><td>${c.date?fmtDate(c.date).replace(/, \d{4}$/,''):''}</td></tr>`).join('')}</tbody></table></div><div class="ep-foot"><span class="hint">${fmtNum(cur.length)} in this list</span><button class="btn btn-secondary btn-sm" id="epCopyCands">Copy list</button></div>` : '<p class="hint ep-empty">Nobody in this list for the week.</p>')}`;
-    body.querySelectorAll('[data-ep-cat]').forEach(b=>b.onclick=()=>{ epState.cat=b.dataset.epCat; renderEntityDrawer(); });
-    body.querySelector('#epCopyCands')?.addEventListener('click', ()=>navigator.clipboard.writeText(['Candidate\tEmployee Number\tDate', ...cur.map(c=>c.name+'\t'+c.eid+'\t'+(c.date||''))].join('\n')).then(()=>showToast('Copied '+cur.length+' rows.')).catch(()=>showToast('Clipboard blocked by the browser.')));
-    if(week && week.listsSplit && !week.listsLoaded) candFromWeekLists(week.weekEndDate).then(()=>{ if(epState.tab==='candidates') renderEntityDrawer(); }).catch(()=>{});
+
   }
   pop.scrollTop=keepScroll.pop; const nb=pop.querySelector('#epBody'); if(nb) nb.scrollTop=keepScroll.body; const tw=pop.querySelector('.ep-table-wrap'); if(tw && epState.tab==='weeks') tw.scrollTop=keepScroll.tbl;
 }
@@ -5376,12 +5383,12 @@ window.addEventListener('resize',()=>positionEntityPopover());
 /* ============================= FULL HISTORY PAGE ============================= */
 // Clicking a recruiter / branch NAME opens its whole history as a page of its own; Back returns
 // to where you came from (the browser Back button works too).
-const historyState = {mode:null, name:null, from:'recruiters', range:'all', pushed:false};
+const historyState = {candidateWeek:null, cat:'showsList', mode:null, name:null, from:'recruiters', range:'all', pushed:false};
 function openHistoryPage(mode, name){
   if(!Server.can(mode)) return;
   closeEntityPopover();
   if(currentView!=='history') historyState.from = currentView==='settings' ? 'performance' : currentView;
-  Object.assign(historyState, {mode, name, range: historyState.range||'all'});
+  Object.assign(historyState, {mode, name, candidateWeek:epState.week||defaultWeekEnd(), range: historyState.range||'all'});
   currentView = 'history';
   try{ history.pushState({ipdView:'history', mode, name}, '', '#history'); historyState.pushed=true; }catch(e){ historyState.pushed=false; }
   refreshUI(); window.scrollTo(0,0);
@@ -5403,10 +5410,32 @@ function historyRows(mode, name){
   const weeks=[...weeksData].sort((a,b)=>a.weekEndDate.localeCompare(b.weekEndDate));
   return weeks.map(w=>({w, x:epEntity(w, mode, name)})).filter(r=>r.x && (r.x.schedules||r.x.scheduledDateOf||r.x.shows||r.x.noShows||r.x.i9||r.x.placed));
 }
+async function renderHistoryCandidates(){
+  const host=document.getElementById('historyCandidates');
+  if(!host || !canSeeCandidates() || historyState.mode!=='recruiters') return;
+  const name=historyState.name, dates=[...weeksData].map(w=>w.weekEndDate).sort().reverse();
+  if(!dates.includes(historyState.candidateWeek)) historyState.candidateWeek=dates[0];
+  const date=historyState.candidateWeek, week=weeksData.find(w=>w.weekEndDate===date);
+  const cats=[['schedulesList','Schedules'],['interviewsList','Interviews'],['showsList','Shows'],['noShowsList','No shows'],['i9List','Hires'],['placedList','Placed']];
+  const stored=KV.get('weekly:'+date)||week;
+  const loading=stored && stored.listsSplit && !stored.listsLoaded;
+  const lists=Object.fromEntries(cats.map(([k])=>[k,epCandidates(week,'recruiters',name,k)]));
+  const cur=lists[historyState.cat]||[];
+  host.innerHTML=`<div class="hp-panel-head"><h3>Candidates</h3><label>Week <select id="historyCandidateWeek">${dates.map(d=>`<option value="${d}" ${d===date?'selected':''}>Wk ${weekOfDate(d).number} · ${fmtDate(d)}</option>`).join('')}</select></label></div>
+    <div class="ep-cats">${cats.map(([k,l])=>`<button type="button" data-history-cat="${k}" aria-pressed="${k===historyState.cat}">${l} <b>${loading?'…':fmtNum(lists[k].length)}</b></button>`).join('')}</div>
+    ${loading?'<p class="hint">Loading names…</p>':cur.length?`<div class="hp-table-wrap"><table class="ep-table" id="historyCandidatesTable"><thead><tr><th>Candidate</th><th>Employee #</th><th>Date</th></tr></thead><tbody>${cur.map(c=>`<tr><td>${escapeHtml(c.name)}</td><td>${escapeHtml(c.eid)}</td><td>${escapeHtml(c.date||'')}</td></tr>`).join('')}</tbody></table></div><div class="ep-foot"><span class="hint">${cur.length} in this list</span>${copyBtnHtml('historyCandidatesTable')}</div>`:'<p class="hint">Nobody in this list for the week.</p>'}`;
+  host.querySelector('#historyCandidateWeek').onchange=e=>{historyState.candidateWeek=e.target.value;renderHistoryCandidates();};
+  host.querySelectorAll('[data-history-cat]').forEach(b=>b.onclick=()=>{historyState.cat=b.dataset.historyCat;renderHistoryCandidates();});
+  if(loading){
+    try { const got=await Server.rpc('dash_kv_get',{p_keys:['weekly:'+date+LISTS_SUFFIX]}); if(!got.length) throw new Error('Missing candidate lists'); for(const r of got) mergeWeeklyLists(stored,await decodeKvValue(r.key,r.value)); if(host.isConnected && historyState.name===name && historyState.candidateWeek===date) renderHistoryCandidates(); }
+    catch(e){ if(host.isConnected && historyState.name===name && historyState.candidateWeek===date) host.querySelector('.hint').textContent='Could not load names. Select the week again to retry.'; }
+  }
+}
+
 function renderHistoryView(){
   const el=document.getElementById('view-history'); if(!el) return;
   const {mode, name}=historyState;
-  ['historyTrend','historyGoal'].forEach(destroyChart);
+  ['historyTrend','historyTrendBar','historyGoal'].forEach(destroyChart);
   const all=historyRows(mode, name);
   const ranges={all:'All weeks', 52:'Last 52 weeks', 26:'Last 26 weeks', 13:'Last 13 weeks', 6:'Last 6 weeks'};
   const rows = historyState.range==='all' ? all : all.slice(-Number(historyState.range));
@@ -5428,7 +5457,7 @@ function renderHistoryView(){
       <div class="hp-table-wrap"><table class="ep-table"><thead><tr><th>Recruiter</th><th>Weeks</th><th>Schedules</th><th>Interviews</th><th>Shows</th><th>Show %</th><th>Hires</th><th>Placed</th></tr></thead><tbody>${list.map(([n,t])=>`<tr><td>${Server.can('recruiters')?`<button type="button" class="entity-link" data-history-open="recruiters" data-name="${escapeHtml(n)}">${escapeHtml(n)}</button>`:escapeHtml(n)}</td><td>${t.weeks}</td><td>${fmtNum(t.schedules)}</td><td>${fmtNum(t.scheduledDateOf)}</td><td>${fmtNum(t.shows)}</td><td>${fmtPct(t.shows,t.scheduledDateOf)}</td><td>${fmtNum(t.i9)}</td><td>${fmtNum(t.placed)}</td></tr>`).join('')}</tbody></table></div></section>`;
   }
   const weekRows = rows.slice().reverse().map(({w,x})=>{ const gp=x.goal?Math.round(x.schedules/x.goal*100):null; const pend=weekIsFullyPending(w.weekEndDate);
-    return `<tr><td>Wk ${w.weekNumber}<small>${fmtDate(weekOfDate(w.weekEndDate).weekStart).replace(/, \d{4}$/,'')} – ${fmtDate(w.weekEndDate)}</small></td>${mode==='recruiters'?`<td>${escapeHtml(x.branch||'–')}</td>`:''}<td>${fmtNum(x.goal)}</td><td>${fmtNum(x.schedules)}${gp!=null?` <span class="ep-pct ${gp<50?'bad':gp<80?'warn':'good'}">${gp}%</span>`:''}</td><td>${fmtNum(x.scheduledDateOf)}</td><td>${fmtNum(x.shows)}</td><td>${fmtNum(x.noShows)}</td><td>${pend?'pending':fmtPct(x.shows,x.scheduledDateOf)}</td><td>${fmtNum(x.i9)}</td><td>${fmtNum(x.placed)}</td>${mode==='recruiters'?`<td class="hp-rem">${(()=>{ const rs=remarks.filter(r=>r.week_end_date===w.weekEndDate); return rs.length?escapeHtml(rs[0].remark).slice(0,80)+(rs.length>1?` <b>+${rs.length-1}</b>`:''):''; })()}</td>`:''}</tr>`; }).join('');
+    return `<tr><td>Wk ${w.weekNumber}<small>${fmtDate(weekOfDate(w.weekEndDate).weekStart).replace(/, \d{4}$/,'')} – ${fmtDate(w.weekEndDate)}</small></td>${mode==='recruiters'?`<td>${escapeHtml(x.branch||'–')}</td>`:''}<td>${fmtNum(x.goal)}</td><td>${fmtNum(x.schedules)}${gp!=null?` <span class="ep-pct ${gp<50?'bad':gp<80?'warn':'good'}">${gp}%</span>`:''}</td><td>${fmtNum(x.scheduledDateOf)}</td><td>${fmtNum(x.shows)}</td><td>${fmtNum(x.noShows)}</td><td>${pend?'pending':fmtPct(x.shows,x.scheduledDateOf)}</td><td>${fmtNum(x.i9)}</td><td>${fmtNum(x.placed)}</td>${mode==='recruiters'?`<td class="hp-rem" data-copy-value="${escapeHtml(remarks.filter(r=>r.week_end_date===w.weekEndDate).map(r=>r.remark).join(" | "))}">${(()=>{ const rs=remarks.filter(r=>r.week_end_date===w.weekEndDate); return rs.length?escapeHtml(rs[0].remark).slice(0,80)+(rs.length>1?` <b>+${rs.length-1}</b>`:''):''; })()}</td>`:''}</tr>`; }).join('');
   el.innerHTML = `<div class="hp-top">
       <button type="button" class="btn btn-secondary hp-back" id="historyBack"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg> Back to ${escapeHtml((VIEW_META[historyState.from]||VIEW_META.performance).title)}</button>
       <div class="hp-id"><div class="ep-eyebrow">${mode==='recruiters'?'Recruiter':'Branch'} · ${escapeHtml(div)}${branchesSeen.length?' · '+escapeHtml(last.x.branch||branchesSeen[branchesSeen.length-1])+(branchesSeen.length>1?` <span class="hp-more" title="${escapeHtml(branchesSeen.join(', '))}">+${branchesSeen.length-1} earlier branch${branchesSeen.length>2?'es':''}</span>`:''):''}</div><h2>${escapeHtml(name)}</h2><p class="hint">${all.length?`Active in ${all.length} week${all.length===1?'':'s'} · first Wk ${all[0].w.weekNumber} (${fmtDate(all[0].w.weekEndDate)}) · latest Wk ${last.w.weekNumber} (${fmtDate(last.w.weekEndDate)})`:'No activity recorded.'}</p></div>
@@ -5445,9 +5474,10 @@ function renderHistoryView(){
       ${tile('Goal hit', `${hit}<small>/${rows.length}</small>`, `${low} week${low===1?'':'s'} below 50%${best?` · best Wk ${best.w.weekNumber}`:''}`)}
     </div>
     <div class="hp-charts">
-      <section class="panel hp-panel" data-section="hist.trend"><div class="hp-panel-head"><h3>Week by week</h3></div><div class="hp-chart"><canvas id="historyTrend"></canvas></div></section>
+      <section class="panel hp-panel" data-section="hist.trend"><div class="hp-panel-head"><h3>Weekly line trend</h3></div><div class="hp-chart"><canvas id="historyTrend"></canvas></div></section>
       <section class="panel hp-panel" data-section="hist.goal"><div class="hp-panel-head"><h3>Schedules vs goal</h3><span class="hint">red under 50%, amber under 80%</span></div><div class="hp-chart"><canvas id="historyGoal"></canvas></div></section>
     </div>
+    <section class="panel hp-panel" data-section="hist.trend"><div class="hp-panel-head"><h3>Weekly bar trend</h3></div><div class="hp-chart"><canvas id="historyTrendBar"></canvas></div></section>
     ${team}
     <section class="panel hp-panel" data-section="hist.weeks"><div class="hp-panel-head"><h3>Every week</h3><span class="hint">${rows.length} week${rows.length===1?'':'s'}</span><button class="btn btn-secondary btn-sm" id="historyCopy" style="margin-left:auto">Copy table</button></div>
       <div class="hp-table-wrap"><table class="ep-table" id="historyTable"><thead><tr><th>Week</th>${mode==='recruiters'?'<th>Branch</th>':''}<th>Goal</th><th>Schedules</th><th>Interviews</th><th>Shows</th><th>No shows</th><th>Show %</th><th>Hires</th><th>Placed</th>${mode==='recruiters'?'<th>Remark</th>':''}</tr></thead><tbody>${weekRows}</tbody>
@@ -5455,15 +5485,17 @@ function renderHistoryView(){
     ${mode==='recruiters' ? `<section class="panel hp-panel" data-section="hist.remarks"><div class="hp-panel-head"><h3>Remarks</h3><span class="hint">${remarks.length}</span>${Remarks.canAdd()||remarks.length?`<button class="btn btn-secondary btn-sm" id="historyRemarks" style="margin-left:auto">${Remarks.canAdd()?'Add or review remarks':'Open remarks'}</button>`:''}</div>
       ${remarks.length?`<div class="ep-remarks">${remarks.map(r=>`<div class="ep-remark"><div class="ep-remark-meta"><strong>Wk ${weekOfDate(r.week_end_date).number}</strong> · ${fmtDate(r.remark_date)} · ${escapeHtml(r.author||'')} ${remarkStatusHtml(r)}</div><div class="ep-remark-text">${escapeHtml(r.remark)}</div></div>`).join('')}</div>`:'<p class="hint">No remarks yet.</p>'}</section>` : ''}`
     : `<div class="panel"><p class="hint">No activity for ${escapeHtml(name)} in ${ranges[historyState.range].toLowerCase()}.</p></div>`}`;
+  if(mode==='recruiters' && canSeeCandidates()){ el.insertAdjacentHTML('beforeend', '<section class="panel hp-panel" data-section="hist.candidates" id="historyCandidates"></section>'); renderHistoryCandidates(); }
   el.querySelector('#historyBack').onclick=()=>leaveHistoryPage(false);
   el.querySelector('#historyRange').onchange=e=>{ historyState.range=e.target.value; renderHistoryView(); };
   el.querySelector('#historyRemarks')?.addEventListener('click', ()=>openRemarksModal(name, last?last.w.weekEndDate:defaultWeekEnd()));
   el.querySelectorAll('[data-history-open]').forEach(b=>b.onclick=()=>{ historyState.from='branches'; Object.assign(historyState,{mode:b.dataset.historyOpen, name:b.dataset.name}); try{ history.pushState({ipdView:'history', mode:historyState.mode, name:historyState.name}, '', '#history'); }catch(e){} renderHistoryView(); window.scrollTo(0,0); });
-  el.querySelector('#historyCopy')?.addEventListener('click', ()=>{ const t=el.querySelector('#historyTable'); navigator.clipboard.writeText([...t.rows].map(r=>[...r.cells].map(c=>c.innerText.replace(/\s+/g,' ').trim()).join('\t')).join('\n')).then(()=>showToast('Copied — paste into Excel.')).catch(()=>showToast('Clipboard blocked by the browser.')); });
+  el.querySelector('#historyCopy')?.addEventListener('click', ()=>copyTableToClipboard(el.querySelector('#historyTable')));
   if(!rows.length) return;
-  const labels=rows.map(r=>'Wk '+r.w.weekNumber+(rows.length>20?'':' · '+fmtDate(r.w.weekEndDate).replace(/, \d{4}$/,'')));
+  const labels=rows.map(r=>'Wk '+weekOfDate(r.w.weekEndDate).number+' · '+fmtDate(r.w.weekEndDate));
   const ds=(l,k,c,extra)=>({label:l, data:rows.map(r=>r.x[k]||0), borderColor:c, backgroundColor:c, tension:.25, pointRadius:rows.length>30?0:2.5, borderWidth:2, ...(extra||{})});
   charts.historyTrend=safeChart(document.getElementById('historyTrend'),{type:'line',data:{labels,datasets:[ds('Schedules','schedules','#2f8f8a'),ds('Interviews','scheduledDateOf','#4a78c8'),ds('Shows','shows','#1f9a6c'),ds('No shows','noShows','#c4565f',{hidden:true}),ds('Hires','i9','#7a5fb8'),ds('Placed','placed','#d08a2c',{hidden:true})]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{noValueLabels:true,legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{y:{beginAtZero:true},x:{ticks:{autoSkip:true,maxRotation:0,font:{size:10}}}}}});
+  charts.historyTrendBar=safeChart(document.getElementById('historyTrendBar'),{type:'bar',data:{labels,datasets:[ds('Schedules','schedules','#2f8f8a'),ds('Interviews','scheduledDateOf','#4a78c8'),ds('Shows','shows','#1f9a6c'),ds('No shows','noShows','#c4565f',{hidden:true}),ds('Hires','i9','#7a5fb8'),ds('Placed','placed','#d08a2c',{hidden:true})]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{noValueLabels:true,legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{y:{beginAtZero:true},x:{ticks:{autoSkip:true,maxRotation:0,font:{size:10}}}}}});
   const pct=rows.map(r=>r.x.goal?Math.round(r.x.schedules/r.x.goal*100):0);
   charts.historyGoal=safeChart(document.getElementById('historyGoal'),{type:'bar',data:{labels,datasets:[{label:'% of goal',data:pct,backgroundColor:pct.map(p=>p<50?'#d64545':p<80?'#e0a020':'#1f9a6c'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{noValueLabels:rows.length>16,legend:{display:false},tooltip:{callbacks:{label:c=>{ const r=rows[c.dataIndex]; return `${c.raw}% · ${fmtNum(r.x.schedules)} of ${fmtNum(r.x.goal)}`; }}}},scales:{y:{beginAtZero:true,ticks:{callback:v=>v+'%'}},x:{ticks:{autoSkip:true,maxRotation:0,font:{size:10}}}}}});
 }
@@ -5620,7 +5652,7 @@ function renderPeopleTable(mode, allRows, displayRows){
       <td>${r.goalPct!==null && r.goalPct!==undefined ? goalPill(r.goalPct) : '\u2013'}</td>
       <td>${ratePill(r.rate)}</td>
       <td>${noShowRatePill(r.noShowRate)}</td>
-      <td class="remark-td">${remarksCellHtml(r.name, peopleRemarksWeek)}</td>
+      <td class="remark-td" data-copy-value="${escapeHtml(Remarks.forWeek(r.name, peopleRemarksWeek).map(x=>x.remark).join(" | "))}">${remarksCellHtml(r.name, peopleRemarksWeek)}</td>
     </tr>` : `<tr data-pie-name="${escapeHtml(r.name)}" style="cursor:pointer;${isSelectedPie?'background:var(--indigo-light);':''}">
       <td style="${isSelectedPie?'background:var(--indigo-light);':'background:var(--surface);'}"><span class="recruiter-name">${i<3?'<span class="rank">#'+(i+1)+'</span>':''}<button type="button" class="entity-link" data-history-name="${escapeHtml(r.name)}" title="Open full history">${escapeHtml(r.name)}</button></span>${isSelectedPie?' <span class="pill good">Selected</span>':''}</td>
       <td style="${isSelectedPie?'background:var(--indigo-light);':'background:var(--surface);'}">${escapeHtml(r.division||'\u2013')}</td>
@@ -6331,7 +6363,7 @@ const MODULES = [
   {key:'performance', label:'Performance Summary', hint:'Weekly, monthly and quarterly overview'},
   {key:'recruiters',  label:'Recruiter Performance', hint:'Recruiter table, trends, reading remarks'},
   {key:'branches',    label:'Branch Performance', hint:'Branch table and trends'},
-  {key:'candidates',  label:'Candidates — see names', hint:'Candidate names & Employee Numbers anywhere: the Candidates page, hover lists in tables and the recruiter card'},
+  {key:'candidates',  label:'Candidates — see names', hint:'Candidate names & Employee Numbers anywhere: the Candidates page, hover lists in tables and the recruiter detail page'},
   {key:'alerts',      label:'Alerts', hint:'Recruiters below 50% of their goal, other signals and remarks'},
   {key:'pivot',       label:'Pivot & Charts', hint:'Build their own pivot tables and charts, and save views'},
   {key:'master',      label:'Master Data — view', hint:'Browse and filter every candidate row'},
@@ -6654,7 +6686,7 @@ function renderUploadAlerts(){
 const PAGE_SECTIONS = {
   performance:[['perf.kpis','KPI cards (all)'],['perf.kpi.schedules','· Schedules card'],['perf.kpi.interviews','· Interviews card'],['perf.kpi.shows','· Shows card'],['perf.kpi.no_shows','· No Shows card'],['perf.kpi.hires','· Hires card'],['perf.kpi.placed','· Placed card'],['perf.kpi.hires_per_recruiter','· Hires per Recruiter card'],['perf.kpi.goal_reach','· Goal Reach card'],['perf.kpi.show_rate','· Show Rate card'],['perf.kpi.no_show_rate','· No Show Rate card'],
                 ['perf.trends','Trends charts'],['perf.leaderboards','Leaderboards (recruiter & branch snapshots)'],['perf.divisions','Division breakdown'],['perf.history','Previous 6 weeks table'],['perf.insights','Insights'],['perf.composition','Composition pies (monthly / quarterly)']],
-  recruiters:[['rec.table','Recruiter table'],['hist.kpis','History page — summary tiles (recruiter & branch)'],['hist.trend','History page — week-by-week chart'],['hist.goal','History page — schedules vs goal chart'],['hist.weeks','History page — every-week table'],['hist.remarks','History page — remarks']],
+  recruiters:[['rec.table','Recruiter table'],['hist.kpis','History page — summary tiles (recruiter & branch)'],['hist.trend','History page — week-by-week chart'],['hist.goal','History page — schedules vs goal chart'],['hist.weeks','History page — every-week table'],['hist.remarks','History page — remarks'],['hist.candidates','History page — candidates']],
   branches:[['br.table','Branch table'],['hist.team','History page — recruiters in the branch']],
   candidates:[['cand.list','Category boxes and candidate list'],['cand.explain','“How are these counted?” breakdown']],
   pivot:[['pivot.chart','Chart'],['pivot.table','Pivot table']],
@@ -6678,6 +6710,7 @@ function applyPermissions(){
     document.querySelectorAll('#navList button').forEach(b=>b.classList.toggle('active', b.dataset.view===currentView));
   }
   document.body.classList.toggle('no-export', !Server.can('export'));
+  document.body.classList.toggle('no-copy-tables', !canCopyTables());
   document.body.classList.toggle('no-upload', !Server.can('upload'));
   document.body.classList.toggle('no-settings', !Server.can('settings'));
   document.body.classList.toggle('no-views', !allowedViews.length);
@@ -8131,6 +8164,7 @@ function drawUserForm(){
       <label class="role-opt"><input type="radio" name="ufRole" value="user" ${u.role!=='admin'?'checked':''}><span><strong>User</strong><em>Only the modules and sections you tick below</em></span></label>
       <label class="role-opt"><input type="radio" name="ufRole" value="admin" ${u.role==='admin'?'checked':''}><span><strong>Admin</strong><em>Every module, approves remarks, manages users (can’t change passwords, admins or the super admin)</em></span></label></div>` : ''}
     ${sa?'<p class="hint">The super admin always has every right.</p>':`<p class="hint admin-note" ${u.role==='admin'?'':'hidden'}>Admins see every module and section — the ticks below only apply if you change them back to User.</p><fieldset class="mod-grid"><legend>Modules this person can open</legend>${MODULES.map(m=>`<label class="mod-opt"><input type="checkbox" value="${m.key}" ${u.modules.includes(m.key)?'checked':''}><span><strong>${escapeHtml(m.label)}</strong><em>${escapeHtml(m.hint)}</em></span></label>`).join('')}</fieldset>
+    <label class="mod-opt"><input type="checkbox" data-sec="copy.tables" ${(u.hidden_sections||[]).includes("copy.tables")?"":"checked"}><span><strong>Copy tables</strong><em>Allow copying tables and candidate lists to the clipboard</em></span></label>
     <fieldset class="sec-grid"><legend>What this person sees on each page <span class="hint">(untick to hide a card or section)</span></legend>${Object.entries(PAGE_SECTIONS).map(([mod,secs])=>`<details class="sec-page" data-sec-mod="${mod}" ${u.modules.includes(mod)?'':'hidden'}><summary>${escapeHtml((MODULES.find(m=>m.key===mod)||{label:mod}).label)} <span class="sec-count"></span></summary><div class="sec-list">${secs.map(([k,l])=>`<label class="sec-opt${l.startsWith('·')?' sub':''}"><input type="checkbox" data-sec="${k}" ${(u.hidden_sections||[]).includes(k)?'':'checked'}> ${escapeHtml(l.replace(/^· /,''))}</label>`).join('')}</div></details>`).join('')}</fieldset>
     <label class="mod-opt" style="margin-top:6px;"><input type="checkbox" id="ufActive" ${u.active?'checked':''}><span><strong>Account active</strong><em>Untick to block sign-in without deleting the account</em></span></label>`}
     <p class="auth-msg" id="ufMsg" role="alert"></p>
