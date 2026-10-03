@@ -719,6 +719,60 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
 }
 @media (min-width:761px) and (max-width:1180px){ :root{--side-w:216px} }
 @media print{.sidebar{display:none!important}}
+/* ---------- v4.20: recruiter / branch side panel ---------- */
+#entityDrawerBack{position:fixed;inset:0;background:#0f2a3433;z-index:310;opacity:0;transition:opacity .18s;pointer-events:none}
+@media (max-width:899px){#entityDrawerBack{pointer-events:auto}}
+@media (min-width:900px){#entityDrawerBack{background:transparent}}
+#entityDrawerBack.in{opacity:1}
+#entityDrawer{position:fixed;top:0;right:0;bottom:0;width:min(600px,100vw);z-index:320;background:#f7fafb;box-shadow:-12px 0 40px #0f2a3426;display:flex;flex-direction:column;overflow:hidden;transform:translateX(24px);opacity:0;transition:transform .2s ease,opacity .2s ease}
+#entityDrawer.in{transform:none;opacity:1}
+.ep-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:18px 22px 12px;background:#fff;border-bottom:1px solid #e6eef1}
+.ep-eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#1f8a84}
+.ep-head h3{margin:4px 0 0;font-size:21px;line-height:1.25;color:#132f3b}
+.ep-close{border:0;background:#eef3f5;width:34px;height:34px;border-radius:9px;font-size:22px;line-height:1;cursor:pointer;color:#4a6370;flex:0 0 34px}
+.ep-close:hover{background:#e1eaed}
+.ep-weekbar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 22px;background:#fff;border-bottom:1px solid #e6eef1;font-size:12px;font-weight:700;color:#4a6370}
+.ep-weekbar select{margin-left:8px;padding:6px 8px;border:1px solid #cfdde2;border-radius:8px;font:inherit;font-weight:600;font-size:12.5px;background:#fff}
+.ep-goal{margin:14px 22px 0;padding:12px 14px;background:#fff;border:1px solid #e1eaed;border-radius:12px}
+.ep-goal-top{display:flex;align-items:baseline;gap:10px}
+.ep-goal-top span{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#6b818c}
+.ep-goal-top strong{font-size:22px;color:#132f3b;margin-left:auto}.ep-goal-top small{font-size:13px;color:#6b818c;font-weight:600}
+.ep-goal-top em{font-style:normal;font-weight:800;font-size:15px;padding:2px 8px;border-radius:8px}
+.ep-goal-top em.bad{background:#fde3e3;color:#a12d36}.ep-goal-top em.warn{background:#fff1d6;color:#8a5a00}.ep-goal-top em.good{background:#e3f4ee;color:#17684a}
+.ep-bar{position:relative;height:7px;border-radius:7px;background:#edf2f4;margin-top:8px}
+.ep-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:7px}.ep-bar i.bad{background:#d64545}.ep-bar i.warn{background:#e0a020}.ep-bar i.good{background:#1f9a6c}
+.ep-bar b{position:absolute;top:-3px;bottom:-3px;width:2px;margin-left:-1px;background:#304a55}
+.ep-tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:10px 22px 0}
+.ep-tile{background:#fff;border:1px solid #e1eaed;border-radius:10px;padding:8px 10px;min-width:0}
+.ep-tile span{display:block;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#6b818c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ep-tile strong{display:block;font-size:18px;color:#132f3b;margin-top:2px}
+.ep-tile em{display:block;font-style:normal;font-size:10.5px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ep-tile em b{font-weight:700}.ep-tile em b.up{color:#17845c}.ep-tile em b.down{color:#c0444e}
+.ep-tabs{display:flex;gap:4px;padding:14px 22px 0;border-bottom:1px solid #e1eaed}
+.ep-tabs button{border:0;background:none;padding:8px 12px;font:inherit;font-size:13px;font-weight:600;color:#6b818c;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.ep-tabs button[aria-selected="true"]{color:#135c5f;border-bottom-color:#1f8a84}
+.ep-body{flex:1;overflow:auto;padding:14px 22px 22px}
+.ep-chart{position:relative;height:220px;background:#fff;border:1px solid #e1eaed;border-radius:12px;padding:10px}
+.ep-table-wrap{background:#fff;border:1px solid #e1eaed;border-radius:12px;overflow:auto;max-height:calc(100vh - 400px)}
+.ep-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.ep-table th{position:sticky;top:0;background:#f3f7f8;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#6b818c;padding:8px 10px;text-align:left;white-space:nowrap}
+.ep-table td{padding:8px 10px;border-top:1px solid #edf2f4;white-space:nowrap}
+.ep-table td small{display:block;font-size:10.5px;color:#8a9ca5}
+.ep-table tr[data-ep-week]{cursor:pointer}.ep-table tr[data-ep-week]:hover td{background:#f5f9fa}.ep-table tr.on td{background:#e6f2f1}
+.ep-pct{font-size:10.5px;font-weight:700;padding:1px 5px;border-radius:6px}.ep-pct.bad{background:#fde3e3;color:#a12d36}.ep-pct.warn{background:#fff1d6;color:#8a5a00}.ep-pct.good{background:#e3f4ee;color:#17684a}
+.ep-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px}
+.ep-remarks{display:flex;flex-direction:column;gap:8px}
+.ep-remark{background:#fff;border:1px solid #e1eaed;border-radius:10px;padding:10px 12px}
+.ep-remark.cur{border-color:#9fd0cb;background:#f2fbfa}
+.ep-remark-meta{font-size:11.5px;color:var(--text-secondary);display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.ep-remark-text{font-size:13px;line-height:1.5;margin-top:4px;white-space:pre-wrap}
+.ep-cats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.ep-cats button{border:1px solid #d7e3e7;background:#fff;border-radius:16px;padding:5px 10px;font:inherit;font-size:12px;cursor:pointer;color:#304a55}
+.ep-cats button b{margin-left:4px}.ep-cats button[aria-pressed="true"]{background:#1f8a84;border-color:#1f8a84;color:#fff}
+.ep-empty{margin:16px 22px!important}
+#entityDrawer .hint{font-size:12px!important;color:var(--text-secondary)}.ep-body .ep-empty{margin:4px 0 10px!important}
+@media (max-width:640px){.ep-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}.ep-head,.ep-weekbar,.ep-tabs,.ep-body{padding-left:14px;padding-right:14px}.ep-goal,.ep-tiles{margin-left:14px;margin-right:14px}}
+
 /* ---------- v4.19: pivot, alert groups, roles ---------- */
 .pv-grid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:10px 12px}
 .pv-grid .cand-field{min-width:0}.pv-saved .hint{font-size:12px!important}
@@ -957,7 +1011,7 @@ button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #183442
       <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V12M10 20V5M16 20V9M22 20V3"/></svg></div>
       <div class="brand-text">
         <h1 id="dashboardTitle" title="Click to go home">Performance Dashboard</h1>
-        <p><span id="versionLabelInline">Version 4.19.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
+        <p><span id="versionLabelInline">Version 4.20.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
       </div>
     </div>
     <button type="button" class="side-collapse" id="sideCollapseBtn" aria-label="Collapse menu" title="Collapse menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
@@ -1060,7 +1114,7 @@ button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #183442
       </div>
       <div class="muted-note" id="storageModeNote" style="text-align:center;margin-top:24px;">Data stored locally in this browser.</div>
       <div class="muted-note" style="text-align:center;margin-top:4px;opacity:.65;">
-        <span id="footerVersionLabel">Version 4.19.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
+        <span id="footerVersionLabel">Version 4.20.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
       </div>
     </div>
   </main>
@@ -1649,7 +1703,10 @@ document.addEventListener('mouseout', (e)=>{
   const leavingCand = e.target.closest('[data-hover-candidates]');
   if(leavingCand){ scheduleHideRecruiterTooltip(); }
 });
+// Candidate names / Employee Numbers are only shown to people with the Candidates right.
+function canSeeCandidates(){ return Server.can('candidates'); }
 function candidateCellHtml(value, list, metricKey, entityName){
+  if(!canSeeCandidates()) return fmtNum(value);
   const listJson = escapeHtml(JSON.stringify((list||[]).slice(0,500)));
   return `<span data-hover-candidates="${metricKey}" data-hover-candidates-name="${escapeHtml(entityName)}" data-hover-candidates-list="${listJson}" style="cursor:pointer;border-bottom:1px dotted var(--text-tertiary);">${fmtNum(value)}</span>`;
 }
@@ -5046,6 +5103,7 @@ function closeEntityPopover(restoreFocus=false){
   entityPopoverRevision++;
   destroyChart('entityTrend');
   document.getElementById('entityPopover')?.remove();
+  document.getElementById('entityDrawer')?.remove(); document.getElementById('entityDrawerBack')?.remove();
   if(restoreFocus && entityPopoverAnchor?.isConnected) entityPopoverAnchor.focus({preventScroll:true});
   entityPopoverAnchor=null;
 }
@@ -5134,62 +5192,103 @@ async function showPopupWeek(pop,mode,names,date){
   charts.entityTrend=safeChart(document.getElementById('entityTrend'),{type:'bar',data:{labels:names,datasets:[['Schedules','schedules','#467bd1'],['Interviews','scheduledDateOf','#8a68b2'],['Shows','shows','#218778']].map(([label,key,color])=>({label,data:totals.map(t=>week?t.totals[key]:null),backgroundColor:color,borderRadius:4}))},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true,title:{display:true,text:'Count'}},x:{grid:{display:false}}}}});
   pop.querySelectorAll('#entityHistoryTable tbody tr').forEach(row=>row.classList.toggle('history-active',row.dataset.week===date));
 }
+// Recruiter / branch card: a side panel with the week's numbers on top and tabs below
+// (Trend · Weeks · Remarks · Candidates) so nothing is stacked or squeezed.
+const epState = {mode:null, names:[], week:null, tab:'trend', cat:'showsList'};
+function epWeeks(anchor){ const all=[...weeksData].sort((a,b)=>a.weekEndDate.localeCompare(b.weekEndDate)); const i=all.findIndex(w=>w.weekEndDate===anchor); return all.slice(Math.max(0,(i<0?all.length:i+1)-8), i<0?all.length:i+1); }
+function epEntity(week, mode, name){
+  if(!week) return null;
+  const goals = KV.get('goals:'+week.weekEndDate) || {}; const g = n=>{ const v=goals[n]; return (v!==undefined && v!==null && v!=='') ? Number(v) : DEFAULT_WEEKLY_GOAL; };
+  if(mode==='recruiters'){ const r=(week.byRecruiter||{})[name]; return r ? {...emptyTotals(), ...r, goal:g(name), branch:r.branch} : null; }
+  const t = emptyTotals(); let goal=0, any=false;
+  Object.entries(week.byRecruiter||{}).forEach(([n,r])=>{ if(r.branch===name){ any=true; goal+=g(n); for(const k of Object.keys(t)) t[k]+=r[k]||0; } });
+  const b = (week.byBranch||{})[name]; return any||b ? {...t, ...(b||{}), goal} : null;
+}
+function epCandidates(week, mode, name, list){
+  if(!week) return [];
+  if(mode==='recruiters'){ const r=(week.byRecruiter||{})[name]; return (r && r[list]) || []; }
+  return branchCandidateList(week, name, list);
+}
 async function openEntityPopover(mode,name,row){
   closeEntityPopover();
-  const oldTooltip=document.getElementById('recruiterHoverTooltip');
-  if(oldTooltip) oldTooltip.style.display='none';
   entityPopoverAnchor=row;
-  const revision=entityPopoverRevision;
   const names=Array.isArray(name)?name:[name];
-  const entityWeeks=names.map(n=>entityTrendWeeks(mode,n));
-  const weeks=entityWeeks[0];
-  const total=sumTotals(entityWeeks.flat());
-  name=names.length===1?names[0]:names.length+' selected';
-  const pop=document.createElement('section');pop.id='entityPopover';pop.setAttribute('role','dialog');pop.setAttribute('aria-modal','false');pop.setAttribute('aria-labelledby','entityPopoverTitle');
-  pop.innerHTML=`<div class="entity-pop-head"><div><div class="entity-eyebrow">${mode==='recruiters'?'Recruiter':'Branch'} performance</div><h3 id="entityPopoverTitle">${escapeHtml(name)}</h3></div><button type="button" class="modal-close" aria-label="Close performance detail">&times;</button></div><div class="entity-context">${escapeHtml(periodPickerButtonLabel())} · ${escapeHtml(universalDivision||'All divisions')}</div><div class="entity-metrics">${[['Goals','…'],['Schedules',total.schedules],['Interviews',total.scheduledDateOf],['Shows',total.shows]].map(([label,value])=>'<div><span>'+label+'</span><strong>'+(typeof value==='string'?value:fmtNum(value))+'</strong></div>').join('')}</div><div class="entity-context">${names.length>1?'Activity comparison · '+escapeHtml(names.join(', ')):(weeks.length===1?'Daily activity':'Weekly activity')}</div><div class="chart-wrap" style="height:220px"><canvas id="entityTrend"></canvas></div>`;
-  pop.insertAdjacentHTML('beforeend','<div class="entity-history"><div class="entity-history-head"><h4>Last 6 weeks</h4><div><button class="btn btn-secondary btn-sm" data-copy-table="entityHistoryTable" disabled>Copy table</button> <button class="btn btn-secondary btn-sm" data-copy-popup disabled>Copy popup as image</button></div></div><p class="entity-context">Through the latest selected week, including that week. Missing weeks show —.</p><div style="overflow-x:auto"><table id="entityHistoryTable"><tbody><tr><td>Loading history…</td></tr></tbody></table></div></div>');
-  pop.querySelector('[data-copy-popup]').addEventListener('click',()=>copyEntityImage(pop));
-  document.body.appendChild(pop);
-  positionEntityPopover();
-  pop.querySelector('button').addEventListener('click',()=>closeEntityPopover(true));
-  positionEntityPopover();
-  pop.querySelector('button').focus({preventScroll:true});
-  const goals=await Promise.all(entityWeeks.flat().map(w=>computeGoalsForWeeks([w],null,w.weekEndDate).then(g=>g.total)));
-  if(revision!==entityPopoverRevision || !pop.isConnected) return;
-  pop.querySelector('.entity-metrics strong').textContent=fmtNum(goals.reduce((a,b)=>a+b,0));
-  if(names.length===1)drawAllCategoriesTrend(weeks,'entityTrend',null);
-  else {
-    const totals=entityWeeks.map(ws=>sumTotals(ws));
-    charts.entityTrend=safeChart(document.getElementById('entityTrend'),{
-      type:'bar',data:{labels:names,datasets:[['Schedules','schedules','#467bd1'],['Interviews','scheduledDateOf','#8a68b2'],['Shows','shows','#218778']].map(([label,key,color])=>({label,data:totals.map(t=>t[key]),backgroundColor:color,borderRadius:4}))},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true,title:{display:true,text:'Count'}},x:{grid:{display:false}}}}
-    });
-  }
-  const anchor=weeks.length?weeks[weeks.length-1].weekEndDate:weeksData[weeksData.length-1]?.weekEndDate;
-  if(!anchor)return;
-  const history=await entityHistoryRows(mode,names,anchor);
-  if(revision!==entityPopoverRevision || !pop.isConnected)return;
-  const headers=['Week ending',...(mode==='recruiters'&&names.length>1?['Recruiter']:[]),'Goals','Schedules','Interviews','Shows','No Shows','Show rate'];
-  pop.querySelector('#entityHistoryTable').innerHTML='<thead><tr>'+headers.map(h=>'<th>'+escapeHtml(h)+'</th>').join('')+'</tr></thead><tbody>'+history.map(row=>'<tr>'+row.map(v=>'<td>'+escapeHtml(v)+'</td>').join('')+'</tr>').join('')+'</tbody>';
-  const groupSize=mode==='branches'?1:names.length;
-  pop.querySelectorAll('#entityHistoryTable tbody tr').forEach((row,i)=>{
-    const date=new Date(anchor+'T00:00:00');date.setDate(date.getDate()-7*Math.floor(i/groupSize));row.dataset.week=toIsoDateOnly(date);row.tabIndex=0;
-    row.addEventListener('mouseenter',()=>showPopupWeek(pop,mode,names,row.dataset.week));
-    row.addEventListener('focus',()=>showPopupWeek(pop,mode,names,row.dataset.week));
-    row.addEventListener('click',()=>showPopupWeek(pop,mode,names,row.dataset.week));
-  });
-  await showPopupWeek(pop,mode,names,anchor);
-  pop.querySelectorAll('.entity-history button').forEach(b=>b.disabled=false);
-  if(mode==='recruiters' && names.length===1){
-    const recent = Remarks.forRecruiter(names[0]).slice(0,4);
-    pop.insertAdjacentHTML('beforeend', `<div class="entity-remarks"><div class="entity-history-head"><h4>Remarks</h4><button class="btn btn-secondary btn-sm" data-open-remarks>${Server.can('remarks')?'Add / view all':'View all'}</button></div>${recent.length?recent.map(r=>`<div class="remark-item"><div class="remark-meta"><strong>Wk ${isoWeekNumber(new Date(r.week_end_date+'T00:00:00'))}</strong> · ${fmtDate(r.remark_date)}${r.author?' · '+escapeHtml(r.author):''}</div><div class="remark-text">${escapeHtml(r.remark)}</div></div>`).join(''):'<p class="entity-context">No remarks yet.</p>'}</div>`);
-    pop.querySelector('[data-open-remarks]').addEventListener('click',()=>openRemarksModal(names[0], anchor));
-  }
-  positionEntityPopover();
-
+  const period=selectedPeriodWeeks();
+  const anchor=(period.length?period[period.length-1].weekEndDate:null) || defaultWeekEnd();
+  Object.assign(epState, {mode, names, week:anchor, tab: epState.tab==='candidates' && !canSeeCandidates() ? 'trend' : (epState.tab||'trend')});
+  const back=document.createElement('div'); back.id='entityDrawerBack'; back.onclick=()=>closeEntityPopover(true);
+  const pop=document.createElement('aside'); pop.id='entityDrawer'; pop.setAttribute('role','dialog'); pop.setAttribute('aria-modal','true'); pop.setAttribute('aria-labelledby','epTitle');
+  document.body.append(back, pop);
+  renderEntityDrawer();
+  requestAnimationFrame(()=>{ back.classList.add('in'); pop.classList.add('in'); });
+  pop.querySelector('.ep-close')?.focus({preventScroll:true});
 }
-document.addEventListener('click',e=>{if(document.getElementById('entityPopover') && !e.target.closest('#entityPopover, [data-pie-name]')) closeEntityPopover();});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeEntityPopover(true);});
+function renderEntityDrawer(){
+  const pop=document.getElementById('entityDrawer'); if(!pop) return;
+  const {mode, names}=epState, single=names.length===1, name=names[0];
+  const weeks=epWeeks(epState.week); const week=weeksData.find(w=>w.weekEndDate===epState.week);
+  const prevWeek=weeks.length>1?weeks[weeks.length-2]:null;
+  const e = single ? epEntity(week, mode, name) : null, pe = single ? epEntity(prevWeek, mode, name) : null;
+  const div = single ? (mode==='recruiters' ? (getEffectiveRecruiterDivision(name, epState.week)||'Unassigned') : (branchDivisions[name]||'Unassigned')) : '';
+  const tile=(label, val, sub, cls)=>`<div class="ep-tile ${cls||''}"><span>${label}</span><strong>${val}</strong>${sub?`<em>${sub}</em>`:''}</div>`;
+  const dlt=(k)=>{ if(!e||!pe) return ''; const d=(e[k]||0)-(pe[k]||0); return d? `<b class="${d>0?'up':'down'}">${d>0?'▲':'▼'} ${fmtNum(Math.abs(d))}</b>` : ''; };
+  const goalPct = e && e.goal ? e.schedules/e.goal*100 : null;
+  const pend = weekIsFullyPending(epState.week);
+  const remarks = single && mode==='recruiters' ? Remarks.forRecruiter(name) : [];
+  const tabs = [['trend','Trend'],['weeks','Weeks'], ...(single && mode==='recruiters' ? [['remarks','Remarks'+(remarks.length?' ('+remarks.length+')':'')]] : []), ...(single && canSeeCandidates() ? [['candidates','Candidates']] : [])];
+  if(!tabs.some(t=>t[0]===epState.tab)) epState.tab='trend';
+  pop.innerHTML = `<header class="ep-head">
+      <div><div class="ep-eyebrow">${mode==='recruiters'?'Recruiter':'Branch'}${single?' · '+escapeHtml(div)+(mode==='recruiters'&&e&&e.branch?' · '+escapeHtml(e.branch):''):' · comparing '+names.length}</div>
+      <h3 id="epTitle">${single?escapeHtml(name):names.map(escapeHtml).join(', ')}</h3></div>
+      <button type="button" class="ep-close" aria-label="Close">&times;</button></header>
+    <div class="ep-weekbar"><label>Week <select id="epWeek">${[...weeksData].map(w=>w.weekEndDate).sort().reverse().map(d=>`<option value="${d}" ${d===epState.week?'selected':''}>Wk ${weekOfDate(d).number} · ${fmtDate(weekOfDate(d).weekStart).replace(/, \d{4}$/,'')} – ${fmtDate(d)}</option>`).join('')}</select></label>${single&&mode==='recruiters'&&Remarks.canAdd()?'<button class="btn btn-primary btn-sm" id="epAddRemark">Add remark</button>':''}</div>
+    ${single ? (e ? `<div class="ep-goal"><div class="ep-goal-top"><span>Schedules vs goal</span><strong>${fmtNum(e.schedules)} <small>/ ${fmtNum(e.goal)}</small></strong><em class="${goalPct<50?'bad':goalPct<80?'warn':'good'}">${goalPct==null?'–':Math.round(goalPct)+'%'}</em></div><div class="ep-bar"><i class="${goalPct<50?'bad':goalPct<80?'warn':'good'}" style="width:${Math.min(100,goalPct||0)}%"></i><b style="left:50%"></b></div></div>
+      <div class="ep-tiles">
+        ${tile('Interviews', fmtNum(e.scheduledDateOf), dlt('scheduledDateOf'))}
+        ${tile('Shows', fmtNum(e.shows), pend?'pending':(e.scheduledDateOf?fmtPct(e.shows,e.scheduledDateOf)+' rate':''))}
+        ${tile('No shows', fmtNum(e.noShows), !pend && e.scheduledDateOf ? fmtPct(e.noShows,e.scheduledDateOf) : '')}
+        ${tile('Hires', fmtNum(e.i9), dlt('i9'))}
+        ${tile('Placed', fmtNum(e.placed), dlt('placed'))}
+      </div>` : `<p class="hint ep-empty">No activity in this week.</p>`) : ''}
+    <nav class="ep-tabs" role="tablist">${tabs.map(([k,l])=>`<button type="button" role="tab" data-ep-tab="${k}" aria-selected="${epState.tab===k}">${l}</button>`).join('')}</nav>
+    <div class="ep-body" id="epBody"></div>`;
+  pop.querySelector('.ep-close').onclick=()=>closeEntityPopover(true);
+  pop.querySelector('#epWeek').onchange=ev=>{ epState.week=ev.target.value; renderEntityDrawer(); };
+  pop.querySelector('#epAddRemark')?.addEventListener('click', ()=>openRemarksModal(name, epState.week));
+  pop.querySelectorAll('[data-ep-tab]').forEach(b=>b.onclick=()=>{ epState.tab=b.dataset.epTab; renderEntityDrawer(); });
+  const body=pop.querySelector('#epBody'); destroyChart('entityTrend');
+  if(epState.tab==='trend'){
+    body.innerHTML='<div class="ep-chart"><canvas id="entityTrend"></canvas></div><p class="hint" style="margin:6px 0 0;">Last '+weeks.length+' weeks up to the selected week.</p>';
+    const labels=weeks.map(w=>'Wk '+w.weekNumber);
+    const series = single
+      ? [['Schedules','schedules','#2f8f8a'],['Interviews','scheduledDateOf','#4a78c8'],['Shows','shows','#1f9a6c'],['Hires','i9','#7a5fb8']].map(([l,k,c])=>({label:l, data:weeks.map(w=>{ const x=epEntity(w,mode,name); return x?x[k]:0; }), borderColor:c, backgroundColor:c, tension:.25, pointRadius:2.5, borderWidth:2}))
+      : names.map((n,i)=>({label:n, data:weeks.map(w=>{ const x=epEntity(w,mode,n); return x?x.schedules:0; }), borderColor:PIVOT_COLORS[i%PIVOT_COLORS.length], backgroundColor:PIVOT_COLORS[i%PIVOT_COLORS.length], tension:.25, pointRadius:2.5, borderWidth:2}));
+    charts.entityTrend=safeChart(document.getElementById('entityTrend'),{type:'line',data:{labels,datasets:series},options:{responsive:true,maintainAspectRatio:false,plugins:{noValueLabels:true,legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{y:{beginAtZero:true,ticks:{font:{size:10}}},x:{ticks:{font:{size:10}}}}}});
+  } else if(epState.tab==='weeks'){
+    const rowsFor = n=>weeks.slice().reverse().map(w=>{ const x=epEntity(w,mode,n); const gp = x&&x.goal ? Math.round(x.schedules/x.goal*100) : null; return `<tr data-ep-week="${w.weekEndDate}" class="${w.weekEndDate===epState.week?'on':''}"><td>Wk ${w.weekNumber}<small>${fmtDate(w.weekEndDate).replace(/, \d{4}$/,'')}</small></td>${single?'':`<td>${escapeHtml(n)}</td>`}<td>${x?fmtNum(x.goal):'–'}</td><td>${x?fmtNum(x.schedules):'–'}${gp!=null?` <span class="ep-pct ${gp<50?'bad':gp<80?'warn':'good'}">${gp}%</span>`:''}</td><td>${x?fmtNum(x.scheduledDateOf):'–'}</td><td>${x?fmtNum(x.shows):'–'}</td><td>${x&&x.scheduledDateOf?fmtPct(x.shows,x.scheduledDateOf):'–'}</td><td>${x?fmtNum(x.i9):'–'}</td><td>${x?fmtNum(x.placed):'–'}</td></tr>`; }).join('');
+    body.innerHTML=`<div class="ep-table-wrap"><table class="ep-table" id="entityHistoryTable"><thead><tr><th>Week</th>${single?'':'<th>Name</th>'}<th>Goal</th><th>Sched.</th><th>Interv.</th><th>Shows</th><th>Show %</th><th>Hires</th><th>Placed</th></tr></thead><tbody>${names.map(rowsFor).join('')}</tbody></table></div><div class="ep-foot"><span class="hint">Click a week to show it above.</span><button class="btn btn-secondary btn-sm" data-copy-table="entityHistoryTable">Copy table</button></div>`;
+    body.querySelectorAll('[data-ep-week]').forEach(tr=>tr.onclick=()=>{ epState.week=tr.dataset.epWeek; renderEntityDrawer(); });
+    body.querySelector('[data-copy-table]').onclick=()=>{ const t=body.querySelector('table'); navigator.clipboard.writeText([...t.rows].map(r=>[...r.cells].map(c=>c.innerText.replace(/\s+/g,' ').trim()).join('\t')).join('\n')).then(()=>showToast('Copied — paste into Excel.')).catch(()=>showToast('Clipboard blocked by the browser.')); };
+  } else if(epState.tab==='remarks'){
+    const list = remarks.slice().sort((a,b)=> (a.week_end_date===epState.week?-1:0)-(b.week_end_date===epState.week?-1:0) || b.week_end_date.localeCompare(a.week_end_date) || String(b.created_at).localeCompare(String(a.created_at)));
+    body.innerHTML = list.length ? `<div class="ep-remarks">${list.map(r=>`<div class="ep-remark ${r.week_end_date===epState.week?'cur':''}"><div class="ep-remark-meta"><strong>Wk ${weekOfDate(r.week_end_date).number}</strong> · ${fmtDate(r.remark_date)} · ${escapeHtml(r.author||'')} ${remarkStatusHtml(r)}</div><div class="ep-remark-text">${escapeHtml(r.remark)}</div></div>`).join('')}</div><div class="ep-foot"><span class="hint">${Remarks.canApprove()?'Approve or edit in the full view.':''}</span><button class="btn btn-secondary btn-sm" id="epAllRemarks">Open full view</button></div>`
+      : `<p class="hint ep-empty">No remarks yet.</p>${Remarks.canAdd()?'<button class="btn btn-primary btn-sm" id="epAllRemarks">Add the first remark</button>':''}`;
+    body.querySelector('#epAllRemarks')?.addEventListener('click', ()=>openRemarksModal(name, epState.week));
+  } else if(epState.tab==='candidates' && canSeeCandidates()){
+    const cats=[['schedulesList','Schedules'],['interviewsList','Interviews'],['showsList','Shows'],['noShowsList','No shows'],['i9List','Hires'],['placedList','Placed']];
+    if(!cats.some(c=>c[0]===epState.cat)) epState.cat='showsList';
+    const lists = Object.fromEntries(cats.map(([k])=>[k, epCandidates(week, mode, name, k)]));
+    const cur = lists[epState.cat]||[];
+    body.innerHTML = `<div class="ep-cats">${cats.map(([k,l])=>`<button type="button" data-ep-cat="${k}" aria-pressed="${k===epState.cat}">${l} <b>${fmtNum(lists[k].length)}</b></button>`).join('')}</div>
+      ${week && week.listsSplit && !week.listsLoaded ? '<p class="hint">Loading names…</p>' : (cur.length ? `<div class="ep-table-wrap"><table class="ep-table"><thead><tr><th>Candidate</th><th>Employee #</th><th>Date</th></tr></thead><tbody>${cur.map(c=>`<tr><td>${escapeHtml(c.name)}</td><td class="mono">${escapeHtml(c.eid)}</td><td>${c.date?fmtDate(c.date).replace(/, \d{4}$/,''):''}</td></tr>`).join('')}</tbody></table></div><div class="ep-foot"><span class="hint">${fmtNum(cur.length)} in this list</span><button class="btn btn-secondary btn-sm" id="epCopyCands">Copy list</button></div>` : '<p class="hint ep-empty">Nobody in this list for the week.</p>')}`;
+    body.querySelectorAll('[data-ep-cat]').forEach(b=>b.onclick=()=>{ epState.cat=b.dataset.epCat; renderEntityDrawer(); });
+    body.querySelector('#epCopyCands')?.addEventListener('click', ()=>navigator.clipboard.writeText(['Candidate\tEmployee Number\tDate', ...cur.map(c=>c.name+'\t'+c.eid+'\t'+(c.date||''))].join('\n')).then(()=>showToast('Copied '+cur.length+' rows.')).catch(()=>showToast('Clipboard blocked by the browser.')));
+    if(week && week.listsSplit && !week.listsLoaded) candFromWeekLists(week.weekEndDate).then(()=>{ if(epState.tab==='candidates') renderEntityDrawer(); }).catch(()=>{});
+  }
+}
+document.addEventListener('keydown',e=>{ if(e.key==='Escape' && !document.getElementById('remarksModal')) closeEntityPopover(true); });
+// a click outside the panel closes it — except on table rows (Ctrl/Cmd-click adds them to the comparison) and dialogs opened from it
+document.addEventListener('click',e=>{ if(document.getElementById('entityDrawer') && e.target.isConnected && !e.target.closest('#entityDrawer, [data-pie-name], .modal-overlay, #toast')) closeEntityPopover(); });
 window.addEventListener('resize',()=>positionEntityPopover());
 
 
@@ -6020,7 +6119,7 @@ const MODULES = [
   {key:'performance', label:'Performance Summary', hint:'Weekly, monthly and quarterly overview'},
   {key:'recruiters',  label:'Recruiter Performance', hint:'Recruiter table, trends, reading remarks'},
   {key:'branches',    label:'Branch Performance', hint:'Branch table and trends'},
-  {key:'candidates',  label:'Candidates', hint:'Names and Employee Numbers behind each count, by week and category'},
+  {key:'candidates',  label:'Candidates — see names', hint:'Candidate names & Employee Numbers anywhere: the Candidates page, hover lists in tables and the recruiter card'},
   {key:'alerts',      label:'Alerts', hint:'Recruiters below 50% of their goal, other signals and remarks'},
   {key:'pivot',       label:'Pivot & Charts', hint:'Build their own pivot tables and charts, and save views'},
   {key:'master',      label:'Master Data — view', hint:'Browse and filter every candidate row'},
@@ -6168,7 +6267,7 @@ const Server = {
   // Fetches the candidate lists for weeks loaded without them, then refreshes quietly.
   listsLoading:false,
   async loadListsInBackground(){
-    if(this.listsLoading) return; this.listsLoading = true;
+    if(this.listsLoading || !this.can('candidates')) return; this.listsLoading = true;
     try{
       const pending = [...KV.entries()].filter(([k,v])=>k.startsWith('weekly:') && v && v.listsSplit && !v.listsLoaded).map(([k])=>k).sort().reverse();
       for(let i=0;i<pending.length;i+=4){
@@ -6305,7 +6404,7 @@ document.addEventListener('visibilitychange', async ()=>{
 // The page needs the database functions from the matching supabase_setup.sql. If the super
 // admin hasn't run the latest one (or the run failed), new features such as new user rights
 // silently don't work — so say so plainly.
-const REQUIRED_SCHEMA = 14;
+const REQUIRED_SCHEMA = 15;
 let databaseSchemaStale = false;
 async function checkDatabaseSchema(){
   try{
@@ -6975,6 +7074,7 @@ async function saveRemarkFromModal(){
     renderRemarksModalBody();
     if(currentView==='recruiters') renderPeopleView('recruiters');
     showToast(Remarks.canApprove() ? 'Remark saved.' : 'Remark sent for approval.');
+    if(document.getElementById('entityDrawer')) renderEntityDrawer();
     if(currentView==='alerts') renderAlertsView();
   }catch(e){ showToast('Could not save the remark: '+cleanErr(e)); }
   finally{ btn.disabled=false; }
@@ -7933,7 +8033,7 @@ async function renderUploadHistory(){
 }
 
 /* ============================= INIT ============================= */
-const APP_VERSION = 'Version 4.19.0';
+const APP_VERSION = 'Version 4.20.0';
 async function init(){
   document.getElementById('versionLabelInline').textContent = APP_VERSION;
   document.getElementById('footerVersionLabel').textContent = APP_VERSION;
