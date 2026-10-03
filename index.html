@@ -363,6 +363,16 @@ body.no-copy-tables [data-copy-table], body.no-copy-tables #historyCopy,
 body.no-copy-tables #historyCandidatesCopy, body.no-copy-tables #candCopy,
 body.no-copy-tables #pvCopy, body.no-copy-tables #pvDrillCopy,
 body.no-copy-tables #copyPrevWeeksBtn, body.no-copy-tables #tooltipCopyBtn {display:none!important;}
+
+/* Leader-owned teams */
+.tg-controls{display:flex;align-items:end;gap:12px;flex-wrap:wrap;margin:14px 0}
+.tg-controls label{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600}
+.tg-controls input,.tg-controls select{font:inherit;padding:9px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);max-width:100%}
+.tg-form{padding:14px 0;border-bottom:1px solid var(--border);margin-bottom:16px}
+.tg-charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.tg-chart{position:relative;height:300px}.tg-charts .panel{min-width:0}
+#view-teams>.panel,#tgReport>.panel{margin-bottom:16px}
+@media(max-width:850px){.tg-charts{grid-template-columns:1fr}.tg-controls label{flex:1 1 150px}.tg-chart{height:280px}}
 </style>
 <style id="executive-design">
 :root{--bg:#f2f5f6;--surface:#fff;--border:#dfe7e9;--navy:#102c3b;--navy-2:#193e4d;--indigo:#146f78;--indigo-light:#e7f3f3;--teal:#17775c;--teal-light:#e8f5ee;--amber:#94671b;--amber-light:#fbf2df;--red:#bb4d50;--red-light:#fbecee;--text:#183442;--text-secondary:#5b707c;--text-tertiary:#687e89;--radius:12px;--radius-lg:18px;--shadow:0 3px 16px #17374405}
@@ -1098,6 +1108,7 @@ button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #183442
     <nav class="nav" id="navList">
       <button data-view="performance" class="active"><span class="dot"></span>Performance Summary</button>
       <div class="divider"></div>
+      <button data-view="teams"><span class="dot"></span>My Team Groups</button>
       <button data-view="recruiters"><span class="dot"></span>Recruiter Performance</button>
       <button data-view="branches"><span class="dot"></span>Branch Performance</button>
       <button data-view="master"><span class="dot"></span>Master Data</button>
@@ -1180,6 +1191,7 @@ button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #183442
         <div id="view-monthly" class="hidden"></div>
         <div id="view-quarterly" class="hidden"></div>
       </div>
+        <div id="view-teams" class="hidden"></div>
         <div id="view-recruiters" class="hidden"></div>
         <div id="view-branches" class="hidden"></div>
         <div id="view-master" class="hidden"></div>
@@ -3211,6 +3223,7 @@ document.getElementById('weeklyDivisionSelect').addEventListener('change', (e)=>
 });
 
 const VIEW_META = {
+  teams:{title:'My Team Groups',sub:'Manage dated memberships and track your own teams'},
   performance:{title:'Performance Summary', sub:'Interview schedules, shows, and outcomes for the selected week'},
   recruiters:{title:'Recruiter Performance', sub:'Show rates and outcomes by recruiter'},
   branches:{title:'Branch Performance', sub:'Show rates and outcomes by branch'},
@@ -3251,7 +3264,7 @@ async function refreshUI(){
   // The Uploads page must stay reachable even with zero weeks saved — it's the page you use
   // to add the first one — so it's treated as always-showable, unlike Performance/Recruiter/
   // Branch which genuinely have nothing to render without data.
-  const showDashboardViews = hasData || currentView==='master';
+  const showDashboardViews = hasData || currentView==='master' || currentView==='teams';
   document.getElementById('emptyState').classList.toggle('hidden', showDashboardViews);
   document.getElementById('dashboardViews').classList.toggle('hidden', !showDashboardViews);
   document.getElementById('downloadDropdownWrap').classList.toggle('hidden', !hasData);
@@ -3260,7 +3273,7 @@ async function refreshUI(){
   document.getElementById('viewTitle').textContent = meta.title;
   document.getElementById('viewSub').textContent = showDashboardViews ? meta.sub : 'No data uploaded yet';
 
-  ['performance','recruiters','branches','master','candidates','alerts','pivot','history'].forEach(v=>{
+  ['teams','performance','recruiters','branches','master','candidates','alerts','pivot','history'].forEach(v=>{
     document.getElementById('view-'+v).classList.toggle('hidden', v!==currentView);
   });
 
@@ -3274,8 +3287,9 @@ async function refreshUI(){
   renderPeriodPickerButton();
   closePeriodPicker();
   syncDedupeControls();
-  document.getElementById('periodPicker')?.classList.toggle('hidden', currentView==='candidates' || currentView==='alerts' || currentView==='pivot' || currentView==='history');
+  document.getElementById('periodPicker')?.classList.toggle('hidden', currentView==='teams' || currentView==='candidates' || currentView==='alerts' || currentView==='pivot' || currentView==='history');
   ['weeklyDivisionSelect','weeklyDivisionSelectLbl'].forEach(id=>document.getElementById(id).classList.toggle('hidden',currentView!=='performance'));
+  if(currentView==='teams'){ renderTeamGroups(); return; }
   if(!hasData){ if(showDashboardViews) renderMasterView(); return; }
 
   if(!currentWeekEndDate || (currentWeekEndDate!=='all-weeks' && !weeksData.find(w=>w.weekEndDate===currentWeekEndDate))){
@@ -6374,7 +6388,7 @@ const MODULES = [
   {key:'settings',    label:'Settings', hint:'Divisions, branch divisions, show/hide recruiters, saved weeks'},
   {key:'export',      label:'Download & share', hint:'Excel, PDF, Word, master sheet download, snapshots'},
 ];
-const VIEW_MODULE = {performance:'performance', recruiters:'recruiters', branches:'branches', master:'master', candidates:'candidates', alerts:'alerts', pivot:'pivot'};
+const VIEW_MODULE = {teams:'teams',performance:'performance', recruiters:'recruiters', branches:'branches', master:'master', candidates:'candidates', alerts:'alerts', pivot:'pivot'};
 
 function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
 function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
@@ -6482,7 +6496,7 @@ const Server = {
     return data;
   },
   rpc(fn, args){ return this.call(fn, {p_token:this.token, ...(args||{})}); },
-  can(m){ return !!this.user && (this.user.role==='super_admin' || this.user.role==='admin' || (this.user.modules||[]).includes(m)); },
+  can(m){ return !!this.user && (m==='teams' || this.user.role==='super_admin' || this.user.role==='admin' || (this.user.modules||[]).includes(m)); },
   isAdmin(){ return !!this.user && (this.user.role==='super_admin' || this.user.role==='admin'); },
   isSuperAdmin(){ return !!this.user && this.user.role==='super_admin'; },
   expired(){
@@ -8517,6 +8531,119 @@ async function renderUploadHistory(){
     const last = log[0];
     host.innerHTML = `<details class="panel set-details"><summary><span class="sd-title">Recent imports</span><span class="sd-status">${last ? escapeHtml(String(last.file_name||'').slice(0,60))+' · '+new Date(last.uploaded_at).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})+(last.uploaded_by?' · '+escapeHtml(last.uploaded_by):'') : 'None yet'}</span></summary>${log.length?`<div style="overflow-x:auto"><table class="users-table"><thead><tr><th>When</th><th>File</th><th>Type</th><th>Rows</th><th>Contact columns removed</th><th>By</th><th>Status</th></tr></thead><tbody>${log.map(l=>`<tr><td style="white-space:nowrap;">${new Date(l.uploaded_at).toLocaleString()}</td><td>${escapeHtml(l.file_name)}</td><td>${escapeHtml(SOURCE_LABEL[l.source]||l.source||'')}</td><td>${fmtNum(l.rows_saved||0)}</td><td>${escapeHtml((l.removed_columns||[]).join(', ')||'—')}</td><td>${escapeHtml(l.uploaded_by||'')}</td><td>${l.status==='done'?'Done':'<span class="pill warn">Incomplete</span>'}</td></tr>`).join('')}</tbody></table></div>`:'<p class="hint" style="margin:0;">No imports yet.</p>'}</details>`;
   }catch(e){ host.innerHTML=''; }
+}
+
+/* Team groups: saved per signed-in owner; memberships include both endpoint dates. */
+const TG_METRICS=[['schedules','Schedules','#2f8f8a','schedulesList'],['scheduledDateOf','Interviews','#4a78c8','interviewsList'],['shows','Shows','#1f9a6c','showsList'],['noShows','No shows','#c4565f','noShowsList'],['i9','Hires','#7a5fb8','i9List'],['placed','Placed','#d08a2c','placedList']];
+const tgState={owner:null,groups:[],selected:null,loaded:false,loading:false,error:'',from:'',to:'',grain:'week',matrix:'member',editing:null,busy:false};
+function tgDate(d){return /^\d{4}-\d{2}-\d{2}$/.test(d||'') && Number.isFinite(Date.parse(d+'T12:00:00Z')) && new Date(d+'T12:00:00Z').toISOString().slice(0,10)===d;}
+function tgShift(d,n){const x=new Date(d+'T12:00:00Z');x.setUTCDate(x.getUTCDate()+n);return x.toISOString().slice(0,10);}
+function tgDays(from,to){const out=[];for(let d=from;d<=to;d=tgShift(d,1))out.push(d);return out;}
+function tgActive(g,name,date){return g.memberships.some(m=>m.name===name && m.from<=date && (!m.to||m.to>=date));}
+function tgBlank(){return {...Object.fromEntries(TG_METRICS.map(([k])=>[k,0])),goal:0};}
+function tgPlus(a,b){for(const k of [...TG_METRICS.map(x=>x[0]),'goal'])a[k]=a[k]===null||b[k]===null?null:a[k]+(b[k]||0);return a;}
+function tgValidate(g){
+ if(!g.name?.trim()||g.name.length>100)throw Error('Enter a group name up to 100 characters.');
+ if(g.memberships.length>2000)throw Error('This group has reached 2,000 membership periods.');
+ for(const m of g.memberships){if(!m.name?.trim()||!tgDate(m.from)||(m.to&&!tgDate(m.to))||(m.to&&m.to<m.from))throw Error('Each membership needs a member, a valid start date and an end date on or after the start.');}
+ const sorted=[...g.memberships].sort((a,b)=>a.name.localeCompare(b.name)||a.from.localeCompare(b.from));
+ for(let i=1;i<sorted.length;i++){const a=sorted[i-1],b=sorted[i];if(a.name===b.name&&(!a.to||a.to>=b.from))throw Error('Membership dates overlap for '+a.name+'. Edit the existing period or choose different dates.');}
+}
+function tgCalculate(g,from,to,weeks){
+ const total=tgBlank(), members=new Map(), weekly=[],daily=new Map(),covered=new Set(),missing=new Set();
+ const names=[...new Set(g.memberships.map(m=>m.name))];
+ for(const w of [...weeks].sort((a,b)=>a.weekEndDate.localeCompare(b.weekEndDate))){
+  const allDays=tgDays(tgShift(w.weekEndDate,-6),w.weekEndDate), days=allDays.filter(d=>d>=from&&d<=to);if(!days.length)continue;
+  days.forEach(d=>{covered.add(d);if(!daily.has(d))daily.set(d,{label:d,...tgBlank()});});
+  const wt={label:'Wk '+weekOfDate(w.weekEndDate).number+' · '+fmtDate(w.weekEndDate),...tgBlank()};
+  for(const name of names){
+   const active=days.filter(d=>tgActive(g,name,d));if(!active.length)continue;
+   const r=w.byRecruiter?.[name], mt=members.get(name)||{label:name,days:0,...tgBlank()};members.set(name,mt);mt.days+=active.length;
+   const goals=KV.get('goals:'+w.weekEndDate)||{},v=goals[name];const goal=v!==undefined&&v!==null&&v!==''?Number(v):DEFAULT_WEEKLY_GOAL;
+   const part=tgBlank();part.goal=goal*active.length/7;
+   active.forEach(d=>daily.get(d).goal+=goal/7);
+   for(const [k,label,,listKey] of TG_METRICS){
+    const expected=r?(r[k]||0):0;
+    let values=null;
+    if(!r)values=Object.fromEntries(allDays.map(d=>[d,0]));
+    else if(r.daily&&Object.values(r.daily).reduce((a,x)=>a+(x[k]||0),0)===expected)values=Object.fromEntries(allDays.map(d=>[d,r.daily[d]?.[k]||0]));
+    else if((r[listKey]||[]).length===expected&&(r[listKey]||[]).every(c=>allDays.includes(c.date)))values=Object.fromEntries(allDays.map(d=>[d,(r[listKey]||[]).filter(c=>c.date===d).length]));
+    if(values)part[k]=active.reduce((a,d)=>a+values[d],0);
+    else {part[k]=active.length===7?expected:null;missing.add(label);}
+    active.forEach(d=>{const v=values?values[d]:null, t=daily.get(d);t[k]=t[k]===null||v===null?null:t[k]+v;});
+   }
+   tgPlus(mt,part);tgPlus(wt,part);
+  }
+  tgPlus(total,wt);weekly.push(wt);
+ }
+ return {total,members:[...members.values()],weekly,daily:[...daily.values()].sort((a,b)=>a.label.localeCompare(b.label)),missing:[...missing],uncovered:tgDays(from,to).filter(d=>!covered.has(d)).length};
+}
+function tgNumber(n){return n===null?'Unavailable':Number(n||0).toLocaleString('en-US',{maximumFractionDigits:1});}
+function tgRate(n,d){return n===null||d===null||!d?'—':(n/d*100).toFixed(1)+'%';}
+function tgCurrent(){return tgState.groups.find(g=>g.id===tgState.selected);}
+async function tgLoad(){
+ const owner=Server.user?.id;if(!owner||tgState.loading)return;
+ tgState.loading=true;tgState.error='';
+ try{const groups=await Server.rpc('dash_team_groups_list');if(Server.user?.id!==owner)return;tgState.groups=Array.isArray(groups)?groups:[];tgState.loaded=true;if(!tgCurrent())tgState.selected=tgState.groups[0]?.id||null;}
+ catch(e){if(Server.user?.id===owner)tgState.error=cleanErr(e);}
+ finally{tgState.loading=false;if(currentView==='teams'&&Server.user?.id===owner)renderTeamGroups();}
+}
+async function tgSave(g){
+ if(tgState.busy)return false;tgValidate(g);const owner=Server.user?.id;tgState.busy=true;
+ try{const saved=await Server.rpc('dash_team_group_save',{p_group:g,p_expected_version:g.version||0});if(Server.user?.id!==owner)return false;const i=tgState.groups.findIndex(x=>x.id===saved.id);if(i<0)tgState.groups.push(saved);else tgState.groups[i]=saved;tgState.selected=saved.id;tgState.editing=null;showToast('Team group saved.');return true;}
+ catch(e){throw Error(cleanErr(e));}finally{tgState.busy=false;}
+}
+function tgForm(g){
+ const m=g.memberships.find(x=>x.id===tgState.editing);
+ const names=[...new Set([...weeksData.flatMap(w=>Object.keys(w.byRecruiter||{})),...g.memberships.map(x=>x.name)])].sort();
+ return `<form id="tgMemberForm" class="tg-form"><h4>${m?'Edit membership dates':'Add team member'}</h4><div class="tg-controls"><label>Recruiter<select name="member" required>${names.map(n=>`<option ${n===m?.name?'selected':''} value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('')}</select></label><label>First day<input name="from" type="date" required value="${m?.from||tgState.from}"></label><label>Last day (inclusive)<input name="to" type="date" value="${m?.to||''}"></label><button class="btn btn-secondary btn-sm" type="button" id="tgOneDay">One day</button><button class="btn btn-secondary btn-sm" type="button" id="tgOneWeek">7 days</button><button class="btn btn-primary" ${names.length?'':'disabled'}>Save membership</button>${m?'<button type="button" class="btn btn-secondary" id="tgCancelEdit">Cancel</button>':''}</div><p class="hint">Leave the last day blank for ongoing membership. Use equal dates for one day. Dates are inclusive; a member can leave and rejoin in separate periods.</p><p role="alert" id="tgMemberError" class="auth-msg"></p></form>`;
+}
+function renderTeamGroups(){
+ const host=document.getElementById('view-teams');if(!host||!Server.user)return;
+ if(tgState.owner!==Server.user.id)Object.assign(tgState,{owner:Server.user.id,groups:[],selected:null,loaded:false,loading:false,error:'',editing:null,from:'',to:''});
+ for(const id of ['tgLine','tgBar','tgGoals','tgRates','tgOutcomes','tgRanking'])destroyChart(id);
+ if(!tgState.loaded){host.innerHTML=`<section class="panel"><h3>My Team Groups</h3><p>${tgState.error?'Team groups could not be loaded.':'Loading your groups…'}</p>${tgState.error?`<p class="hint">${escapeHtml(tgState.error)}</p><p>For first-time setup, your administrator must run the supplied <strong>team-groups-setup.sql</strong> in Supabase.</p><button class="btn btn-secondary" id="tgRetry">Retry</button>`:''}</section>`;host.querySelector('#tgRetry')?.addEventListener('click',()=>tgLoad());if(!tgState.error&&!tgState.loading)tgLoad();return;}
+ const ends=weeksData.map(w=>w.weekEndDate).sort();tgState.to||=ends.at(-1)||toIsoDateOnly(new Date());tgState.from||=tgShift(tgState.to,-6);
+ const g=tgCurrent();
+ host.innerHTML=`<section class="panel"><div class="tg-controls"><div><h3>My Team Groups</h3><p class="hint">Groups owned by ${escapeHtml(Server.user.name||'you')} · saved to your account</p></div><label>Team<select id="tgGroup">${tgState.groups.map(x=>`<option value="${x.id}" ${x.id===g?.id?'selected':''}>${escapeHtml(x.name)}</option>`).join('')}</select></label><button class="btn btn-secondary" id="tgReload">Refresh groups</button></div><form id="tgCreate" class="tg-controls"><label>New group name<input name="name" required maxlength="100" placeholder="e.g. North recruiting team"></label><button class="btn btn-primary">Create group</button><span id="tgCreateError" role="alert" class="auth-msg"></span></form></section>
+ ${g?`<section class="panel"><div class="tg-controls"><h3>${escapeHtml(g.name)}</h3><button class="btn btn-secondary btn-sm" id="tgRename">Rename</button><button class="btn btn-secondary btn-sm" id="tgDelete">Delete group</button></div><form id="tgRange" class="tg-controls"><label>From<input type="date" name="from" required value="${tgState.from}"></label><label>Through<input type="date" name="to" required value="${tgState.to}"></label><button class="btn btn-primary">Apply dates</button><label>Choose week<select id="tgWeek"><option value="">Custom dates</option>${ends.slice().reverse().map(d=>`<option value="${d}" ${tgState.to===d&&tgState.from===tgShift(d,-6)?'selected':''}>Wk ${weekOfDate(d).number} · ${fmtDate(d)}</option>`).join('')}</select></label><label>Chart intervals<select id="tgGrain"><option value="week" ${tgState.grain==='week'?'selected':''}>Weeks</option><option value="day" ${tgState.grain==='day'?'selected':''}>Days</option></select></label><span role="alert" id="tgRangeError" class="auth-msg"></span></form></section><div id="tgReport"></div><section class="panel"><h3>Membership calendar</h3>${tgForm(g)}<div class="hp-table-wrap"><table class="ep-table"><thead><tr><th>Recruiter</th><th>First day</th><th>Last day</th><th>Actions</th></tr></thead><tbody>${[...g.memberships].sort((a,b)=>a.name.localeCompare(b.name)||a.from.localeCompare(b.from)).map(m=>`<tr><td>${escapeHtml(m.name)}</td><td>${m.from}</td><td>${m.to||'Ongoing'}</td><td><button class="btn btn-secondary btn-sm" data-tg-edit="${m.id}">Edit dates</button> <button class="btn btn-secondary btn-sm" data-tg-end="${m.id}">End membership</button> <button class="btn btn-secondary btn-sm" data-tg-remove="${m.id}">Delete period</button></td></tr>`).join('')||'<tr><td colspan="4">Add your first team member above.</td></tr>'}</tbody></table></div><p class="hint">End membership keeps past results. Delete period corrects an assignment and removes its contribution from this group’s history.</p></section>`:'<section class="panel"><h3>Create your first team</h3><p>Add recruiters with their membership dates to see your team’s performance.</p></section>'}`;
+ host.querySelector('#tgGroup').onchange=e=>{tgState.selected=e.target.value;tgState.editing=null;renderTeamGroups();};
+ host.querySelector('#tgReload').onclick=()=>{tgState.loaded=false;tgState.error='';renderTeamGroups();};
+ host.querySelector('#tgCreate').onsubmit=async e=>{e.preventDefault();const f=e.currentTarget;try{if(await tgSave({id:crypto.randomUUID(),name:f.elements.name.value.trim(),memberships:[],version:0}))renderTeamGroups();}catch(x){f.querySelector('[role=alert]').textContent=x.message;}};
+ if(!g)return;
+ const commit=async next=>{try{if(await tgSave(next))renderTeamGroups();}catch(x){showToast(x.message);}};
+ host.querySelector('#tgRename').onclick=()=>{const name=prompt('Group name',g.name);if(name?.trim())commit({...g,name:name.trim()});};
+ host.querySelector('#tgDelete').onclick=async()=>{if(tgState.busy||!confirm('Delete '+g.name+' and its membership history? Imported recruiter data will remain.'))return;tgState.busy=true;try{await Server.rpc('dash_team_group_delete',{p_id:g.id,p_expected_version:g.version});tgState.groups=tgState.groups.filter(x=>x.id!==g.id);tgState.selected=tgState.groups[0]?.id;renderTeamGroups();}catch(x){showToast(cleanErr(x));}finally{tgState.busy=false;}};
+ host.querySelector('#tgRange').onsubmit=e=>{e.preventDefault();const f=e.currentTarget,a=f.elements.from.value,b=f.elements.to.value;if(!tgDate(a)||!tgDate(b)||a>b||(Date.parse(b+'T12:00:00Z')-Date.parse(a+'T12:00:00Z'))/86400000>=1096){f.querySelector('[role=alert]').textContent='Choose a valid range of up to three years.';return;}tgState.from=a;tgState.to=b;renderTeamGroups();};
+ host.querySelector('#tgWeek').onchange=e=>{if(e.target.value){tgState.to=e.target.value;tgState.from=tgShift(e.target.value,-6);renderTeamGroups();}};
+ host.querySelector('#tgGrain').onchange=e=>{tgState.grain=e.target.value;tgRenderReport(g);};
+ const form=host.querySelector('#tgMemberForm');
+ form.querySelector('#tgOneDay').onclick=()=>form.elements.to.value=form.elements.from.value;
+ form.querySelector('#tgOneWeek').onclick=()=>{if(tgDate(form.elements.from.value))form.elements.to.value=tgShift(form.elements.from.value,6);};
+ form.querySelector('#tgCancelEdit')?.addEventListener('click',()=>{tgState.editing=null;renderTeamGroups();});
+ form.onsubmit=async e=>{e.preventDefault();const m={id:tgState.editing||crypto.randomUUID(),name:form.elements.member.value,from:form.elements.from.value,to:form.elements.to.value||null};try{const next={...g,memberships:[...g.memberships.filter(x=>x.id!==m.id),m]};if(await tgSave(next))renderTeamGroups();}catch(x){form.querySelector('[role=alert]').textContent=x.message;}};
+ host.querySelectorAll('[data-tg-edit]').forEach(b=>b.onclick=()=>{tgState.editing=b.dataset.tgEdit;renderTeamGroups();document.getElementById('tgMemberForm').scrollIntoView({block:'center'});});
+ host.querySelectorAll('[data-tg-end]').forEach(b=>b.onclick=()=>{const m=g.memberships.find(x=>x.id===b.dataset.tgEnd),last=prompt('Last day '+m.name+' belongs to this team (YYYY-MM-DD)',m.to||tgState.to);if(last!==null){if(!tgDate(last)){showToast('Enter a valid last day.');return;}commit({...g,memberships:g.memberships.map(x=>x.id===m.id?{...x,to:last}:x)});}});
+ host.querySelectorAll('[data-tg-remove]').forEach(b=>b.onclick=()=>{if(confirm('Delete this membership period? This changes this team’s historical totals.'))commit({...g,memberships:g.memberships.filter(x=>x.id!==b.dataset.tgRemove)});});
+ tgRenderReport(g);
+}
+function tgRenderReport(g){
+ const host=document.getElementById('tgReport');if(!host)return;
+ for(const id of ['tgLine','tgBar','tgGoals','tgRates','tgOutcomes','tgRanking'])destroyChart(id);
+ const r=tgCalculate(g,tgState.from,tgState.to,weeksData),t=r.total,series=tgState.grain==='day'?r.daily:r.weekly;
+ const pct=t.schedules===null||!t.goal?null:t.schedules/t.goal*100;
+ const matrix=tgState.matrix==='member'?r.members:tgState.matrix==='day'?r.daily:r.weekly;
+ const chart=(id,title)=>`<section class="panel"><h3>${title}</h3><div class="tg-chart"><canvas id="${id}" aria-label="${title}" role="img"></canvas></div></section>`;
+ host.innerHTML=`${r.uncovered?`<p class="warn-note">${r.uncovered} selected day(s) have no imported week. Totals and goals cover imported days only.</p>`:''}${r.missing.length?`<p class="warn-note">Daily detail is unavailable for ${r.missing.join(', ')} in some records. Complete-week totals are used only for full-week memberships; partial-period results are marked unavailable. Re-sync the source weeks to fill in daily detail.</p>`:''}<section class="panel"><div class="tg-controls"><h3>${escapeHtml(g.name)} · Progress card</h3><span class="hint">${fmtDate(tgState.from)} – ${fmtDate(tgState.to)} · ${r.members.length} team members in this period</span></div><div class="ep-goal-top"><span>Schedules vs membership-adjusted goal</span><strong>${tgNumber(t.schedules)} / ${tgNumber(t.goal)}</strong><em>${pct===null?'—':pct.toFixed(1)+'%'}</em></div><progress style="width:100%;height:18px" max="100" value="${Math.max(0,Math.min(100,pct||0))}" aria-label="Team schedule goal progress"></progress><div class="hp-tiles">${TG_METRICS.map(([k,l])=>`<div class="hp-tile"><span>${l}</span><strong>${tgNumber(t[k])}</strong></div>`).join('')}<div class="hp-tile"><span>Show rate</span><strong>${tgRate(t.shows,t.scheduledDateOf)}</strong></div><div class="hp-tile"><span>Hire / show</span><strong>${tgRate(t.i9,t.shows)}</strong></div></div><p class="hint">Weekly goals are prorated across 7 calendar days of membership. Only activity on membership dates counts. Recruiters in more than one group count separately in each group.</p></section><div class="tg-charts">${chart('tgLine','Team activity · line')}${chart('tgBar','Team activity · bars')}${chart('tgGoals','Schedules vs goal')}${chart('tgRates','Conversion rates')}${chart('tgOutcomes','Interview outcomes')}${chart('tgRanking','Recruiter contributions')}</div><section class="panel"><div class="tg-controls"><h3>Performance matrix</h3><label>Rows<select id="tgMatrixMode"><option value="member" ${tgState.matrix==='member'?'selected':''}>Recruiters</option><option value="week" ${tgState.matrix==='week'?'selected':''}>Weeks</option><option value="day" ${tgState.matrix==='day'?'selected':''}>Days</option></select></label>${copyBtnHtml('tgMatrix')}</div><div class="hp-table-wrap"><table class="ep-table" id="tgMatrix"><thead><tr><th>${tgState.matrix==='member'?'Recruiter':'Period'}</th><th>Goal</th>${TG_METRICS.map(([,l])=>`<th>${l}</th>`).join('')}<th>Goal reach</th><th>Show rate</th><th>No-show rate</th><th>Hire / show</th><th>Placed / hire</th></tr></thead><tbody>${matrix.map(x=>`<tr><td>${escapeHtml(x.label)}</td><td>${tgNumber(x.goal)}</td>${TG_METRICS.map(([k])=>`<td>${tgNumber(x[k])}</td>`).join('')}<td>${tgRate(x.schedules,x.goal)}</td><td>${tgRate(x.shows,x.scheduledDateOf)}</td><td>${tgRate(x.noShows,x.scheduledDateOf)}</td><td>${tgRate(x.i9,x.shows)}</td><td>${tgRate(x.placed,x.i9)}</td></tr>`).join('')||'<tr><td colspan="13">No assigned members in imported dates for this period.</td></tr>'}</tbody></table></div></section>`;
+ host.querySelector('#tgMatrixMode').onchange=e=>{tgState.matrix=e.target.value;tgRenderReport(g);};
+ const labels=series.map(x=>x.label),opts={responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{noValueLabels:true,legend:{position:'bottom'}},scales:{y:{beginAtZero:true},x:{ticks:{maxRotation:45}}}};
+ const draw=(id,type,data,options=opts)=>{charts[id]=safeChart(document.getElementById(id),{type,data,options});};
+ const datasets=()=>TG_METRICS.map(([k,label,c])=>({label,data:series.map(x=>x[k]),borderColor:c,backgroundColor:c,tension:.2,spanGaps:false,pointRadius:2}));
+ draw('tgLine','line',{labels,datasets:datasets()});draw('tgBar','bar',{labels,datasets:datasets()});
+ draw('tgGoals','bar',{labels,datasets:[{label:'Schedules',data:series.map(x=>x.schedules),backgroundColor:'#2f8f8a'},{type:'line',label:'Prorated goal',data:series.map(x=>x.goal),borderColor:'#d08a2c',backgroundColor:'#d08a2c'}]});
+ draw('tgRates','line',{labels,datasets:[['Show rate','shows','scheduledDateOf','#1f9a6c'],['No-show rate','noShows','scheduledDateOf','#c4565f'],['Hire / show','i9','shows','#7a5fb8'],['Placed / hire','placed','i9','#d08a2c']].map(([label,n,d,c])=>({label,data:series.map(x=>x[n]===null||!x[d]?null:x[n]/x[d]*100),borderColor:c,backgroundColor:c,spanGaps:false}))},{...opts,scales:{...opts.scales,y:{beginAtZero:true,title:{display:true,text:'Percent'}}}});
+ if(t.shows!==null&&t.noShows!==null)draw('tgOutcomes','doughnut',{labels:['Shows','No shows'],datasets:[{data:[t.shows,t.noShows],backgroundColor:['#1f9a6c','#c4565f']}]},{responsive:true,maintainAspectRatio:false,plugins:{noValueLabels:true,legend:{position:'bottom'}}});else document.getElementById('tgOutcomes').parentElement.innerHTML='<p class="hint">Outcomes unavailable for this period.</p>';
+ draw('tgRanking','bar',{labels:r.members.map(x=>x.label),datasets:TG_METRICS.map(([k,label,c])=>({label,data:r.members.map(x=>x[k]),backgroundColor:c}))},{...opts,indexAxis:'y',scales:{x:{beginAtZero:true},y:{ticks:{autoSkip:false}}}});
 }
 
 /* ============================= INIT ============================= */
