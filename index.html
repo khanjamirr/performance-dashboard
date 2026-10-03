@@ -697,7 +697,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
   .ribbon-actions .ribbon-btn:hover{background:#ffffff10!important;color:#fff!important}
   .rb-ico{display:block}
   .download-dropdown-wrap{position:relative}
-  .download-dropdown-menu{top:auto!important;bottom:calc(100% + 4px)!important;left:0!important;right:auto!important;min-width:200px}
+
   .user-chip-wrap{display:flex;flex-direction:column;gap:4px;margin-top:8px;padding-top:10px;border-top:1px solid #ffffff14}
   .user-chip-wrap.hidden{display:none!important}
   .ribbon-actions .user-chip{background:#ffffff0c!important;border-color:#ffffff1a!important;padding:8px 10px!important}
@@ -731,6 +731,7 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
 .ep-head h3{margin:4px 0 0;font-size:21px;line-height:1.25;color:#132f3b}
 .ep-close{border:0;background:#eef3f5;width:34px;height:34px;border-radius:9px;font-size:22px;line-height:1;cursor:pointer;color:#4a6370;flex:0 0 34px}
 .ep-close:hover{background:#e1eaed}
+.ep-histlink{border:0;background:none;padding:0;margin-top:4px;font:inherit;font-size:12px;font-weight:700;color:#1f8a84;cursor:pointer}.ep-histlink:hover{text-decoration:underline}
 .ep-weekbar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 22px;background:#fff;border-bottom:1px solid #e6eef1;font-size:12px;font-weight:700;color:#4a6370}
 .ep-weekbar select{margin-left:8px;padding:6px 8px;border:1px solid #cfdde2;border-radius:8px;font:inherit;font-weight:600;font-size:12.5px;background:#fff}
 .ep-goal{margin:14px 22px 0;padding:12px 14px;background:#fff;border:1px solid #e1eaed;border-radius:12px}
@@ -772,11 +773,39 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
 .ep-empty{margin:16px 22px!important}
 #entityDrawer .hint{font-size:12px!important;color:var(--text-secondary)}.ep-body .ep-empty{margin:4px 0 10px!important}
 @media (max-width:640px){.ep-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}.ep-head,.ep-weekbar,.ep-tabs,.ep-body{padding-left:14px;padding-right:14px}.ep-goal,.ep-tiles{margin-left:14px;margin-right:14px}}
+.dl-modal{max-width:560px!important;width:calc(100vw - 32px)}
+.dl-group+.dl-group{margin-top:16px}.dl-group h4{margin:0 0 8px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#6b818c}
+.dl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+.dl-opt{display:flex;gap:12px;align-items:center;text-align:left;border:1px solid #dbe6ea;background:#fff;border-radius:12px;padding:12px;font:inherit;cursor:pointer;color:#203f4c;transition:border-color .12s,background .12s}
+.dl-opt:hover:not(:disabled),.dl-opt:focus-visible{border-color:#1f8a84;background:#f2faf9;outline:none}
+.dl-opt:disabled{opacity:.5;cursor:not-allowed}
+.dl-ico{display:grid;place-items:center;width:40px;height:40px;flex:0 0 40px;border-radius:10px;background:#e7f3f3;color:#146f78}
+.dl-txt strong{display:block;font-size:13.5px}.dl-txt em{display:block;font-style:normal;font-size:11.5px;color:var(--text-secondary);line-height:1.4;margin-top:2px}
+/* full history page */
+.entity-link{border:0;background:none;padding:0;font:inherit;font-weight:inherit;color:inherit;cursor:pointer;text-align:left;text-decoration:underline;text-decoration-color:#9fc6c3;text-underline-offset:3px}
+.entity-link:hover{color:#135c5f;text-decoration-color:#1f8a84}
+#view-history{padding-bottom:30px}
+.hp-top{display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px 20px;margin-bottom:16px}
+.hp-back{display:inline-flex;align-items:center;gap:6px;flex-basis:100%;width:max-content}
+.hp-id{flex:1;min-width:220px}.hp-more{text-transform:none;letter-spacing:0;font-weight:600;color:#6b818c;cursor:help}.hp-id h2{margin:4px 0 2px;font-size:26px;color:#132f3b}.hp-id .hint{margin:0;font-size:12px}
+.hp-range{font-size:12px;font-weight:700;color:#4a6370}.hp-range select{margin-left:8px;padding:7px 9px;border:1px solid #cfdde2;border-radius:8px;font:inherit;font-weight:600;background:#fff}
+.hp-tiles{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.hp-tile{background:#fff;border:1px solid #e1eaed;border-radius:12px;padding:10px 12px;min-width:0}
+.hp-tile span{display:block;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#6b818c}
+.hp-tile strong{display:block;font-size:22px;color:#132f3b;margin-top:2px}.hp-tile strong small{font-size:13px;color:#6b818c}
+.hp-tile em{display:block;font-style:normal;font-size:11px;color:var(--text-secondary);margin-top:2px}
+.hp-charts{display:grid;grid-template-columns:3fr 2fr;gap:16px}
+.hp-panel{padding:16px 18px!important}
+.hp-panel-head{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}.hp-panel-head h3{margin:0;font-size:14px}.hp-panel-head .hint{font-size:11.5px}
+.hp-chart{position:relative;height:260px}
+.hp-table-wrap{overflow:auto;max-height:560px;border:1px solid #e1eaed;border-radius:10px}
+.hp-table-wrap tfoot td{position:sticky;bottom:0;background:#edf5f5;font-weight:700;border-top:2px solid #ccdedf}
+.hp-rem{white-space:normal!important;min-width:180px;max-width:320px;font-size:12px;color:#40596a}
+@media (max-width:1100px){.hp-tiles{grid-template-columns:repeat(4,minmax(0,1fr))}.hp-charts{grid-template-columns:1fr}}
+@media (max-width:560px){.hp-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.hp-id h2{font-size:21px}}
 
 /* ---------- v4.19: pivot, alert groups, roles ---------- */
-.pv-grid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:10px 12px}
-.pv-grid .cand-field{min-width:0}.pv-saved .hint{font-size:12px!important}
-.pv-grid select{width:100%;min-width:0;padding:8px 10px;border:1px solid #cfdde2;border-radius:8px;font:inherit;font-size:13px;background:#fff}
+.pv-saved .hint{font-size:12px!important}
 .pv-saved{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid #edf2f4}
 .pv-chip{display:inline-flex;align-items:center;border:1px solid #cfe3e1;background:#eef7f6;border-radius:16px;overflow:hidden}
 .pv-chip button{border:0;background:none;padding:5px 10px;font:inherit;font-size:12.5px;color:#135c5f;cursor:pointer}
@@ -784,8 +813,54 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
 .pv-chart-wrap{position:relative;height:380px}
 .pv-table td,.pv-table th{white-space:nowrap}
 .pv-table tfoot td{font-weight:700;background:#edf5f5}
-@media (max-width:1300px){.pv-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media (max-width:760px){.pv-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.pv-shell{display:grid;grid-template-columns:230px minmax(0,1fr);gap:16px;align-items:start}
+.pv-main{min-width:0}
+.pv-fields{position:sticky;top:12px;padding:16px!important;max-height:calc(100vh - 40px);overflow:auto}
+.pv-fields h4{margin:0;font-size:14px}.pv-fields>.hint{font-size:11.5px!important;margin:4px 0 10px}
+.pv-fields h5{margin:12px 0 6px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#6b818c}
+.pv-flist{display:flex;flex-direction:column;gap:5px}
+.pv-field{display:flex;align-items:center;gap:6px;text-align:left;border:1px solid #d7e3e7;background:#fff;border-radius:8px;padding:7px 10px;font:inherit;font-size:12.5px;color:#203f4c;cursor:grab}
+.pv-field:hover{border-color:#8fc2bd;background:#f4fbfa}.pv-field:active{cursor:grabbing}
+.pv-field.d:before,.pv-pill.d:before{content:'';width:8px;height:8px;border-radius:2px;background:#4a78c8;flex:0 0 8px}
+.pv-field.m:before,.pv-pill.m:before{content:'';width:8px;height:8px;border-radius:50%;background:#1f9a6c;flex:0 0 8px}
+.pv-field.used{background:#eef7f6;border-color:#bfe0dc;font-weight:600}.pv-field i{font-style:normal;margin-left:auto;color:#1f8a84}
+.pv-candhint{font-size:11px!important;margin-top:12px!important;padding-top:10px;border-top:1px solid #edf2f4}
+.pv-builder{padding:16px 18px!important}
+.pv-wells{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.pv-well-h{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#4a6370;margin-bottom:5px}.pv-well-h small{font-weight:500;letter-spacing:0;text-transform:none;color:#8a9ca5;font-size:11px}
+.pv-drop{min-height:74px;border:1.5px dashed #cfdde2;border-radius:10px;padding:6px;display:flex;flex-wrap:wrap;gap:5px;align-content:flex-start;background:#fafcfc;transition:background .12s,border-color .12s}
+.pv-dragging .pv-drop.ok{border-color:#7fbfb8;background:#f1faf8}.pv-drop.over{border-color:#1f8a84!important;background:#e3f4f1!important}
+.pv-ph{font-size:11.5px;color:#9aabb2;padding:4px}
+.pv-pill{display:inline-flex;align-items:center;gap:5px;background:#fff;border:1px solid #c9dbe0;border-radius:7px;padding:4px 4px 4px 6px;font-size:12px;font-weight:600;color:#203f4c;cursor:grab;max-width:100%}
+.pv-pill.dragging,.pv-field.dragging{opacity:.45}
+.pv-grip{color:#a8b8be;font-size:10px;letter-spacing:-2px}
+.pv-rm{border:0;background:none;color:#8a9ca5;cursor:pointer;font-size:15px;line-height:1;padding:0 3px}.pv-rm:hover{color:#c0444e}
+.pv-fval{border:0;background:#eef3f5;border-radius:5px;padding:2px 6px;font:inherit;font-size:11px;font-weight:600;color:#135c5f;cursor:pointer;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pv-bar{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:flex-end;margin-top:12px}
+.pv-opt{display:flex;flex-direction:column;gap:3px;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#6b818c}
+.pv-opt select{padding:6px 8px;border:1px solid #cfdde2;border-radius:8px;font:inherit;font-size:12.5px;font-weight:500;letter-spacing:0;text-transform:none;color:#203f4c;background:#fff}
+.pv-tog{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:#304a55;padding-bottom:6px}
+.pv-charts{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.pv-charts button{display:inline-flex;align-items:center;gap:6px;border:1px solid #d7e3e7;background:#fff;border-radius:8px;padding:6px 10px;font:inherit;font-size:12px;color:#40596a;cursor:pointer}
+.pv-charts button:hover{border-color:#8fc2bd}.pv-charts button[aria-checked="true"]{background:#1f8a84;border-color:#1f8a84;color:#fff}
+.pv-more{margin-top:10px}.pv-more summary{cursor:pointer;font-size:12.5px;font-weight:700;color:#1f8a84}.pv-more .pv-bar{margin-top:8px}
+.pv-pop{position:fixed;z-index:400;background:#fff;border:1px solid #d7e3e7;border-radius:10px;box-shadow:0 12px 32px #0f2a3433;padding:6px;min-width:190px;display:flex;flex-direction:column;gap:2px}
+.pv-pop.wide{width:280px}
+.pv-pop-h{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#6b818c;padding:6px 8px}.pv-pop-h small{text-transform:none;letter-spacing:0;font-weight:500;margin-left:4px}
+.pv-pop>button{border:0;background:none;text-align:left;padding:8px 10px;border-radius:7px;font:inherit;font-size:13px;color:#203f4c;cursor:pointer}.pv-pop>button:hover:not(:disabled){background:#eef7f6}.pv-pop>button:disabled{color:#a8b8be;cursor:default}
+.pv-pop-q{margin:2px 4px 4px;padding:7px 9px;border:1px solid #cfdde2;border-radius:7px;font:inherit;font-size:12.5px}
+.pv-pop-acts{display:flex;gap:6px;padding:0 4px}.pv-pop-acts button{border:0;background:none;color:#1f8a84;font:inherit;font-size:12px;font-weight:600;cursor:pointer;padding:2px}
+.pv-pop-list{max-height:260px;overflow:auto;padding:4px}.pv-pop-list label{display:flex;gap:8px;align-items:center;font-size:12.5px;padding:4px;border-radius:5px;cursor:pointer}.pv-pop-list label:hover{background:#f4f8f9}
+.pv-pop-foot{display:flex;justify-content:flex-end;padding:6px 4px 2px;border-top:1px solid #edf2f4;margin-top:4px}
+.pv-table-wrap{overflow:auto;max-height:640px}
+.pv-table th.pv-ch{text-align:center;border-left:1px solid #e1eaed}.pv-table th.pv-mh{font-size:9.5px}
+.pv-pc{cursor:pointer;border-bottom:1px dotted #7d969f}.pv-pc:hover{color:#135c5f;border-bottom-color:#1f8a84}
+.pv-drill .panel-head{flex-wrap:wrap}.pv-drill-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pv-drill-tools input{padding:7px 10px;border:1px solid #cfdde2;border-radius:8px;font:inherit;font-size:12.5px;min-width:220px}
+.pv-drill-body{max-height:420px;overflow:auto;border:1px solid #e1eaed;border-radius:10px}
+@media (max-width:1100px){.pv-shell{grid-template-columns:1fr}.pv-fields{position:static;max-height:none}.pv-flist{flex-direction:row;flex-wrap:wrap}.pv-wells{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.pv-wells{grid-template-columns:1fr}.pv-drop{min-height:48px}.pv-charts button span{display:none}}
+
 .al-group{margin:0 0 14px;border:1px solid #edf2f4;border-radius:12px;padding:10px 12px}
 .al-group>summary{list-style:none;cursor:pointer}.al-group>summary::-webkit-details-marker{display:none}
 .al-group>summary h4{margin:0;font-size:14px;display:flex;align-items:center;gap:8px}
@@ -1011,7 +1086,7 @@ button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #183442
       <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V12M10 20V5M16 20V9M22 20V3"/></svg></div>
       <div class="brand-text">
         <h1 id="dashboardTitle" title="Click to go home">Performance Dashboard</h1>
-        <p><span id="versionLabelInline">Version 4.20.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
+        <p><span id="versionLabelInline">Version 4.21.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
       </div>
     </div>
     <button type="button" class="side-collapse" id="sideCollapseBtn" aria-label="Collapse menu" title="Collapse menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
@@ -1030,11 +1105,7 @@ button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #183442
     <div class="ribbon-actions">
       <button class="ribbon-btn" id="clearAllFiltersBtn" title="Reset every dashboard filter and selection to the latest available week"><svg class="rb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8z"/><path d="M17 3l4 4M21 3l-4 4"/></svg><span class="rb-label">Clear all filters</span></button>
       <div class="download-dropdown-wrap hidden" id="downloadDropdownWrap">
-        <button class="ribbon-btn" id="downloadDropdownBtn"><svg class="rb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg><span class="rb-label">Download &#9662;</span></button>
-        <div class="download-dropdown-menu hidden" id="downloadDropdownMenu">
-          <button id="downloadAsPdfBtn">Download as PDF</button>
-          <button id="downloadAsWordBtn">Download as Word</button>
-        </div>
+        <button class="ribbon-btn" id="downloadDropdownBtn"><svg class="rb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg><span class="rb-label">Download</span></button>
       </div>
       <button data-view="uploads" class="ribbon-btn" id="settingsNavBtn"><svg class="rb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span class="rb-label">Settings</span></button>
       <div class="user-chip-wrap hidden" id="userChipWrap"><button type="button" class="ribbon-btn user-chip" id="userChip" title="My account"></button><button type="button" class="ribbon-btn" id="signOutBtn" title="Sign out"><svg class="rb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg><span class="rb-label">Sign out</span></button></div>
@@ -1111,10 +1182,11 @@ button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #183442
         <div id="view-candidates" class="hidden"></div>
         <div id="view-alerts" class="hidden"></div>
         <div id="view-pivot" class="hidden"></div>
+        <div id="view-history" class="hidden"></div>
       </div>
       <div class="muted-note" id="storageModeNote" style="text-align:center;margin-top:24px;">Data stored locally in this browser.</div>
       <div class="muted-note" style="text-align:center;margin-top:4px;opacity:.65;">
-        <span id="footerVersionLabel">Version 4.20.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
+        <span id="footerVersionLabel">Version 4.21.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
       </div>
     </div>
   </main>
@@ -1705,8 +1777,9 @@ document.addEventListener('mouseout', (e)=>{
 });
 // Candidate names / Employee Numbers are only shown to people with the Candidates right.
 function canSeeCandidates(){ return Server.can('candidates'); }
+// v4.21: the hover lists moved to Pivot & Charts — tables show plain numbers everywhere.
 function candidateCellHtml(value, list, metricKey, entityName){
-  if(!canSeeCandidates()) return fmtNum(value);
+  return fmtNum(value);
   const listJson = escapeHtml(JSON.stringify((list||[]).slice(0,500)));
   return `<span data-hover-candidates="${metricKey}" data-hover-candidates-name="${escapeHtml(entityName)}" data-hover-candidates-list="${listJson}" style="cursor:pointer;border-bottom:1px dotted var(--text-tertiary);">${fmtNum(value)}</span>`;
 }
@@ -3128,7 +3201,8 @@ const VIEW_META = {
   branches:{title:'Branch Performance', sub:'Show rates and outcomes by branch'},
   candidates:{title:'Candidates', sub:'Who is counted in each category, by week'},
   alerts:{title:'Alerts', sub:'Who needs attention this week — below 50% of goal first'},
-  pivot:{title:'Pivot & Charts', sub:'Pick rows, columns and a measure — the chart builds itself'},
+  pivot:{title:'Pivot & Charts', sub:'Drag fields into Rows, Columns, Values and Filters — the chart builds itself'},
+  history:{title:'History', sub:'Every week on record'},
   master:{title:'Master Data', sub:'Every candidate row from every import, in one sheet — filter any column, exclude or include candidates'},
   settings:{title:'Settings', sub:'Uploads, saved weeks, divisions, users and your account'},
   uploads:{title:'Uploads', sub:'Manage uploaded weeks and recruiter goals & divisions'},
@@ -3167,11 +3241,11 @@ async function refreshUI(){
   document.getElementById('dashboardViews').classList.toggle('hidden', !showDashboardViews);
   document.getElementById('downloadDropdownWrap').classList.toggle('hidden', !hasData);
 
-  const meta = currentView==='performance' ? PERFORMANCE_TYPE_META[performancePeriodType] : VIEW_META[currentView];
+  const meta = currentView==='performance' ? PERFORMANCE_TYPE_META[performancePeriodType] : currentView==='history' ? {title:(historyState.mode==='branches'?'Branch':'Recruiter')+' history', sub:'Every week on record — use Back to return'} : VIEW_META[currentView];
   document.getElementById('viewTitle').textContent = meta.title;
   document.getElementById('viewSub').textContent = showDashboardViews ? meta.sub : 'No data uploaded yet';
 
-  ['performance','recruiters','branches','master','candidates','alerts','pivot'].forEach(v=>{
+  ['performance','recruiters','branches','master','candidates','alerts','pivot','history'].forEach(v=>{
     document.getElementById('view-'+v).classList.toggle('hidden', v!==currentView);
   });
 
@@ -3185,7 +3259,7 @@ async function refreshUI(){
   renderPeriodPickerButton();
   closePeriodPicker();
   syncDedupeControls();
-  document.getElementById('periodPicker')?.classList.toggle('hidden', currentView==='candidates' || currentView==='alerts' || currentView==='pivot');
+  document.getElementById('periodPicker')?.classList.toggle('hidden', currentView==='candidates' || currentView==='alerts' || currentView==='pivot' || currentView==='history');
   ['weeklyDivisionSelect','weeklyDivisionSelectLbl'].forEach(id=>document.getElementById(id).classList.toggle('hidden',currentView!=='performance'));
   if(!hasData){ if(showDashboardViews) renderMasterView(); return; }
 
@@ -3201,6 +3275,7 @@ async function refreshUI(){
   else if(currentView==='candidates') renderCandidatesView();
   else if(currentView==='alerts') renderAlertsView();
   else if(currentView==='pivot') renderPivotView();
+  else if(currentView==='history') renderHistoryView();
 }
 
 /* ============================= SETTINGS MODAL ============================= */
@@ -5194,8 +5269,10 @@ async function showPopupWeek(pop,mode,names,date){
 }
 // Recruiter / branch card: a side panel with the week's numbers on top and tabs below
 // (Trend · Weeks · Remarks · Candidates) so nothing is stacked or squeezed.
-const epState = {mode:null, names:[], week:null, tab:'trend', cat:'showsList'};
-function epWeeks(anchor){ const all=[...weeksData].sort((a,b)=>a.weekEndDate.localeCompare(b.weekEndDate)); const i=all.findIndex(w=>w.weekEndDate===anchor); return all.slice(Math.max(0,(i<0?all.length:i+1)-8), i<0?all.length:i+1); }
+const epState = {mode:null, names:[], week:null, anchor:null, tab:'trend', cat:'showsList'};
+const EP_WEEKS = 6;
+function epWeeks(anchor, n){ n=n||EP_WEEKS; const all=[...weeksData].sort((a,b)=>a.weekEndDate.localeCompare(b.weekEndDate)); const i=all.findIndex(w=>w.weekEndDate===anchor); const end=i<0?all.length:i+1; return all.slice(Math.max(0,end-n), end); }
+function epPrevWeek(d){ const all=[...weeksData].map(w=>w.weekEndDate).sort(); const i=all.indexOf(d); return i>0 ? weeksData.find(w=>w.weekEndDate===all[i-1]) : null; }
 function epEntity(week, mode, name){
   if(!week) return null;
   const goals = KV.get('goals:'+week.weekEndDate) || {}; const g = n=>{ const v=goals[n]; return (v!==undefined && v!==null && v!=='') ? Number(v) : DEFAULT_WEEKLY_GOAL; };
@@ -5215,7 +5292,7 @@ async function openEntityPopover(mode,name,row){
   const names=Array.isArray(name)?name:[name];
   const period=selectedPeriodWeeks();
   const anchor=(period.length?period[period.length-1].weekEndDate:null) || defaultWeekEnd();
-  Object.assign(epState, {mode, names, week:anchor, tab: epState.tab==='candidates' && !canSeeCandidates() ? 'trend' : (epState.tab||'trend')});
+  Object.assign(epState, {mode, names, week:anchor, anchor, tab: epState.tab==='candidates' && !canSeeCandidates() ? 'trend' : (epState.tab||'trend')});
   const back=document.createElement('div'); back.id='entityDrawerBack'; back.onclick=()=>closeEntityPopover(true);
   const pop=document.createElement('aside'); pop.id='entityDrawer'; pop.setAttribute('role','dialog'); pop.setAttribute('aria-modal','true'); pop.setAttribute('aria-labelledby','epTitle');
   document.body.append(back, pop);
@@ -5226,8 +5303,11 @@ async function openEntityPopover(mode,name,row){
 function renderEntityDrawer(){
   const pop=document.getElementById('entityDrawer'); if(!pop) return;
   const {mode, names}=epState, single=names.length===1, name=names[0];
-  const weeks=epWeeks(epState.week); const week=weeksData.find(w=>w.weekEndDate===epState.week);
-  const prevWeek=weeks.length>1?weeks[weeks.length-2]:null;
+  // the 6-week window stays put; picking a week only changes the numbers on top
+  if(!epState.anchor || !epWeeks(epState.anchor).some(w=>w.weekEndDate===epState.week)) epState.anchor=epState.week;
+  const weeks=epWeeks(epState.anchor); const week=weeksData.find(w=>w.weekEndDate===epState.week);
+  const prevWeek=epPrevWeek(epState.week);
+  const keepScroll={pop:pop.scrollTop, body:pop.querySelector('#epBody')?.scrollTop||0, tbl:pop.querySelector('.ep-table-wrap')?.scrollTop||0};
   const e = single ? epEntity(week, mode, name) : null, pe = single ? epEntity(prevWeek, mode, name) : null;
   const div = single ? (mode==='recruiters' ? (getEffectiveRecruiterDivision(name, epState.week)||'Unassigned') : (branchDivisions[name]||'Unassigned')) : '';
   const tile=(label, val, sub, cls)=>`<div class="ep-tile ${cls||''}"><span>${label}</span><strong>${val}</strong>${sub?`<em>${sub}</em>`:''}</div>`;
@@ -5239,7 +5319,7 @@ function renderEntityDrawer(){
   if(!tabs.some(t=>t[0]===epState.tab)) epState.tab='trend';
   pop.innerHTML = `<header class="ep-head">
       <div><div class="ep-eyebrow">${mode==='recruiters'?'Recruiter':'Branch'}${single?' · '+escapeHtml(div)+(mode==='recruiters'&&e&&e.branch?' · '+escapeHtml(e.branch):''):' · comparing '+names.length}</div>
-      <h3 id="epTitle">${single?escapeHtml(name):names.map(escapeHtml).join(', ')}</h3></div>
+      <h3 id="epTitle">${single?`<button type="button" class="entity-link" id="epHistory" title="Open full history">${escapeHtml(name)}</button>`:names.map(escapeHtml).join(', ')}</h3>${single?'<button type="button" class="ep-histlink" id="epHistory2">Full history →</button>':''}</div>
       <button type="button" class="ep-close" aria-label="Close">&times;</button></header>
     <div class="ep-weekbar"><label>Week <select id="epWeek">${[...weeksData].map(w=>w.weekEndDate).sort().reverse().map(d=>`<option value="${d}" ${d===epState.week?'selected':''}>Wk ${weekOfDate(d).number} · ${fmtDate(weekOfDate(d).weekStart).replace(/, \d{4}$/,'')} – ${fmtDate(d)}</option>`).join('')}</select></label>${single&&mode==='recruiters'&&Remarks.canAdd()?'<button class="btn btn-primary btn-sm" id="epAddRemark">Add remark</button>':''}</div>
     ${single ? (e ? `<div class="ep-goal"><div class="ep-goal-top"><span>Schedules vs goal</span><strong>${fmtNum(e.schedules)} <small>/ ${fmtNum(e.goal)}</small></strong><em class="${goalPct<50?'bad':goalPct<80?'warn':'good'}">${goalPct==null?'–':Math.round(goalPct)+'%'}</em></div><div class="ep-bar"><i class="${goalPct<50?'bad':goalPct<80?'warn':'good'}" style="width:${Math.min(100,goalPct||0)}%"></i><b style="left:50%"></b></div></div>
@@ -5253,12 +5333,13 @@ function renderEntityDrawer(){
     <nav class="ep-tabs" role="tablist">${tabs.map(([k,l])=>`<button type="button" role="tab" data-ep-tab="${k}" aria-selected="${epState.tab===k}">${l}</button>`).join('')}</nav>
     <div class="ep-body" id="epBody"></div>`;
   pop.querySelector('.ep-close').onclick=()=>closeEntityPopover(true);
+  ['#epHistory','#epHistory2'].forEach(id=>pop.querySelector(id)?.addEventListener('click',()=>openHistoryPage(mode,name)));
   pop.querySelector('#epWeek').onchange=ev=>{ epState.week=ev.target.value; renderEntityDrawer(); };
   pop.querySelector('#epAddRemark')?.addEventListener('click', ()=>openRemarksModal(name, epState.week));
   pop.querySelectorAll('[data-ep-tab]').forEach(b=>b.onclick=()=>{ epState.tab=b.dataset.epTab; renderEntityDrawer(); });
   const body=pop.querySelector('#epBody'); destroyChart('entityTrend');
   if(epState.tab==='trend'){
-    body.innerHTML='<div class="ep-chart"><canvas id="entityTrend"></canvas></div><p class="hint" style="margin:6px 0 0;">Last '+weeks.length+' weeks up to the selected week.</p>';
+    body.innerHTML='<div class="ep-chart"><canvas id="entityTrend"></canvas></div><p class="hint" style="margin:6px 0 0;">Last '+weeks.length+' weeks.</p>';
     const labels=weeks.map(w=>'Wk '+w.weekNumber);
     const series = single
       ? [['Schedules','schedules','#2f8f8a'],['Interviews','scheduledDateOf','#4a78c8'],['Shows','shows','#1f9a6c'],['Hires','i9','#7a5fb8']].map(([l,k,c])=>({label:l, data:weeks.map(w=>{ const x=epEntity(w,mode,name); return x?x[k]:0; }), borderColor:c, backgroundColor:c, tension:.25, pointRadius:2.5, borderWidth:2}))
@@ -5266,7 +5347,7 @@ function renderEntityDrawer(){
     charts.entityTrend=safeChart(document.getElementById('entityTrend'),{type:'line',data:{labels,datasets:series},options:{responsive:true,maintainAspectRatio:false,plugins:{noValueLabels:true,legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{y:{beginAtZero:true,ticks:{font:{size:10}}},x:{ticks:{font:{size:10}}}}}});
   } else if(epState.tab==='weeks'){
     const rowsFor = n=>weeks.slice().reverse().map(w=>{ const x=epEntity(w,mode,n); const gp = x&&x.goal ? Math.round(x.schedules/x.goal*100) : null; return `<tr data-ep-week="${w.weekEndDate}" class="${w.weekEndDate===epState.week?'on':''}"><td>Wk ${w.weekNumber}<small>${fmtDate(w.weekEndDate).replace(/, \d{4}$/,'')}</small></td>${single?'':`<td>${escapeHtml(n)}</td>`}<td>${x?fmtNum(x.goal):'–'}</td><td>${x?fmtNum(x.schedules):'–'}${gp!=null?` <span class="ep-pct ${gp<50?'bad':gp<80?'warn':'good'}">${gp}%</span>`:''}</td><td>${x?fmtNum(x.scheduledDateOf):'–'}</td><td>${x?fmtNum(x.shows):'–'}</td><td>${x&&x.scheduledDateOf?fmtPct(x.shows,x.scheduledDateOf):'–'}</td><td>${x?fmtNum(x.i9):'–'}</td><td>${x?fmtNum(x.placed):'–'}</td></tr>`; }).join('');
-    body.innerHTML=`<div class="ep-table-wrap"><table class="ep-table" id="entityHistoryTable"><thead><tr><th>Week</th>${single?'':'<th>Name</th>'}<th>Goal</th><th>Sched.</th><th>Interv.</th><th>Shows</th><th>Show %</th><th>Hires</th><th>Placed</th></tr></thead><tbody>${names.map(rowsFor).join('')}</tbody></table></div><div class="ep-foot"><span class="hint">Click a week to show it above.</span><button class="btn btn-secondary btn-sm" data-copy-table="entityHistoryTable">Copy table</button></div>`;
+    body.innerHTML=`<div class="ep-table-wrap"><table class="ep-table" id="entityHistoryTable"><thead><tr><th>Week</th>${single?'':'<th>Name</th>'}<th>Goal</th><th>Sched.</th><th>Interv.</th><th>Shows</th><th>Show %</th><th>Hires</th><th>Placed</th></tr></thead><tbody>${names.map(rowsFor).join('')}</tbody></table></div><div class="ep-foot"><span class="hint">Last ${weeks.length} weeks · click one to show it above.</span><button class="btn btn-secondary btn-sm" data-copy-table="entityHistoryTable">Copy table</button></div>`;
     body.querySelectorAll('[data-ep-week]').forEach(tr=>tr.onclick=()=>{ epState.week=tr.dataset.epWeek; renderEntityDrawer(); });
     body.querySelector('[data-copy-table]').onclick=()=>{ const t=body.querySelector('table'); navigator.clipboard.writeText([...t.rows].map(r=>[...r.cells].map(c=>c.innerText.replace(/\s+/g,' ').trim()).join('\t')).join('\n')).then(()=>showToast('Copied — paste into Excel.')).catch(()=>showToast('Clipboard blocked by the browser.')); };
   } else if(epState.tab==='remarks'){
@@ -5285,11 +5366,107 @@ function renderEntityDrawer(){
     body.querySelector('#epCopyCands')?.addEventListener('click', ()=>navigator.clipboard.writeText(['Candidate\tEmployee Number\tDate', ...cur.map(c=>c.name+'\t'+c.eid+'\t'+(c.date||''))].join('\n')).then(()=>showToast('Copied '+cur.length+' rows.')).catch(()=>showToast('Clipboard blocked by the browser.')));
     if(week && week.listsSplit && !week.listsLoaded) candFromWeekLists(week.weekEndDate).then(()=>{ if(epState.tab==='candidates') renderEntityDrawer(); }).catch(()=>{});
   }
+  pop.scrollTop=keepScroll.pop; const nb=pop.querySelector('#epBody'); if(nb) nb.scrollTop=keepScroll.body; const tw=pop.querySelector('.ep-table-wrap'); if(tw && epState.tab==='weeks') tw.scrollTop=keepScroll.tbl;
 }
 document.addEventListener('keydown',e=>{ if(e.key==='Escape' && !document.getElementById('remarksModal')) closeEntityPopover(true); });
 // a click outside the panel closes it — except on table rows (Ctrl/Cmd-click adds them to the comparison) and dialogs opened from it
 document.addEventListener('click',e=>{ if(document.getElementById('entityDrawer') && e.target.isConnected && !e.target.closest('#entityDrawer, [data-pie-name], .modal-overlay, #toast')) closeEntityPopover(); });
 window.addEventListener('resize',()=>positionEntityPopover());
+
+/* ============================= FULL HISTORY PAGE ============================= */
+// Clicking a recruiter / branch NAME opens its whole history as a page of its own; Back returns
+// to where you came from (the browser Back button works too).
+const historyState = {mode:null, name:null, from:'recruiters', range:'all', pushed:false};
+function openHistoryPage(mode, name){
+  if(!Server.can(mode)) return;
+  closeEntityPopover();
+  if(currentView!=='history') historyState.from = currentView==='settings' ? 'performance' : currentView;
+  Object.assign(historyState, {mode, name, range: historyState.range||'all'});
+  currentView = 'history';
+  try{ history.pushState({ipdView:'history', mode, name}, '', '#history'); historyState.pushed=true; }catch(e){ historyState.pushed=false; }
+  refreshUI(); window.scrollTo(0,0);
+}
+function leaveHistoryPage(viaPop){
+  if(currentView!=='history') return;
+  if(!viaPop && historyState.pushed){ history.back(); return; } // popstate brings us back here with viaPop
+  historyState.pushed=false;
+  currentView = historyState.from || 'performance';
+  document.querySelectorAll('#navList button').forEach(b=>b.classList.toggle('active', b.dataset.view===currentView));
+  if(location.hash==='#history') try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){}
+  refreshUI();
+}
+window.addEventListener('popstate', e=>{
+  if(currentView==='history' && !(e.state && e.state.ipdView==='history')) leaveHistoryPage(true);
+  else if(e.state && e.state.ipdView==='history' && Server.can(e.state.mode)){ Object.assign(historyState,{mode:e.state.mode, name:e.state.name, pushed:true}); if(currentView!=='history') historyState.from=currentView; currentView='history'; refreshUI(); }
+});
+function historyRows(mode, name){
+  const weeks=[...weeksData].sort((a,b)=>a.weekEndDate.localeCompare(b.weekEndDate));
+  return weeks.map(w=>({w, x:epEntity(w, mode, name)})).filter(r=>r.x && (r.x.schedules||r.x.scheduledDateOf||r.x.shows||r.x.noShows||r.x.i9||r.x.placed));
+}
+function renderHistoryView(){
+  const el=document.getElementById('view-history'); if(!el) return;
+  const {mode, name}=historyState;
+  ['historyTrend','historyGoal'].forEach(destroyChart);
+  const all=historyRows(mode, name);
+  const ranges={all:'All weeks', 52:'Last 52 weeks', 26:'Last 26 weeks', 13:'Last 13 weeks', 6:'Last 6 weeks'};
+  const rows = historyState.range==='all' ? all : all.slice(-Number(historyState.range));
+  const sum=k=>rows.reduce((s,r)=>s+(r.x[k]||0),0);
+  const T={schedules:sum('schedules'), scheduledDateOf:sum('scheduledDateOf'), shows:sum('shows'), noShows:sum('noShows'), i9:sum('i9'), placed:sum('placed'), goal:sum('goal')};
+  const hit=rows.filter(r=>r.x.goal && r.x.schedules>=r.x.goal).length, low=rows.filter(r=>r.x.goal && r.x.schedules<r.x.goal*0.5).length;
+  const best=rows.reduce((b,r)=>!b||r.x.schedules>b.x.schedules?r:b,null);
+  const last=all[all.length-1];
+  const div = mode==='recruiters' ? (getEffectiveRecruiterDivision(name, last?last.w.weekEndDate:null)||'Unassigned') : (branchDivisions[name]||'Unassigned');
+  const branchesSeen = mode==='recruiters' ? [...new Set(all.map(r=>r.x.branch).filter(Boolean))] : [];
+  const tile=(l,v,s)=>`<div class="hp-tile"><span>${l}</span><strong>${v}</strong>${s?`<em>${s}</em>`:''}</div>`;
+  const remarks = mode==='recruiters' ? Remarks.forRecruiter(name) : [];
+  // branch: recruiters who worked in it over the range
+  let team='';
+  if(mode==='branches'){
+    const by={}; rows.forEach(({w})=>Object.entries(w.byRecruiter||{}).forEach(([n,r])=>{ if(r.branch!==name) return; const t=by[n]||(by[n]={weeks:0,...emptyTotals()}); t.weeks++; for(const k of Object.keys(emptyTotals())) t[k]+=r[k]||0; }));
+    const list=Object.entries(by).sort((a,b)=>b[1].schedules-a[1].schedules);
+    team = `<section class="panel hp-panel" data-section="hist.team"><div class="hp-panel-head"><h3>Recruiters in this branch</h3><span class="hint">${list.length} over ${ranges[historyState.range].toLowerCase()}</span></div>
+      <div class="hp-table-wrap"><table class="ep-table"><thead><tr><th>Recruiter</th><th>Weeks</th><th>Schedules</th><th>Interviews</th><th>Shows</th><th>Show %</th><th>Hires</th><th>Placed</th></tr></thead><tbody>${list.map(([n,t])=>`<tr><td>${Server.can('recruiters')?`<button type="button" class="entity-link" data-history-open="recruiters" data-name="${escapeHtml(n)}">${escapeHtml(n)}</button>`:escapeHtml(n)}</td><td>${t.weeks}</td><td>${fmtNum(t.schedules)}</td><td>${fmtNum(t.scheduledDateOf)}</td><td>${fmtNum(t.shows)}</td><td>${fmtPct(t.shows,t.scheduledDateOf)}</td><td>${fmtNum(t.i9)}</td><td>${fmtNum(t.placed)}</td></tr>`).join('')}</tbody></table></div></section>`;
+  }
+  const weekRows = rows.slice().reverse().map(({w,x})=>{ const gp=x.goal?Math.round(x.schedules/x.goal*100):null; const pend=weekIsFullyPending(w.weekEndDate);
+    return `<tr><td>Wk ${w.weekNumber}<small>${fmtDate(weekOfDate(w.weekEndDate).weekStart).replace(/, \d{4}$/,'')} – ${fmtDate(w.weekEndDate)}</small></td>${mode==='recruiters'?`<td>${escapeHtml(x.branch||'–')}</td>`:''}<td>${fmtNum(x.goal)}</td><td>${fmtNum(x.schedules)}${gp!=null?` <span class="ep-pct ${gp<50?'bad':gp<80?'warn':'good'}">${gp}%</span>`:''}</td><td>${fmtNum(x.scheduledDateOf)}</td><td>${fmtNum(x.shows)}</td><td>${fmtNum(x.noShows)}</td><td>${pend?'pending':fmtPct(x.shows,x.scheduledDateOf)}</td><td>${fmtNum(x.i9)}</td><td>${fmtNum(x.placed)}</td>${mode==='recruiters'?`<td class="hp-rem">${(()=>{ const rs=remarks.filter(r=>r.week_end_date===w.weekEndDate); return rs.length?escapeHtml(rs[0].remark).slice(0,80)+(rs.length>1?` <b>+${rs.length-1}</b>`:''):''; })()}</td>`:''}</tr>`; }).join('');
+  el.innerHTML = `<div class="hp-top">
+      <button type="button" class="btn btn-secondary hp-back" id="historyBack"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg> Back to ${escapeHtml((VIEW_META[historyState.from]||VIEW_META.performance).title)}</button>
+      <div class="hp-id"><div class="ep-eyebrow">${mode==='recruiters'?'Recruiter':'Branch'} · ${escapeHtml(div)}${branchesSeen.length?' · '+escapeHtml(last.x.branch||branchesSeen[branchesSeen.length-1])+(branchesSeen.length>1?` <span class="hp-more" title="${escapeHtml(branchesSeen.join(', '))}">+${branchesSeen.length-1} earlier branch${branchesSeen.length>2?'es':''}</span>`:''):''}</div><h2>${escapeHtml(name)}</h2><p class="hint">${all.length?`Active in ${all.length} week${all.length===1?'':'s'} · first Wk ${all[0].w.weekNumber} (${fmtDate(all[0].w.weekEndDate)}) · latest Wk ${last.w.weekNumber} (${fmtDate(last.w.weekEndDate)})`:'No activity recorded.'}</p></div>
+      <label class="hp-range">Show <select id="historyRange">${Object.entries(ranges).map(([k,l])=>`<option value="${k}" ${String(historyState.range)===k?'selected':''}>${l}</option>`).join('')}</select></label>
+    </div>
+    ${rows.length ? `<div class="hp-tiles" data-section="hist.kpis">
+      ${tile('Schedules', fmtNum(T.schedules), T.goal?`${Math.round(T.schedules/T.goal*100)}% of goal ${fmtNum(T.goal)}`:'')}
+      ${tile('Interviews', fmtNum(T.scheduledDateOf), '')}
+      ${tile('Shows', fmtNum(T.shows), fmtPct(T.shows,T.scheduledDateOf)+' show rate')}
+      ${tile('No shows', fmtNum(T.noShows), fmtPct(T.noShows,T.scheduledDateOf))}
+      ${tile('Hires', fmtNum(T.i9), fmtPct(T.i9,T.shows)+' of shows')}
+      ${tile('Placed', fmtNum(T.placed), '')}
+      ${tile('Avg / week', fmtNum(Math.round(T.schedules/rows.length)), 'schedules')}
+      ${tile('Goal hit', `${hit}<small>/${rows.length}</small>`, `${low} week${low===1?'':'s'} below 50%${best?` · best Wk ${best.w.weekNumber}`:''}`)}
+    </div>
+    <div class="hp-charts">
+      <section class="panel hp-panel" data-section="hist.trend"><div class="hp-panel-head"><h3>Week by week</h3></div><div class="hp-chart"><canvas id="historyTrend"></canvas></div></section>
+      <section class="panel hp-panel" data-section="hist.goal"><div class="hp-panel-head"><h3>Schedules vs goal</h3><span class="hint">red under 50%, amber under 80%</span></div><div class="hp-chart"><canvas id="historyGoal"></canvas></div></section>
+    </div>
+    ${team}
+    <section class="panel hp-panel" data-section="hist.weeks"><div class="hp-panel-head"><h3>Every week</h3><span class="hint">${rows.length} week${rows.length===1?'':'s'}</span><button class="btn btn-secondary btn-sm" id="historyCopy" style="margin-left:auto">Copy table</button></div>
+      <div class="hp-table-wrap"><table class="ep-table" id="historyTable"><thead><tr><th>Week</th>${mode==='recruiters'?'<th>Branch</th>':''}<th>Goal</th><th>Schedules</th><th>Interviews</th><th>Shows</th><th>No shows</th><th>Show %</th><th>Hires</th><th>Placed</th>${mode==='recruiters'?'<th>Remark</th>':''}</tr></thead><tbody>${weekRows}</tbody>
+      <tfoot><tr><td>Total</td>${mode==='recruiters'?'<td></td>':''}<td>${fmtNum(T.goal)}</td><td>${fmtNum(T.schedules)}</td><td>${fmtNum(T.scheduledDateOf)}</td><td>${fmtNum(T.shows)}</td><td>${fmtNum(T.noShows)}</td><td>${fmtPct(T.shows,T.scheduledDateOf)}</td><td>${fmtNum(T.i9)}</td><td>${fmtNum(T.placed)}</td>${mode==='recruiters'?'<td></td>':''}</tr></tfoot></table></div></section>
+    ${mode==='recruiters' ? `<section class="panel hp-panel" data-section="hist.remarks"><div class="hp-panel-head"><h3>Remarks</h3><span class="hint">${remarks.length}</span>${Remarks.canAdd()||remarks.length?`<button class="btn btn-secondary btn-sm" id="historyRemarks" style="margin-left:auto">${Remarks.canAdd()?'Add or review remarks':'Open remarks'}</button>`:''}</div>
+      ${remarks.length?`<div class="ep-remarks">${remarks.map(r=>`<div class="ep-remark"><div class="ep-remark-meta"><strong>Wk ${weekOfDate(r.week_end_date).number}</strong> · ${fmtDate(r.remark_date)} · ${escapeHtml(r.author||'')} ${remarkStatusHtml(r)}</div><div class="ep-remark-text">${escapeHtml(r.remark)}</div></div>`).join('')}</div>`:'<p class="hint">No remarks yet.</p>'}</section>` : ''}`
+    : `<div class="panel"><p class="hint">No activity for ${escapeHtml(name)} in ${ranges[historyState.range].toLowerCase()}.</p></div>`}`;
+  el.querySelector('#historyBack').onclick=()=>leaveHistoryPage(false);
+  el.querySelector('#historyRange').onchange=e=>{ historyState.range=e.target.value; renderHistoryView(); };
+  el.querySelector('#historyRemarks')?.addEventListener('click', ()=>openRemarksModal(name, last?last.w.weekEndDate:defaultWeekEnd()));
+  el.querySelectorAll('[data-history-open]').forEach(b=>b.onclick=()=>{ historyState.from='branches'; Object.assign(historyState,{mode:b.dataset.historyOpen, name:b.dataset.name}); try{ history.pushState({ipdView:'history', mode:historyState.mode, name:historyState.name}, '', '#history'); }catch(e){} renderHistoryView(); window.scrollTo(0,0); });
+  el.querySelector('#historyCopy')?.addEventListener('click', ()=>{ const t=el.querySelector('#historyTable'); navigator.clipboard.writeText([...t.rows].map(r=>[...r.cells].map(c=>c.innerText.replace(/\s+/g,' ').trim()).join('\t')).join('\n')).then(()=>showToast('Copied — paste into Excel.')).catch(()=>showToast('Clipboard blocked by the browser.')); });
+  if(!rows.length) return;
+  const labels=rows.map(r=>'Wk '+r.w.weekNumber+(rows.length>20?'':' · '+fmtDate(r.w.weekEndDate).replace(/, \d{4}$/,'')));
+  const ds=(l,k,c,extra)=>({label:l, data:rows.map(r=>r.x[k]||0), borderColor:c, backgroundColor:c, tension:.25, pointRadius:rows.length>30?0:2.5, borderWidth:2, ...(extra||{})});
+  charts.historyTrend=safeChart(document.getElementById('historyTrend'),{type:'line',data:{labels,datasets:[ds('Schedules','schedules','#2f8f8a'),ds('Interviews','scheduledDateOf','#4a78c8'),ds('Shows','shows','#1f9a6c'),ds('No shows','noShows','#c4565f',{hidden:true}),ds('Hires','i9','#7a5fb8'),ds('Placed','placed','#d08a2c',{hidden:true})]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{noValueLabels:true,legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:{y:{beginAtZero:true},x:{ticks:{autoSkip:true,maxRotation:0,font:{size:10}}}}}});
+  const pct=rows.map(r=>r.x.goal?Math.round(r.x.schedules/r.x.goal*100):0);
+  charts.historyGoal=safeChart(document.getElementById('historyGoal'),{type:'bar',data:{labels,datasets:[{label:'% of goal',data:pct,backgroundColor:pct.map(p=>p<50?'#d64545':p<80?'#e0a020':'#1f9a6c'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{noValueLabels:rows.length>16,legend:{display:false},tooltip:{callbacks:{label:c=>{ const r=rows[c.dataIndex]; return `${c.raw}% · ${fmtNum(r.x.schedules)} of ${fmtNum(r.x.goal)}`; }}}},scales:{y:{beginAtZero:true,ticks:{callback:v=>v+'%'}},x:{ticks:{autoSkip:true,maxRotation:0,font:{size:10}}}}}});
+}
 
 
 function renderPeopleTable(mode, allRows, displayRows){
@@ -5430,7 +5607,7 @@ function renderPeopleTable(mode, allRows, displayRows){
       const rowBg = isSelectedPie ? 'background:var(--indigo-light);' : (isBottomPerformer?'background:var(--red-light);':'');
       const stickyBg = rowBg || 'background:var(--surface);'; // sticky cells need an explicit bg or they show through as white
       return mode==='recruiters' ? `<tr data-pie-name="${escapeHtml(r.name)}" style="cursor:pointer;${rowBg}">
-      <td style="${stickyBg}"><span class="recruiter-name">${i<3?'<span class="rank">#'+(i+1)+'</span>':''}${escapeHtml(r.name)}</span>${isSelectedPie?' <span class="pill good">Selected</span>':''}</td>
+      <td style="${stickyBg}"><span class="recruiter-name">${i<3?'<span class="rank">#'+(i+1)+'</span>':''}<button type="button" class="entity-link" data-history-name="${escapeHtml(r.name)}" title="Open full history">${escapeHtml(r.name)}</button></span>${isSelectedPie?' <span class="pill good">Selected</span>':''}</td>
       ${showPerformerHighlights?`<td style="${stickyBg}">${r.highlightBadgesHtml||'—'}</td>`:''}
       <td style="${stickyBg}">${escapeHtml(r.division||'\u2013')}</td>
       <td>${r.goal!==undefined ? fmtNum(r.goal) : '\u2013'}</td>
@@ -5445,7 +5622,7 @@ function renderPeopleTable(mode, allRows, displayRows){
       <td>${noShowRatePill(r.noShowRate)}</td>
       <td class="remark-td">${remarksCellHtml(r.name, peopleRemarksWeek)}</td>
     </tr>` : `<tr data-pie-name="${escapeHtml(r.name)}" style="cursor:pointer;${isSelectedPie?'background:var(--indigo-light);':''}">
-      <td style="${isSelectedPie?'background:var(--indigo-light);':'background:var(--surface);'}"><span class="recruiter-name">${i<3?'<span class="rank">#'+(i+1)+'</span>':''}${escapeHtml(r.name)}</span>${isSelectedPie?' <span class="pill good">Selected</span>':''}</td>
+      <td style="${isSelectedPie?'background:var(--indigo-light);':'background:var(--surface);'}"><span class="recruiter-name">${i<3?'<span class="rank">#'+(i+1)+'</span>':''}<button type="button" class="entity-link" data-history-name="${escapeHtml(r.name)}" title="Open full history">${escapeHtml(r.name)}</button></span>${isSelectedPie?' <span class="pill good">Selected</span>':''}</td>
       <td style="${isSelectedPie?'background:var(--indigo-light);':'background:var(--surface);'}">${escapeHtml(r.division||'\u2013')}</td>
       <td>${candidateCellHtml(r.schedules, r.schedulesList, 'schedules', r.name)}</td>
       <td>${candidateCellHtml(r.scheduledDateOf, r.interviewsList, 'scheduledDateOf', r.name)}</td>
@@ -5468,7 +5645,7 @@ function renderPeopleTable(mode, allRows, displayRows){
       table.querySelectorAll('tbody tr[data-pie-name]').forEach(r=>{const checked=selectedPieTargets[mode].includes(r.dataset.pieName);r.setAttribute('aria-selected',String(checked));r.classList.toggle('comparison-selected',checked);if(!checked){r.querySelectorAll('td').forEach(td=>{if(td.style.background==='var(--indigo-light)')td.style.background='';});r.style.background='';r.querySelectorAll('.pill.good').forEach(p=>{if(p.textContent==='Selected')p.remove();});}});
       if(selectedPieTargets[mode].length)openEntityPopover(mode,selectedPieTargets[mode],row);else closeEntityPopover();
     };
-    row.addEventListener('click',e=>{ if(e.target.closest('[data-remarks]')) return; select(e.ctrlKey||e.metaKey); });
+    row.addEventListener('click',e=>{ if(e.target.closest('[data-remarks]')) return; const hn=e.target.closest('[data-history-name]'); if(hn && !(e.ctrlKey||e.metaKey)){ e.stopPropagation(); openHistoryPage(mode, hn.dataset.historyName); return; } select(e.ctrlKey||e.metaKey); });
     row.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(e.ctrlKey||e.metaKey);}});
   });
   table.querySelectorAll('[data-remarks]').forEach(b=>b.addEventListener('click', e=>{ e.stopPropagation(); openRemarksModal(b.dataset.remarks, peopleRemarksWeek); }));
@@ -5647,7 +5824,7 @@ function getActiveExportContainer(){
   if(currentView==='recruiters') return document.getElementById('view-recruiters');
   if(currentView==='branches') return document.getElementById('view-branches');
   if(settingsModalOpen) return document.getElementById('view-manage');
-  return null;
+  return document.getElementById('view-'+currentView) || null;
 }
 // jsPDF's built-in fonts (helvetica/times/courier) only support the WinAnsi/Latin-1 character
 // set — typographic Unicode punctuation like em-dashes, curly quotes, bullets and ellipses
@@ -5984,19 +6161,54 @@ function exportSnapshot(){
   }
 }
 document.getElementById('clearAllFiltersBtn').addEventListener('click',clearAllDashboardFilters);
-document.getElementById('downloadDropdownBtn').addEventListener('click', (e)=>{
-  e.stopPropagation();
-  document.getElementById('downloadDropdownMenu').classList.toggle('hidden');
-});
-document.addEventListener('click', ()=> document.getElementById('downloadDropdownMenu').classList.add('hidden'));
-document.getElementById('downloadAsPdfBtn').addEventListener('click', ()=>{
-  document.getElementById('downloadDropdownMenu').classList.add('hidden');
-  exportCurrentPageToPDF();
-});
-document.getElementById('downloadAsWordBtn').addEventListener('click', ()=>{
-  document.getElementById('downloadDropdownMenu').classList.add('hidden');
-  exportCurrentPageToWord();
-});
+// Download: one button → a dialog with every option (v4.21 — replaces the drop-down).
+function currentViewTables(){
+  const host = currentView==='settings' ? document.getElementById('view-settings') : document.getElementById('view-'+currentView);
+  return host ? [...host.querySelectorAll('table')].filter(t=>t.offsetParent!==null && t.rows.length>1) : [];
+}
+function exportPageTablesExcel(){
+  const tables=currentViewTables(); if(!tables.length){ showToast('No tables on this page to export.'); return; }
+  const wb=XLSX.utils.book_new(), used=new Set();
+  tables.forEach((t,i)=>{
+    const head=(t.closest('.panel, section')?.querySelector('h3, h4')?.textContent||'Table '+(i+1)).replace(/[\\/?*\[\]:]/g,' ').trim().slice(0,28)||('Table '+(i+1));
+    let name=head, n=2; while(used.has(name.toLowerCase())) name=head.slice(0,25)+' '+(n++); used.add(name.toLowerCase());
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.table_to_sheet(t, {raw:true}), name);
+  });
+  XLSX.writeFile(wb, (VIEW_META[currentView]?.title||currentView).replace(/[^a-z0-9]+/gi,'-').toLowerCase()+'-'+toIsoDateOnly(new Date())+'.xlsx');
+}
+function exportWeeklySummaryExcel(){
+  const rows=[...weeksData].sort((a,b)=>a.weekEndDate.localeCompare(b.weekEndDate)).map(w=>{ const t=w.totals||{}; return ['Wk '+w.weekNumber, w.weekEndDate, t.schedules||0, t.scheduledDateOf||0, t.shows||0, t.noShows||0, t.scheduledDateOf?+((t.shows||0)/t.scheduledDateOf*100).toFixed(1):'', t.i9||0, t.placed||0, Object.keys(w.byRecruiter||{}).length]; });
+  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['Week','Week ending','Schedules','Interviews','Shows','No shows','Show rate %','Hires','Placed','Recruiters'], ...rows]), 'Weekly summary');
+  XLSX.writeFile(wb, 'weekly-summary-'+(dedupeByEmployeeNumber?'deduped':'raw')+'-'+toIsoDateOnly(new Date())+'.xlsx');
+}
+function openDownloadDialog(){
+  if(!Server.can('export')){ showToast('Your account cannot download data.'); return; }
+  document.getElementById('downloadDialog')?.remove();
+  const page = currentView==='performance' ? PERFORMANCE_TYPE_META[performancePeriodType].title : currentView==='history' ? (historyState.name+' — history') : (VIEW_META[currentView]?.title||'This page');
+  const nTables = currentViewTables().length;
+  const ico = p=>`<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+  const opts = [
+    {id:'pdf', group:'This page', title:'PDF', sub:'Print-ready copy of “'+page+'”', icon:'<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 15h2a1.5 1.5 0 0 0 0-3H8v5M14 12v5M14 12h3M14 14.5h2"/>', run:exportCurrentPageToPDF},
+    {id:'word', group:'This page', title:'Word', sub:'Editable .doc of “'+page+'”', icon:'<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 12l1.3 5 1.7-4 1.7 4L14 12"/>', run:exportCurrentPageToWord},
+    {id:'xlsx', group:'This page', title:'Excel — tables', sub: nTables ? nTables+' table'+(nTables===1?'':'s')+' on this page, one sheet each' : 'No tables on this page', icon:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 4v16"/>', run:exportPageTablesExcel, disabled:!nTables},
+    {id:'weekly', group:'All data', title:'Excel — weekly summary', sub:'Totals for every saved week ('+(dedupeByEmployeeNumber?'Deduped':'Raw')+')', icon:'<path d="M4 20V12M10 20V5M16 20V9M22 20V3"/>', run:exportWeeklySummaryExcel},
+    ...(Server.can('master') ? [{id:'master', group:'All data', title:'Excel — master sheet', sub:'Every candidate row from every import', icon:'<ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>', run:downloadMasterSheet}] : []),
+  ];
+  const groups=[...new Set(opts.map(o=>o.group))];
+  const wrap=document.createElement('div'); wrap.className='modal-overlay'; wrap.id='downloadDialog';
+  wrap.innerHTML=`<div class="modal modal-sm dl-modal" role="dialog" aria-modal="true" aria-labelledby="dlTitle">
+    <div class="modal-header"><h3 id="dlTitle">Download</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div>
+    <div class="modal-body">${groups.map(g=>`<div class="dl-group"><h4>${g}</h4><div class="dl-grid">${opts.filter(o=>o.group===g).map(o=>`<button type="button" class="dl-opt" data-dl="${o.id}" ${o.disabled?'disabled':''}><span class="dl-ico">${ico(o.icon)}</span><span class="dl-txt"><strong>${escapeHtml(o.title)}</strong><em>${escapeHtml(o.sub)}</em></span></button>`).join('')}</div></div>`).join('')}</div>
+  </div>`;
+  document.body.appendChild(wrap);
+  const close=()=>{ wrap.remove(); document.removeEventListener('keydown', onKey); };
+  const onKey=e=>{ if(e.key==='Escape') close(); };
+  document.addEventListener('keydown', onKey);
+  wrap.addEventListener('click', e=>{ if(e.target===wrap || e.target.closest('[data-close]')) close(); });
+  wrap.querySelectorAll('[data-dl]').forEach(b=>b.onclick=()=>{ const o=opts.find(x=>x.id===b.dataset.dl); close(); if(o) setTimeout(()=>o.run(), 30); });
+  wrap.querySelector('.dl-opt:not([disabled])')?.focus();
+}
+document.getElementById('downloadDropdownBtn').addEventListener('click', e=>{ e.stopPropagation(); openDownloadDialog(); });
 
 /* ============================= RECRUITER VISIBILITY ============================= */
 const recruiterVisibilityModal = document.getElementById('recruiterVisibilityModal');
@@ -6363,7 +6575,7 @@ const Server = {
         chunk.forEach(k=>{ if(!seen.has(k) && !k.endsWith(LISTS_SUFFIX)) KV.delete(k); });
       }
     }
-    if(remarks){ await Remarks.load().catch(()=>{}); if(currentView==='alerts') renderAlertsView(); }
+    if(remarks){ await Remarks.load().catch(()=>{}); if(currentView==='alerts') renderAlertsView(); if(currentView==='history') renderHistoryView(); }
     if(users){
       try{ const me = await this.rpc('dash_me'); const changed = JSON.stringify(me.modules)!==JSON.stringify(this.user.modules) || me.name!==this.user.name; this.user=me; if(changed){ applyPermissions(); refreshUI(); showToast('Your access rights were updated.'); } }catch(e){}
       if(settingsModalOpen && !document.getElementById('settingsPane-users')?.classList.contains('hidden')) renderUsersAdmin();
@@ -6442,8 +6654,8 @@ function renderUploadAlerts(){
 const PAGE_SECTIONS = {
   performance:[['perf.kpis','KPI cards (all)'],['perf.kpi.schedules','· Schedules card'],['perf.kpi.interviews','· Interviews card'],['perf.kpi.shows','· Shows card'],['perf.kpi.no_shows','· No Shows card'],['perf.kpi.hires','· Hires card'],['perf.kpi.placed','· Placed card'],['perf.kpi.hires_per_recruiter','· Hires per Recruiter card'],['perf.kpi.goal_reach','· Goal Reach card'],['perf.kpi.show_rate','· Show Rate card'],['perf.kpi.no_show_rate','· No Show Rate card'],
                 ['perf.trends','Trends charts'],['perf.leaderboards','Leaderboards (recruiter & branch snapshots)'],['perf.divisions','Division breakdown'],['perf.history','Previous 6 weeks table'],['perf.insights','Insights'],['perf.composition','Composition pies (monthly / quarterly)']],
-  recruiters:[['rec.table','Recruiter table']],
-  branches:[['br.table','Branch table']],
+  recruiters:[['rec.table','Recruiter table'],['hist.kpis','History page — summary tiles (recruiter & branch)'],['hist.trend','History page — week-by-week chart'],['hist.goal','History page — schedules vs goal chart'],['hist.weeks','History page — every-week table'],['hist.remarks','History page — remarks']],
+  branches:[['br.table','Branch table'],['hist.team','History page — recruiters in the branch']],
   candidates:[['cand.list','Category boxes and candidate list'],['cand.explain','“How are these counted?” breakdown']],
   pivot:[['pivot.chart','Chart'],['pivot.table','Pivot table']],
   alerts:[['alerts.summary','Summary tiles'],['alerts.below','Below 50% of goal'],['alerts.watch','50–79% of goal'],['alerts.signals','Other signals & wins'],['alerts.approvals','Remarks awaiting approval (approvers only)']],
@@ -6460,7 +6672,8 @@ function applyPermissions(){
   const u = Server.user; if(!u) return;
   document.querySelectorAll('#navList button[data-view]').forEach(b=>{ b.classList.toggle('hidden', !Server.can(VIEW_MODULE[b.dataset.view])); });
   const allowedViews = Object.keys(VIEW_MODULE).filter(v=>Server.can(VIEW_MODULE[v]));
-  if(currentView!=='settings' && !allowedViews.includes(currentView) && allowedViews.length){
+  if(currentView==='history' && !Server.can(historyState.mode)) currentView = historyState.from||'performance';
+  if(currentView!=='settings' && currentView!=='history' && !allowedViews.includes(currentView) && allowedViews.length){
     currentView = allowedViews[0];
     document.querySelectorAll('#navList button').forEach(b=>b.classList.toggle('active', b.dataset.view===currentView));
   }
@@ -7076,6 +7289,7 @@ async function saveRemarkFromModal(){
     showToast(Remarks.canApprove() ? 'Remark saved.' : 'Remark sent for approval.');
     if(document.getElementById('entityDrawer')) renderEntityDrawer();
     if(currentView==='alerts') renderAlertsView();
+    if(currentView==='history') renderHistoryView();
   }catch(e){ showToast('Could not save the remark: '+cleanErr(e)); }
   finally{ btn.disabled=false; }
 }
@@ -7101,12 +7315,12 @@ function renderRemarksModalBody(){
     renderRemarksModalBody();
   }));
   host.querySelectorAll('[data-approve],[data-reject]').forEach(b=>b.addEventListener('click', async ()=>{
-    try{ await Remarks.review(b.closest('.remark-item').dataset.id, b.hasAttribute('data-approve')); renderRemarksModalBody(); if(currentView==='recruiters') renderPeopleView('recruiters'); if(currentView==='alerts') renderAlertsView(); showToast(b.hasAttribute('data-approve')?'Remark approved.':'Remark rejected.'); }
+    try{ await Remarks.review(b.closest('.remark-item').dataset.id, b.hasAttribute('data-approve')); renderRemarksModalBody(); if(currentView==='recruiters') renderPeopleView('recruiters'); if(currentView==='alerts') renderAlertsView(); if(currentView==='history') renderHistoryView(); showToast(b.hasAttribute('data-approve')?'Remark approved.':'Remark rejected.'); }
     catch(e){ showToast('Could not update: '+cleanErr(e)); }
   }));
   host.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click', async ()=>{
     if(!confirm('Delete this remark?')) return;
-    try{ await Remarks.remove(b.closest('.remark-item').dataset.id); renderRemarksModalBody(); if(currentView==='recruiters') renderPeopleView('recruiters'); }
+    try{ await Remarks.remove(b.closest('.remark-item').dataset.id); renderRemarksModalBody(); if(currentView==='recruiters') renderPeopleView('recruiters'); if(currentView==='history') renderHistoryView(); }
     catch(e){ showToast('Could not delete: '+cleanErr(e)); }
   }));
 }
@@ -7327,140 +7541,379 @@ async function downloadMasterSheet(){
 
 
 /* ------------------------------------------ PIVOT & CHARTS ------------------------------------------ */
-// Users with the "pivot" right build their own pivot: rows, optional columns, a measure, a period
-// and a filter; the chart is generated from it in the chart type they pick. Data: the stored
-// weekly numbers per recruiter (follows the Deduped / Raw switch). Views are saved per person.
+// v4.21: a drag-and-drop builder. Fields (things to group by, and numbers) are dragged into
+// Filters / Columns / Rows / Values — or clicked, then "Add to …" (works on phones too).
+// Results redraw on every change. Data: the stored weekly numbers per recruiter (follows the
+// Deduped / Raw switch). People with the Candidates right can hover a number (or click it, or a
+// chart bar) to see the candidates behind it — that is the only place hover lists appear now.
 const PIVOT_DIMS = {week:'Week', month:'Month', quarter:'Quarter', recruiter:'Recruiter', branch:'Branch', division:'Division'};
 const PIVOT_MEASURES = {
-  schedules:{label:'Schedules', sum:'schedules'}, interviews:{label:'Interviews', sum:'scheduledDateOf'}, shows:{label:'Shows', sum:'shows'},
-  noShows:{label:'No Shows', sum:'noShows'}, hires:{label:'Hires', sum:'i9'}, placed:{label:'Placed', sum:'placed'},
-  showRate:{label:'Show rate %', rate:['shows','scheduledDateOf']}, noShowRate:{label:'No-show rate %', rate:['noShows','scheduledDateOf']},
-  hireRate:{label:'Hires per show %', rate:['i9','shows']}, goalReach:{label:'Goal reach %', rate:['schedules','goal']},
-  hiresPerRecruiter:{label:'Hires per recruiter-week', per:'i9'}, recruiters:{label:'Active recruiters', distinct:true},
+  schedules:{label:'Schedules', sum:'schedules', list:'schedulesList'}, interviews:{label:'Interviews', sum:'scheduledDateOf', list:'interviewsList'}, shows:{label:'Shows', sum:'shows', list:'showsList'},
+  noShows:{label:'No Shows', sum:'noShows', list:'noShowsList'}, hires:{label:'Hires', sum:'i9', list:'i9List'}, placed:{label:'Placed', sum:'placed', list:'placedList'},
+  goal:{label:'Goal', sum:'goal'},
+  showRate:{label:'Show rate %', rate:['shows','scheduledDateOf'], list:'showsList'}, noShowRate:{label:'No-show rate %', rate:['noShows','scheduledDateOf'], list:'noShowsList'},
+  hireRate:{label:'Hires per show %', rate:['i9','shows'], list:'i9List'}, goalReach:{label:'Goal reach %', rate:['schedules','goal'], list:'schedulesList'},
+  hiresPerRecruiter:{label:'Hires per recruiter-week', per:'i9', list:'i9List'}, recruiters:{label:'Active recruiters', distinct:true},
 };
-const PIVOT_CHARTS = {bar:'Bar', stacked:'Stacked bar', hbar:'Horizontal bar', line:'Line', area:'Area', pie:'Pie', doughnut:'Doughnut', table:'Table only'};
-const pivotDefault = ()=>({rows:'branch', cols:'none', measure:'schedules', chart:'bar', weeks:'8', division:'', top:'15', sort:'value'});
-let pivotState = (()=>{ try{ return {...pivotDefault(), ...JSON.parse(lsGet('ipd_pivot')||'{}')}; }catch(e){ return pivotDefault(); } })();
+const PIVOT_CHARTS = {bar:'Bar', hbar:'Horizontal', line:'Line', area:'Area', combo:'Bar + line', pie:'Pie', doughnut:'Doughnut', polarArea:'Polar', radar:'Radar', table:'Table only'};
+const PIVOT_CHART_ICONS = {bar:'<path d="M5 20V10M10 20V4M15 20v-7M20 20V8"/>', hbar:'<path d="M4 5h10M4 10h16M4 15h7M4 20h13"/>', line:'<path d="M3 17l5-6 4 3 8-9"/>', area:'<path d="M3 19l5-7 4 3 8-9v13z" fill="currentColor" fill-opacity=".18"/>', combo:'<path d="M5 20v-6M11 20v-9M17 20v-5M3 10l6-4 6 3 6-5"/>', pie:'<path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M14 3.3A9 9 0 0 1 20.7 10H14z"/>', doughnut:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/>', polarArea:'<path d="M12 12L12 3a9 9 0 0 1 7 4z M12 12l7 2a7 7 0 0 1-6 6z M12 12l-4 5a6 6 0 0 1-3-7z"/>', radar:'<path d="M12 3l8 6-3 10H7L4 9z"/><path d="M12 8l4 3-1.5 5h-5L8 11z"/>', table:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 4v16"/>'};
+const PIVOT_PALETTES = {
+  default:['#2a7f8f','#4a78c8','#d08a2c','#7a5fb8','#c4565f','#1f9a6c','#8a99aa','#b07a2a','#3f9fd0','#a5577f','#5f8a3a','#6a6fb0'],
+  ocean:['#0b4f6c','#01baef','#20bf55','#0c7c59','#5c80bc','#4d9de0','#3bb273','#1b998b','#2e86ab','#a5d8ff','#118ab2','#06d6a0'],
+  warm:['#d1495b','#edae49','#e76f51','#8d0801','#f4a261','#bc4b51','#e9c46a','#9e2a2b','#f08a4b','#c97c5d','#b5651d','#ffb4a2'],
+  mono:['#0f4c5c','#1f6f78','#2f8f8a','#4fa9a0','#77c2b6','#a3d9cd','#c9ebe3','#5e7d86','#8aa3aa','#b7c9ce','#123c46','#376f73'],
+};
+const PIVOT_COLORS = PIVOT_PALETTES.default;
+const pivotDefault = ()=>({rows:['branch'], cols:[], values:['schedules'], filters:{}, chart:'bar', weeks:'8', from:'', to:'', top:'15', sort:'auto',
+  stack:false, labels:'auto', legend:'bottom', palette:'default', showAs:'value', totals:true, heat:false, height:'380'});
+function pivotMigrate(o){
+  const st = {...pivotDefault(), ...(o||{})};
+  if(typeof st.rows==='string') st.rows=[st.rows];
+  if(typeof st.cols==='string') st.cols = st.cols==='none' ? [] : [st.cols];
+  if(!Array.isArray(st.values)) st.values = [o && o.measure && PIVOT_MEASURES[o.measure] ? o.measure : 'schedules'];
+  if(o && typeof o.division==='string' && o.division) st.filters = {...(st.filters||{}), division:[o.division]};
+  if(st.chart==='stacked'){ st.chart='bar'; st.stack=true; }
+  if(!PIVOT_CHARTS[st.chart]) st.chart='bar';
+  st.rows = st.rows.filter(d=>PIVOT_DIMS[d]); st.cols = st.cols.filter(d=>PIVOT_DIMS[d] && !st.rows.includes(d)); st.values = st.values.filter(m=>PIVOT_MEASURES[m]);
+  if(!st.values.length) st.values=['schedules'];
+  st.filters = Object.fromEntries(Object.entries(st.filters||{}).filter(([d,v])=>PIVOT_DIMS[d] && Array.isArray(v)));
+  delete st.measure; delete st.division;
+  return st;
+}
+let pivotState = (()=>{ try{ return pivotMigrate(JSON.parse(lsGet('ipd_pivot')||'{}')); }catch(e){ return pivotDefault(); } })();
+function pivotSave(){ lsSet('ipd_pivot', JSON.stringify(pivotState)); }
 function pivotSavedKey(){ return 'pivot:'+(Server.user ? Server.user.id : 'me'); }
 function pivotSavedViews(){ const v = KV.get(pivotSavedKey()); return Array.isArray(v) ? v : []; }
 function pivotDimValue(dim, f){ return dim==='week' ? 'Wk '+isoWeekNumber(new Date(f.week+'T00:00:00'))+' · '+fmtDate(f.week).replace(/, \d{4}$/,'') : dim==='month' ? monthLabel(f.week) : dim==='quarter' ? quarterLabel(f.week) : f[dim]; }
-function pivotDimSort(dim, key, f){ return dim==='week' ? f.week : dim==='month' ? String(monthSortKey(f.week)) : dim==='quarter' ? String(quarterSortKey(f.week)) : key; }
-function pivotCompute(st){
+function pivotDimSort(dim, f){ return dim==='week' ? f.week : dim==='month' ? String(monthSortKey(f.week)).padStart(8,'0') : dim==='quarter' ? String(quarterSortKey(f.week)).padStart(8,'0') : String(f[dim]).toLowerCase(); }
+const pivotTimeDim = d=>d==='week'||d==='month'||d==='quarter';
+function pivotPeriodWeeks(st){
   const weeks = [...weeksData].sort((a,b)=>a.weekEndDate.localeCompare(b.weekEndDate));
-  const sel = st.weeks==='all' ? weeks : weeks.slice(-Number(st.weeks||8));
+  if(st.weeks==='custom'){ const from=st.from||weeks[0]?.weekEndDate, to=st.to||weeks[weeks.length-1]?.weekEndDate; return weeks.filter(w=>w.weekEndDate>=from && w.weekEndDate<=to); }
+  return st.weeks==='all' ? weeks : weeks.slice(-Number(st.weeks||8));
+}
+function pivotFacts(st){
   const facts = [];
-  sel.forEach(w=>{
+  pivotPeriodWeeks(st).forEach(w=>{
     const goals = KV.get('goals:'+w.weekEndDate) || {};
     Object.entries(w.byRecruiter||{}).forEach(([name,r])=>{
       if(!name || excludedRecruitersSet.has(name)) return;
-      const division = getEffectiveRecruiterDivision(name, w.weekEndDate) || 'Unassigned';
-      if(st.division && division!==st.division) return;
       const g = goals[name]; const goal = (g!==undefined && g!==null && g!=='') ? Number(g) : DEFAULT_WEEKLY_GOAL;
-      facts.push({week:w.weekEndDate, recruiter:name, branch:r.branch||'Unassigned', division, goal, schedules:r.schedules||0, scheduledDateOf:r.scheduledDateOf||0, shows:r.shows||0, noShows:r.noShows||0, i9:r.i9||0, placed:r.placed||0});
+      facts.push({week:w.weekEndDate, recruiter:name, branch:r.branch||'Unassigned', division:getEffectiveRecruiterDivision(name, w.weekEndDate)||'Unassigned', goal,
+        schedules:r.schedules||0, scheduledDateOf:r.scheduledDateOf||0, shows:r.shows||0, noShows:r.noShows||0, i9:r.i9||0, placed:r.placed||0});
     });
   });
-  const m = PIVOT_MEASURES[st.measure] || PIVOT_MEASURES.schedules;
-  const newAcc = ()=>({schedules:0, scheduledDateOf:0, shows:0, noShows:0, i9:0, placed:0, goal:0, n:0, recs:new Set()});
-  const add = (a,f)=>{ ['schedules','scheduledDateOf','shows','noShows','i9','placed','goal'].forEach(k=>a[k]+=f[k]); a.n++; a.recs.add(f.recruiter); };
-  const val = a=>{ if(!a || !a.n) return null; if(m.sum) return a[m.sum]; if(m.rate) return a[m.rate[1]] ? a[m.rate[0]]/a[m.rate[1]]*100 : null; if(m.per) return a.n ? a[m.per]/a.n : null; if(m.distinct) return a.recs.size; return null; };
-  const rowMap = new Map(), colMap = new Map(), cell = new Map(), rowAcc = new Map(), colAcc = new Map(), total = newAcc();
-  facts.forEach(f=>{
-    const rk = pivotDimValue(st.rows, f), ck = st.cols==='none' ? '__all' : pivotDimValue(st.cols, f);
-    if(!rowMap.has(rk)) rowMap.set(rk, pivotDimSort(st.rows, rk, f));
-    if(!colMap.has(ck)) colMap.set(ck, st.cols==='none' ? '' : pivotDimSort(st.cols, ck, f));
-    const key = rk+'\u0001'+ck; if(!cell.has(key)) cell.set(key, newAcc()); add(cell.get(key), f);
-    if(!rowAcc.has(rk)) rowAcc.set(rk, newAcc()); add(rowAcc.get(rk), f);
-    if(!colAcc.has(ck)) colAcc.set(ck, newAcc()); add(colAcc.get(ck), f);
-    add(total, f);
-  });
-  const timeDim = d=>d==='week'||d==='month'||d==='quarter';
-  let rows = [...rowMap.keys()];
-  if(st.sort==='label' || (st.sort==='value' && timeDim(st.rows))) rows.sort((a,b)=>String(rowMap.get(a)).localeCompare(String(rowMap.get(b))));
-  else rows.sort((a,b)=>(val(rowAcc.get(b))??-1)-(val(rowAcc.get(a))??-1));
-  if(st.sort==='asc') rows.sort((a,b)=>(val(rowAcc.get(a))??-1)-(val(rowAcc.get(b))??-1));
-  const top = st.top==='all' ? Infinity : Number(st.top||15);
-  const hiddenRows = rows.length > top ? rows.length - top : 0;
-  if(hiddenRows && !timeDim(st.rows)) rows = rows.slice(0, top); else if(hiddenRows) rows = rows.slice(-top);
-  const cols = [...colMap.keys()].sort((a,b)=>String(colMap.get(a)).localeCompare(String(colMap.get(b))));
-  const colsShown = cols.length>12 && st.cols!=='none' ? cols.slice(timeDim(st.cols)?-12:0, timeDim(st.cols)?undefined:12) : cols;
-  return {rows, cols:colsShown, hiddenRows, hiddenCols: cols.length-colsShown.length, val, cell:(r,c)=>val(cell.get(r+'\u0001'+c)), rowTotal:r=>val(rowAcc.get(r)), colTotal:c=>val(colAcc.get(c)), grand:val(total), m, facts:facts.length, weeks:sel};
+  return facts;
 }
-function pivotFmt(v, m){ if(v==null || Number.isNaN(v)) return '–'; if(m.rate) return v.toFixed(1)+'%'; if(m.per) return v.toFixed(1); return fmtNum(Math.round(v)); }
+// values each filterable field takes in the chosen period (filters on OTHER fields applied)
+function pivotFieldValues(st, dim){
+  const others = {...st.filters}; delete others[dim];
+  const m = new Map();
+  pivotFacts(st).filter(f=>pivotPasses(others, f)).forEach(f=>{ const v=pivotDimValue(dim,f); if(!m.has(v)) m.set(v, pivotDimSort(dim,f)); });
+  return [...m.entries()].sort((a,b)=>a[1].localeCompare(b[1])).map(e=>e[0]);
+}
+function pivotPasses(filters, f){ for(const [d,vals] of Object.entries(filters||{})){ if(vals && !vals.includes(pivotDimValue(d,f))) return false; } return true; }
+function pivotCompute(st){
+  if(!Array.isArray(st.rows) || !Array.isArray(st.values) || !Array.isArray(st.cols)) st = pivotMigrate(st);
+  const facts = pivotFacts(st).filter(f=>pivotPasses(st.filters, f));
+  const ms = st.values.map(k=>({key:k, ...PIVOT_MEASURES[k]}));
+  const newAcc = ()=>({schedules:0, scheduledDateOf:0, shows:0, noShows:0, i9:0, placed:0, goal:0, n:0, recs:new Set(), facts:[]});
+  const add = (a,f)=>{ for(const k of ['schedules','scheduledDateOf','shows','noShows','i9','placed','goal']) a[k]+=f[k]; a.n++; a.recs.add(f.recruiter); a.facts.push(f); };
+  const raw = (a,m)=>{ if(!a || !a.n) return null; if(m.sum) return a[m.sum]; if(m.rate) return a[m.rate[1]] ? a[m.rate[0]]/a[m.rate[1]]*100 : null; if(m.per) return a[m.per]/a.n; if(m.distinct) return a.recs.size; return null; };
+  const keyOf = (dims,f)=>dims.length ? dims.map(d=>pivotDimValue(d,f)).join(' › ') : '__all';
+  const sortOf = (dims,f)=>dims.map(d=>pivotDimSort(d,f)).join('\u0002');
+  const rowMap=new Map(), colMap=new Map(), cell=new Map(), rowAcc=new Map(), colAcc=new Map(), total=newAcc();
+  facts.forEach(f=>{
+    const rk=keyOf(st.rows,f), ck=keyOf(st.cols,f);
+    if(!rowMap.has(rk)) rowMap.set(rk, sortOf(st.rows,f));
+    if(!colMap.has(ck)) colMap.set(ck, sortOf(st.cols,f));
+    const key=rk+'\u0001'+ck; if(!cell.has(key)) cell.set(key,newAcc()); add(cell.get(key),f);
+    if(!rowAcc.has(rk)) rowAcc.set(rk,newAcc()); add(rowAcc.get(rk),f);
+    if(!colAcc.has(ck)) colAcc.set(ck,newAcc()); add(colAcc.get(ck),f);
+    add(total,f);
+  });
+  const shareable = m=>!m.rate && !m.per;
+  const shown = (v, m, base)=>{ if(v==null || st.showAs==='value' || !shareable(m)) return v; return base ? v/base*100 : null; };
+  const val = (a, m, ck)=>{ const v=raw(a,m); if(st.showAs==='pctCol') return shown(v, m, raw(colAcc.get(ck),m)); if(st.showAs==='pctTotal') return shown(v, m, raw(total,m)); return v; };
+  const m0 = ms[0];
+  let rows=[...rowMap.keys()];
+  const sort = st.sort==='auto' ? (st.rows.length && pivotTimeDim(st.rows[0]) ? 'label' : 'desc') : st.sort;
+  if(sort==='label') rows.sort((a,b)=>rowMap.get(a).localeCompare(rowMap.get(b)));
+  else rows.sort((a,b)=>{ const x=raw(rowAcc.get(a),m0)??-Infinity, y=raw(rowAcc.get(b),m0)??-Infinity; return sort==='asc' ? x-y : y-x; });
+  const top = st.top==='all' ? Infinity : Number(st.top||15);
+  const hiddenRows = Math.max(0, rows.length-top);
+  if(hiddenRows) rows = (sort==='label' && st.rows.length && pivotTimeDim(st.rows[0])) ? rows.slice(-top) : rows.slice(0, top);
+  const cols=[...colMap.keys()].sort((a,b)=>colMap.get(a).localeCompare(colMap.get(b)));
+  const pct = st.showAs!=='value';
+  return {rows, cols, hiddenRows, ms, facts:facts.length,
+    cell:(r,c,m=m0)=>val(cell.get(r+'\u0001'+c), m, c),
+    rowTotal:(r,m=m0)=>pct&&shareable(m) ? shown(raw(rowAcc.get(r),m),m,raw(total,m)) : raw(rowAcc.get(r),m),
+    colTotal:(c,m)=>st.showAs==='pctCol'&&shareable(m) ? 100 : st.showAs==='pctTotal'&&shareable(m) ? shown(raw(colAcc.get(c),m),m,raw(total,m)) : raw(colAcc.get(c),m),
+    grand:m=>pct&&shareable(m) ? 100 : raw(total,m),
+    factsFor:(r,c)=> (r==null && c==null) ? total.facts : r==null ? (colAcc.get(c)||{facts:[]}).facts : c==null ? (rowAcc.get(r)||{facts:[]}).facts : (cell.get(r+'\u0001'+c)||{facts:[]}).facts,
+    weeks:pivotPeriodWeeks(st), isPct:m=>!!m.rate || (pct && shareable(m))};
+}
+function pivotFmt(v, m, isPct){ if(v==null || Number.isNaN(v)) return '–'; if(isPct) return v.toFixed(1)+'%'; if(m.per) return v.toFixed(1); return fmtNum(Math.round(v)); }
+
+// ---------- candidate drill-down (Candidates right only) ----------
+let pivotLast = null; // last computed result, used by hover / click
+async function pivotCandidates(facts, m){
+  if(!m.list) return null;
+  const weeks=[...new Set(facts.map(f=>f.week))];
+  const need=weeks.filter(we=>{ const v=KV.get('weekly:'+we); return v && v.listsSplit && !v.listsLoaded; });
+  for(const we of need){ try{ await candFromWeekLists(we); }catch(e){} }
+  const out=[], seen=new Set();
+  facts.forEach(f=>{ const w=weeksData.find(x=>x.weekEndDate===f.week); const r=w && (w.byRecruiter||{})[f.recruiter]; ((r && r[m.list])||[]).forEach(c=>{ const k=f.recruiter+'|'+c.eid+'|'+c.name+'|'+c.date; if(seen.has(k)) return; seen.add(k); out.push({...c, recruiter:f.recruiter, branch:f.branch}); }); });
+  return out.sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')) || String(a.name).localeCompare(String(b.name)));
+}
+function pivotCellRef(el){ const res=pivotLast; if(!res) return null; const [ri,ci,mi]=el.dataset.pc.split('|'); const r = ri==='t'?null:res.rows[+ri], c = ci==='t'?null:res.cols[+ci], m=res.ms[+mi]; return {r, c, m, facts:res.factsFor(r,c)}; }
+function pivotCellTitle(ref){ const parts=[]; if(ref.r && ref.r!=='__all') parts.push(ref.r); if(ref.c && ref.c!=='__all') parts.push(ref.c); return (parts.join(' · ')||'All')+' — '+ref.m.label; }
+async function pivotShowTip(el){
+  const ref=pivotCellRef(el); if(!ref || !ref.m.list) return;
+  clearTimeout(tooltipHideTimer);
+  const tip=document.getElementById('recruiterHoverTooltip');
+  tip.innerHTML='<div style="color:var(--text-tertiary);">Loading names…</div>'; tip.style.removeProperty('display'); tip.classList.remove('hidden');
+  const rect=el.getBoundingClientRect(); const tw=360; tip.style.left=Math.max(8,Math.min(rect.left, innerWidth-tw-20))+'px'; tip.style.top=(rect.bottom+6)+'px';
+  const token=(pivotShowTip.n=(pivotShowTip.n||0)+1);
+  const list=await pivotCandidates(ref.facts, ref.m); if(token!==pivotShowTip.n || tip.classList.contains('hidden')) return;
+  const cap=list.slice(0,200);
+  tip.innerHTML=buildCandidateListHtml(cap, ref.m.label, pivotCellTitle(ref).replace(' — '+ref.m.label,'')).replace('('+cap.length+')</div>', '('+fmtNum(list.length)+')</div>')+(list.length>cap.length?`<p class="hint" style="margin:6px 0 0;font-size:11px;">+${fmtNum(list.length-cap.length)} more — click the number to see them all.</p>`:'')+'<p class="hint" style="margin:6px 0 0;font-size:11px;">Click the number to pin the full list.</p>';
+  if(list.length>cap.length) tooltipCopyText=['Name\tEID\tDate', ...list.map(c=>`${c.name}\t${c.eid}\t${c.date?fmtDate(c.date):''}`)].join('\n');
+  tip.style.maxHeight=Math.max(160,innerHeight-32)+'px'; tip.style.overflow='auto';
+  tip.style.top=Math.max(8,Math.min(rect.bottom+6, innerHeight-tip.offsetHeight-12))+'px';
+  document.getElementById('tooltipCopyBtn')?.addEventListener('click', ()=>navigator.clipboard.writeText(tooltipCopyText).then(()=>showToast('Copied — paste directly into Excel.')).catch(()=>showToast('Clipboard blocked by the browser.')));
+}
+async function pivotDrill(ref){
+  const box=document.getElementById('pvDrill'); if(!box || !ref) return;
+  if(!ref.m.list){ box.classList.remove('hidden'); box.innerHTML=`<div class="panel-head"><div><h3>${escapeHtml(pivotCellTitle(ref))}</h3><span class="hint">There is no candidate list behind “${escapeHtml(ref.m.label)}”. Pick a count such as Schedules or Shows.</span></div><button class="btn btn-secondary btn-sm" id="pvDrillClose">Close</button></div>`; box.querySelector('#pvDrillClose').onclick=()=>box.classList.add('hidden'); return; }
+  box.classList.remove('hidden'); box.innerHTML='<p class="hint" style="margin:0">Loading names…</p>';
+  const list=await pivotCandidates(ref.facts, ref.m);
+  const draw=(q)=>{
+    const ql=(q||'').toLowerCase(); const rows=ql?list.filter(c=>[c.name,c.eid,c.recruiter,c.branch].some(x=>String(x||'').toLowerCase().includes(ql))):list;
+    box.querySelector('#pvDrillBody').innerHTML=rows.length?`<table class="ep-table"><thead><tr><th>Candidate</th><th>Employee #</th><th>Date</th><th>Recruiter</th><th>Branch</th></tr></thead><tbody>${rows.map(c=>`<tr><td>${escapeHtml(c.name)}</td><td class="mono">${escapeHtml(c.eid)}</td><td>${c.date?fmtDate(c.date):''}</td><td>${escapeHtml(c.recruiter)}</td><td>${escapeHtml(c.branch)}</td></tr>`).join('')}</tbody></table>`:'<p class="hint" style="padding:10px;margin:0">Nobody matches.</p>';
+    box.querySelector('#pvDrillCount').textContent=fmtNum(rows.length)+(ql?' of '+fmtNum(list.length):'')+' candidate'+(list.length===1?'':'s');
+  };
+  box.innerHTML=`<div class="panel-head"><div><h3>${escapeHtml(pivotCellTitle(ref))}</h3><span class="hint" id="pvDrillCount"></span></div><div class="pv-drill-tools"><input type="search" id="pvDrillSearch" placeholder="Search name, EID, recruiter…" autocomplete="off"><button class="btn btn-secondary btn-sm" id="pvDrillCopy">📋 Copy</button><button class="btn btn-secondary btn-sm" id="pvDrillClose">Close</button></div></div><div class="pv-drill-body" id="pvDrillBody"></div>`;
+  draw('');
+  box.querySelector('#pvDrillSearch').oninput=e=>draw(e.target.value);
+  box.querySelector('#pvDrillClose').onclick=()=>box.classList.add('hidden');
+  box.querySelector('#pvDrillCopy').onclick=()=>navigator.clipboard.writeText(['Candidate\tEmployee Number\tDate\tRecruiter\tBranch', ...list.map(c=>[c.name,c.eid,c.date||'',c.recruiter,c.branch].join('\t'))].join('\n')).then(()=>showToast('Copied '+fmtNum(list.length)+' rows.')).catch(()=>showToast('Clipboard blocked by the browser.'));
+  box.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+document.addEventListener('mouseover', e=>{ const el=e.target.closest && e.target.closest('#view-pivot [data-pc]'); if(el && canSeeCandidates()) pivotShowTip(el); });
+document.addEventListener('mouseout', e=>{ const el=e.target.closest && e.target.closest('#view-pivot [data-pc]'); if(el) scheduleHideRecruiterTooltip(); });
+
+// ---------- builder ----------
+const PV_WELLS = {filters:'Filters', cols:'Columns', rows:'Rows', values:'Values'};
+function pivotWellAccepts(well, field){ const [kind]=field.split(':'); return well==='values' ? kind==='m' : kind==='d'; }
+function pivotPlace(field, well, index){
+  const st=pivotState, [kind,key]=field.split(':');
+  if(!pivotWellAccepts(well, field)){ showToast(kind==='m' ? 'Numbers go into Values.' : 'Drop this into Rows, Columns or Filters.'); return false; }
+  if(well==='filters'){ if(!st.filters[key]) st.filters[key]=null; }
+  else if(well==='values'){ st.values=st.values.filter(x=>x!==key); st.values.splice(index==null?st.values.length:index, 0, key); }
+  else { st.rows=st.rows.filter(x=>x!==key); st.cols=st.cols.filter(x=>x!==key); const arr=st[well]; arr.splice(index==null?arr.length:Math.min(index,arr.length), 0, key); if(arr.length>3){ arr.length=3; showToast('Up to 3 fields per box.'); } }
+  return true;
+}
+function pivotRemove(well, key){ const st=pivotState; if(well==='filters') delete st.filters[key]; else { st[well]=st[well].filter(x=>x!==key); if(well==='values' && !st.values.length) st.values=['schedules']; } }
+function pivotChipHtml(well, key){
+  const st=pivotState, isM=well==='values', label=isM?PIVOT_MEASURES[key].label:PIVOT_DIMS[key];
+  let extra='';
+  if(well==='filters'){ const v=st.filters[key]; extra=`<button type="button" class="pv-fval" data-pv-fopen="${key}">${v?(v.length===1?escapeHtml(v[0]):v.length+' selected'):'All'} ▾</button>`; }
+  return `<span class="pv-pill ${isM?'m':'d'}" draggable="true" data-pv-drag="${isM?'m':'d'}:${key}" data-from="${well}"><span class="pv-grip" aria-hidden="true">⋮⋮</span>${escapeHtml(label)}${extra}<button type="button" class="pv-rm" data-pv-rm="${well}:${key}" aria-label="Remove ${escapeHtml(label)}">×</button></span>`;
+}
 function renderPivotView(){
   const host = document.getElementById('view-pivot'); if(!host) return;
   if(!weeksData.length){ host.innerHTML='<div class="panel"><p class="hint" style="margin:0;">No weeks yet — upload data first.</p></div>'; return; }
   const st = pivotState;
-  const opt = (obj, cur, extra)=>(extra||'')+Object.entries(obj).map(([k,v])=>`<option value="${k}" ${k===cur?'selected':''}>${escapeHtml(typeof v==='string'?v:v.label)}</option>`).join('');
   const saved = pivotSavedViews();
   const extra = document.getElementById('topbarExtra'); if(extra) extra.innerHTML='';
-  host.innerHTML = `<div class="panel pv-builder">
-      <div class="pv-grid">
-        <label class="cand-field"><span>Rows</span><select data-pv="rows">${opt(PIVOT_DIMS, st.rows)}</select></label>
-        <label class="cand-field"><span>Columns</span><select data-pv="cols">${opt(PIVOT_DIMS, st.cols, `<option value="none" ${st.cols==='none'?'selected':''}>— none —</option>`)}</select></label>
-        <label class="cand-field"><span>Measure</span><select data-pv="measure">${opt(PIVOT_MEASURES, st.measure)}</select></label>
-        <label class="cand-field"><span>Chart</span><select data-pv="chart">${opt(PIVOT_CHARTS, st.chart)}</select></label>
-        <label class="cand-field"><span>Period</span><select data-pv="weeks">${[['4','Last 4 weeks'],['8','Last 8 weeks'],['13','Last 13 weeks'],['26','Last 26 weeks'],['52','Last 52 weeks'],['all','All weeks']].map(([k,l])=>`<option value="${k}" ${k===String(st.weeks)?'selected':''}>${l}</option>`).join('')}</select></label>
-        <label class="cand-field"><span>Division</span><select data-pv="division"><option value="">All divisions</option>${[...DIVISIONS,'Unassigned'].map(d=>`<option ${d===st.division?'selected':''}>${escapeHtml(d)}</option>`).join('')}</select></label>
-        <label class="cand-field"><span>Show</span><select data-pv="top">${[['10','Top 10'],['15','Top 15'],['25','Top 25'],['50','Top 50'],['all','All']].map(([k,l])=>`<option value="${k}" ${k===String(st.top)?'selected':''}>${l}</option>`).join('')}</select></label>
-        <label class="cand-field"><span>Sort</span><select data-pv="sort">${[['value','Highest first'],['asc','Lowest first'],['label','A → Z / oldest first']].map(([k,l])=>`<option value="${k}" ${k===st.sort?'selected':''}>${l}</option>`).join('')}</select></label>
+  const used = new Set([...st.rows, ...st.cols]);
+  const allWeeks=[...weeksData].map(w=>w.weekEndDate).sort();
+  const wkOpt=(cur)=>allWeeks.map(d=>`<option value="${d}" ${d===cur?'selected':''}>Wk ${weekOfDate(d).number} · ${fmtDate(d)}</option>`).join('');
+  const sel=(k, opts)=>`<select data-pv="${k}">${opts.map(([v,l])=>`<option value="${v}" ${String(st[k])===v?'selected':''}>${l}</option>`).join('')}</select>`;
+  const tog=(k,l)=>`<label class="pv-tog"><input type="checkbox" data-pv-tog="${k}" ${st[k]?'checked':''}> ${l}</label>`;
+  host.innerHTML = `<div class="pv-shell">
+    <aside class="panel pv-fields">
+      <h4>Fields</h4><p class="hint">Drag a field into a box — or click (tap) it to add it.</p>
+      <h5>Group by</h5><div class="pv-flist">${Object.entries(PIVOT_DIMS).map(([k,l])=>`<button type="button" class="pv-field d ${used.has(k)?'used':''}" draggable="true" data-pv-drag="d:${k}" data-pv-pick="d:${k}">${escapeHtml(l)}${st.filters[k]!==undefined?' <i title="Filtered">⚲</i>':''}</button>`).join('')}</div>
+      <h5>Numbers</h5><div class="pv-flist">${Object.entries(PIVOT_MEASURES).map(([k,m])=>`<button type="button" class="pv-field m ${st.values.includes(k)?'used':''}" draggable="true" data-pv-drag="m:${k}" data-pv-pick="m:${k}">${escapeHtml(m.label)}</button>`).join('')}</div>
+      ${canSeeCandidates()?'<p class="hint pv-candhint">Hover any number in the table for the candidates behind it; click a number or a chart bar to pin the list.</p>':''}
+    </aside>
+    <div class="pv-main">
+      <div class="panel pv-builder">
+        <div class="pv-wells">${Object.entries(PV_WELLS).map(([w,l])=>{ const items = w==='filters'?Object.keys(st.filters):st[w]; return `<div class="pv-well" data-well="${w}"><div class="pv-well-h">${l}${w==='values'?' <small>numbers</small>':w==='filters'?' <small>limit the data</small>':''}</div><div class="pv-drop" data-drop="${w}">${items.map(k=>pivotChipHtml(w,k)).join('')}<span class="pv-ph">${items.length?'':'Drop fields here'}</span></div></div>`; }).join('')}</div>
+        <div class="pv-bar">
+          <label class="pv-opt"><span>Period</span>${sel('weeks', [['4','Last 4 weeks'],['8','Last 8 weeks'],['13','Last 13 weeks'],['26','Last 26 weeks'],['52','Last 52 weeks'],['all','All weeks'],['custom','Custom range…']])}</label>
+          ${st.weeks==='custom'?`<label class="pv-opt"><span>From</span><select data-pv="from">${wkOpt(st.from||allWeeks[0])}</select></label><label class="pv-opt"><span>To</span><select data-pv="to">${wkOpt(st.to||allWeeks[allWeeks.length-1])}</select></label>`:''}
+          <label class="pv-opt"><span>Sort</span>${sel('sort', [['auto','Auto'],['desc','Highest first'],['asc','Lowest first'],['label','A → Z / oldest first']])}</label>
+          <label class="pv-opt"><span>Show</span>${sel('top', [['5','Top 5'],['10','Top 10'],['15','Top 15'],['25','Top 25'],['50','Top 50'],['all','All rows']])}</label>
+          <label class="pv-opt"><span>Values as</span>${sel('showAs', [['value','Numbers'],['pctCol','% of column'],['pctTotal','% of grand total']])}</label>
+          <button type="button" class="btn btn-secondary btn-sm" id="pvSwap" title="Swap rows and columns">⇄ Swap</button>
+        </div>
+        <div class="pv-charts" role="radiogroup" aria-label="Chart type">${Object.entries(PIVOT_CHARTS).map(([k,l])=>`<button type="button" role="radio" aria-checked="${st.chart===k}" data-pv-chart="${k}" title="${l}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${PIVOT_CHART_ICONS[k]}</svg><span>${l}</span></button>`).join('')}</div>
+        <details class="pv-more" ${lsGet('ipd_pivot_more')==='1'?'open':''}><summary>More options</summary><div class="pv-bar">
+          ${tog('stack','Stack series')}${tog('totals','Totals')}${tog('heat','Colour table cells')}
+          <label class="pv-opt"><span>Value labels</span>${sel('labels', [['auto','Auto'],['on','On'],['off','Off']])}</label>
+          <label class="pv-opt"><span>Legend</span>${sel('legend', [['bottom','Bottom'],['right','Right'],['top','Top'],['none','Hidden']])}</label>
+          <label class="pv-opt"><span>Colours</span>${sel('palette', [['default','Default'],['ocean','Ocean'],['warm','Warm'],['mono','Teal shades']])}</label>
+          <label class="pv-opt"><span>Chart height</span>${sel('height', [['280','Compact'],['380','Standard'],['520','Tall']])}</label>
+        </div></details>
+        <div class="pv-saved">
+          <span class="hint">My views:</span>${saved.length?saved.map((v,i)=>`<span class="pv-chip"><button type="button" data-pv-load="${i}">${escapeHtml(v.name)}</button><button type="button" class="pv-x" data-pv-del="${i}" aria-label="Delete ${escapeHtml(v.name)}">×</button></span>`).join(''):'<span class="hint">none yet</span>'}
+          <button class="btn btn-secondary btn-sm" id="pvSave">Save this view</button><button class="btn btn-secondary btn-sm" id="pvReset">Reset</button>
+        </div>
       </div>
-      <div class="pv-saved">
-        <span class="hint">My saved views:</span>${saved.length?saved.map((v,i)=>`<span class="pv-chip"><button type="button" data-pv-load="${i}">${escapeHtml(v.name)}</button><button type="button" class="pv-x" data-pv-del="${i}" aria-label="Delete ${escapeHtml(v.name)}">×</button></span>`).join(''):'<span class="hint">none yet</span>'}
-        <button class="btn btn-secondary btn-sm" id="pvSave">Save this view</button><button class="btn btn-secondary btn-sm" id="pvReset">Reset</button>
-      </div>
-    </div>
-    <div class="panel" data-section="pivot.chart"><div class="panel-head"><div><h3 id="pvTitle"></h3><span class="hint" id="pvSub"></span></div><div style="display:flex;gap:8px;"><button class="btn btn-secondary btn-sm export-only" id="pvPng">⬇ PNG</button></div></div><div class="pv-chart-wrap" id="pvChartWrap"><canvas id="pvChart"></canvas></div></div>
-    <div class="panel" data-section="pivot.table"><div class="panel-head"><h3>Pivot table</h3><div style="display:flex;gap:8px;"><button class="btn btn-secondary btn-sm" id="pvCopy">📋 Copy</button><button class="btn btn-secondary btn-sm export-only" id="pvXlsx">⬇ Excel</button></div></div><div style="overflow-x:auto"><table class="users-table pv-table" id="pvTable"></table></div></div>`;
-  host.querySelectorAll('[data-pv]').forEach(sel=>sel.onchange=()=>{ st[sel.dataset.pv]=sel.value; if(st.rows===st.cols) st.cols='none'; lsSet('ipd_pivot', JSON.stringify(st)); renderPivotView(); });
-  host.querySelector('#pvReset').onclick = ()=>{ pivotState = pivotDefault(); lsSet('ipd_pivot', JSON.stringify(pivotState)); renderPivotView(); };
+      <div class="panel" data-section="pivot.chart"><div class="panel-head"><div><h3 id="pvTitle"></h3><span class="hint" id="pvSub"></span></div><div style="display:flex;gap:8px;"><button class="btn btn-secondary btn-sm export-only" id="pvPng">⬇ PNG</button></div></div><div class="pv-chart-wrap" id="pvChartWrap"><canvas id="pvChart"></canvas></div></div>
+      <div class="panel hidden pv-drill" id="pvDrill"></div>
+      <div class="panel" data-section="pivot.table"><div class="panel-head"><h3>Pivot table</h3><div style="display:flex;gap:8px;"><button class="btn btn-secondary btn-sm" id="pvCopy">📋 Copy</button><button class="btn btn-secondary btn-sm export-only" id="pvXlsx">⬇ Excel</button></div></div><div class="pv-table-wrap"><table class="users-table pv-table" id="pvTable"></table></div></div>
+    </div></div>`;
+  const changed=()=>{ pivotSave(); renderPivotView(); };
+  host.querySelectorAll('[data-pv]').forEach(s=>s.onchange=()=>{ st[s.dataset.pv]=s.value; if(s.dataset.pv==='weeks' && s.value==='custom' && !st.from){ st.from=allWeeks[Math.max(0,allWeeks.length-8)]; st.to=allWeeks[allWeeks.length-1]; } if(st.from && st.to && st.from>st.to){ const t=st.from; st.from=st.to; st.to=t; } changed(); });
+  host.querySelectorAll('[data-pv-tog]').forEach(c=>c.onchange=()=>{ st[c.dataset.pvTog]=c.checked; changed(); });
+  host.querySelectorAll('[data-pv-chart]').forEach(b=>b.onclick=()=>{ st.chart=b.dataset.pvChart; changed(); });
+  host.querySelector('.pv-more').addEventListener('toggle', e=>lsSet('ipd_pivot_more', e.target.open?'1':'0'));
+  host.querySelector('#pvSwap').onclick=()=>{ const r=st.rows; st.rows=st.cols; st.cols=r; changed(); };
+  host.querySelector('#pvReset').onclick = ()=>{ pivotState = pivotDefault(); changed(); };
   host.querySelector('#pvSave').onclick = async ()=>{
-    const name = (prompt('Name for this view:', PIVOT_MEASURES[st.measure].label+' by '+PIVOT_DIMS[st.rows].toLowerCase())||'').trim(); if(!name) return;
-    const list = pivotSavedViews().filter(v=>v.name!==name); list.push({name:name.slice(0,60), cfg:{...st}});
+    const def = st.values.map(k=>PIVOT_MEASURES[k].label).join(' & ')+(st.rows.length?' by '+st.rows.map(d=>PIVOT_DIMS[d].toLowerCase()).join(' & '):'');
+    const name = (prompt('Name for this view:', def)||'').trim(); if(!name) return;
+    const list = pivotSavedViews().filter(v=>v.name!==name); list.push({name:name.slice(0,60), cfg:JSON.parse(JSON.stringify(st))});
     if(await storageSet(pivotSavedKey(), list.slice(-20))){ showToast('View saved.'); renderPivotView(); }
   };
-  host.querySelectorAll('[data-pv-load]').forEach(b=>b.onclick=()=>{ const v=pivotSavedViews()[+b.dataset.pvLoad]; if(v){ pivotState={...pivotDefault(), ...v.cfg}; lsSet('ipd_pivot', JSON.stringify(pivotState)); renderPivotView(); } });
+  host.querySelectorAll('[data-pv-load]').forEach(b=>b.onclick=()=>{ const v=pivotSavedViews()[+b.dataset.pvLoad]; if(v){ pivotState=pivotMigrate(v.cfg); changed(); } });
   host.querySelectorAll('[data-pv-del]').forEach(b=>b.onclick=async ()=>{ const list=pivotSavedViews(); list.splice(+b.dataset.pvDel,1); if(await storageSet(pivotSavedKey(), list)) renderPivotView(); });
+  host.querySelectorAll('[data-pv-rm]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const [w,k]=b.dataset.pvRm.split(':'); pivotRemove(w,k); changed(); });
+  host.querySelectorAll('[data-pv-fopen]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); pivotFilterPopover(b, b.dataset.pvFopen); });
+  // click-to-add (and the only way on touch screens)
+  host.querySelectorAll('[data-pv-pick]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); pivotPickMenu(b, b.dataset.pvPick); });
+  // drag & drop
+  let dragField=null, dragFrom=null;
+  host.querySelectorAll('[data-pv-drag]').forEach(el=>{
+    el.addEventListener('dragstart', e=>{ dragField=el.dataset.pvDrag; dragFrom=el.dataset.from||null; e.dataTransfer.effectAllowed='move'; try{ e.dataTransfer.setData('text/plain', dragField); }catch(_){} el.classList.add('dragging'); host.classList.add('pv-dragging'); host.querySelectorAll('[data-drop]').forEach(d=>d.classList.toggle('ok', pivotWellAccepts(d.dataset.drop, dragField))); });
+    el.addEventListener('dragend', ()=>{ el.classList.remove('dragging'); host.classList.remove('pv-dragging'); host.querySelectorAll('[data-drop]').forEach(d=>d.classList.remove('ok','over')); });
+  });
+  host.querySelectorAll('[data-drop]').forEach(d=>{
+    d.addEventListener('dragover', e=>{ if(!dragField || !pivotWellAccepts(d.dataset.drop, dragField)) return; e.preventDefault(); e.dataTransfer.dropEffect='move'; d.classList.add('over'); });
+    d.addEventListener('dragleave', e=>{ if(!d.contains(e.relatedTarget)) d.classList.remove('over'); });
+    d.addEventListener('drop', e=>{
+      e.preventDefault(); d.classList.remove('over'); if(!dragField) return;
+      const well=d.dataset.drop; const pills=[...d.querySelectorAll('.pv-pill')].filter(p=>p.dataset.pvDrag!==dragField);
+      let index=pills.findIndex(p=>{ const r=p.getBoundingClientRect(); return e.clientX < r.left+r.width/2 && e.clientY < r.bottom; }); if(index<0) index=null;
+      const key=dragField.split(':')[1];
+      if(dragFrom==='filters' && well!=='filters') pivotRemove('filters', key);
+      if(dragFrom && dragFrom!=='filters' && well==='filters') pivotRemove(dragFrom, key);
+      if(pivotPlace(dragField, well, index)) changed();
+      dragField=null;
+    });
+  });
+  // dropping a pill back on the field list removes it
+  host.querySelector('.pv-fields').addEventListener('dragover', e=>{ if(dragFrom) e.preventDefault(); });
+  host.querySelector('.pv-fields').addEventListener('drop', e=>{ if(!dragFrom) return; e.preventDefault(); pivotRemove(dragFrom, dragField.split(':')[1]); dragField=null; changed(); });
   drawPivot();
 }
-const PIVOT_COLORS = ['#2a7f8f','#4a78c8','#d08a2c','#7a5fb8','#c4565f','#1f9a6c','#8a99aa','#b07a2a','#3f9fd0','#a5577f','#5f8a3a','#6a6fb0'];
+function pivotClosePops(){ document.querySelectorAll('.pv-pop').forEach(p=>p.remove()); }
+document.addEventListener('click', e=>{ if(!e.target.closest || !e.target.closest('.pv-pop')) pivotClosePops(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') pivotClosePops(); });
+function pivotPopAt(anchor, html){
+  pivotClosePops();
+  const p=document.createElement('div'); p.className='pv-pop'; p.innerHTML=html; document.body.appendChild(p);
+  const r=anchor.getBoundingClientRect(); p.style.left=Math.max(8,Math.min(r.left, innerWidth-p.offsetWidth-12))+'px'; p.style.top=Math.min(r.bottom+6, innerHeight-p.offsetHeight-12)+'px';
+  return p;
+}
+function pivotPickMenu(anchor, field){
+  const [kind,key]=field.split(':'), st=pivotState;
+  const wells = kind==='m' ? ['values'] : ['rows','cols','filters'];
+  const where = kind==='m' ? (st.values.includes(key)?'values':null) : st.rows.includes(key)?'rows':st.cols.includes(key)?'cols':null;
+  const p=pivotPopAt(anchor, `<div class="pv-pop-h">${escapeHtml(kind==='m'?PIVOT_MEASURES[key].label:PIVOT_DIMS[key])}</div>${wells.map(w=>`<button type="button" data-to="${w}" ${(w===where || (w==='filters' && st.filters[key]!==undefined))?'disabled':''}>Add to ${PV_WELLS[w]}</button>`).join('')}${where?`<button type="button" data-rm="${where}">Remove from ${PV_WELLS[where]}</button>`:''}${kind==='d' && st.filters[key]!==undefined?'<button type="button" data-rm="filters">Remove filter</button>':''}`);
+  p.querySelectorAll('[data-to]').forEach(b=>b.onclick=()=>{ if(where && b.dataset.to!=='filters') pivotRemove(where,key); if(pivotPlace(field, b.dataset.to)){ pivotSave(); pivotClosePops(); renderPivotView(); if(b.dataset.to==='filters') setTimeout(()=>{ const fb=document.querySelector(`[data-pv-fopen="${key}"]`); if(fb) pivotFilterPopover(fb,key); },0); } });
+  p.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{ pivotRemove(b.dataset.rm,key); pivotSave(); pivotClosePops(); renderPivotView(); });
+}
+function pivotFilterPopover(anchor, dim){
+  const st=pivotState, vals=pivotFieldValues(st, dim), cur=st.filters[dim];
+  const on=new Set(cur||vals);
+  const p=pivotPopAt(anchor, `<div class="pv-pop-h">${escapeHtml(PIVOT_DIMS[dim])} <small>${vals.length} values</small></div><input type="search" class="pv-pop-q" placeholder="Search…" autocomplete="off"><div class="pv-pop-acts"><button type="button" data-all>Select all</button><button type="button" data-none>Clear</button></div><div class="pv-pop-list">${vals.map(v=>`<label><input type="checkbox" value="${escapeHtml(v)}" ${on.has(v)?'checked':''}> ${escapeHtml(v)}</label>`).join('')||'<p class="hint">No values in this period.</p>'}</div><div class="pv-pop-foot"><button type="button" class="btn btn-primary btn-sm" data-apply>Apply</button></div>`);
+  p.classList.add('wide');
+  const boxes=()=>[...p.querySelectorAll('.pv-pop-list input')];
+  p.querySelector('.pv-pop-q').oninput=e=>{ const q=e.target.value.toLowerCase(); p.querySelectorAll('.pv-pop-list label').forEach(l=>l.style.display=l.textContent.toLowerCase().includes(q)?'':'none'); };
+  p.querySelector('[data-all]').onclick=()=>boxes().forEach(b=>{ if(b.parentElement.style.display!=='none') b.checked=true; });
+  p.querySelector('[data-none]').onclick=()=>boxes().forEach(b=>{ if(b.parentElement.style.display!=='none') b.checked=false; });
+  p.querySelector('[data-apply]').onclick=()=>{ const sel=boxes().filter(b=>b.checked).map(b=>b.value); st.filters[dim] = sel.length===vals.length ? null : sel; pivotSave(); pivotClosePops(); renderPivotView(); };
+  p.querySelector('.pv-pop-q').focus();
+}
 function drawPivot(){
-  const st = pivotState, res = pivotCompute(st), m = res.m;
-  const title = m.label+' by '+PIVOT_DIMS[st.rows].toLowerCase()+(st.cols!=='none'?' and '+PIVOT_DIMS[st.cols].toLowerCase():'');
+  const st = pivotState, res = pivotCompute(st), ms = res.ms; pivotLast = res;
+  const pal = PIVOT_PALETTES[st.palette] || PIVOT_PALETTES.default;
+  const rowsLabel = st.rows.map(d=>PIVOT_DIMS[d]).join(' › ') || 'All';
+  const title = ms.map(m=>m.label).join(', ')+(st.rows.length?' by '+st.rows.map(d=>PIVOT_DIMS[d].toLowerCase()).join(' › '):'')+(st.cols.length?' and '+st.cols.map(d=>PIVOT_DIMS[d].toLowerCase()).join(' › '):'');
   document.getElementById('pvTitle').textContent = title;
-  const wk = res.weeks; const range = wk.length ? 'Wk '+wk[0].weekNumber+' – Wk '+wk[wk.length-1].weekNumber : '';
-  document.getElementById('pvSub').textContent = range+' · '+(st.division||'all divisions')+' · '+(dedupeByEmployeeNumber?'Deduped':'Raw')+(res.hiddenRows?' · '+res.hiddenRows+' more row'+(res.hiddenRows===1?'':'s')+' not shown (change “Show”)':'')+(res.hiddenCols?' · '+res.hiddenCols+' more columns in the table':'');
-  // table
+  const wk = res.weeks; const range = wk.length ? 'Wk '+wk[0].weekNumber+' – Wk '+wk[wk.length-1].weekNumber : 'no weeks';
+  const fl = Object.entries(st.filters).filter(([,v])=>v).map(([d,v])=>PIVOT_DIMS[d]+': '+(v.length===1?v[0]:v.length+' selected'));
+  document.getElementById('pvSub').textContent = range+' · '+(fl.length?fl.join(' · '):'no filters')+' · '+(dedupeByEmployeeNumber?'Deduped':'Raw')+(res.hiddenRows?' · '+res.hiddenRows+' more row'+(res.hiddenRows===1?'':'s')+' not shown (change “Show”)':'');
+  const cols = st.cols.length ? res.cols : ['__all'];
+  const multiM = ms.length>1, hasCols = st.cols.length>0;
+  const cand = canSeeCandidates();
+  const pcAttr = (ri,ci,mi)=> cand && ms[mi].list ? ` data-pc="${ri}|${ci}|${mi}" class="pv-pc"` : '';
+  // heat-map scale per measure
+  const maxOf = ms.map(m=>{ let mx=0; res.rows.forEach(r=>cols.forEach(c=>{ const v=res.cell(r,c,m); if(v!=null && v>mx) mx=v; })); return mx||1; });
+  const heat = (v,mi)=> st.heat && v!=null ? ` style="background:rgba(42,127,143,${(0.06+0.5*v/maxOf[mi]).toFixed(3)})"` : '';
   const tbl = document.getElementById('pvTable');
-  const colLabels = st.cols==='none' ? [] : res.cols;
-  tbl.innerHTML = `<thead><tr><th>${escapeHtml(PIVOT_DIMS[st.rows])}</th>${colLabels.map(c=>`<th>${escapeHtml(c)}</th>`).join('')}<th>${st.cols==='none'?escapeHtml(m.label):'Total'}</th></tr></thead>
-    <tbody>${res.rows.map(r=>`<tr><td><strong>${escapeHtml(r)}</strong></td>${colLabels.map(c=>`<td>${pivotFmt(res.cell(r,c), m)}</td>`).join('')}<td><strong>${pivotFmt(res.rowTotal(r), m)}</strong></td></tr>`).join('') || `<tr><td colspan="${colLabels.length+2}" class="hint">No data for this selection.</td></tr>`}</tbody>
-    <tfoot><tr class="summary-total"><td>All${res.hiddenRows?' (incl. rows not shown)':''}</td>${colLabels.map(c=>`<td>${pivotFmt(res.colTotal(c), m)}</td>`).join('')}<td>${pivotFmt(res.grand, m)}</td></tr></tfoot>`;
-  const aoa = ()=>[[PIVOT_DIMS[st.rows], ...colLabels, st.cols==='none'?m.label:'Total'], ...res.rows.map(r=>[r, ...colLabels.map(c=>{ const v=res.cell(r,c); return v==null?'':+v.toFixed(2); }), (v=>v==null?'':+v.toFixed(2))(res.rowTotal(r))])];
+  const showTot = st.totals && hasCols;
+  const head1 = hasCols ? `<tr><th rowspan="${multiM?2:1}">${escapeHtml(rowsLabel)}</th>${cols.map(c=>`<th colspan="${ms.length}" class="pv-ch">${escapeHtml(c)}</th>`).join('')}${showTot?`<th colspan="${ms.length}" class="pv-ch">Total</th>`:''}</tr>` : `<tr><th>${escapeHtml(rowsLabel)}</th>${ms.map(m=>`<th>${escapeHtml(m.label)}</th>`).join('')}</tr>`;
+  const head2 = hasCols && multiM ? `<tr>${[...cols, ...(showTot?['t']:[])].map(()=>ms.map(m=>`<th class="pv-mh">${escapeHtml(m.label)}</th>`).join('')).join('')}</tr>` : '';
+  const body = res.rows.map((r,ri)=>`<tr><td><strong>${escapeHtml(r==='__all'?'All':r)}</strong></td>${cols.map((c,ci)=>ms.map((m,mi)=>{ const v=res.cell(r,c,m); return `<td${heat(v,mi)}><span${pcAttr(ri,ci,mi)}>${pivotFmt(v,m,res.isPct(m))}</span></td>`; }).join('')).join('')}${showTot?ms.map((m,mi)=>`<td><strong><span${pcAttr(ri,'t',mi)}>${pivotFmt(res.rowTotal(r,m),m,res.isPct(m))}</span></strong></td>`).join(''):''}</tr>`).join('')
+    || `<tr><td colspan="${1+cols.length*ms.length+(showTot?ms.length:0)}" class="hint">No data for this selection.</td></tr>`;
+  const foot = st.totals && res.rows.length && (st.rows.length) ? `<tfoot><tr class="summary-total"><td>All${res.hiddenRows?' (incl. rows not shown)':''}</td>${cols.map((c,ci)=>ms.map((m,mi)=>`<td><span${pcAttr('t',hasCols?ci:'t',mi)}>${pivotFmt(hasCols?res.colTotal(c,m):res.grand(m),m,res.isPct(m))}</span></td>`).join('')).join('')}${showTot?ms.map((m,mi)=>`<td><span${pcAttr('t','t',mi)}>${pivotFmt(res.grand(m),m,res.isPct(m))}</span></td>`).join(''):''}</tr></tfoot>` : '';
+  tbl.innerHTML = `<thead>${head1}${head2}</thead><tbody>${body}</tbody>${foot}`;
+  tbl.querySelectorAll('[data-pc]').forEach(el=>el.onclick=()=>{ document.getElementById('recruiterHoverTooltip').classList.add('hidden'); pivotDrill(pivotCellRef(el)); });
+  const num = (v)=> v==null ? '' : +v.toFixed(2);
+  const aoa = ()=>{
+    const h = [rowsLabel, ...cols.flatMap(c=>ms.map(m=>(hasCols?c+(multiM?' · ':''):'')+(multiM||!hasCols?m.label:''))), ...(showTot?ms.map(m=>'Total'+(multiM?' · '+m.label:'')):[])];
+    return [h, ...res.rows.map(r=>[r==='__all'?'All':r, ...cols.flatMap(c=>ms.map(m=>num(res.cell(r,c,m)))), ...(showTot?ms.map(m=>num(res.rowTotal(r,m))):[])])];
+  };
   document.getElementById('pvCopy').onclick = ()=>navigator.clipboard.writeText(aoa().map(r=>r.join('\t')).join('\n')).then(()=>showToast('Copied — paste into Excel.')).catch(()=>showToast('Clipboard blocked by the browser.'));
-  document.getElementById('pvXlsx').onclick = ()=>{ const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa()), 'Pivot'); XLSX.writeFile(wb, 'pivot-'+st.measure+'-by-'+st.rows+'.xlsx'); };
+  document.getElementById('pvXlsx').onclick = ()=>{ const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa()), 'Pivot'); XLSX.writeFile(wb, 'pivot-'+st.values.join('-')+(st.rows.length?'-by-'+st.rows.join('-'):'')+'.xlsx'); };
   // chart
   const wrap = document.getElementById('pvChartWrap');
   destroyChart('pvChart');
   if(st.chart==='table'){ wrap.parentElement.classList.add('hidden'); return; }
   wrap.parentElement.classList.remove('hidden');
   const canvas = document.getElementById('pvChart');
-  const round = v=>v==null?null:+v.toFixed(m.rate||m.per?1:0);
-  const pie = st.chart==='pie' || st.chart==='doughnut';
-  let datasets;
-  if(st.cols==='none' || pie){
-    const data = res.rows.map(r=>round(res.rowTotal(r)));
-    datasets = [{label:m.label, data, backgroundColor: pie ? res.rows.map((_,i)=>PIVOT_COLORS[i%PIVOT_COLORS.length]) : '#2a7f8f', borderColor: pie ? '#fff' : '#2a7f8f', borderWidth: pie?2:2, fill: st.chart==='area', tension:.25, borderRadius: st.chart.includes('bar')||st.chart==='stacked'?5:0}];
-  } else {
-    datasets = res.cols.map((c,i)=>({label:c, data:res.rows.map(r=>round(res.cell(r,c))), backgroundColor: st.chart==='area' ? PIVOT_COLORS[i%PIVOT_COLORS.length]+'33' : PIVOT_COLORS[i%PIVOT_COLORS.length], borderColor:PIVOT_COLORS[i%PIVOT_COLORS.length], borderWidth:2, fill: st.chart==='area', tension:.25, borderRadius:4}));
-  }
-  const type = pie ? st.chart : (st.chart==='line'||st.chart==='area') ? 'line' : 'bar';
+  const radial = ['pie','doughnut','polarArea'].includes(st.chart);
+  const labels = res.rows.map(r=>r==='__all'?'All':r);
+  const anyRate = ms.some(m=>res.isPct(m)), anyCount = ms.some(m=>!res.isPct(m)), dual = anyRate && anyCount && !radial && st.chart!=='radar';
+  let series = []; // {label, data, mi, ci}
+  if(radial){ const m=ms[0]; series=[{label:m.label, data:res.rows.map(r=>num(hasCols?res.rowTotal(r,m):res.cell(r,'__all',m))), mi:0, ci:hasCols?'t':0}]; }
+  else cols.forEach((c,ci)=>ms.forEach((m,mi)=>series.push({label: hasCols ? c+(multiM?' · '+m.label:'') : m.label, data:res.rows.map(r=>num(res.cell(r,c,m))), mi, ci})));
+  if(series.length>40){ series=series.slice(0,40); }
+  const area = st.chart==='area', lineLike = st.chart==='line'||area;
+  const datasets = series.map((s,i)=>{
+    const color = pal[i%pal.length], m=ms[s.mi];
+    const asLine = lineLike || st.chart==='radar' || (st.chart==='combo' && s.mi>0) || (st.chart==='combo' && !multiM && i>0);
+    const ds = {label:s.label, data:s.data, _mi:s.mi, _ci:s.ci, borderColor: radial?'#fff':color, backgroundColor: radial ? res.rows.map((_,j)=>pal[j%pal.length]+(st.chart==='polarArea'?'cc':'')) : (asLine ? color+(area||st.chart==='radar'?'33':'') : color),
+      borderWidth: 2, tension:.25, pointRadius: res.rows.length>30?0:3, fill: area || st.chart==='radar', borderRadius: asLine||radial?0:4};
+    if(st.chart==='combo') ds.type = asLine ? 'line' : 'bar';
+    if(dual) ds.yAxisID = res.isPct(m) ? 'y2' : 'y';
+    if(st.stack && !radial && st.chart!=='radar' && !(st.chart==='combo' && asLine)) ds.stack = dual ? (res.isPct(m)?'p':'n') : 's';
+    if(st.chart==='combo' && asLine) ds.order = -1;
+    return ds;
+  });
+  const type = radial ? st.chart : st.chart==='radar' ? 'radar' : lineLike ? 'line' : 'bar';
   const horizontal = st.chart==='hbar';
-  wrap.style.height = horizontal ? Math.max(320, res.rows.length*28+80)+'px' : (pie ? '380px' : '380px');
-  const valueAxis = {beginAtZero:true, stacked: st.chart==='stacked', ticks:{callback:v=>m.rate?v+'%':v}};
-  charts.pvChart = safeChart(canvas, {type, data:{labels:res.rows, datasets}, options:{responsive:true, maintainAspectRatio:false, indexAxis: horizontal?'y':'x',
-    plugins:{noValueLabels: datasets.length>1 || res.rows.length>20, legend:{display: pie || datasets.length>1, position: pie?'right':'bottom'}, tooltip:{callbacks:{label:c=>(c.dataset.label&&datasets.length>1?c.dataset.label+': ':(pie?c.label+': ':''))+pivotFmt(c.raw, m)}}},
-    scales: pie ? {} : (horizontal ? {x:valueAxis, y:{stacked: st.chart==='stacked', ticks:{autoSkip:false}}} : {y:valueAxis, x:{stacked: st.chart==='stacked', ticks:{maxRotation:45, autoSkip:true}}})}});
-  document.getElementById('pvPng').onclick = ()=>{ const a=document.createElement('a'); a.href=canvas.toDataURL('image/png'); a.download='pivot-'+st.measure+'.png'; a.click(); };
+  wrap.style.height = horizontal ? Math.max(Number(st.height), res.rows.length*(st.stack?26:Math.min(60,14+12*series.length))+90)+'px' : st.height+'px';
+  const pctOnly = ms.every(m=>res.isPct(m));
+  const axis = (pct, stacked)=>({beginAtZero:true, stacked, ticks:{callback:v=>pct?v+'%':fmtNum(v)}});
+  const scales = radial ? {} : st.chart==='radar' ? {r:{beginAtZero:true}} : horizontal
+    ? {x:axis(pctOnly, !!st.stack), y:{stacked:!!st.stack, ticks:{autoSkip:false}}}
+    : Object.assign({x:{stacked:!!st.stack, ticks:{maxRotation:45, autoSkip:true}}, y:axis(pctOnly && !dual, !!st.stack)}, dual?{y2:{...axis(true,!!st.stack), position:'right', grid:{drawOnChartArea:false}}}:{});
+  const noLabels = st.labels==='off' || (st.labels==='auto' && (series.length>3 || res.rows.length>20));
+  charts.pvChart = safeChart(canvas, {type, data:{labels, datasets}, options:{responsive:true, maintainAspectRatio:false, indexAxis: horizontal?'y':'x',
+    interaction: radial ? {} : {mode:'nearest', intersect:true},
+    onHover:(e,els)=>{ e.native && (e.native.target.style.cursor = cand && els.length ? 'pointer' : 'default'); },
+    onClick:(e,els)=>{ if(!cand || !els.length) return; const el=els[0]; const ds=datasets[el.datasetIndex]; const r=res.rows[el.index]; const c = ds._ci==='t' ? null : cols[ds._ci]; const m=ms[ds._mi]; pivotDrill({r, c: hasCols?c:null, m, facts:res.factsFor(r, hasCols?c:'__all')}); },
+    plugins:{noValueLabels: noLabels, legend:{display: st.legend!=='none' && (radial || datasets.length>1), position: st.legend==='none'?'bottom':st.legend},
+      tooltip:{callbacks:{label:c=>{ const m=ms[c.dataset._mi]||ms[0]; return (datasets.length>1||radial ? (radial?c.label:c.dataset.label)+': ' : '')+pivotFmt(c.raw, m, res.isPct(m)); }, footer:()=>cand?'Click for the candidates':''}}},
+    scales}});
+  document.getElementById('pvPng').onclick = ()=>{ const a=document.createElement('a'); a.href=canvas.toDataURL('image/png'); a.download='pivot-'+st.values.join('-')+'.png'; a.click(); };
 }
 
 /* ------------------------------------------ ALERTS MODULE ------------------------------------------ */
@@ -8033,7 +8486,7 @@ async function renderUploadHistory(){
 }
 
 /* ============================= INIT ============================= */
-const APP_VERSION = 'Version 4.20.0';
+const APP_VERSION = 'Version 4.21.0';
 async function init(){
   document.getElementById('versionLabelInline').textContent = APP_VERSION;
   document.getElementById('footerVersionLabel').textContent = APP_VERSION;
