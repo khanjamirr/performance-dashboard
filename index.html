@@ -387,6 +387,8 @@ body.no-copy-tables #copyPrevWeeksBtn, body.no-copy-tables #tooltipCopyBtn {disp
 
 .lt-head,.lt-section-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}.lt-head h2{margin:8px 0}.lt-head>div:last-child{text-align:right}.lt-section-head{margin-bottom:16px}.lt-section-head h3{margin:0}.lt-warning{padding:20px 24px;background:#fff0e5;border:1px solid #e8bd9b;border-left:5px solid #cc6a35;border-radius:12px;margin-bottom:18px}.lt-warning p{margin:10px 0}.lt-mine td{background:#edf8f5!important}#view-teams>.panel{margin-bottom:18px}#view-teams .kpi-grid{margin-bottom:0}#view-teams .value{overflow-wrap:anywhere}#teamAssignmentsAdmin input,#teamAssignmentsAdmin select{max-width:100%;font:inherit;padding:8px;border:1px solid var(--border);border-radius:7px}#ltGoalChecks{scroll-margin-top:90px}
 @media(max-width:650px){.lt-head>div:last-child{text-align:left}.lt-section-head .ts-tabs{flex-wrap:wrap}}
+#accountMenu[hidden]{display:none!important}#accountMenu{width:100%;padding:6px 0;border-top:1px solid #ffffff26}#accountMenu .ribbon-btn{width:100%;text-align:left}.user-chip-wrap{flex-direction:column!important;align-items:stretch!important}.user-chip .user-name{display:inline!important}.live-badge{display:block!important;white-space:normal!important;line-height:1.5;background:transparent!important;color:inherit!important;padding:2px 0!important;font-size:10px!important}.kpi-minimum{font-size:12px;color:var(--text-secondary);margin:7px 0;font-weight:600}
+#periodPicker{display:flex;align-items:center;gap:6px}#periodPicker .period-picker-panel{top:100%}#periodPicker>button:disabled{opacity:.4;cursor:default}
 </style>
 <style id="executive-design">
 :root{--bg:#f2f5f6;--surface:#fff;--border:#dfe7e9;--navy:#102c3b;--navy-2:#193e4d;--indigo:#146f78;--indigo-light:#e7f3f3;--teal:#17775c;--teal-light:#e8f5ee;--amber:#94671b;--amber-light:#fbf2df;--red:#bb4d50;--red-light:#fbecee;--text:#183442;--text-secondary:#5b707c;--text-tertiary:#687e89;--radius:12px;--radius-lg:18px;--shadow:0 3px 16px #17374405}
@@ -1103,6 +1105,13 @@ button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #183442
 @media (min-width:761px) and (max-width:1180px){ :root{--side-w:224px} .nav button{font-size:12.5px!important;gap:10px!important;padding:10px!important} .topbar,.content{padding-left:20px!important;padding-right:20px!important} }
 @media (max-width:760px){ .kpi-v2{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important} .kpi-v2 .kpi-card,.kpi-v2 .kpi-rate{grid-column:auto!important} .kpi-v2 .kpi-card{padding:12px!important} .kpi-v2 .kpi-ico{width:24px;height:24px;flex-basis:24px} .kpi-spark{height:26px} }
 
+
+.sidebar .brand{flex-wrap:wrap!important;align-items:center!important;row-gap:10px!important}
+.sidebar .brand-text{flex:1;min-width:0}
+.sidebar .brand .upload-stamp{flex:0 0 100%;width:100%;min-width:0;box-sizing:border-box;margin:0!important;padding:8px 0 0!important;border-top:1px solid #ffffff18;border-radius:0;letter-spacing:0;line-height:1.5!important;font-weight:400;color:#d3e3e8!important}
+.upload-caption{display:block;font-size:10px;color:#9ebac5;margin-bottom:2px}.upload-stamp time{display:block;font-size:11px;white-space:nowrap;font-variant-numeric:tabular-nums}
+@media(min-width:761px){.sidebar .brand{padding-right:6px!important}.sidebar .brand h1{padding-right:24px;white-space:normal!important}body.side-collapsed .upload-stamp{display:none!important}}
+@media(max-width:760px){.sidebar .brand .upload-stamp{padding-top:2px!important;border:0}.upload-caption{display:inline;margin-right:5px}.upload-stamp time{display:inline}}
 </style>
 </head>
 <body class="locked">
@@ -1114,21 +1123,21 @@ button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #183442
       <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V12M10 20V5M16 20V9M22 20V3"/></svg></div>
       <div class="brand-text">
         <h1 id="dashboardTitle" title="Click to go home">Performance Dashboard</h1>
-        <p><span id="versionLabelInline">Version 4.21.0</span> <span id="liveBadge" class="live-badge" title="Sync status">Connecting…</span></p>
+        <p><span id="versionLabelInline">Version 4.21.0</span></p>
       </div>
+      <div id="liveBadge" class="live-badge upload-stamp" title="Latest upload">No uploads yet</div>
     </div>
     <button type="button" class="side-collapse" id="sideCollapseBtn" aria-label="Collapse menu" title="Collapse menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
     <div class="side-label">Views</div>
     <nav class="nav" id="navList">
-      <button data-view="performance" class="active"><span class="dot"></span>Performance Summary</button>
+      <button data-view="performance" class="active"><span class="dot"></span>Performance Overview</button>
       <div class="divider"></div>
       <button data-view="teams"><span class="dot"></span>My Team</button>
-      <button data-view="recruiters"><span class="dot"></span>Recruiter Performance</button>
-      <button data-view="branches"><span class="dot"></span>Branch Performance</button>
-      <button data-view="master"><span class="dot"></span>Master Data</button>
-      <button data-view="candidates"><span class="dot"></span>Candidates</button>
-      <button data-view="alerts"><span class="dot"></span>Alerts</button>
-      <button data-view="pivot"><span class="dot"></span>Pivot &amp; Charts</button>
+      <button data-view="recruiters"><span class="dot"></span>Recruiter Scorecards</button>
+      <button data-view="branches"><span class="dot"></span>Branch Results</button>
+      <button data-view="candidates"><span class="dot"></span>Candidate Hub</button>
+      <button data-view="alerts"><span class="dot"></span>Action Center</button>
+      <button data-view="pivot"><span class="dot"></span>Report Builder</button>
     </nav>
     <div class="side-label side-label-tools">Tools</div>
     <div class="ribbon-actions">
@@ -1136,8 +1145,7 @@ button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #183442
       <div class="download-dropdown-wrap hidden" id="downloadDropdownWrap">
         <button class="ribbon-btn" id="downloadDropdownBtn"><svg class="rb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg><span class="rb-label">Download</span></button>
       </div>
-      <button data-view="uploads" class="ribbon-btn" id="settingsNavBtn"><svg class="rb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span class="rb-label">Settings</span></button>
-      <div class="user-chip-wrap hidden" id="userChipWrap"><button type="button" class="ribbon-btn user-chip" id="userChip" title="My account"></button><button type="button" class="ribbon-btn" id="signOutBtn" title="Sign out"><svg class="rb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg><span class="rb-label">Sign out</span></button></div>
+      <div class="user-chip-wrap hidden" id="userChipWrap"><button type="button" class="ribbon-btn user-chip" id="userChip" title="Account menu" aria-expanded="false" aria-controls="accountMenu"></button><div id="accountMenu" hidden><button data-view="uploads" class="ribbon-btn" id="settingsNavBtn"><svg class="rb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span class="rb-label">Settings</span></button><button type="button" class="ribbon-btn" id="myAccountBtn">My account</button><button type="button" class="ribbon-btn" id="signOutBtn" title="Sign out"><svg class="rb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg><span class="rb-label">Sign out</span></button></div></div>
     </div>
   </header>
 
@@ -1150,7 +1158,7 @@ button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #183442
       <div id="topbarCenter" class="hidden" style="display:flex;align-items:center;justify-content:center;gap:10px;flex:1;flex-wrap:wrap;">
         <span class="lbl">Period:</span>
         <div class="period-picker" id="periodPicker">
-          <button class="period-picker-btn" id="periodPickerBtn" type="button">All Weeks <span style="opacity:.6;">&#9662;</span></button>
+          <button class="btn btn-secondary" id="periodPrevious" type="button" aria-label="Previous uploaded week" title="Previous uploaded week">←</button><button class="period-picker-btn" id="periodPickerBtn" type="button">All Weeks <span style="opacity:.6;">&#9662;</span></button><button class="btn btn-secondary" id="periodNext" type="button" aria-label="Next uploaded week" title="Next uploaded week">→</button>
           <div class="period-picker-panel hidden" id="periodPickerPanel">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;">
               <a href="#" id="periodPickerClearLink" style="color:var(--text-tertiary);font-size:12px;flex-shrink:0;">Clear selection</a>
@@ -1817,7 +1825,7 @@ document.addEventListener('mouseout', (e)=>{
 });
 // Candidate names / Employee Numbers are only shown to people with the Candidates right.
 function canSeeCandidates(){ return Server.can('candidates'); }
-// v4.21: the hover lists moved to Pivot & Charts — tables show plain numbers everywhere.
+// v4.21: the hover lists moved to Report Builder — tables show plain numbers everywhere.
 function candidateCellHtml(value, list, metricKey, entityName){
   return fmtNum(value);
   const listJson = escapeHtml(JSON.stringify((list||[]).slice(0,500)));
@@ -3208,7 +3216,12 @@ document.getElementById('navList').addEventListener('click', (e)=>{
 document.getElementById('settingsNavBtn').addEventListener('click', ()=>{
   openSettingsModal('sync');
 });
-document.getElementById('userChip').addEventListener('click', ()=>openSettingsModal('account'));
+function closeAccountMenu(){document.getElementById('accountMenu').hidden=true;document.getElementById('userChip').setAttribute('aria-expanded','false');}
+document.getElementById('userChip').addEventListener('click',()=>{const menu=document.getElementById('accountMenu');menu.hidden=!menu.hidden;document.getElementById('userChip').setAttribute('aria-expanded',String(!menu.hidden));});
+document.getElementById('myAccountBtn').onclick=()=>{closeAccountMenu();openSettingsModal('account');};
+document.getElementById('accountMenu').addEventListener('click',e=>{if(e.target.closest('button'))closeAccountMenu();});
+document.addEventListener('click',e=>{if(!e.target.closest('#userChipWrap'))closeAccountMenu();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!document.getElementById('accountMenu').hidden){closeAccountMenu();document.getElementById('userChip').focus();}});
 document.getElementById('signOutBtn').addEventListener('click', ()=>signOut());
 
 function goToHome(){
@@ -3236,25 +3249,35 @@ document.getElementById('weeklyDivisionSelect').addEventListener('change', (e)=>
 
 const VIEW_META = {
   teams:{title:'My Team',sub:'Your assigned team, today’s results and schedule goals'},
-  performance:{title:'Performance Summary', sub:'Interview schedules, shows, and outcomes for the selected week'},
-  recruiters:{title:'Recruiter Performance', sub:'Show rates and outcomes by recruiter'},
-  branches:{title:'Branch Performance', sub:'Show rates and outcomes by branch'},
-  candidates:{title:'Candidates', sub:'Who is counted in each category, by week'},
-  alerts:{title:'Alerts', sub:'Who needs attention this week — below 50% of goal first'},
-  pivot:{title:'Pivot & Charts', sub:'Drag fields into Rows, Columns, Values and Filters — the chart builds itself'},
+  performance:{title:'Performance Overview', sub:'Interview schedules, shows, and outcomes for the selected week'},
+  recruiters:{title:'Recruiter Scorecards', sub:'Show rates and outcomes by recruiter'},
+  branches:{title:'Branch Results', sub:'Show rates and outcomes by branch'},
+  candidates:{title:'Candidate Hub', sub:'Who is counted in each category, by week'},
+  alerts:{title:'Action Center', sub:'Who needs attention this week — below 50% of goal first'},
+  pivot:{title:'Report Builder', sub:'Drag fields into Rows, Columns, Values and Filters — the chart builds itself'},
   history:{title:'History', sub:'Every week on record'},
-  master:{title:'Master Data', sub:'Every candidate row from every import, in one sheet — filter any column, exclude or include candidates'},
+  master:{title:'Candidate Hub', sub:'Every candidate row from every import, in one sheet — filter any column, exclude or include candidates'},
   settings:{title:'Settings', sub:'Uploads, saved weeks, divisions, users and your account'},
   uploads:{title:'Uploads', sub:'Manage uploaded weeks and recruiter goals & divisions'},
 };
 const PERFORMANCE_TYPE_META = {
-  weekly:{title:'Performance Summary', sub:'Interview schedules, shows, and outcomes for the selected week'},
+  weekly:{title:'Performance Overview', sub:'Interview schedules, shows, and outcomes for the selected week'},
   monthly:{title:'Monthly Rollup', sub:'Aggregated performance across all weeks in each month'},
   quarterly:{title:'Quarterly Rollup', sub:'Aggregated performance across all weeks in each quarter'},
 };
 let uploadType = 'weekly'; // 'weekly' | 'monthly' — Uploads section sub-selector, defaults to weekly
 
+function renderUploadStamp(){
+ const el=document.getElementById('liveBadge');if(!el)return;
+ const dates=weeksData.map(w=>new Date(w.savedAt).getTime()).filter(t=>Number.isFinite(t)&&t>0);
+ const latest=dates.length?new Date(Math.max(...dates)):null;
+ el.innerHTML=latest?'<span class="upload-caption">Last upload</span><time datetime="'+latest.toISOString()+'">'+escapeHtml(latest.toLocaleString(undefined,{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}))+'</time>':'<span class="upload-caption">Last upload</span><span>No uploads yet</span>';
+ el.title=latest?'Latest uploaded data · '+latest.toLocaleString()+' · '+Intl.DateTimeFormat().resolvedOptions().timeZone:'No uploaded data available';
+ el.dataset.status='upload';
+}
 async function refreshUI(){
+ renderUploadStamp();
+ if(currentView==='candidates'&&!Server.can('candidates')&&Server.can('master'))currentView='master';
   closeEntityPopover();
   const hasData = weeksData.length>0;
   const onSettings = currentView==='settings';
@@ -3289,7 +3312,7 @@ async function refreshUI(){
     document.getElementById('view-'+v).classList.toggle('hidden', v!==currentView);
   });
 
-  document.getElementById('topbarCenter').classList.toggle('hidden', !showDashboardViews || currentView==='teams');
+  document.getElementById('topbarCenter').classList.toggle('hidden', !showDashboardViews || ['teams','candidates','alerts','pivot','history'].includes(currentView));
 
   if(currentView!=='recruiters' && currentView!=='branches' && currentView!=='master' && currentView!=='candidates' && currentView!=='alerts' && currentView!=='pivot'){
     const extra = document.getElementById('topbarExtra');
@@ -3513,7 +3536,18 @@ function periodPickerButtonLabel(){
   }
   return n+' weeks selected';
 }
+function adjacentUploadedWeek(direction){
+ const available=[...new Set(weeksData.map(w=>w.weekEndDate))].sort();
+ const selected=selectedWeekEndDates.length?[...selectedWeekEndDates].sort():currentWeekEndDate&&currentWeekEndDate!=='all-weeks'?[currentWeekEndDate]:[];
+ if(!selected.length)return direction<0?available[available.length-1]:null;
+ return direction<0?available.filter(d=>d<selected[0]).pop():available.find(d=>d>selected[selected.length-1]);
+}
+function navigateUploadedWeek(direction){const date=adjacentUploadedWeek(direction);if(!date)return;selectedWeekEndDates=[date];currentWeekEndDate=date;closePeriodPicker();refreshUI();}
+document.getElementById('periodPrevious').onclick=()=>navigateUploadedWeek(-1);
+document.getElementById('periodNext').onclick=()=>navigateUploadedWeek(1);
 function renderPeriodPickerButton(){
+ document.getElementById('periodPrevious').disabled=!adjacentUploadedWeek(-1);
+ document.getElementById('periodNext').disabled=!adjacentUploadedWeek(1);
   const btn = document.getElementById('periodPickerBtn');
   if(!btn) return;
   btn.innerHTML = escapeHtml(periodPickerButtonLabel())+' <span style="opacity:.6;">&#9662;</span>';
@@ -3536,7 +3570,8 @@ function applyPeriodSelection(){
 
   if(selectedWeekEndDates.length>0 && currentWeekEndDate==='all-weeks') currentWeekEndDate = null; // let the weekly view fall back to combined mode
   if(currentView==='performance') renderPerformanceView();
-  else renderPeopleView(currentView);
+  else if(currentView==='recruiters'||currentView==='branches')renderPeopleView(currentView);
+  else refreshUI();
   renderPeriodPickerButton();
 }
 function selectPeriodAllWeeks(){
@@ -3819,7 +3854,7 @@ async function renderWeeklyView(){
           delta: d==null ? '<div class="delta flat">'+fmtNum(hpr.hires)+' hires ÷ '+fmtNum(hpr.recruiters)+' recruiters</div>' : '<span class="delta '+(d>=0?'up':'down')+'">'+(d>=0?'+':'−')+Math.abs(d).toFixed(1)+' vs prior week · '+fmtNum(hpr.hires)+' ÷ '+fmtNum(hpr.recruiters)+'</span>',
           bar: hpr.value==null ? null : {v:hpr.value, target:HIRES_PER_RECRUITER_TARGET, max:HIRES_PER_RECRUITER_TARGET*1.5, good:'up', unit:''},
           title:'Total hires ÷ number of recruiters with activity'+(isMultiWeekMode?' (per recruiter per week)':' this week')}); })()}
-      ${kpiCardHtml({rate:true, label:'Goal Reach', icon:'target', accent:'#a67c2e', value:goalReachPct!==null?goalReachPct.toFixed(1)+'%':'\u2013', delta:'<div class="delta flat">'+(isMultiWeekMode?'Combined':'Target 100%')+'</div>', bar:goalReachPct!==null?{v:goalReachPct, target:100, good:'up'}:null})}
+      ${kpiCardHtml({rate:true, label:'Goal Reach', icon:'target', accent:'#a67c2e', value:goalReachPct!==null?goalReachPct.toFixed(1)+'%':'\u2013', delta:'<div class="delta flat">'+(isMultiWeekMode?'Combined':'Minimum 90%')+'</div>', bar:goalReachPct!==null?{v:goalReachPct, target:100, good:'up'}:null})}
       ${(()=>{ const pend=!isMultiWeekMode && weekIsFullyPending(week.weekEndDate); return kpiCardHtml({label:'Show Rate', icon:'trend', rate:true, accent:'#1f8a84', value:pend?'Pending':fmtPct(t.shows,t.scheduledDateOf), delta:pend?'<div class="delta flat">Week hasn\u2019t happened yet</div>':deltaHtml(showRate, prevShowRate, true, true), bar:pend||!t.scheduledDateOf?null:{v:showRate, target:60, good:'up'}})
         + kpiCardHtml({rate:true, label:'No Show Rate', icon:'down', accent:'#c4565f', value:pend?'Pending':fmtPct(t.noShows,t.scheduledDateOf), delta:pend?'<div class="delta flat">Week hasn\u2019t happened yet</div>':deltaHtml(noShowRate, prevNoShowRate, false, true), bar:pend||!t.scheduledDateOf?null:{v:noShowRate, target:40, good:'down'}}); })()}
     </div>
@@ -4026,7 +4061,7 @@ async function renderWeeklyTopPerformers(week, suppliedGoals){
 }
 
 /* ---------- KPI cards: value, change, 8-week sparkline or target bar ---------- */
-const HIRES_PER_RECRUITER_TARGET = 12; // same target as the "Hires per Recruiter" trend chart
+const HIRES_PER_RECRUITER_TARGET = 15; // same target as the "Hires per Recruiter" trend chart
 // Total hires ÷ number of recruiters with any activity, summed over the weeks given (so for
 // several weeks it is hires per recruiter per week).
 function hiresPerRecruiter(weeks){
@@ -4054,14 +4089,16 @@ function sparkSvg(pts, color){
     <circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="2.6" fill="${color}"/></svg>`;
 }
 function kpiCardHtml(o){
+ const benchmark={'Goal Reach':[90,'Minimum 90%'],'Show Rate':[70,'Minimum 70%'],'Hires per Recruiter':[15,'Minimum 15'],'No Show Rate':[20,'Less than 20%']}[o.label];
+ if(benchmark&&o.bar)o={...o,bar:{...o.bar,target:benchmark[0],strict:o.label==='No Show Rate'}};
   let foot='';
   if(o.spark && o.spark.length>1) foot = `<div class="kpi-foot">${sparkSvg(o.spark, o.accent)}</div>`;
   else if(o.bar){
     const max=o.bar.max||100, unit=o.bar.unit==null?'%':o.bar.unit, scale=x=>Math.max(0,Math.min(100,x/max*100));
-    const ok = o.bar.good==='up' ? o.bar.v>=o.bar.target : o.bar.v<=o.bar.target;
-    foot = `<div class="kpi-foot kpi-bar-wrap" title="Target ${o.bar.good==='up'?'≥':'≤'} ${o.bar.target}${unit}"><div class="kpi-bar"><i style="width:${scale(o.bar.v)}%;background:${ok?'#1f9a6c':'#d0776f'}"></i><b style="left:${scale(o.bar.target)}%"></b></div><span class="kpi-foot-lbl">${o.bar.good==='up'?'≥':'≤'} ${o.bar.target}${unit}</span></div>`;
+    const ok = o.bar.good==='up' ? o.bar.v>=o.bar.target : (o.bar.strict?o.bar.v<o.bar.target:o.bar.v<=o.bar.target);
+    foot = `<div class="kpi-foot kpi-bar-wrap" title="Target ${o.bar.good==='up'?'≥':o.bar.strict?'<':'≤'} ${o.bar.target}${unit}"><div class="kpi-bar"><i style="width:${scale(o.bar.v)}%;background:${ok?'#1f9a6c':'#d0776f'}"></i><b style="left:${scale(o.bar.target)}%"></b></div><span class="kpi-foot-lbl">${o.bar.good==='up'?'≥':o.bar.strict?'<':'≤'} ${o.bar.target}${unit}</span></div>`;
   }
-  return `<div class="kpi-card${o.rate?' kpi-rate':''}" data-section="perf.kpi.${o.label.toLowerCase().replace(/[^a-z]+/g,'_').replace(/^_|_$/g,'')}" style="--accent:${o.accent}"${o.title?` title="${escapeHtml(o.title)}"`:''}><div class="kpi-top"><div class="label">${o.label}</div><span class="kpi-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${KPI_ICONS[o.icon]||''}</svg></span></div><div class="value">${o.value}</div>${o.delta||''}${foot}</div>`;
+  return `<div class="kpi-card${o.rate?' kpi-rate':''}" data-section="perf.kpi.${o.label.toLowerCase().replace(/[^a-z]+/g,'_').replace(/^_|_$/g,'')}" style="--accent:${o.accent}"${o.title?` title="${escapeHtml(o.title)}"`:''}><div class="kpi-top"><div class="label">${o.label}</div><span class="kpi-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${KPI_ICONS[o.icon]||''}</svg></span></div><div class="value">${o.value}</div>${benchmark?`<div class="kpi-minimum">${benchmark[1]}</div>`:''}${o.delta||''}${foot}</div>`;
 }
 function drawKpiMiniPies(weeks){
   const totals=computeDivisionBreakdown(weeks);
@@ -4298,7 +4335,7 @@ function drawDivisionBreakdown(weeksList, chartId, onDivisionClick, selectedDivi
 /* ============================= ALL-CATEGORIES TREND ============================= */
 let trendGranularity='weeks';
 function trendExplorerHtml(){
- return '<div class="trend-explorer" data-export-exclude><div class="trend-controls"><label for="trendScale">Time scale</label><input id="trendScale" aria-label="Time scale: days, weeks, months, quarters" type="range" min="0" max="3" step="1" value="'+['days','weeks','months','quarters'].indexOf(trendGranularity)+'"><strong id="trendScaleLabel">'+trendGranularity+'</strong><span>Latest 6 available weeks · division filter applied. Scroll horizontally to explore. Hiring target: 12 per recruiter per week, scaled to the period.</span></div><div class="row-2col">'+explorerPanel('Show Rate','explorerShowRate')+explorerPanel('Hires per Recruiter','explorerHires')+'</div>'+explorerPanel('Performance Trend','explorerActivity')+'</div>';
+ return '<div class="trend-explorer" data-export-exclude><div class="trend-controls"><label for="trendScale">Time scale</label><input id="trendScale" aria-label="Time scale: days, weeks, months, quarters" type="range" min="0" max="3" step="1" value="'+['days','weeks','months','quarters'].indexOf(trendGranularity)+'"><strong id="trendScaleLabel">'+trendGranularity+'</strong><span>Latest 6 available weeks · division filter applied. Scroll horizontally to explore. Hiring target: 15 per recruiter per week, scaled to the period.</span></div><div class="row-2col">'+explorerPanel('Show Rate','explorerShowRate')+explorerPanel('Hires per Recruiter','explorerHires')+'</div>'+explorerPanel('Performance Trend','explorerActivity')+'</div>';
 }
 function explorerPanel(title,id){return '<div class="panel"><div class="panel-head"><h3>'+title+'</h3></div><div class="explorer-scroll"><div class="explorer-canvas"><canvas id="'+id+'"></canvas></div></div></div>';}
 function trendBuckets(weeks,unit){
@@ -4322,7 +4359,7 @@ function renderTrendExplorer(weeks){
    trendGranularity=['days','weeks','months','quarters'][+slider.value];document.getElementById('trendScaleLabel').textContent=trendGranularity;
    const buckets=trendBuckets(weeks,trendGranularity);const labels=buckets.map(b=>b.label);
    const line=(label,data,color,extra={})=>({label,data,borderColor:color,backgroundColor:color,pointRadius:3,tension:.15,...extra});
-   const configs=[['explorerShowRate','line',[line('Show rate %',buckets.map(b=>b.totals.shows===null||!b.totals.scheduledDateOf?null:100*b.totals.shows/b.totals.scheduledDateOf),'#218778'),line('60% minimum',buckets.map(()=>60),'#a67b38',{borderDash:[2,5],pointRadius:0})]],['explorerHires','line',[line('Hires per recruiter',buckets.map(b=>b.totals.i9===null||!b.recruiters.size?null:b.totals.i9/b.recruiters.size),'#8a68b2'),line('Target: 12 per recruiter / week',buckets.map(b=>12*b.weight),'#a67b38',{borderDash:[2,5],pointRadius:0})]],['explorerActivity','bar',[['Schedules','schedules','#467bd1'],['Shows','shows','#218778'],['Placed','placed','#8666b0']].map(([label,key,color])=>({label,data:buckets.map(b=>b.totals[key]),backgroundColor:color,borderRadius:3}))]];
+   const configs=[['explorerShowRate','line',[line('Show rate %',buckets.map(b=>b.totals.shows===null||!b.totals.scheduledDateOf?null:100*b.totals.shows/b.totals.scheduledDateOf),'#218778'),line('70% minimum',buckets.map(()=>70),'#a67b38',{borderDash:[2,5],pointRadius:0})]],['explorerHires','line',[line('Hires per recruiter',buckets.map(b=>b.totals.i9===null||!b.recruiters.size?null:b.totals.i9/b.recruiters.size),'#8a68b2'),line('Target: 15 per recruiter / week',buckets.map(b=>15*b.weight),'#a67b38',{borderDash:[2,5],pointRadius:0})]],['explorerActivity','bar',[['Schedules','schedules','#467bd1'],['Shows','shows','#218778'],['Placed','placed','#8666b0']].map(([label,key,color])=>({label,data:buckets.map(b=>b.totals[key]),backgroundColor:color,borderRadius:3}))]];
    for(const [id,type,datasets] of configs){destroyChart(id);const canvas=document.getElementById(id);canvas.parentElement.style.width=Math.max(canvas.parentElement.parentElement.clientWidth,labels.length*(type==='bar'?130:85))+'px';charts[id]=safeChart(canvas,{type,data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:28,right:20}},plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true,...(id==='explorerShowRate'?{max:100}:{grace:'15%'})},x:{grid:{display:false}}}}});}
  };
  slider.oninput=draw;draw();
@@ -5904,7 +5941,7 @@ async function buildFullExportTables(){
   const weeks=selectedPeriodWeeks().map(w=>scopeWeekToDivision(w,universalDivision));
   const goals=(await computeGoalsForWeeks(weeks,universalDivision,weeks.at(-1)?.weekEndDate)).perRecruiter;
   const sections=[];
-  for(const [field,title] of [['byRecruiter','Recruiter Performance — Complete Detail'],['byBranch','Branch Performance — Complete Detail']]){
+  for(const [field,title] of [['byRecruiter','Recruiter Scorecards — Complete Detail'],['byBranch','Branch Results — Complete Detail']]){
     const map={};
     for(const w of weeks)for(const [name,r] of Object.entries(w[field]||{})){
       const t=map[name] ||= {name,...emptyTotals()};for(const k of Object.keys(emptyTotals()))t[k]+=Number(r[k])||0;
@@ -6386,21 +6423,21 @@ const CONN_LS_KEY = 'ipd_conn_v4';
 const TOKEN_LS_KEY = 'ipd_session_v4';
 const LIVE_POLL_MS = 4000;
 const MODULES = [
-  {key:'performance', label:'Performance Summary', hint:'Weekly, monthly and quarterly overview'},
-  {key:'recruiters',  label:'Recruiter Performance', hint:'Recruiter table, trends, reading remarks'},
-  {key:'branches',    label:'Branch Performance', hint:'Branch table and trends'},
-  {key:'candidates',  label:'Candidates — see names', hint:'Candidate names & Employee Numbers anywhere: the Candidates page, hover lists in tables and the recruiter detail page'},
+  {key:'performance', label:'Performance Overview', hint:'Weekly, monthly and quarterly overview'},
+  {key:'recruiters',  label:'Recruiter Scorecards', hint:'Recruiter table, trends, reading remarks'},
+  {key:'branches',    label:'Branch Results', hint:'Branch table and trends'},
+  {key:'candidates',  label:'Candidate Hub — pipeline and names', hint:'Candidate names & Employee Numbers anywhere: the Candidates page, hover lists in tables and the recruiter detail page'},
   {key:'alerts',      label:'Alerts', hint:'Recruiters below 50% of their goal, other signals and remarks'},
-  {key:'pivot',       label:'Pivot & Charts', hint:'Build their own pivot tables and charts, and save views'},
-  {key:'master',      label:'Master Data — view', hint:'Browse and filter every candidate row'},
-  {key:'master_edit', label:'Master Data — exclude / include', hint:'Remove candidates from the metrics or bring them back'},
+  {key:'pivot',       label:'Report Builder', hint:'Build their own pivot tables and charts, and save views'},
+  {key:'master',      label:'Candidate Hub — all records', hint:'Browse and filter every candidate row'},
+  {key:'master_edit', label:'Candidate Hub — exclude / include', hint:'Remove candidates from the metrics or bring them back'},
   {key:'upload',      label:'Upload spreadsheets', hint:'Import Created On / Date Of / goals files, folder sync'},
   {key:'remarks',     label:'Remarks — add', hint:'Add remarks; they wait for an approver (can edit their own while pending)'},
   {key:'remarks_approve', label:'Remarks — approve & edit', hint:'Approve or reject remarks, edit or delete anyone’s remark'},
   {key:'settings',    label:'Settings', hint:'Divisions, branch divisions, show/hide recruiters, saved weeks'},
   {key:'export',      label:'Download & share', hint:'Excel, PDF, Word, master sheet download, snapshots'},
 ];
-const VIEW_MODULE = {teams:'teams',performance:'performance', recruiters:'recruiters', branches:'branches', master:'master', candidates:'candidates', alerts:'alerts', pivot:'pivot'};
+const VIEW_MODULE = {teams:'teams',performance:'performance', recruiters:'recruiters', branches:'branches', master:'master', candidates:'candidate_hub', alerts:'alerts', pivot:'pivot'};
 
 function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
 function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
@@ -6508,7 +6545,7 @@ const Server = {
     return data;
   },
   rpc(fn, args){ return this.call(fn, {p_token:this.token, ...(args||{})}); },
-  can(m){ return !!this.user && (m==='teams' || this.user.role==='super_admin' || this.user.role==='admin' || (this.user.modules||[]).includes(m)); },
+  can(m){ if(m==='candidate_hub')return this.can('candidates')||this.can('master'); return !!this.user && (m==='teams' || this.user.role==='super_admin' || this.user.role==='admin' || (this.user.modules||[]).includes(m)); },
   isAdmin(){ return !!this.user && (this.user.role==='super_admin' || this.user.role==='admin'); },
   isSuperAdmin(){ return !!this.user && this.user.role==='super_admin'; },
   expired(){
@@ -6579,9 +6616,7 @@ const Server = {
   setStatus(s, detail){
     this.status = s;
     const el = document.getElementById('liveBadge'); if(!el) return;
-    const map = {live:['● Live','Connected — changes from your team appear within a few seconds'], offline:['● Offline','Server unreachable — retrying automatically'], connecting:['Connecting…','Connecting to the server']};
-    const [label,title] = map[s]||map.connecting;
-    el.textContent=label; el.title=title+(detail?' — '+detail:''); el.dataset.status=s;
+    renderUploadStamp();
   },
   async startPolling(){
     const head = await this.rpc('dash_changes', {p_since:0});
@@ -6712,6 +6747,7 @@ function renderUploadAlerts(){
 const PAGE_SECTIONS = {
   performance:[['perf.kpis','KPI cards (all)'],['perf.kpi.schedules','· Schedules card'],['perf.kpi.interviews','· Interviews card'],['perf.kpi.shows','· Shows card'],['perf.kpi.no_shows','· No Shows card'],['perf.kpi.hires','· Hires card'],['perf.kpi.placed','· Placed card'],['perf.kpi.hires_per_recruiter','· Hires per Recruiter card'],['perf.kpi.goal_reach','· Goal Reach card'],['perf.kpi.show_rate','· Show Rate card'],['perf.kpi.no_show_rate','· No Show Rate card'],
                 ['perf.trends','Trends charts'],['perf.leaderboards','Leaderboards (recruiter & branch snapshots)'],['perf.divisions','Division breakdown'],['perf.history','Previous 6 weeks table'],['perf.insights','Insights'],['perf.composition','Composition pies (monthly / quarterly)']],
+  teams:[['team.summary','Team — summary cards'],['team.daily','Team — daily table'],['team.weekly','Team — weekly table'],['team.goals','Team — goal checks and breaks'],['team.charts','Team — charts'],...['Schedules','Interviews','Shows','No Shows','Hires','Placed','Hires per Recruiter','Goal Reach','Show Rate','No Show Rate'].map(l=>['team.kpi.'+l.toLowerCase().replace(/[^a-z]+/g,'_'),'· '+l+' card'])],
   recruiters:[['rec.table','Recruiter table'],['hist.kpis','History page — summary tiles (recruiter & branch)'],['hist.trend','History page — week-by-week chart'],['hist.goal','History page — schedules vs goal chart'],['hist.weeks','History page — every-week table'],['hist.remarks','History page — remarks'],['hist.candidates','History page — candidates']],
   branches:[['br.table','Branch table'],['hist.team','History page — recruiters in the branch']],
   candidates:[['cand.list','Category boxes and candidate list'],['cand.explain','“How are these counted?” breakdown']],
@@ -7454,6 +7490,8 @@ function masterQuery(extra){
     weeks: st.periodOnly ? selectedPeriodWeeks().map(w=>w.weekEndDate) : [], sort:st.sort, dir:st.dir, offset:st.offset, limit:st.limit, ...(extra||{})};
 }
 function fmtMasterCell(v){ v = v==null ? '' : String(v); return v.replace(/^(\d{4}-\d{2}-\d{2}) 00:00:00$/,'$1').replace(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}):\d{2}$/,'$1'); }
+function candidateHubTabs(){return `<div class="panel" style="padding:12px;display:flex;gap:8px">${[['candidates','Candidate pipeline'],['master','All candidate records']].filter(([k])=>Server.can(k)).map(([k,l])=>`<button class="btn ${currentView===k?'btn-primary':'btn-secondary'}" data-candidate-hub="${k}">${l}</button>`).join('')}</div>`;}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-candidate-hub]');if(!b||!Server.can(b.dataset.candidateHub))return;currentView=b.dataset.candidateHub;candState.rev++;refreshUI();});
 async function renderMasterView(){
   const container = document.getElementById('view-master'); if(!container) return;
   const st = masterViewState;
@@ -7463,9 +7501,9 @@ async function renderMasterView(){
     const s=document.getElementById('masterSearch'); s.value=st.search;
     let t; s.addEventListener('input', ()=>{ clearTimeout(t); t=setTimeout(()=>{ st.search=s.value; st.offset=0; drawMasterTable(); }, 350); });
   }
-  container.innerHTML = `<div class="panel">
+  container.innerHTML = `${candidateHubTabs()}<div class="panel">
     <div class="panel-head master-head">
-      <div><h3>Master Sheet</h3><span class="hint" id="masterCounts">Loading…</span></div>
+      <div><h3>All candidate records</h3><span class="hint" id="masterCounts">Loading…</span></div>
       <div class="master-tools">
         <div class="seg" role="group" aria-label="Rows">${[['all','All rows'],['schedules','Created On'],['shows','Date Of']].map(([v,l])=>`<button type="button" data-files="${v}" aria-pressed="${st.files===v}">${l}</button>`).join('')}</div>
         <label class="hint master-period"><input type="checkbox" id="masterPeriodOnly" ${st.periodOnly?'checked':''}> Selected period only</label>
@@ -8192,7 +8230,7 @@ function drawUserForm(){
       <label class="role-opt"><input type="radio" name="ufRole" value="admin" ${u.role==='admin'?'checked':''}><span><strong>Admin</strong><em>Every module, approves remarks, manages users (can’t change passwords, admins or the super admin)</em></span></label></div>` : ''}
     ${sa?'<p class="hint">The super admin always has every right.</p>':`<p class="hint admin-note" ${u.role==='admin'?'':'hidden'}>Admins see every module and section — the ticks below only apply if you change them back to User.</p><fieldset class="mod-grid"><legend>Modules this person can open</legend>${MODULES.map(m=>`<label class="mod-opt"><input type="checkbox" value="${m.key}" ${u.modules.includes(m.key)?'checked':''}><span><strong>${escapeHtml(m.label)}</strong><em>${escapeHtml(m.hint)}</em></span></label>`).join('')}</fieldset>
     <label class="mod-opt"><input type="checkbox" data-sec="copy.tables" ${(u.hidden_sections||[]).includes("copy.tables")?"":"checked"}><span><strong>Copy tables</strong><em>Allow copying tables and candidate lists to the clipboard</em></span></label>
-    <fieldset class="sec-grid"><legend>What this person sees on each page <span class="hint">(untick to hide a card or section)</span></legend>${Object.entries(PAGE_SECTIONS).map(([mod,secs])=>`<details class="sec-page" data-sec-mod="${mod}" ${u.modules.includes(mod)?'':'hidden'}><summary>${escapeHtml((MODULES.find(m=>m.key===mod)||{label:mod}).label)} <span class="sec-count"></span></summary><div class="sec-list">${secs.map(([k,l])=>`<label class="sec-opt${l.startsWith('·')?' sub':''}"><input type="checkbox" data-sec="${k}" ${(u.hidden_sections||[]).includes(k)?'':'checked'}> ${escapeHtml(l.replace(/^· /,''))}</label>`).join('')}</div></details>`).join('')}</fieldset>
+    <fieldset class="sec-grid"><legend>What this person sees on each page <span class="hint">(untick to hide a card or section)</span></legend>${Object.entries(PAGE_SECTIONS).map(([mod,secs])=>`<details class="sec-page" data-sec-mod="${mod}" ${mod==='teams'||u.modules.includes(mod)?'':'hidden'}><summary>${escapeHtml((MODULES.find(m=>m.key===mod)||{label:mod==='teams'?'My Team':mod}).label)} <span class="sec-count"></span></summary><div class="sec-list">${secs.map(([k,l])=>`<label class="sec-opt${l.startsWith('·')?' sub':''}"><input type="checkbox" data-sec="${k}" ${(u.hidden_sections||[]).includes(k)?'':'checked'}> ${escapeHtml(l.replace(/^· /,''))}</label>`).join('')}</div></details>`).join('')}</fieldset>
     <label class="mod-opt" style="margin-top:6px;"><input type="checkbox" id="ufActive" ${u.active?'checked':''}><span><strong>Account active</strong><em>Untick to block sign-in without deleting the account</em></span></label>`}
     <p class="auth-msg" id="ufMsg" role="alert"></p>
     <div class="user-form-actions"><button class="btn btn-secondary btn-sm" id="ufCancel">Cancel</button><button class="btn btn-primary btn-sm" id="ufSave">${isNew?'Create user':'Save changes'}</button></div>
@@ -8349,7 +8387,7 @@ async function renderCandidatesView(){
   const container = document.getElementById('view-candidates'); if(!container) return;
   const st = candState; const rev = ++st.rev;
   const weeks = [...weeksData].map(w=>w.weekEndDate).sort().reverse();
-  if(!weeks.length){ container.innerHTML = '<div class="panel"><p class="hint" style="margin:0;">No weeks yet — upload data first.</p></div>'; return; }
+  if(!weeks.length){ container.innerHTML = candidateHubTabs()+'<div class="panel"><p class="hint" style="margin:0;">No weeks yet — upload data first.</p></div>'; return; }
   if(!st.week || !weeks.includes(st.week)){ const sel = selectedPeriodWeeks(); st.week = (sel.length ? sel[sel.length-1].weekEndDate : weeks[0]); if(!weeks.includes(st.week)) st.week = weeks[0]; }
   const extra = document.getElementById('topbarExtra');
   if(extra){
@@ -8357,7 +8395,7 @@ async function renderCandidatesView(){
     const s = document.getElementById('candSearch'); s.value = st.search;
     let t; s.addEventListener('input', ()=>{ clearTimeout(t); t=setTimeout(()=>{ st.search=s.value; st.limit=500; drawCandidateTable(); }, 200); });
   }
-  container.innerHTML = `<div class="panel cand-panel">
+  container.innerHTML = `${candidateHubTabs()}<div class="panel cand-panel">
     <div class="cand-controls">
       <label class="cand-field"><span>Week</span><select id="candWeek">${weeks.map(w=>`<option value="${w}" ${w===st.week?'selected':''}>Wk ${isoWeekNumber(new Date(w+'T00:00:00'))} · ${fmtDate(toIsoDateOnly(new Date(new Date(w+'T00:00:00').getTime()-6*86400000))).replace(/, \d{4}$/,'')} – ${fmtDate(w)}</option>`).join('')}</select></label>
       <label class="cand-field"><span>Recruiter</span><select id="candRecruiter"><option value="">All recruiters</option></select></label>
@@ -8594,17 +8632,18 @@ function tgCalculate(g,from,to,weeks){
 function tgNumber(n){return n===null?'Unavailable':Number(n||0).toLocaleString('en-US',{maximumFractionDigits:1});}
 function tgRate(n,d){return n===null||d===null||!d?'—':(n/d*100).toFixed(1)+'%';}
 /* Admin-owned team assignments; leader dashboard uses local system date/time. */
-const ltState={owner:null,assignment:null,loaded:false,loading:false,error:'',period:'current',focus:null,adminDraft:null,adminUser:null,adminBusy:false};
+const ltState={owner:null,assignment:null,loaded:false,loading:false,error:'',period:'current',day:null,weekDate:null,division:'',focus:null,adminDraft:null,adminUser:null,adminBusy:false};
 function ltToday(now=new Date()){return toIsoDateOnly(now);}
 function ltGroup(a){const own=a.recruiter_name;return {name:a.team_name,memberships:[...(a.memberships||[]).filter(m=>m.name!==own),...(own?[{name:own,from:'1900-01-01',to:null}]:[])]};}
 function ltBounds(mode,today=ltToday()){
  const w=weekOfDate(today);
  if(mode==='previous')return {from:tgShift(w.weekStart,-7),to:tgShift(w.weekEnd,-7),label:'Previous week'};
  if(mode==='six')return {from:tgShift(w.weekStart,-42),to:tgShift(w.weekStart,-1),label:'Past 6 completed weeks'};
- return {from:w.weekStart,to:w.weekEnd,label:'Current week'};
+ return {from:w.weekStart,to:w.weekEnd,label:mode==='custom'?'Selected week':'Current week'};
 }
 function ltWorkdays(a,b){return tgDays(a,b).filter(d=>{const n=new Date(d+'T12:00:00Z').getUTCDay();return n>=1&&n<=5;});}
 function ltReport(g,from,to,today=ltToday()){
+ if(g.division){const memberships=[];for(const m of g.memberships){for(const d of tgDays(from,to)){if(tgActive({memberships:[m]},m.name,d)&&(getEffectiveRecruiterDivision(m.name,weekOfDate(d).weekEnd)||'Unassigned')===g.division)memberships.push({...m,from:d,to:d});}}g={...g,memberships};}
  const cutoff=to>today?today:to;
  const r=cutoff>=from?tgCalculate(g,from,cutoff,weeksData):{total:tgBlank(),members:[],daily:[],weekly:[],uncovered:0,missing:[]};
  const names=[...new Set(g.memberships.filter(m=>m.from<=to&&(!m.to||m.to>=from)).map(m=>m.name))];
@@ -8621,7 +8660,7 @@ function ltPersonal(name,date){
  if(!rec)return empty;
  const r=ltReport({memberships:[{name,from:date,to:date}]},date,date,date).total;
  const stamp=w.savedAt?new Date(w.savedAt):null;
- const syncedToday=stamp&&Number.isFinite(stamp.getTime())&&toIsoDateOnly(stamp)===date;
+ const syncedToday=stamp&&Number.isFinite(stamp.getTime())&&toIsoDateOnly(stamp)>=date;
  return {label:name,...r,...Object.fromEntries(TG_METRICS.map(([k,,,list])=>{
    const explicit=rec.daily?.[date]&&Object.prototype.hasOwnProperty.call(rec.daily[date],k);
    const dated=(rec[list]||[]).some(x=>x.date===date);
@@ -8653,33 +8692,43 @@ function ltCards(r,prev,series){
  const cards=cfg.map(([label,k,icon,accent])=>kpiCardHtml({label,icon,accent,value:tgNumber(t[k]),delta:delta(t[k],prev?.total[k]),spark:series.every(x=>x.r.total[k]!==null)?series.map(x=>({x:weekOfDate(x.end).number,y:x.r.total[k]})):null}));
  const active=n? t.i9===null?null:t.i9/n:null,goal=rate(t.schedules,t.goal),show=rate(t.shows,t.scheduledDateOf),noShow=rate(t.noShows,t.scheduledDateOf);
  cards.push(kpiCardHtml({label:'Hires per Recruiter',icon:'hire',accent:'#7a5fb8',rate:true,value:active===null?'Unavailable':active.toFixed(1),delta:`<span class="delta flat">${n} active recruiter${ltState.period==='six'?'-weeks':'s'} in this period</span>`}));
- for(const [label,v,icon,c,target,good] of [['Goal Reach',goal,'target','#a67c2e',100,'up'],['Show Rate',show,'trend','#1f8a84',60,'up'],['No Show Rate',noShow,'down','#c4565f',40,'down']])cards.push(kpiCardHtml({label,rate:true,icon,accent:c,value:v===null?'Unavailable':v.toFixed(1)+'%',delta:`<span class="delta flat">${label==='Goal Reach'?tgNumber(t.schedules)+' / '+tgNumber(t.goal)+' schedules':'Same benchmark as Performance Summary'}</span>`,bar:v===null?null:{v,target,good}}));
+ for(const [label,v,icon,c,target,good] of [['Goal Reach',goal,'target','#a67c2e',100,'up'],['Show Rate',show,'trend','#1f8a84',60,'up'],['No Show Rate',noShow,'down','#c4565f',40,'down']])cards.push(kpiCardHtml({label,rate:true,icon,accent:c,value:v===null?'Unavailable':v.toFixed(1)+'%',delta:`<span class="delta flat">${label==='Goal Reach'?tgNumber(t.schedules)+' / '+tgNumber(t.goal)+' schedules':'Minimum standard for this metric'}</span>`,bar:v===null?null:{v,target,good}}));
  return cards.join('').replaceAll('data-section="perf.kpi.','data-section="team.kpi.');
 }
 function renderTeamGroups(){
  const host=document.getElementById('view-teams');if(!host||!Server.user)return;
  const owner=String(Server.user.id);
- if(ltState.owner!==owner)Object.assign(ltState,{owner,assignment:null,loaded:false,loading:false,error:'',period:'current',focus:null});
+ if(ltState.owner!==owner)Object.assign(ltState,{owner,assignment:null,loaded:false,loading:false,error:'',period:'current',day:null,weekDate:null,division:'',focus:null});
  ['ltGoals','ltTimeline'].forEach(destroyChart);
  if(!ltState.loaded){host.innerHTML=`<section class="panel"><h2>My team</h2><p>${ltState.error?'Team assignments could not be loaded.':'Loading your assigned team…'}</p>${ltState.error?`<p class="hint">${escapeHtml(ltState.error)}</p><p>An administrator needs to install team-admin-setup.sql if this is the first upgrade.</p><button id="ltRetry" class="btn btn-secondary">Retry</button>`:''}</section>`;host.querySelector('#ltRetry')?.addEventListener('click',ltLoad);if(!ltState.error&&!ltState.loading)ltLoad();return;}
  const a=ltState.assignment;
  if(!a){host.innerHTML=`<section class="panel"><h2>Your team is not assigned yet</h2><p>Ask an administrator to link your recruiter pseudoname and assign your team in Settings → Users → Team assignments.</p>${Server.isAdmin()?'<button class="btn btn-primary" id="ltAdminSetup">Open user settings</button>':''}</section>`;host.querySelector('#ltAdminSetup')?.addEventListener('click',()=>openSettingsModal('users'));return;}
- const now=new Date(),today=ltToday(now),zone=Intl.DateTimeFormat().resolvedOptions().timeZone,g=ltGroup(a),p=ltBounds(ltState.period,today),curWeek=weekOfDate(today);
+ const now=new Date(),today=ltToday(now),zone=Intl.DateTimeFormat().resolvedOptions().timeZone,g={...ltGroup(a),division:ltState.division},p=ltBounds(ltState.period,ltState.weekDate||today),curWeek=weekOfDate(today);
  const report=ltReport(g,p.from,p.to,today),length=tgDays(p.from,p.to).length,prev=ltReport(g,tgShift(p.from,-length),tgShift(p.from,-1),today);
  const six=Array.from({length:6},(_,i)=>{const end=tgShift(curWeek.weekEnd,-7*(6-i));return {end,r:ltReport(g,tgShift(end,-6),end,today)};});
  const names=[...new Set(g.memberships.filter(m=>m.from<=today&&(!m.to||m.to>=today)).map(m=>m.name))].sort((x,y)=>x===a.recruiter_name?-1:y===a.recruiter_name?1:x.localeCompare(y));
- const daily=names.map(name=>ltPersonal(name,today)),checks=daily.map(x=>({...x,status:ltGoalStatus(x.schedules,now)})),late=checks.filter(x=>x.status.flag),unknown=checks.filter(x=>x.schedules===null);
- const stamp=weeksData.find(w=>w.weekEndDate===curWeek.weekEnd)?.savedAt;
- host.innerHTML=`<header class="panel lt-head"><div><div class="ep-eyebrow">MY TEAM</div><h2>${escapeHtml(a.team_name)}</h2><p class="hint">${escapeHtml(Server.user.name)} → ${escapeHtml(a.recruiter_name)} · assigned by your administrator</p></div><div><strong>${fmtDate(today)} · ${now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</strong><p class="hint">System timezone: ${escapeHtml(zone)}</p><button class="btn btn-secondary btn-sm" id="ltRefresh">Refresh team</button></div></header>
+ const selectedDay=ltState.day||today;
+ const dayNames=[...new Set(g.memberships.filter(m=>m.from<=selectedDay&&(!m.to||m.to>=selectedDay)).map(m=>m.name))].filter(n=>!g.division||(getEffectiveRecruiterDivision(n,weekOfDate(selectedDay).weekEnd)||'Unassigned')===g.division);
+ const selectedDaily=dayNames.map(n=>ltPersonal(n,selectedDay));
+ const daily=names.filter(n=>!g.division||(getEffectiveRecruiterDivision(n,curWeek.weekEnd)||'Unassigned')===g.division).map(name=>ltPersonal(name,today)),checks=daily.map(x=>({...x,status:ltGoalStatus(x.schedules,now)})),late=checks.filter(x=>x.status.flag),unknown=checks.filter(x=>x.schedules===null);
+ const stamp=weeksData.find(w=>w.weekEndDate===weekOfDate(selectedDay).weekEnd)?.savedAt;
+ host.innerHTML=`<header class="panel lt-head"><div><div class="ep-eyebrow">MY TEAM</div><h2>${escapeHtml(a.team_name)}</h2><p class="hint">${escapeHtml(Server.user.name)} → ${escapeHtml(a.recruiter_name)} · assigned by your administrator</p></div><div><strong>${fmtDate(today)} · ${now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</strong><p class="hint">System timezone: ${escapeHtml(zone)}</p><label>Division <select id="ltDivision"><option value="">All team divisions</option>${[...new Set(g.memberships.flatMap(m=>weeksData.map(w=>getEffectiveRecruiterDivision(m.name,w.weekEndDate)||'Unassigned')))].sort().map(d=>`<option ${d===g.division?'selected':''}>${escapeHtml(d)}</option>`).join('')}</select></label> <button class="btn btn-secondary btn-sm" id="ltRefresh">Refresh team</button></div></header>
  ${late.length?`<section class="lt-warning" role="alert"><strong>2 PM schedule goal missed · ${late.length} recruiter${late.length===1?'':'s'}</strong><p>${late.map(x=>`${escapeHtml(x.label)}: ${x.schedules}/10`).join(' · ')}</p><a href="#ltGoalChecks">View goal checks ↓</a></section>`:''}
  ${unknown.length?`<p class="warn-note">Today’s data is unavailable for ${unknown.map(x=>escapeHtml(x.label)).join(', ')}. Refresh the imports before judging goal progress.</p>`:''}
- <section class="panel"><div class="lt-section-head"><h3>1. Team performance summary</h3><div class="ts-tabs">${[['current','Current week'],['previous','Previous week'],['six','Past 6 weeks']].map(([k,l])=>`<button class="btn ${ltState.period===k?'btn-primary':'btn-secondary'}" data-lt-period="${k}" aria-pressed="${ltState.period===k}">${l}</button>`).join('')}</div></div><p class="hint">${fmtDate(p.from)} – ${fmtDate(p.to)}${ltState.period==='current'?' · activity through today':''}</p>${report.uncovered?'<p class="warn-note">Some dates have no imported week. Totals are unavailable until those imports are present.</p>':''}<div class="kpi-grid kpi-v2">${ltCards(report,prev,six)}</div></section>
- <section class="panel"><div class="lt-section-head"><h3>2. Today’s performance · team and you</h3>${copyBtnHtml('ltTodayTable')}</div><p class="hint">${fmtDate(today)} · latest week import: ${stamp?escapeHtml(new Date(stamp).toLocaleString()):'not available'}</p><div class="hp-table-wrap"><table class="ep-table" id="ltTodayTable"><thead>${ltHeaders()}</thead><tbody>${daily.map(x=>ltRow(x,a.recruiter_name)).join('')}</tbody><tfoot><tr><td>Team total (including you)</td>${TG_METRICS.map(([k])=>`<td>${daily.some(x=>x[k]===null)?'Unavailable':tgNumber(daily.reduce((s,x)=>s+x[k],0))}</td>`).join('')}</tr></tfoot></table></div></section>
- <section class="panel"><div class="lt-section-head"><h3>3. Weekly data</h3>${copyBtnHtml('ltWeeklyTable')}</div><p class="hint">${p.label} · names open a focused performance table.</p><div class="hp-table-wrap"><table class="ep-table" id="ltWeeklyTable"><thead>${ltHeaders('<th>Schedule goal</th><th>Goal reach</th>')}</thead><tbody>${report.members.map(x=>ltRow(x,a.recruiter_name,`<td>${tgNumber(x.goal)}</td><td>${tgRate(x.schedules,x.goal)}</td>`)).join('')}</tbody></table></div><h4>Past 6 completed weeks</h4><div class="hp-table-wrap"><table class="ep-table"><thead><tr><th>Week ending</th>${TG_METRICS.map(([,l])=>`<th>${l}</th>`).join('')}<th>Goal reach</th></tr></thead><tbody>${six.slice().reverse().map(x=>`<tr><td>Wk ${weekOfDate(x.end).number} · ${fmtDate(x.end)}</td>${TG_METRICS.map(([k])=>`<td>${tgNumber(x.r.total[k])}</td>`).join('')}<td>${tgRate(x.r.total.schedules,x.r.total.goal)}</td></tr>`).join('')}</tbody></table></div></section>
- <section class="panel" id="ltGoalChecks"><div class="lt-section-head"><h3>4. Schedule goal checks</h3><strong>10 today · 50 per week</strong></div><p class="hint">The daily goal is checked from 2:00 PM in ${escapeHtml(zone)}. Weekly progress is shown for context; the full weekly goal is not due every afternoon.</p><div class="hp-table-wrap"><table class="ep-table"><thead><tr><th>Recruiter</th><th>Today / 10</th><th>Still needed today</th><th>Personal week to date / 50</th><th>Status</th></tr></thead><tbody>${checks.map(x=>{const personal=ltReport({memberships:[{name:x.label,from:curWeek.weekStart,to:curWeek.weekEnd}]},curWeek.weekStart,today,today);return `<tr><td>${escapeHtml(x.label)}${x.label===a.recruiter_name?' (You)':''}</td><td>${tgNumber(x.schedules)} / 10</td><td>${x.schedules===null?'Unavailable':Math.max(0,10-x.schedules)}</td><td>${tgNumber(personal.total.schedules)} / 50</td><td><span class="pill ${x.status.cls}">${x.status.label}</span></td></tr>`;}).join('')}</tbody></table></div></section>
- <section class="panel"><div class="lt-section-head"><h3>5. Goals and performance timeline</h3><span class="hint">${p.label}</span></div><div class="tg-charts"><div><h4>Schedules · goal vs achieved</h4><div class="tg-chart"><canvas id="ltGoals" role="img" aria-label="Recruiter schedule goals versus achieved"></canvas></div></div><div><h4>Schedules, visits and hires · weekly timeline</h4><div class="tg-chart"><canvas id="ltTimeline" role="img" aria-label="Weekly schedules visits and hires timeline"></canvas></div></div></div></section><div id="ltPersonHost"></div>`;
+ <section class="panel" id="ltGoalChecks" data-section="team.goals"><div class="lt-section-head"><h3>Schedule goals & third break</h3><strong>10 today · 50 per week</strong></div><p class="hint">The daily goal is checked from 2:00 PM in ${escapeHtml(zone)}. Weekly progress is shown for context; the full weekly goal is not due every afternoon.</p><div class="hp-table-wrap"><table class="ep-table"><thead><tr><th>Recruiter</th><th>Today / 10</th><th>Still needed today</th><th>Personal week to date / 50</th><th>Status</th><th>Third break</th></tr></thead><tbody>${checks.map(x=>{const personal=ltReport({memberships:[{name:x.label,from:curWeek.weekStart,to:curWeek.weekEnd}]},curWeek.weekStart,today,today);return `<tr><td>${escapeHtml(x.label)}${x.label===a.recruiter_name?' (You)':''}</td><td>${tgNumber(x.schedules)} / 10</td><td>${x.schedules===null?'Unavailable':Math.max(0,10-x.schedules)}</td><td>${tgNumber(personal.total.schedules)} / 50</td><td><span class="pill ${x.status.cls}">${x.status.label}</span>${now.getDay()>=4&&personal.total.schedules!==null&&personal.total.schedules<25?'<span class="pill warn">Below halfway after midweek</span>':''}</td><td><span class="pill ${x.schedules>=10&&personal.total.schedules>=50?'good':'pending'}">${x.schedules===null||personal.total.schedules===null?'Awaiting data':x.schedules>=10&&personal.total.schedules>=50?'Eligible':'Not eligible'}</span></td></tr>`;}).join('')}</tbody></table></div></section>
+ <section class="panel" data-section="team.summary"><div class="lt-section-head"><h3>Team performance summary</h3><div class="ts-tabs">${[['current','Current week'],['previous','Previous week'],['six','Past 6 weeks']].map(([k,l])=>`<button class="btn ${ltState.period===k?'btn-primary':'btn-secondary'}" data-lt-period="${k}" aria-pressed="${ltState.period===k}">${l}</button>`).join('')}</div></div><p class="hint">${fmtDate(p.from)} – ${fmtDate(p.to)}${ltState.period==='current'?' · activity through today':''}</p>${report.uncovered?'<p class="warn-note">Some dates have no imported week. Totals are unavailable until those imports are present.</p>':''}<div class="kpi-grid kpi-v2">${ltCards(report,prev,six)}</div></section>
+ <section class="panel" data-section="team.daily"><div class="lt-section-head"><h3>Daily performance · team and you</h3>${copyBtnHtml('ltTodayTable')}</div><p class="hint"><button class="btn btn-secondary" data-lt-day="-1" aria-label="Previous day">←</button> <input id="ltDay" type="date" value="${selectedDay}" max="${today}" aria-label="Performance date"> <button class="btn btn-secondary" data-lt-day="1" ${selectedDay>=today?'disabled':''} aria-label="Next day">→</button> <button class="btn btn-secondary" id="ltDayToday">Today</button> · latest week import: ${stamp?escapeHtml(new Date(stamp).toLocaleString()):'not available'}</p><div class="hp-table-wrap"><table class="ep-table" id="ltTodayTable"><thead>${ltHeaders()}</thead><tbody>${selectedDaily.map(x=>ltRow(x,a.recruiter_name)).join('')}</tbody><tfoot><tr><td>Team total (including you)</td>${TG_METRICS.map(([k])=>`<td>${selectedDaily.some(x=>x[k]===null)?'Unavailable':tgNumber(selectedDaily.reduce((s,x)=>s+x[k],0))}</td>`).join('')}</tr></tfoot></table></div></section>
+ <section class="panel" data-section="team.weekly"><div class="lt-section-head"><h3>Weekly performance</h3>${copyBtnHtml('ltWeeklyTable')}</div><p class="hint"><button class="btn btn-secondary" data-lt-week="-1" aria-label="Previous week">← Previous week</button> <input id="ltWeek" type="date" value="${p.from}" max="${today}" aria-label="Select a date in the week"> <button class="btn btn-secondary" data-lt-week="1" ${p.to>=today?'disabled':''}>Next week →</button> · ${fmtDate(p.from)} – ${fmtDate(p.to)}</p><div class="hp-table-wrap"><table class="ep-table" id="ltWeeklyTable"><thead>${ltHeaders('<th>Schedule goal</th><th>Goal reach</th>')}</thead><tbody>${report.members.map(x=>ltRow(x,a.recruiter_name,`<td>${tgNumber(x.goal)}</td><td>${tgRate(x.schedules,x.goal)}</td>`)).join('')}</tbody></table></div><h4>Past 6 completed weeks</h4><div class="hp-table-wrap"><table class="ep-table"><thead><tr><th>Week ending</th>${TG_METRICS.map(([,l])=>`<th>${l}</th>`).join('')}<th>Goal reach</th></tr></thead><tbody>${six.slice().reverse().map(x=>`<tr><td>Wk ${weekOfDate(x.end).number} · ${fmtDate(x.end)}</td>${TG_METRICS.map(([k])=>`<td>${tgNumber(x.r.total[k])}</td>`).join('')}<td>${tgRate(x.r.total.schedules,x.r.total.goal)}</td></tr>`).join('')}</tbody></table></div></section>
+
+ <section class="panel" data-section="team.charts"><div class="lt-section-head"><h3>Goals and performance timeline</h3><span class="hint">${p.label}</span></div><div class="tg-charts"><div><h4>Schedules · goal vs achieved</h4><div class="tg-chart"><canvas id="ltGoals" role="img" aria-label="Recruiter schedule goals versus achieved"></canvas></div></div><div><h4>Schedules, visits and hires · weekly timeline</h4><div class="tg-chart"><canvas id="ltTimeline" role="img" aria-label="Weekly schedules visits and hires timeline"></canvas></div></div></div></section><div id="ltPersonHost"></div>`;
+ host.querySelector('#ltDivision').onchange=e=>{ltState.division=e.target.value;renderTeamGroups();};
+ host.querySelector('#ltDay').onchange=e=>{if(tgDate(e.target.value)&&e.target.value<=today){ltState.day=e.target.value;renderTeamGroups();}};
+ host.querySelector('#ltDayToday').onclick=()=>{ltState.day=null;renderTeamGroups();};
+ host.querySelectorAll('[data-lt-day]').forEach(b=>b.onclick=()=>{ltState.day=tgShift(selectedDay,Number(b.dataset.ltDay));renderTeamGroups();});
+ host.querySelector('#ltWeek').onchange=e=>{if(tgDate(e.target.value)&&e.target.value<=today){ltState.weekDate=e.target.value;ltState.period='custom';renderTeamGroups();}};
+ host.querySelectorAll('[data-lt-week]').forEach(b=>b.onclick=()=>{ltState.weekDate=tgShift(p.from,7*Number(b.dataset.ltWeek));ltState.period='custom';renderTeamGroups();});
  host.querySelector('#ltRefresh').onclick=()=>{ltState.loaded=false;ltState.error='';renderTeamGroups();};
- host.querySelectorAll('[data-lt-period]').forEach(b=>b.onclick=()=>{ltState.period=b.dataset.ltPeriod;renderTeamGroups();});
+ host.querySelectorAll('[data-lt-period]').forEach(b=>b.onclick=()=>{ltState.period=b.dataset.ltPeriod;ltState.weekDate=null;renderTeamGroups();});
  host.querySelectorAll('[data-lt-person]').forEach(b=>b.onclick=()=>ltPersonDialog(b.dataset.ltPerson,g,today));
  const opts={responsive:true,maintainAspectRatio:false,plugins:{noValueLabels:true,legend:{position:'bottom'}},scales:{y:{beginAtZero:true},x:{ticks:{maxRotation:45}}}};
  charts.ltGoals=safeChart(document.getElementById('ltGoals'),{type:'bar',data:{labels:report.members.map(x=>x.label),datasets:[{label:'Minimum goal',data:report.members.map(x=>x.goal),backgroundColor:'#b58b38'},{label:'Achieved',data:report.members.map(x=>x.schedules),backgroundColor:'#218a86'}]},options:opts});
@@ -8703,7 +8752,8 @@ function ltAdminRender(){
  if(!Server.isAdmin()||!ltState.adminDraft)return;
  const host=document.getElementById('teamAssignmentsAdmin'),a=ltState.adminDraft,u=ltState.adminUser;
  const names=[...new Set([...weeksData.flatMap(w=>Object.keys(w.byRecruiter||{})),a.recruiter_name,...a.memberships.map(x=>x.name)].filter(Boolean))].sort();
- host.innerHTML=`<section class="panel"><div class="lt-section-head"><h3>Team assignments · ${escapeHtml(u.name)}</h3><button class="btn btn-secondary" id="laClose">Close</button></div><p class="hint">Only admins can change this mapping or roster. The user’s own recruiter identity is included in their team automatically.</p><form id="laProfile" class="tg-controls"><label>Team name<input name="team" maxlength="100" required value="${escapeHtml(a.team_name)}"></label><label>User’s recruiter pseudoname<select name="self" required><option value="">Choose recruiter…</option>${names.map(n=>`<option ${n===a.recruiter_name?'selected':''}>${escapeHtml(n)}</option>`).join('')}</select></label></form><form id="laAdd" class="tg-controls"><label>Add recruiter<select name="member" required><option value="">Choose recruiter…</option>${names.filter(n=>n!==a.recruiter_name).map(n=>`<option>${escapeHtml(n)}</option>`).join('')}</select></label><label>First day<input type="date" name="from" required value="${ltToday()}"></label><label>Last day (optional)<input type="date" name="to"></label><button class="btn btn-secondary">Add to draft</button></form><div class="hp-table-wrap"><table class="ep-table"><thead><tr><th>Recruiter</th><th>First day</th><th>Last day (inclusive)</th><th></th></tr></thead><tbody>${a.memberships.map(m=>`<tr><td>${escapeHtml(m.name)}</td><td><input type="date" data-la-from="${m.id}" value="${m.from}"></td><td><input type="date" data-la-to="${m.id}" value="${m.to||''}"></td><td><button type="button" class="btn btn-secondary btn-sm" data-la-remove="${m.id}">Remove period</button></td></tr>`).join('')||'<tr><td colspan="4">Only the mapped recruiter is included so far. Add team members above.</td></tr>'}</tbody></table></div><p class="hint">Set a last day to end membership and preserve history. Remove period deletes the historical assignment when you save.</p><p role="alert" id="laError"></p><button class="btn btn-primary" id="laSave">Save assignments</button> <span class="hint">Draft changes are not live until saved.</span></section>`;
+ host.innerHTML=`<section class="panel"><div class="lt-section-head"><h3>Team assignments · ${escapeHtml(u.name)}</h3><button class="btn btn-secondary" id="laClose">Close</button></div><p class="hint">Only admins can change this mapping or roster. The user’s own recruiter identity is included in their team automatically.</p><form id="laProfile" class="tg-controls"><label>Team name<input name="team" maxlength="100" required value="${escapeHtml(a.team_name)}"></label><label>User’s recruiter pseudoname<select name="self" required><option value="">Choose recruiter…</option>${names.map(n=>`<option ${n===a.recruiter_name?'selected':''}>${escapeHtml(n)}</option>`).join('')}</select></label></form><form id="laAdd" class="tg-controls"><label>Add recruiter<select name="member" required><option value="">Choose recruiter…</option>${names.filter(n=>n!==a.recruiter_name).map(n=>`<option>${escapeHtml(n)}</option>`).join('')}</select></label><label>First day<input type="date" name="from" required value="${ltToday()}"></label><label>Last day (optional)<input type="date" name="to"></label><button class="btn btn-secondary">Add to draft</button></form><div class="hp-table-wrap"><table class="ep-table"><thead><tr><th>Recruiter</th><th>First day</th><th>Last day (inclusive)</th><th></th></tr></thead><tbody>${a.memberships.map(m=>`<tr><td>${escapeHtml(m.name)}</td><td><input type="date" data-la-from="${m.id}" value="${m.from}"></td><td><input type="date" data-la-to="${m.id}" value="${m.to||''}"></td><td><button type="button" class="btn btn-secondary btn-sm" data-la-remove="${m.id}">Remove period</button></td></tr>`).join('')||'<tr><td colspan="4">Only the mapped recruiter is included so far. Add team members above.</td></tr>'}</tbody></table></div><p class="hint">Set a last day to end membership and preserve history. Remove period deletes the historical assignment when you save.</p><p role="alert" id="laError"></p><button class="btn btn-primary" id="laSave">Save assignments</button> <span class="hint">Draft changes are not live until saved.</span><hr><h4>Schedule a transfer</h4><p class="hint">Save any draft changes first. The recruiter stays on this team through the day before the transfer; their history is preserved.</p><form id="laTransfer" class="tg-controls"><label>Recruiter<select name="recruiter" required>${[...new Set(a.memberships.map(m=>m.name))].map(n=>`<option>${escapeHtml(n)}</option>`).join('')}</select></label><label>Move to leader<select name="target" required><option value="">Choose leader…</option>${usersCache.filter(x=>String(x.id)!==String(a.owner_id)).map(x=>`<option value="${escapeHtml(String(x.id))}">${escapeHtml(x.name)}</option>`).join('')}</select></label><label>First day on new team<input type="date" name="effective" required min="${tgShift(ltToday(),1)}" value="${tgShift(ltToday(),1)}"></label><button class="btn btn-secondary">Schedule transfer</button></form></section>`;
+ host.querySelector('#laTransfer').onsubmit=async e=>{e.preventDefault();if(ltState.adminBusy)return;const f=e.currentTarget,button=f.querySelector('button');try{ltState.adminBusy=true;button.disabled=true;await Server.rpc('dash_team_assignment_transfer',{p_source:String(a.owner_id),p_target:f.elements.target.value,p_name:f.elements.recruiter.value,p_effective:f.elements.effective.value,p_timezone:Intl.DateTimeFormat().resolvedOptions().timeZone});showToast('Transfer scheduled. Both teams updated.');ltState.loaded=false;await ltAdminOpen(u);}catch(x){host.querySelector('#laError').textContent=cleanErr(x);}finally{ltState.adminBusy=false;button.disabled=false;}};
  const profile=host.querySelector('#laProfile');const sync=()=>{a.team_name=profile.elements.team.value.trim();a.recruiter_name=profile.elements.self.value;};
  profile.onsubmit=e=>e.preventDefault();profile.onchange=sync;
  host.querySelector('#laClose').onclick=()=>{host.innerHTML='';ltState.adminDraft=null;ltState.adminUser=null;};
@@ -8774,7 +8824,7 @@ document.addEventListener('keydown', e=>{
   bar.appendChild(btn);
   const close=()=>{ document.body.classList.remove('menu-open'); btn.setAttribute('aria-expanded','false'); };
   btn.addEventListener('click', e=>{ e.stopPropagation(); const open=document.body.classList.toggle('menu-open'); btn.setAttribute('aria-expanded', String(open)); });
-  actions.addEventListener('click', e=>{ const b=e.target.closest('button'); if(b && b.id!=='downloadDropdownBtn') setTimeout(close, 0); });
+  actions.addEventListener('click', e=>{ const b=e.target.closest('button'); if(b && b.id!=='downloadDropdownBtn' && b.id!=='userChip') setTimeout(close, 0); });
   document.addEventListener('click', e=>{ if(document.body.classList.contains('menu-open') && !e.target.closest('.ribbon-actions,#mobileMenuBtn')) close(); });
   document.addEventListener('keydown', e=>{ if(e.key==='Escape') close(); });
   const icons = {performance:'<path d="M4 20V12M10 20V5M16 20V9M22 20V3"/>',
