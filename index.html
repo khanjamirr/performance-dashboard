@@ -1112,6 +1112,23 @@ button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #183442
 .upload-caption{display:block;font-size:10px;color:#9ebac5;margin-bottom:2px}.upload-stamp time{display:block;font-size:11px;white-space:nowrap;font-variant-numeric:tabular-nums}
 @media(min-width:761px){.sidebar .brand{padding-right:6px!important}.sidebar .brand h1{padding-right:24px;white-space:normal!important}body.side-collapsed .upload-stamp{display:none!important}}
 @media(max-width:760px){.sidebar .brand .upload-stamp{padding-top:2px!important;border:0}.upload-caption{display:inline;margin-right:5px}.upload-stamp time{display:inline}}
+
+/* Compact team workspace: shared filters and KPI summary stay in view. */
+body.team-workspace .main>.topbar{display:none!important}
+body.team-workspace .content{padding-top:10px!important}
+.lt-sticky{position:sticky;top:var(--menu-height,0px);z-index:65;background:#f2f6f7;padding:10px 0 12px;margin:0 0 14px;border-bottom:1px solid #d8e4e8;box-shadow:0 6px 10px #18344208}
+.lt-toolbar{display:flex;align-items:flex-end;gap:8px 12px;flex-wrap:wrap}
+.lt-title{flex:1 1 180px;align-self:center;min-width:0}.lt-title h2{font-size:18px;line-height:1.2;margin:0 0 3px;letter-spacing:-.3px}.lt-title>span{font-size:11px;color:var(--text-secondary)}
+.lt-field{display:flex;flex-direction:column;gap:3px;font-size:10px;color:var(--text-secondary);font-weight:600}
+.lt-field select,.lt-field input{min-height:32px;height:32px;border:1px solid var(--border);border-radius:7px;padding:4px 8px;color:var(--text);font:inherit;font-size:12px;background:white;max-width:195px}
+.lt-period{display:flex;align-items:flex-end;gap:5px}.lt-toolbar .btn{min-height:32px;height:32px;padding:5px 9px;white-space:nowrap}.lt-scope{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 12px;font-size:10px;color:var(--text-secondary);margin:9px 0}
+.lt-stats{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px}.lt-stat{min-width:0;background:white;border:1px solid #dce7ea;border-top:2px solid var(--stat-color);border-radius:8px;padding:9px 8px;display:flex;flex-direction:column;gap:4px}.lt-stat>span{font-size:10px;line-height:1.3;color:var(--text-secondary);font-weight:600}.lt-stat>strong{font-size:20px;line-height:1.15;color:var(--text);overflow-wrap:anywhere}.lt-stat>small{font-size:9px;line-height:1.3;color:var(--text-secondary)}
+.lt-data-note{font-size:11px;color:#93651d;margin:7px 0 0}.lt-break-card{padding:12px 16px!important}.lt-break-card summary{display:flex;justify-content:space-between;gap:10px;align-items:center;cursor:pointer;list-style:none}.lt-break-card summary::-webkit-details-marker{display:none}.lt-break-card summary strong{font-size:13px}.lt-break-card summary small{display:block;font-size:10px;color:var(--text-secondary);margin-top:4px}.lt-break-counts{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.lt-break-card .hp-table-wrap{margin-top:12px;max-height:240px;overflow:auto}.lt-break-card td,.lt-break-card th{padding:7px 10px!important}.lt-break-card .hint{font-size:10px;margin:8px 0 0}
+@media(min-width:761px){.lt-sticky{top:0}}
+@media(min-width:761px) and (max-width:1450px){.lt-stats{grid-template-columns:repeat(5,minmax(0,1fr))}.lt-stat{padding:7px 9px;gap:2px}.lt-stat>strong{font-size:18px}.lt-title{flex-basis:140px}}
+@media(max-width:760px){.lt-sticky{padding:6px 0 8px}.lt-title{flex-basis:140px}.lt-title>span{display:none}.lt-title h2{font-size:15px}.lt-toolbar{gap:6px}.lt-period{flex-wrap:wrap}.lt-field select{max-width:160px}.lt-stats{display:flex;overflow-x:auto;padding-bottom:3px;scroll-snap-type:x proximity}.lt-stat{flex:0 0 112px;scroll-snap-align:start}.lt-break-card summary{align-items:flex-start;flex-direction:column}.lt-scope>span:last-child{display:none}}
+@media(max-height:650px){.lt-stats{display:flex;overflow-x:auto}.lt-stat{flex:0 0 115px}.lt-title>span{display:none}.lt-sticky{padding-top:4px;padding-bottom:6px}}
+@media print{.lt-sticky{position:static;box-shadow:none}.lt-toolbar .btn{display:none}}
 </style>
 </head>
 <body class="locked">
@@ -3276,6 +3293,7 @@ function renderUploadStamp(){
  el.dataset.status='upload';
 }
 async function refreshUI(){
+ document.body.classList.toggle('team-workspace',currentView==='teams');
  renderUploadStamp();
  if(currentView==='candidates'&&!Server.can('candidates')&&Server.can('master'))currentView='master';
   closeEntityPopover();
@@ -8632,7 +8650,7 @@ function tgCalculate(g,from,to,weeks){
 function tgNumber(n){return n===null?'Unavailable':Number(n||0).toLocaleString('en-US',{maximumFractionDigits:1});}
 function tgRate(n,d){return n===null||d===null||!d?'—':(n/d*100).toFixed(1)+'%';}
 /* Admin-owned team assignments; leader dashboard uses local system date/time. */
-const ltState={owner:null,assignment:null,loaded:false,loading:false,error:'',period:'current',day:null,weekDate:null,division:'',focus:null,adminDraft:null,adminUser:null,adminBusy:false};
+const ltState={viewingId:null,users:null,directoryError:'',requestSeq:0,rangeMode:'week',anchor:null,owner:null,assignment:null,loaded:false,loading:false,error:'',period:'current',day:null,weekDate:null,division:'',focus:null,adminDraft:null,adminUser:null,adminBusy:false};
 function ltToday(now=new Date()){return toIsoDateOnly(now);}
 function ltGroup(a){const own=a.recruiter_name;return {name:a.team_name,memberships:[...(a.memberships||[]).filter(m=>m.name!==own),...(own?[{name:own,from:'1900-01-01',to:null}]:[])]};}
 function ltBounds(mode,today=ltToday()){
@@ -8675,10 +8693,21 @@ function ltGoalStatus(value,now=new Date()){
 }
 async function ltLoad(){
  const owner=String(Server.user?.id||'');if(!owner||ltState.loading)return;
+ const admin=Server.isAdmin();if(!admin)ltState.viewingId=owner;
+ const target=admin?(ltState.viewingId||owner):owner,seq=++ltState.requestSeq;
  ltState.loading=true;ltState.error='';
- try{const a=await Server.rpc('dash_team_assignment_get');if(String(Server.user?.id)!==owner)return;ltState.assignment=a;ltState.loaded=true;}
- catch(e){if(String(Server.user?.id)===owner)ltState.error=cleanErr(e);}
- finally{if(String(Server.user?.id)===owner){ltState.loading=false;if(currentView==='teams')renderTeamGroups();}}
+ const valid=()=>seq===ltState.requestSeq&&String(Server.user?.id)===owner&&(ltState.viewingId||owner)===target;
+ try{
+  const [assignment,directory]=await Promise.allSettled([
+   Server.rpc('dash_team_assignment_get',admin?{p_user_id:target}:{}),
+   admin&&!ltState.users?Server.rpc('dash_users_list'):Promise.resolve(ltState.users)
+  ]);
+  if(!valid())return;
+  if(directory.status==='fulfilled'){ltState.users=directory.value;ltState.directoryError='';}else ltState.directoryError=cleanErr(directory.reason);
+  if(assignment.status==='rejected')throw assignment.reason;
+  ltState.assignment=assignment.value;ltState.loaded=true;
+ }catch(e){if(valid()){ltState.assignment=null;ltState.loaded=false;ltState.error=cleanErr(e);}}
+ finally{if(valid()){ltState.loading=false;if(currentView==='teams')renderTeamGroups();}}
 }
 function ltRow(x,self,extra=''){
  return `<tr ${x.label===self?'class="lt-mine"':''}><td><button class="entity-link" data-lt-person="${escapeHtml(x.label)}">${escapeHtml(x.label)}</button>${x.label===self?' <span class="pill good">You</span>':''}</td>${TG_METRICS.map(([k])=>`<td>${tgNumber(x[k])}</td>`).join('')}${extra}</tr>`;
@@ -8695,53 +8724,104 @@ function ltCards(r,prev,series){
  for(const [label,v,icon,c,target,good] of [['Goal Reach',goal,'target','#a67c2e',100,'up'],['Show Rate',show,'trend','#1f8a84',60,'up'],['No Show Rate',noShow,'down','#c4565f',40,'down']])cards.push(kpiCardHtml({label,rate:true,icon,accent:c,value:v===null?'Unavailable':v.toFixed(1)+'%',delta:`<span class="delta flat">${label==='Goal Reach'?tgNumber(t.schedules)+' / '+tgNumber(t.goal)+' schedules':'Minimum standard for this metric'}</span>`,bar:v===null?null:{v,target,good}}));
  return cards.join('').replaceAll('data-section="perf.kpi.','data-section="team.kpi.');
 }
+/* One shared period drives the team page and its drill-down. */
+function ltRange(mode,anchor=ltToday()){
+ if(mode==='day')return {from:anchor,to:anchor,label:'Day'};
+ if(mode==='month'){const from=anchor.slice(0,7)+'-01',d=new Date(from+'T12:00:00Z');d.setUTCMonth(d.getUTCMonth()+1);return {from,to:tgShift(d.toISOString().slice(0,10),-1),label:'Month'};}
+ const w=weekOfDate(anchor);return {from:w.weekStart,to:w.weekEnd,label:'Week'};
+}
+function ltMoveRange(mode,anchor,direction){
+ const p=ltRange(mode,anchor);
+ if(mode==='month'){const d=new Date(p.from+'T12:00:00Z');d.setUTCMonth(d.getUTCMonth()+direction);return d.toISOString().slice(0,10);}
+ return tgShift(p.from,direction*(mode==='day'?1:7));
+}
+function ltTeamPicker(){
+ if(!Server.isAdmin())return '';
+ const people=ltState.users||[],id=ltState.viewingId||String(Server.user.id);
+ const opts=people.some(u=>String(u.id)===String(Server.user.id))?people:[Server.user,...people];
+ return `<label class="lt-field">User’s team<select id="ltTeamSelect" aria-label="View user's team">${opts.map(u=>`<option value="${escapeHtml(String(u.id))}" ${String(u.id)===id?'selected':''}>${escapeHtml(u.name)}${String(u.id)===String(Server.user.id)?' (my team)':''}</option>`).join('')}</select></label>`;
+}
+function ltBindTeamPicker(host){
+ host.querySelector('#ltTeamSelect')?.addEventListener('change',e=>{
+  if(!Server.isAdmin())return;
+  ltState.viewingId=e.target.value;ltState.assignment=null;ltState.loaded=false;ltState.loading=false;ltState.error='';ltState.division='';ltState.requestSeq++;renderTeamGroups();
+ });
+}
+function ltBreakCheck(name,date,now=new Date()){
+ const today=ltToday(now),w=weekOfDate(date),daily=ltPersonal(name,date).schedules;
+ const weekly=ltReport({memberships:[{name,from:w.weekStart,to:date}]},w.weekStart,date,today).total.schedules;
+ const known=daily!==null&&weekly!==null;
+ const historical=date<today;
+ const late=daily!==null&&daily<10&&(historical||now.getHours()>=14);
+ const mid=new Date(date+'T12:00:00').getDay()>=4&&weekly!==null&&weekly<25;
+ return {name,daily,weekly,eligible:known&&daily>=10&&weekly>=50,known,late,mid,status:!known?'Awaiting data':daily>=10&&weekly>=50?'Eligible':late?'Daily goal missed':daily>=10?'Weekly goal pending':'In progress'};
+}
+function ltCompactCards(report){
+ const t=report.total,ratio=(a,b)=>a===null||b===null||!b?null:a/b*100;
+ const rows=TG_METRICS.map(([key,label,color])=>({key:label.toLowerCase().replace(/[^a-z]+/g,'_'),label:label==='Shows'?'Visits (shows)':label,value:tgNumber(t[key]),color,note:key==='schedules'?`${tgNumber(t.goal)} schedule target`:''}));
+ const hpr=t.i9===null||!report.hprDenominator?null:t.i9/report.hprDenominator;
+ for(const [key,label,value,target,unit,lower] of [['hires_per_recruiter','Hires / recruiter',hpr,15,'',false],['goal_reach','Goal reach',ratio(t.schedules,t.goal),90,'%',false],['show_rate','Show rate',ratio(t.shows,t.scheduledDateOf),70,'%',false],['no_show_rate','No-show rate',ratio(t.noShows,t.scheduledDateOf),20,'%',true]])rows.push({key,label,value:value===null?'Unavailable':value.toFixed(1)+unit,color:value===null?'#8496a0':(lower?value<target:value>=target)?'#218778':'#b57734',note:lower?'Less than 20%':`Minimum ${target}${unit}`});
+ return rows.map(x=>`<div class="lt-stat" data-section="team.kpi.${x.key}" style="--stat-color:${x.color}"><span>${x.label}</span><strong>${x.value}</strong>${x.note?`<small>${x.note}</small>`:''}</div>`).join('');
+}
 function renderTeamGroups(){
  const host=document.getElementById('view-teams');if(!host||!Server.user)return;
  const owner=String(Server.user.id);
- if(ltState.owner!==owner)Object.assign(ltState,{owner,assignment:null,loaded:false,loading:false,error:'',period:'current',day:null,weekDate:null,division:'',focus:null});
+ if(ltState.owner!==owner)Object.assign(ltState,{owner,viewingId:owner,users:null,directoryError:'',assignment:null,loaded:false,loading:false,error:'',rangeMode:'week',anchor:null,division:'',requestSeq:(ltState.requestSeq||0)+1});
+ if(!Server.isAdmin()&&ltState.viewingId!==owner)Object.assign(ltState,{viewingId:owner,assignment:null,loaded:false,loading:false,error:'',users:null,requestSeq:ltState.requestSeq+1});
+ const openGoals=host.querySelector('#ltGoalChecks')?.open||false;
  ['ltGoals','ltTimeline'].forEach(destroyChart);
- if(!ltState.loaded){host.innerHTML=`<section class="panel"><h2>My team</h2><p>${ltState.error?'Team assignments could not be loaded.':'Loading your assigned team…'}</p>${ltState.error?`<p class="hint">${escapeHtml(ltState.error)}</p><p>An administrator needs to install team-admin-setup.sql if this is the first upgrade.</p><button id="ltRetry" class="btn btn-secondary">Retry</button>`:''}</section>`;host.querySelector('#ltRetry')?.addEventListener('click',ltLoad);if(!ltState.error&&!ltState.loading)ltLoad();return;}
- const a=ltState.assignment;
- if(!a){host.innerHTML=`<section class="panel"><h2>Your team is not assigned yet</h2><p>Ask an administrator to link your recruiter pseudoname and assign your team in Settings → Users → Team assignments.</p>${Server.isAdmin()?'<button class="btn btn-primary" id="ltAdminSetup">Open user settings</button>':''}</section>`;host.querySelector('#ltAdminSetup')?.addEventListener('click',()=>openSettingsModal('users'));return;}
- const now=new Date(),today=ltToday(now),zone=Intl.DateTimeFormat().resolvedOptions().timeZone,g={...ltGroup(a),division:ltState.division},p=ltBounds(ltState.period,ltState.weekDate||today),curWeek=weekOfDate(today);
- const report=ltReport(g,p.from,p.to,today),length=tgDays(p.from,p.to).length,prev=ltReport(g,tgShift(p.from,-length),tgShift(p.from,-1),today);
- const six=Array.from({length:6},(_,i)=>{const end=tgShift(curWeek.weekEnd,-7*(6-i));return {end,r:ltReport(g,tgShift(end,-6),end,today)};});
- const names=[...new Set(g.memberships.filter(m=>m.from<=today&&(!m.to||m.to>=today)).map(m=>m.name))].sort((x,y)=>x===a.recruiter_name?-1:y===a.recruiter_name?1:x.localeCompare(y));
- const selectedDay=ltState.day||today;
- const dayNames=[...new Set(g.memberships.filter(m=>m.from<=selectedDay&&(!m.to||m.to>=selectedDay)).map(m=>m.name))].filter(n=>!g.division||(getEffectiveRecruiterDivision(n,weekOfDate(selectedDay).weekEnd)||'Unassigned')===g.division);
- const selectedDaily=dayNames.map(n=>ltPersonal(n,selectedDay));
- const daily=names.filter(n=>!g.division||(getEffectiveRecruiterDivision(n,curWeek.weekEnd)||'Unassigned')===g.division).map(name=>ltPersonal(name,today)),checks=daily.map(x=>({...x,status:ltGoalStatus(x.schedules,now)})),late=checks.filter(x=>x.status.flag),unknown=checks.filter(x=>x.schedules===null);
- const stamp=weeksData.find(w=>w.weekEndDate===weekOfDate(selectedDay).weekEnd)?.savedAt;
- host.innerHTML=`<header class="panel lt-head"><div><div class="ep-eyebrow">MY TEAM</div><h2>${escapeHtml(a.team_name)}</h2><p class="hint">${escapeHtml(Server.user.name)} → ${escapeHtml(a.recruiter_name)} · assigned by your administrator</p></div><div><strong>${fmtDate(today)} · ${now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</strong><p class="hint">System timezone: ${escapeHtml(zone)}</p><label>Division <select id="ltDivision"><option value="">All team divisions</option>${[...new Set(g.memberships.flatMap(m=>weeksData.map(w=>getEffectiveRecruiterDivision(m.name,w.weekEndDate)||'Unassigned')))].sort().map(d=>`<option ${d===g.division?'selected':''}>${escapeHtml(d)}</option>`).join('')}</select></label> <button class="btn btn-secondary btn-sm" id="ltRefresh">Refresh team</button></div></header>
- ${late.length?`<section class="lt-warning" role="alert"><strong>2 PM schedule goal missed · ${late.length} recruiter${late.length===1?'':'s'}</strong><p>${late.map(x=>`${escapeHtml(x.label)}: ${x.schedules}/10`).join(' · ')}</p><a href="#ltGoalChecks">View goal checks ↓</a></section>`:''}
- ${unknown.length?`<p class="warn-note">Today’s data is unavailable for ${unknown.map(x=>escapeHtml(x.label)).join(', ')}. Refresh the imports before judging goal progress.</p>`:''}
- <section class="panel" id="ltGoalChecks" data-section="team.goals"><div class="lt-section-head"><h3>Schedule goals & third break</h3><strong>10 today · 50 per week</strong></div><p class="hint">The daily goal is checked from 2:00 PM in ${escapeHtml(zone)}. Weekly progress is shown for context; the full weekly goal is not due every afternoon.</p><div class="hp-table-wrap"><table class="ep-table"><thead><tr><th>Recruiter</th><th>Today / 10</th><th>Still needed today</th><th>Personal week to date / 50</th><th>Status</th><th>Third break</th></tr></thead><tbody>${checks.map(x=>{const personal=ltReport({memberships:[{name:x.label,from:curWeek.weekStart,to:curWeek.weekEnd}]},curWeek.weekStart,today,today);return `<tr><td>${escapeHtml(x.label)}${x.label===a.recruiter_name?' (You)':''}</td><td>${tgNumber(x.schedules)} / 10</td><td>${x.schedules===null?'Unavailable':Math.max(0,10-x.schedules)}</td><td>${tgNumber(personal.total.schedules)} / 50</td><td><span class="pill ${x.status.cls}">${x.status.label}</span>${now.getDay()>=4&&personal.total.schedules!==null&&personal.total.schedules<25?'<span class="pill warn">Below halfway after midweek</span>':''}</td><td><span class="pill ${x.schedules>=10&&personal.total.schedules>=50?'good':'pending'}">${x.schedules===null||personal.total.schedules===null?'Awaiting data':x.schedules>=10&&personal.total.schedules>=50?'Eligible':'Not eligible'}</span></td></tr>`;}).join('')}</tbody></table></div></section>
- <section class="panel" data-section="team.summary"><div class="lt-section-head"><h3>Team performance summary</h3><div class="ts-tabs">${[['current','Current week'],['previous','Previous week'],['six','Past 6 weeks']].map(([k,l])=>`<button class="btn ${ltState.period===k?'btn-primary':'btn-secondary'}" data-lt-period="${k}" aria-pressed="${ltState.period===k}">${l}</button>`).join('')}</div></div><p class="hint">${fmtDate(p.from)} – ${fmtDate(p.to)}${ltState.period==='current'?' · activity through today':''}</p>${report.uncovered?'<p class="warn-note">Some dates have no imported week. Totals are unavailable until those imports are present.</p>':''}<div class="kpi-grid kpi-v2">${ltCards(report,prev,six)}</div></section>
- <section class="panel" data-section="team.daily"><div class="lt-section-head"><h3>Daily performance · team and you</h3>${copyBtnHtml('ltTodayTable')}</div><p class="hint"><button class="btn btn-secondary" data-lt-day="-1" aria-label="Previous day">←</button> <input id="ltDay" type="date" value="${selectedDay}" max="${today}" aria-label="Performance date"> <button class="btn btn-secondary" data-lt-day="1" ${selectedDay>=today?'disabled':''} aria-label="Next day">→</button> <button class="btn btn-secondary" id="ltDayToday">Today</button> · latest week import: ${stamp?escapeHtml(new Date(stamp).toLocaleString()):'not available'}</p><div class="hp-table-wrap"><table class="ep-table" id="ltTodayTable"><thead>${ltHeaders()}</thead><tbody>${selectedDaily.map(x=>ltRow(x,a.recruiter_name)).join('')}</tbody><tfoot><tr><td>Team total (including you)</td>${TG_METRICS.map(([k])=>`<td>${selectedDaily.some(x=>x[k]===null)?'Unavailable':tgNumber(selectedDaily.reduce((s,x)=>s+x[k],0))}</td>`).join('')}</tr></tfoot></table></div></section>
- <section class="panel" data-section="team.weekly"><div class="lt-section-head"><h3>Weekly performance</h3>${copyBtnHtml('ltWeeklyTable')}</div><p class="hint"><button class="btn btn-secondary" data-lt-week="-1" aria-label="Previous week">← Previous week</button> <input id="ltWeek" type="date" value="${p.from}" max="${today}" aria-label="Select a date in the week"> <button class="btn btn-secondary" data-lt-week="1" ${p.to>=today?'disabled':''}>Next week →</button> · ${fmtDate(p.from)} – ${fmtDate(p.to)}</p><div class="hp-table-wrap"><table class="ep-table" id="ltWeeklyTable"><thead>${ltHeaders('<th>Schedule goal</th><th>Goal reach</th>')}</thead><tbody>${report.members.map(x=>ltRow(x,a.recruiter_name,`<td>${tgNumber(x.goal)}</td><td>${tgRate(x.schedules,x.goal)}</td>`)).join('')}</tbody></table></div><h4>Past 6 completed weeks</h4><div class="hp-table-wrap"><table class="ep-table"><thead><tr><th>Week ending</th>${TG_METRICS.map(([,l])=>`<th>${l}</th>`).join('')}<th>Goal reach</th></tr></thead><tbody>${six.slice().reverse().map(x=>`<tr><td>Wk ${weekOfDate(x.end).number} · ${fmtDate(x.end)}</td>${TG_METRICS.map(([k])=>`<td>${tgNumber(x.r.total[k])}</td>`).join('')}<td>${tgRate(x.r.total.schedules,x.r.total.goal)}</td></tr>`).join('')}</tbody></table></div></section>
-
- <section class="panel" data-section="team.charts"><div class="lt-section-head"><h3>Goals and performance timeline</h3><span class="hint">${p.label}</span></div><div class="tg-charts"><div><h4>Schedules · goal vs achieved</h4><div class="tg-chart"><canvas id="ltGoals" role="img" aria-label="Recruiter schedule goals versus achieved"></canvas></div></div><div><h4>Schedules, visits and hires · weekly timeline</h4><div class="tg-chart"><canvas id="ltTimeline" role="img" aria-label="Weekly schedules visits and hires timeline"></canvas></div></div></div></section><div id="ltPersonHost"></div>`;
+ if(!ltState.loaded||!ltState.assignment){
+  host.innerHTML=`<section class="panel"><div class="lt-toolbar"><h2>My Team</h2>${ltTeamPicker()}</div>${ltState.directoryError?`<p role="alert">Could not load the user list: ${escapeHtml(ltState.directoryError)}</p><button class="btn btn-secondary" id="ltDirectoryRetry">Retry user list</button>`:''}<p>${ltState.error?escapeHtml(ltState.error):!ltState.loaded?'Loading team…':'No team has been assigned to this user yet.'}</p>${ltState.error?'<button class="btn btn-secondary" id="ltRetry">Retry</button>':''}${ltState.loaded&&Server.isAdmin()?'<button class="btn btn-secondary" id="ltAdminSetup">Manage assignments</button>':''}</section>`;
+  ltBindTeamPicker(host);host.querySelector('#ltRetry')?.addEventListener('click',ltLoad);host.querySelector('#ltDirectoryRetry')?.addEventListener('click',()=>{ltState.users=null;ltLoad();});host.querySelector('#ltAdminSetup')?.addEventListener('click',()=>openSettingsModal('users'));
+  if(!ltState.loaded&&!ltState.error&&!ltState.loading)ltLoad();return;
+ }
+ const a=ltState.assignment,now=new Date(),today=ltToday(now),zone=Intl.DateTimeFormat().resolvedOptions().timeZone;
+ const anchor=ltState.anchor||today,mode=ltState.rangeMode||'week',p=ltRange(mode,anchor),cutoff=p.to>today?today:p.to;
+ const g={...ltGroup(a),division:ltState.division},report=ltReport(g,p.from,p.to,today);
+ const days=tgDays(p.from,cutoff),byDay=new Map(report.daily.map(x=>[x.label,x]));
+ const daily=days.map(date=>({date,r:{total:byDay.get(date)||Object.fromEntries(TG_METRICS.map(([k])=>[k,null]))}}));
+ // Break eligibility is always tied to one day, shown explicitly when viewing a week/month.
+ const checkDay=cutoff,names=[...new Set(g.memberships.filter(m=>m.from<=checkDay&&(!m.to||m.to>=checkDay)).map(m=>m.name))].filter(n=>!g.division||(getEffectiveRecruiterDivision(n,weekOfDate(checkDay).weekEnd)||'Unassigned')===g.division);
+ const checks=names.map(n=>ltBreakCheck(n,checkDay,now)),eligible=checks.filter(x=>x.eligible),missed=checks.filter(x=>x.late||x.mid),unknown=checks.filter(x=>!x.known);
+ const isOwn=String(a.owner_id)===owner,self=isOwn?a.recruiter_name:null,leader=ltState.users?.find(u=>String(u.id)===String(a.owner_id))?.name||Server.user.name;
+ const divisions=[...new Set(g.memberships.flatMap(m=>weeksData.filter(w=>w.weekEndDate>=p.from&&tgShift(w.weekEndDate,-6)<=p.to).map(w=>getEffectiveRecruiterDivision(m.name,w.weekEndDate)||'Unassigned')))].sort();if(g.division&&!divisions.includes(g.division))divisions.push(g.division);
+ const rangeText=mode==='day'?fmtDate(p.from):`${fmtDate(p.from)} – ${fmtDate(p.to)}`;
+ host.innerHTML=`<div class="lt-sticky">
+ <header class="lt-toolbar"><div class="lt-title"><h2>${escapeHtml(a.team_name)}</h2><span>${escapeHtml(leader)} · ${escapeHtml(a.recruiter_name)}</span></div>${ltTeamPicker()}
+ <div class="lt-period" role="group" aria-label="Team reporting period"><label class="lt-field">View<select id="ltRangeMode"><option value="day" ${mode==='day'?'selected':''}>Day</option><option value="week" ${mode==='week'?'selected':''}>Week</option><option value="month" ${mode==='month'?'selected':''}>Month</option></select></label><button class="btn btn-secondary" id="ltPrevious" aria-label="Previous ${mode}">←</button><label class="lt-field">${mode==='month'?'Month':mode==='week'?'Week containing':'Date'}<input id="ltAnchor" type="${mode==='month'?'month':'date'}" value="${mode==='month'?anchor.slice(0,7):anchor}" max="${mode==='month'?today.slice(0,7):today}"></label><button class="btn btn-secondary" id="ltNext" aria-label="Next ${mode}" ${p.to>=today?'disabled':''}>→</button><button class="btn btn-secondary" id="ltCurrent">${mode==='day'?'Today':mode==='month'?'This month':'This week'}</button></div>
+ <label class="lt-field">Division<select id="ltDivision"><option value="">All team divisions</option>${divisions.map(d=>`<option ${d===g.division?'selected':''}>${escapeHtml(d)}</option>`).join('')}</select></label><button class="btn btn-secondary" id="ltRefresh" aria-label="Refresh team" title="Refresh team">↻</button></header>
+ <div class="lt-scope"><span><strong>${rangeText}</strong> · ${escapeHtml(g.division||'All divisions')}${p.to>today?' · through today':''}</span><span title="Dates and cutoff times use your system timezone">${escapeHtml(zone)}</span></div>
+ <section class="lt-summary" aria-label="Team performance summary" data-section="team.summary"><div class="lt-stats">${ltCompactCards(report)}</div></section>
+ ${report.uncovered?'<p class="lt-data-note">Some selected dates have no import; affected totals are unavailable.</p>':''}
+ </div>
+ ${ltState.directoryError?`<p class="warn-note">User list unavailable: ${escapeHtml(ltState.directoryError)} <button class="btn btn-secondary" id="ltDirectoryRetry">Retry</button></p>`:''}
+ <details ${openGoals?'open':''} class="panel lt-break-card" id="ltGoalChecks" data-section="team.goals"><summary><span><strong>Schedule goals & third break</strong><small>${fmtDate(checkDay)}${checkDay===today?' · today':' · historical check'} · daily 10 + weekly 50 required</small></span><span class="lt-break-counts"><span class="pill good">${eligible.length} eligible</span>${missed.length?`<span class="pill warn">${missed.length} need attention</span>`:''}${unknown.length?`<span class="pill pending">${unknown.length} awaiting data</span>`:''}<span class="hint">View recruiters ▾</span></span></summary><div class="hp-table-wrap"><table class="ep-table"><thead><tr><th>Recruiter</th><th>Day / 10</th><th>Week to date / 50</th><th>Third break</th></tr></thead><tbody>${checks.map(x=>`<tr><td><button class="entity-link" data-lt-person="${escapeHtml(x.name)}">${escapeHtml(x.name)}</button>${x.name===self?' (You)':''}</td><td>${tgNumber(x.daily)} / 10</td><td>${tgNumber(x.weekly)} / 50</td><td><span class="pill ${x.eligible?'good':x.late||x.mid?'warn':'pending'}">${x.status}</span>${x.mid?' · below halfway after midweek':''}</td></tr>`).join('')||'<tr><td colspan="4">No assigned recruiters in this division on this day.</td></tr>'}</tbody></table></div><p class="hint">Daily shortfalls are flagged after 2 PM in your system timezone. Historical checks use the completed day. Personal weekly schedules include earlier team assignments.</p></details>
+ <section class="panel" data-section="team.weekly"><div class="lt-section-head"><h3>Recruiter performance</h3>${copyBtnHtml('ltWeeklyTable')}</div><p class="hint">${rangeText} · ${report.members.length} recruiters · includes the team leader</p><div class="hp-table-wrap"><table class="ep-table" id="ltWeeklyTable"><thead>${ltHeaders('<th>Schedule target</th><th>Goal reach</th>')}</thead><tbody>${report.members.map(x=>ltRow(x,self,`<td>${tgNumber(x.goal)}</td><td>${tgRate(x.schedules,x.goal)}</td>`)).join('')||'<tr><td colspan="9">No team members in this selection.</td></tr>'}</tbody><tfoot><tr><td>Team total</td>${TG_METRICS.map(([k])=>`<td>${tgNumber(report.total[k])}</td>`).join('')}<td>${tgNumber(report.total.goal)}</td><td>${tgRate(report.total.schedules,report.total.goal)}</td></tr></tfoot></table></div></section>
+ <section class="panel" data-section="team.charts"><div class="lt-section-head"><h3>Goals & activity</h3><span class="hint">${rangeText}</span></div><div class="tg-charts"><div><h4>Schedules · goal vs achieved</h4><div class="tg-chart"><canvas id="ltGoals" role="img" aria-label="Selected period schedule targets versus achieved"></canvas></div></div><div><h4>Schedules, visits & hires · daily timeline</h4><div class="tg-chart"><canvas id="ltTimeline" role="img" aria-label="Daily activity within the selected period"></canvas></div></div></div></section>
+ <section class="panel" data-section="team.daily"><div class="lt-section-head"><h3>Daily breakdown</h3>${copyBtnHtml('ltTodayTable')}</div><p class="hint">${rangeText} · same team and division selection</p><div class="hp-table-wrap"><table class="ep-table" id="ltTodayTable"><thead><tr><th>Date</th>${TG_METRICS.map(([,l])=>`<th>${l}</th>`).join('')}</tr></thead><tbody>${daily.map(x=>`<tr><td>${fmtDate(x.date)}</td>${TG_METRICS.map(([k])=>`<td>${tgNumber(x.r.total[k])}</td>`).join('')}</tr>`).join('')}</tbody></table></div></section><div id="ltPersonHost"></div>`;
+ ltBindTeamPicker(host);
  host.querySelector('#ltDivision').onchange=e=>{ltState.division=e.target.value;renderTeamGroups();};
- host.querySelector('#ltDay').onchange=e=>{if(tgDate(e.target.value)&&e.target.value<=today){ltState.day=e.target.value;renderTeamGroups();}};
- host.querySelector('#ltDayToday').onclick=()=>{ltState.day=null;renderTeamGroups();};
- host.querySelectorAll('[data-lt-day]').forEach(b=>b.onclick=()=>{ltState.day=tgShift(selectedDay,Number(b.dataset.ltDay));renderTeamGroups();});
- host.querySelector('#ltWeek').onchange=e=>{if(tgDate(e.target.value)&&e.target.value<=today){ltState.weekDate=e.target.value;ltState.period='custom';renderTeamGroups();}};
- host.querySelectorAll('[data-lt-week]').forEach(b=>b.onclick=()=>{ltState.weekDate=tgShift(p.from,7*Number(b.dataset.ltWeek));ltState.period='custom';renderTeamGroups();});
- host.querySelector('#ltRefresh').onclick=()=>{ltState.loaded=false;ltState.error='';renderTeamGroups();};
- host.querySelectorAll('[data-lt-period]').forEach(b=>b.onclick=()=>{ltState.period=b.dataset.ltPeriod;ltState.weekDate=null;renderTeamGroups();});
- host.querySelectorAll('[data-lt-person]').forEach(b=>b.onclick=()=>ltPersonDialog(b.dataset.ltPerson,g,today));
+ host.querySelector('#ltRangeMode').onchange=e=>{ltState.rangeMode=e.target.value;renderTeamGroups();};
+ host.querySelector('#ltAnchor').onchange=e=>{const value=mode==='month'?e.target.value+'-01':e.target.value;if(tgDate(value)&&value<=today){ltState.anchor=value;renderTeamGroups();}};
+ host.querySelector('#ltPrevious').onclick=()=>{ltState.anchor=ltMoveRange(mode,anchor,-1);renderTeamGroups();};
+ host.querySelector('#ltNext').onclick=()=>{const next=ltMoveRange(mode,anchor,1);if(next<=today){ltState.anchor=next;renderTeamGroups();}};
+ host.querySelector('#ltCurrent').onclick=()=>{ltState.anchor=null;renderTeamGroups();};
+ host.querySelector('#ltRefresh').onclick=()=>{if(Server.isAdmin())ltState.users=null;ltLoad();};
+ host.querySelector('#ltDirectoryRetry')?.addEventListener('click',()=>{ltState.users=null;ltLoad();});
+ host.querySelectorAll('[data-lt-person]').forEach(b=>b.onclick=()=>ltPersonDialog(b.dataset.ltPerson,g,p));
  const opts={responsive:true,maintainAspectRatio:false,plugins:{noValueLabels:true,legend:{position:'bottom'}},scales:{y:{beginAtZero:true},x:{ticks:{maxRotation:45}}}};
- charts.ltGoals=safeChart(document.getElementById('ltGoals'),{type:'bar',data:{labels:report.members.map(x=>x.label),datasets:[{label:'Minimum goal',data:report.members.map(x=>x.goal),backgroundColor:'#b58b38'},{label:'Achieved',data:report.members.map(x=>x.schedules),backgroundColor:'#218a86'}]},options:opts});
- const timeline=[...six,{end:curWeek.weekEnd,r:ltReport(g,curWeek.weekStart,curWeek.weekEnd,today)}];
- charts.ltTimeline=safeChart(document.getElementById('ltTimeline'),{type:'line',data:{labels:timeline.map(x=>'Wk '+weekOfDate(x.end).number+' · '+fmtDate(x.end)),datasets:[['schedules','Schedules','#218a86'],['shows','Visits (shows)','#487ec1'],['i9','Hires','#825db3']].map(([k,label,c])=>({label,data:timeline.map(x=>x.r.total[k]),borderColor:c,backgroundColor:c,spanGaps:false,tension:.2,pointRadius:3}))},options:opts});
+ charts.ltGoals=safeChart(document.getElementById('ltGoals'),{type:'bar',data:{labels:report.members.map(x=>x.label),datasets:[{label:'Schedule target',data:report.members.map(x=>x.goal),backgroundColor:'#b58b38'},{label:'Achieved',data:report.members.map(x=>x.schedules),backgroundColor:'#218a86'}]},options:opts});
+ charts.ltTimeline=safeChart(document.getElementById('ltTimeline'),{type:'line',data:{labels:daily.map(x=>fmtDate(x.date)),datasets:[['schedules','Schedules','#218a86'],['shows','Visits (shows)','#487ec1'],['i9','Hires','#825db3']].map(([k,label,c])=>({label,data:daily.map(x=>x.r.total[k]),borderColor:c,backgroundColor:c,spanGaps:false,tension:.2,pointRadius:3}))},options:opts});
 }
-function ltPersonDialog(name,g,today){
+function ltPersonDialog(name,g,p){
  if(!g.memberships.some(x=>x.name===name))return;
- const week=weekOfDate(today),previous=ltBounds('previous',today),six=ltBounds('six',today);
- const rows=[{label:'Today',...ltPersonal(name,today)},...[[week.weekStart,week.weekEnd,'Current week'],[previous.from,previous.to,'Previous week'],[six.from,six.to,'Past 6 weeks']].map(([from,to,label])=>({label,...ltReport({memberships:[{name,from,to}]},from,to,today).total}))];rows[0].label='Today';
- const host=document.getElementById('ltPersonHost');host.innerHTML=`<div class="ts-overlay"><section class="ts-dialog" role="dialog" aria-modal="true" aria-label="Recruiter performance"><button class="btn btn-secondary ts-close" id="ltClosePerson">Close</button><h2>${escapeHtml(name)}</h2><p class="hint">Personal activity across all assignments; a transfer does not reset progress.</p><div class="hp-table-wrap"><table class="ep-table"><thead><tr><th>Period</th>${TG_METRICS.map(([,l])=>`<th>${l}</th>`).join('')}</tr></thead><tbody>${rows.map(x=>`<tr><td>${x.label}</td>${TG_METRICS.map(([k])=>`<td>${tgNumber(x[k])}</td>`).join('')}</tr>`).join('')}</tbody></table></div></section></div>`;
+ const scoped={...g,memberships:g.memberships.filter(m=>m.name===name)},cutoff=p.to>ltToday()?ltToday():p.to;
+ const personal=ltReport(scoped,p.from,p.to),byDay=new Map(personal.daily.map(x=>[x.label,x]));
+ const rows=tgDays(p.from,cutoff).map(date=>({date,r:byDay.get(date)||Object.fromEntries(TG_METRICS.map(([k])=>[k,null]))}));
+ const host=document.getElementById('ltPersonHost');host.innerHTML=`<div class="ts-overlay"><section class="ts-dialog" role="dialog" aria-modal="true" aria-label="Recruiter performance"><button class="btn btn-secondary ts-close" id="ltClosePerson">Close</button><h2>${escapeHtml(name)}</h2><p class="hint">${fmtDate(p.from)} – ${fmtDate(p.to)} · assigned team activity${g.division?' · '+escapeHtml(g.division):''}</p><div class="hp-table-wrap"><table class="ep-table"><thead><tr><th>Date</th>${TG_METRICS.map(([,l])=>`<th>${l}</th>`).join('')}</tr></thead><tbody>${rows.map(x=>`<tr><td>${fmtDate(x.date)}</td>${TG_METRICS.map(([k])=>`<td>${tgNumber(x.r[k])}</td>`).join('')}</tr>`).join('')}</tbody></table></div></section></div>`;
  const close=host.querySelector('#ltClosePerson');close.onclick=()=>{host.innerHTML='';};close.focus();host.onkeydown=e=>{if(e.key==='Escape')close.click();if(e.key==='Tab'){e.preventDefault();close.focus();}};
 }
+
 async function ltAdminOpen(user){
  if(!Server.isAdmin())return;
  ltState.adminUser=user;ltState.adminDraft=null;
@@ -8761,11 +8841,12 @@ function ltAdminRender(){
  host.querySelectorAll('[data-la-from]').forEach(i=>i.onchange=()=>{a.memberships.find(m=>m.id===i.dataset.laFrom).from=i.value;});
  host.querySelectorAll('[data-la-to]').forEach(i=>i.onchange=()=>{a.memberships.find(m=>m.id===i.dataset.laTo).to=i.value||null;});
  host.querySelectorAll('[data-la-remove]').forEach(b=>b.onclick=()=>{sync();a.memberships=a.memberships.filter(m=>m.id!==b.dataset.laRemove);ltAdminRender();});
- host.querySelector('#laSave').onclick=async()=>{if(ltState.adminBusy)return;sync();const btn=host.querySelector('#laSave');try{if(!a.recruiter_name)throw Error('Choose the user’s recruiter pseudoname.');a.memberships=a.memberships.filter(m=>m.name!==a.recruiter_name);tgValidate({name:a.team_name,memberships:a.memberships});ltState.adminBusy=true;btn.disabled=true;const saved=await Server.rpc('dash_team_assignment_save',{p_assignment:a,p_expected_version:a.version||0});ltState.adminDraft=saved;if(String(a.owner_id)===String(Server.user.id)){ltState.assignment=saved;ltState.loaded=true;}showToast('Recruiter identity and team assignments saved.');ltAdminRender();}catch(x){host.querySelector('#laError').textContent=cleanErr(x);}finally{ltState.adminBusy=false;btn.disabled=false;}};
+ host.querySelector('#laSave').onclick=async()=>{if(ltState.adminBusy)return;sync();const btn=host.querySelector('#laSave');try{if(!a.recruiter_name)throw Error('Choose the user’s recruiter pseudoname.');a.memberships=a.memberships.filter(m=>m.name!==a.recruiter_name);tgValidate({name:a.team_name,memberships:a.memberships});ltState.adminBusy=true;btn.disabled=true;const saved=await Server.rpc('dash_team_assignment_save',{p_assignment:a,p_expected_version:a.version||0});ltState.adminDraft=saved;if(String(a.owner_id)===String(ltState.viewingId||Server.user.id)){ltState.assignment=saved;ltState.loaded=true;}showToast('Recruiter identity and team assignments saved.');ltAdminRender();}catch(x){host.querySelector('#laError').textContent=cleanErr(x);}finally{ltState.adminBusy=false;btn.disabled=false;}};
 }
 // Re-evaluate local time and refresh admin assignments while the lead view is visible.
-setInterval(()=>{if(currentView==='teams'&&Server.user&&!document.querySelector('#ltPersonHost .ts-dialog'))ltLoad();},60000);
+setInterval(()=>{if(currentView==='teams'&&Server.user&&!document.querySelector('#ltPersonHost .ts-dialog')&&!document.activeElement?.closest('#view-teams input,#view-teams select'))ltLoad();},60000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentView==='teams'&&Server.user)ltLoad();});
+
 
 /* ============================= INIT ============================= */
 const APP_VERSION = 'Version 4.21.0';
