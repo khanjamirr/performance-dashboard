@@ -1129,7 +1129,7 @@ body.team-workspace .content{padding-top:10px!important}
 @media(max-width:760px){.lt-sticky{padding:6px 0 8px}.lt-title{flex-basis:140px}.lt-title>span{display:none}.lt-title h2{font-size:15px}.lt-toolbar{gap:6px}.lt-period{flex-wrap:wrap}.lt-field select{max-width:160px}.lt-stats{display:flex;overflow-x:auto;padding-bottom:3px;scroll-snap-type:x proximity}.lt-stat{flex:0 0 112px;scroll-snap-align:start}.lt-break-card summary{align-items:flex-start;flex-direction:column}.lt-scope>span:last-child{display:none}}
 @media(max-height:650px){.lt-stats{display:flex;overflow-x:auto}.lt-stat{flex:0 0 115px}.lt-title>span{display:none}.lt-sticky{padding-top:4px;padding-bottom:6px}}
 @media print{.lt-sticky{position:static;box-shadow:none}.lt-toolbar .btn{display:none}}
-</style>
+.rc-good,.rc-good *{color:#167544!important}.rc-near,.rc-near *{color:#977000!important}.rc-bad,.rc-bad *{color:#bf3545!important}.rc-unknown{color:#72838d}.rc-signal{display:inline-block;margin-left:4px;font-size:15px}.rc-rate{display:block;font-size:10px;margin-top:3px}td.rc-good,td.rc-near,td.rc-bad{font-weight:700}</style>
 </head>
 <body class="locked">
 <div id="appLoading" class="app-loading"><div class="spinner" aria-hidden="true"></div><p>Loading dashboard…</p></div>
@@ -3005,7 +3005,7 @@ function processFile1(rows, mapping, weekEndDate, dedupeFlag, rangeCheckFn){
     byRecruiter[recruiter].branch = branch;
     const candName = mapping.candidateName ? (row[mapping.candidateName]||'').toString().trim() : '';
     const eid = mapping.employeeNumber ? (row[mapping.employeeNumber]||'').toString().trim() : '';
-    if(candName || eid) byRecruiter[recruiter].schedulesList.push({name: candName || 'Unknown', eid: eid || '\u2013', date: toIsoDateOnly(d)});
+    if(candName || eid) byRecruiter[recruiter].schedulesList.push({name: candName || 'Unknown', eid: eid || '\u2013', date: toIsoDateOnly(d), branch});
   });
   return byRecruiter;
 }
@@ -5465,8 +5465,28 @@ window.addEventListener('resize',()=>positionEntityPopover());
 // Clicking a recruiter / branch NAME opens its whole history as a page of its own; Back returns
 // to where you came from (the browser Back button works too).
 const historyState = {candidateWeek:null, cat:'showsList', mode:null, name:null, from:'recruiters', range:'all', pushed:false};
-function openHistoryPage(mode, name){
-  if(!Server.can(mode)) return;
+function recruiterSignal(schedules,shows,interviews,target){
+ const schedule=schedules==null||!target?'unknown':schedules>=target?'good':schedules>=Math.max(0,target-2)?'near':'bad';
+ const ratio=shows==null||interviews==null||interviews<=0?null:shows/interviews*100;
+ const visits=ratio===null?'unknown':ratio>=70?'good':ratio>=60?'near':'bad';
+ const level=schedule==='bad'||visits==='bad'?'bad':schedule==='unknown'||visits==='unknown'?'unknown':schedule==='good'&&visits==='good'?'good':'near';
+ return {schedule,visits,ratio,level,emoji:level==='good'?'👍':level==='bad'?'👎':'🟰',label:level==='good'?'Both minimums met':level==='bad'?'Below minimum range':level==='near'?'Close to minimum':'Insufficient data'};
+}
+function recruiterSignalHtml(x){return `<span class="rc-signal rc-${x.level}" role="img" aria-label="${x.label}" title="${x.label}">${x.emoji}</span>`;}
+const recruiterHistoryAccess={owner:null,name:null,date:null};
+async function verifyRecruiterHistory(name){
+ if(Server.isAdmin())return true;
+ const owner=String(Server.user?.id||'');if(!owner)return false;
+ try{const a=await Server.rpc('dash_team_assignment_get');if(String(Server.user?.id)!==owner)return false;
+ const allowed=!!a&&tgActive(ltGroup(a),name,ltToday());
+ Object.assign(recruiterHistoryAccess,{owner,name:allowed?name:null,date:ltToday()});return allowed;
+ }catch(e){showToast('Could not verify your team assignment. Please retry.');return false;}
+}
+function canOpenHistory(mode,name){return mode==='recruiters'?hasRecruiterHistoryAccess(name):Server.can(mode);}
+function hasRecruiterHistoryAccess(name){return Server.isAdmin()||(recruiterHistoryAccess.owner===String(Server.user?.id)&&recruiterHistoryAccess.name===name&&recruiterHistoryAccess.date===ltToday());}
+async function openHistoryPage(mode, name){
+  if(mode==='recruiters'&&!await verifyRecruiterHistory(name)){showToast('History is available only for recruiters currently assigned to you.');return;}
+  if(mode!=='recruiters' && !Server.can(mode)) return;
   closeEntityPopover();
   if(currentView!=='history') historyState.from = currentView==='settings' ? 'performance' : currentView;
   Object.assign(historyState, {mode, name, candidateWeek:epState.week||defaultWeekEnd(), range: historyState.range||'all'});
@@ -5483,9 +5503,9 @@ function leaveHistoryPage(viaPop){
   if(location.hash==='#history') try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){}
   refreshUI();
 }
-window.addEventListener('popstate', e=>{
+window.addEventListener('popstate', async e=>{
   if(currentView==='history' && !(e.state && e.state.ipdView==='history')) leaveHistoryPage(true);
-  else if(e.state && e.state.ipdView==='history' && Server.can(e.state.mode)){ Object.assign(historyState,{mode:e.state.mode, name:e.state.name, pushed:true}); if(currentView!=='history') historyState.from=currentView; currentView='history'; refreshUI(); }
+  else if(e.state && e.state.ipdView==='history' && (e.state.mode==='recruiters'||Server.can(e.state.mode))){ if(e.state.mode==='recruiters'&&!await verifyRecruiterHistory(e.state.name)){currentView='teams';refreshUI();return;} Object.assign(historyState,{mode:e.state.mode, name:e.state.name, pushed:true}); if(currentView!=='history') historyState.from=currentView; currentView='history'; refreshUI(); }
 });
 function historyRows(mode, name){
   const weeks=[...weeksData].sort((a,b)=>a.weekEndDate.localeCompare(b.weekEndDate));
@@ -5493,7 +5513,7 @@ function historyRows(mode, name){
 }
 async function renderHistoryCandidates(){
   const host=document.getElementById('historyCandidates');
-  if(!host || !canSeeCandidates() || historyState.mode!=='recruiters') return;
+  if(!host || !canSeeCandidates() || historyState.mode!=='recruiters' || !hasRecruiterHistoryAccess(historyState.name)) return;
   const name=historyState.name, dates=[...weeksData].map(w=>w.weekEndDate).sort().reverse();
   if(!dates.includes(historyState.candidateWeek)) historyState.candidateWeek=dates[0];
   const date=historyState.candidateWeek, week=weeksData.find(w=>w.weekEndDate===date);
@@ -5513,9 +5533,32 @@ async function renderHistoryCandidates(){
   }
 }
 
+// Candidates created today (system date) — falls back to the master rows if the weekly lists are restricted.
+async function scheduledTodayRows(){
+  const today=ltToday(), week=weekOfDate(today).weekEnd;
+  let lists=null;
+  try{ lists=(await candFromWeekLists(week))?.lists; }catch(e){}
+  if(!lists) lists=candCompute(await loadCandidateWeek(week),week).lists;
+  return (lists.schedules||[]).filter(c=>c.date===today);
+}
+async function renderHistoryToday(name){
+  const host=document.getElementById('historyToday'); if(!host || !hasRecruiterHistoryAccess(name)) return;
+  const today=ltToday();
+  host.innerHTML='<div class="hp-panel-head"><h3>Scheduled today</h3><span class="hint">'+fmtDate(today)+'</span></div><p class="hint">Loading…</p>';
+  try{
+    const rows=(await scheduledTodayRows()).filter(c=>c.recruiter===name);
+    if(!host.isConnected || historyState.name!==name) return;
+    const branches=[...new Set(rows.map(c=>c.branch))].sort();
+    host.innerHTML=`<div class="hp-panel-head"><h3>Scheduled today</h3><span class="hint">${fmtDate(today)} · ${escapeHtml(branches.join(', ')||'no branch yet')} · ${fmtNum(rows.length)} candidate${rows.length===1?'':'s'}</span>${branches.length>1?`<select id="histTodayBranch" style="margin-left:auto"><option value="">All branches</option>${branches.map(b=>`<option>${escapeHtml(b)}</option>`).join('')}</select>`:''}</div><div id="histTodayRows"></div>`;
+    const draw=()=>{ const b=host.querySelector('#histTodayBranch')?.value||'', list=rows.filter(c=>!b||c.branch===b);
+      host.querySelector('#histTodayRows').innerHTML=list.length?`<div class="hp-table-wrap"><table class="ep-table" id="histTodayTable"><thead><tr><th>EID</th><th>Employee name</th></tr></thead><tbody>${list.map(c=>`<tr><td class="mono">${escapeHtml(c.eid)}</td><td>${escapeHtml(c.name)}</td></tr>`).join('')}</tbody></table></div><div class="ep-foot"><span></span>${copyBtnHtml('histTodayTable')}</div>`:'<p class="hint">Nobody scheduled today yet.</p>'; };
+    host.querySelector('#histTodayBranch')?.addEventListener('change',draw); draw();
+  }catch(e){ if(host.isConnected) host.innerHTML='<div class="hp-panel-head"><h3>Scheduled today</h3></div><p class="hint">Today’s candidates could not be loaded ('+escapeHtml(cleanErr(e))+').</p>'; }
+}
 function renderHistoryView(){
   const el=document.getElementById('view-history'); if(!el) return;
   const {mode, name}=historyState;
+  if(mode==='recruiters'&&!hasRecruiterHistoryAccess(name)){el.innerHTML='<section class="panel">Recruiter history is restricted to your assigned team.</section>';return;}
   ['historyTrend','historyTrendBar','historyGoal'].forEach(destroyChart);
   const all=historyRows(mode, name);
   const ranges={all:'All weeks', 52:'Last 52 weeks', 26:'Last 26 weeks', 13:'Last 13 weeks', 6:'Last 6 weeks'};
@@ -5538,7 +5581,7 @@ function renderHistoryView(){
       <div class="hp-table-wrap"><table class="ep-table"><thead><tr><th>Recruiter</th><th>Weeks</th><th>Schedules</th><th>Interviews</th><th>Shows</th><th>Show %</th><th>Hires</th><th>Placed</th></tr></thead><tbody>${list.map(([n,t])=>`<tr><td>${Server.can('recruiters')?`<button type="button" class="entity-link" data-history-open="recruiters" data-name="${escapeHtml(n)}">${escapeHtml(n)}</button>`:escapeHtml(n)}</td><td>${t.weeks}</td><td>${fmtNum(t.schedules)}</td><td>${fmtNum(t.scheduledDateOf)}</td><td>${fmtNum(t.shows)}</td><td>${fmtPct(t.shows,t.scheduledDateOf)}</td><td>${fmtNum(t.i9)}</td><td>${fmtNum(t.placed)}</td></tr>`).join('')}</tbody></table></div></section>`;
   }
   const weekRows = rows.slice().reverse().map(({w,x})=>{ const gp=x.goal?Math.round(x.schedules/x.goal*100):null; const pend=weekIsFullyPending(w.weekEndDate);
-    return `<tr><td>Wk ${w.weekNumber}<small>${fmtDate(weekOfDate(w.weekEndDate).weekStart).replace(/, \d{4}$/,'')} – ${fmtDate(w.weekEndDate)}</small></td>${mode==='recruiters'?`<td>${escapeHtml(x.branch||'–')}</td>`:''}<td>${fmtNum(x.goal)}</td><td>${fmtNum(x.schedules)}${gp!=null?` <span class="ep-pct ${gp<50?'bad':gp<80?'warn':'good'}">${gp}%</span>`:''}</td><td>${fmtNum(x.scheduledDateOf)}</td><td>${fmtNum(x.shows)}</td><td>${fmtNum(x.noShows)}</td><td>${pend?'pending':fmtPct(x.shows,x.scheduledDateOf)}</td><td>${fmtNum(x.i9)}</td><td>${fmtNum(x.placed)}</td>${mode==='recruiters'?`<td class="hp-rem" data-copy-value="${escapeHtml(remarks.filter(r=>r.week_end_date===w.weekEndDate).map(r=>r.remark).join(" | "))}">${(()=>{ const rs=remarks.filter(r=>r.week_end_date===w.weekEndDate); return rs.length?escapeHtml(rs[0].remark).slice(0,80)+(rs.length>1?` <b>+${rs.length-1}</b>`:''):''; })()}</td>`:''}</tr>`; }).join('');
+    return `<tr><td>Wk ${w.weekNumber}<small>${fmtDate(weekOfDate(w.weekEndDate).weekStart).replace(/, \d{4}$/,'')} – ${fmtDate(w.weekEndDate)}</small></td>${mode==='recruiters'?`<td>${escapeHtml(x.branch||'–')}</td>`:''}<td>${fmtNum(x.goal)}</td><td class="rc-${recruiterSignal(x.schedules,x.shows,x.scheduledDateOf,x.goal).schedule}">${mode==='recruiters'?recruiterSignalHtml(recruiterSignal(x.schedules,x.shows,x.scheduledDateOf,x.goal))+' ':''}${fmtNum(x.schedules)}${gp!=null?` <span class="ep-pct ${gp<50?'bad':gp<80?'warn':'good'}">${gp}%</span>`:''}</td><td>${fmtNum(x.scheduledDateOf)}</td><td>${fmtNum(x.shows)}</td><td>${fmtNum(x.noShows)}</td><td>${pend?'pending':fmtPct(x.shows,x.scheduledDateOf)}</td><td>${fmtNum(x.i9)}</td><td>${fmtNum(x.placed)}</td>${mode==='recruiters'?`<td class="hp-rem" data-copy-value="${escapeHtml(remarks.filter(r=>r.week_end_date===w.weekEndDate).map(r=>r.remark).join(" | "))}">${(()=>{ const rs=remarks.filter(r=>r.week_end_date===w.weekEndDate); return rs.length?escapeHtml(rs[0].remark).slice(0,80)+(rs.length>1?` <b>+${rs.length-1}</b>`:''):''; })()}</td>`:''}</tr>`; }).join('');
   el.innerHTML = `<div class="hp-top">
       <button type="button" class="btn btn-secondary hp-back" id="historyBack"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg> Back to ${escapeHtml((VIEW_META[historyState.from]||VIEW_META.performance).title)}</button>
       <div class="hp-id"><div class="ep-eyebrow">${mode==='recruiters'?'Recruiter':'Branch'} · ${escapeHtml(div)}${branchesSeen.length?' · '+escapeHtml(last.x.branch||branchesSeen[branchesSeen.length-1])+(branchesSeen.length>1?` <span class="hp-more" title="${escapeHtml(branchesSeen.join(', '))}">+${branchesSeen.length-1} earlier branch${branchesSeen.length>2?'es':''}</span>`:''):''}</div><h2>${escapeHtml(name)}</h2><p class="hint">${all.length?`Active in ${all.length} week${all.length===1?'':'s'} · first Wk ${all[0].w.weekNumber} (${fmtDate(all[0].w.weekEndDate)}) · latest Wk ${last.w.weekNumber} (${fmtDate(last.w.weekEndDate)})`:'No activity recorded.'}</p></div>
@@ -5566,6 +5609,7 @@ function renderHistoryView(){
     ${mode==='recruiters' ? `<section class="panel hp-panel" data-section="hist.remarks"><div class="hp-panel-head"><h3>Remarks</h3><span class="hint">${remarks.length}</span>${Remarks.canAdd()||remarks.length?`<button class="btn btn-secondary btn-sm" id="historyRemarks" style="margin-left:auto">${Remarks.canAdd()?'Add or review remarks':'Open remarks'}</button>`:''}</div>
       ${remarks.length?`<div class="ep-remarks">${remarks.map(r=>`<div class="ep-remark"><div class="ep-remark-meta"><strong>Wk ${weekOfDate(r.week_end_date).number}</strong> · ${fmtDate(r.remark_date)} · ${escapeHtml(r.author||'')} ${remarkStatusHtml(r)}</div><div class="ep-remark-text">${escapeHtml(r.remark)}</div></div>`).join('')}</div>`:'<p class="hint">No remarks yet.</p>'}</section>` : ''}`
     : `<div class="panel"><p class="hint">No activity for ${escapeHtml(name)} in ${ranges[historyState.range].toLowerCase()}.</p></div>`}`;
+  if(mode==='recruiters'){ el.insertAdjacentHTML('afterbegin', '<section class="panel hp-panel" data-section="hist.today" id="historyToday"></section>'); renderHistoryToday(name); el.prepend(el.querySelector('.hp-top')); }
   if(mode==='recruiters' && canSeeCandidates()){ el.insertAdjacentHTML('beforeend', '<section class="panel hp-panel" data-section="hist.candidates" id="historyCandidates"></section>'); renderHistoryCandidates(); }
   el.querySelector('#historyBack').onclick=()=>leaveHistoryPage(false);
   el.querySelector('#historyRange').onchange=e=>{ historyState.range=e.target.value; renderHistoryView(); };
@@ -5720,13 +5764,13 @@ function renderPeopleTable(mode, allRows, displayRows){
       const rowBg = isSelectedPie ? 'background:var(--indigo-light);' : (isBottomPerformer?'background:var(--red-light);':'');
       const stickyBg = rowBg || 'background:var(--surface);'; // sticky cells need an explicit bg or they show through as white
       return mode==='recruiters' ? `<tr data-pie-name="${escapeHtml(r.name)}" style="cursor:pointer;${rowBg}">
-      <td style="${stickyBg}"><span class="recruiter-name">${i<3?'<span class="rank">#'+(i+1)+'</span>':''}<button type="button" class="entity-link" data-history-name="${escapeHtml(r.name)}" title="Open full history">${escapeHtml(r.name)}</button></span>${isSelectedPie?' <span class="pill good">Selected</span>':''}</td>
+      <td style="${stickyBg}"><span class="recruiter-name">${i<3?'<span class="rank">#'+(i+1)+'</span>':''}<button type="button" class="entity-link" data-history-name="${escapeHtml(r.name)}" title="Open full history">${escapeHtml(r.name)}</button> ${mode==='recruiters'?recruiterSignalHtml(recruiterSignal(r.schedules,r.shows,r.scheduledDateOf,r.goal)):''}</span>${isSelectedPie?' <span class="pill good">Selected</span>':''}</td>
       ${showPerformerHighlights?`<td style="${stickyBg}">${r.highlightBadgesHtml||'—'}</td>`:''}
       <td style="${stickyBg}">${escapeHtml(r.division||'\u2013')}</td>
       <td>${r.goal!==undefined ? fmtNum(r.goal) : '\u2013'}</td>
-      <td>${candidateCellHtml(r.schedules, r.schedulesList, 'schedules', r.name)}</td>
+      <td class="rc-${recruiterSignal(r.schedules,r.shows,r.scheduledDateOf,r.goal).schedule}">${candidateCellHtml(r.schedules, r.schedulesList, 'schedules', r.name)}</td>
       <td>${candidateCellHtml(r.scheduledDateOf, r.interviewsList, 'scheduledDateOf', r.name)}</td>
-      <td>${candidateCellHtml(r.shows, r.showsList, 'shows', r.name)}</td>
+      <td class="rc-${recruiterSignal(r.schedules,r.shows,r.scheduledDateOf,r.goal).visits}">${candidateCellHtml(r.shows, r.showsList, 'shows', r.name)}</td>
       <td>${candidateCellHtml(r.noShows, r.noShowsList, 'noShows', r.name)}</td>
       <td>${candidateCellHtml(r.i9, r.i9List, 'i9', r.name)}</td>
       <td>${candidateCellHtml(r.placed||0, r.placedList, 'placed', r.name)}</td>
@@ -5735,7 +5779,7 @@ function renderPeopleTable(mode, allRows, displayRows){
       <td>${noShowRatePill(r.noShowRate)}</td>
       <td class="remark-td" data-copy-value="${escapeHtml(Remarks.forWeek(r.name, peopleRemarksWeek).map(x=>x.remark).join(" | "))}">${remarksCellHtml(r.name, peopleRemarksWeek)}</td>
     </tr>` : `<tr data-pie-name="${escapeHtml(r.name)}" style="cursor:pointer;${isSelectedPie?'background:var(--indigo-light);':''}">
-      <td style="${isSelectedPie?'background:var(--indigo-light);':'background:var(--surface);'}"><span class="recruiter-name">${i<3?'<span class="rank">#'+(i+1)+'</span>':''}<button type="button" class="entity-link" data-history-name="${escapeHtml(r.name)}" title="Open full history">${escapeHtml(r.name)}</button></span>${isSelectedPie?' <span class="pill good">Selected</span>':''}</td>
+      <td style="${isSelectedPie?'background:var(--indigo-light);':'background:var(--surface);'}"><span class="recruiter-name">${i<3?'<span class="rank">#'+(i+1)+'</span>':''}<button type="button" class="entity-link" data-history-name="${escapeHtml(r.name)}" title="Open full history">${escapeHtml(r.name)}</button> ${mode==='recruiters'?recruiterSignalHtml(recruiterSignal(r.schedules,r.shows,r.scheduledDateOf,r.goal)):''}</span>${isSelectedPie?' <span class="pill good">Selected</span>':''}</td>
       <td style="${isSelectedPie?'background:var(--indigo-light);':'background:var(--surface);'}">${escapeHtml(r.division||'\u2013')}</td>
       <td>${candidateCellHtml(r.schedules, r.schedulesList, 'schedules', r.name)}</td>
       <td>${candidateCellHtml(r.scheduledDateOf, r.interviewsList, 'scheduledDateOf', r.name)}</td>
@@ -6765,7 +6809,7 @@ function renderUploadAlerts(){
 const PAGE_SECTIONS = {
   performance:[['perf.kpis','KPI cards (all)'],['perf.kpi.schedules','· Schedules card'],['perf.kpi.interviews','· Interviews card'],['perf.kpi.shows','· Shows card'],['perf.kpi.no_shows','· No Shows card'],['perf.kpi.hires','· Hires card'],['perf.kpi.placed','· Placed card'],['perf.kpi.hires_per_recruiter','· Hires per Recruiter card'],['perf.kpi.goal_reach','· Goal Reach card'],['perf.kpi.show_rate','· Show Rate card'],['perf.kpi.no_show_rate','· No Show Rate card'],
                 ['perf.trends','Trends charts'],['perf.leaderboards','Leaderboards (recruiter & branch snapshots)'],['perf.divisions','Division breakdown'],['perf.history','Previous 6 weeks table'],['perf.insights','Insights'],['perf.composition','Composition pies (monthly / quarterly)']],
-  teams:[['team.summary','Team — summary cards'],['team.daily','Team — daily table'],['team.weekly','Team — weekly table'],['team.goals','Team — goal checks and breaks'],['team.charts','Team — charts'],...['Schedules','Interviews','Shows','No Shows','Hires','Placed','Hires per Recruiter','Goal Reach','Show Rate','No Show Rate'].map(l=>['team.kpi.'+l.toLowerCase().replace(/[^a-z]+/g,'_'),'· '+l+' card'])],
+  teams:[['team.summary','Team — summary cards'],['team.daily','Team — daily table'],['team.weekly','Team — weekly table'],['team.goals','Team — goal checks and breaks'],['team.charts','Team — charts'],['team.candidates','Team — today’s scheduled candidates'],...['Schedules','Interviews','Shows','No Shows','Hires','Placed','Hires per Recruiter','Goal Reach','Show Rate','No Show Rate'].map(l=>['team.kpi.'+l.toLowerCase().replace(/[^a-z]+/g,'_'),'· '+l+' card'])],
   recruiters:[['rec.table','Recruiter table'],['hist.kpis','History page — summary tiles (recruiter & branch)'],['hist.trend','History page — week-by-week chart'],['hist.goal','History page — schedules vs goal chart'],['hist.weeks','History page — every-week table'],['hist.remarks','History page — remarks'],['hist.candidates','History page — candidates']],
   branches:[['br.table','Branch table'],['hist.team','History page — recruiters in the branch']],
   candidates:[['cand.list','Category boxes and candidate list'],['cand.explain','“How are these counted?” breakdown']],
@@ -6784,7 +6828,7 @@ function applyPermissions(){
   const u = Server.user; if(!u) return;
   document.querySelectorAll('#navList button[data-view]').forEach(b=>{ b.classList.toggle('hidden', !Server.can(VIEW_MODULE[b.dataset.view])); });
   const allowedViews = Object.keys(VIEW_MODULE).filter(v=>Server.can(VIEW_MODULE[v]));
-  if(currentView==='history' && !Server.can(historyState.mode)) currentView = historyState.from||'performance';
+  if(currentView==='history' && !canOpenHistory(historyState.mode, historyState.name)) currentView = historyState.from||'performance';
   if(currentView!=='settings' && currentView!=='history' && !allowedViews.includes(currentView) && allowedViews.length){
     currentView = allowedViews[0];
     document.querySelectorAll('#navList button').forEach(b=>b.classList.toggle('active', b.dataset.view===currentView));
@@ -8357,7 +8401,7 @@ async function candFromWeekLists(week){
     for(const r of got) mergeWeeklyLists(v, await decodeKvValue(r.key, r.value));
     v.listsLoaded = true;
   }
-  const flat = (part, list)=> Object.entries(v[part].byRecruiter).flatMap(([rec,o])=>(o[list]||[]).map(c=>({...c, recruiter:rec, branch:o.branch||'Unassigned'})));
+  const flat = (part, list)=> Object.entries(v[part].byRecruiter).flatMap(([rec,o])=>(o[list]||[]).map(c=>({...c, recruiter:rec, branch:c.branch||o.branch||'Unassigned'})));
   const mode = dedupeByEmployeeNumber ? 'deduped' : 'raw', T = v[mode].totals || {};
   const totals = {schedules:T.schedules||0, interviews:T.scheduledDateOf||0, shows:T.shows||0, noShows:T.noShows||0, i9:T.i9||0, placed:T.placed||0};
   const lists = {}, counted = {};
@@ -8391,7 +8435,7 @@ function candCompute(data, week){
   const out = {}, counted = {};
   const p1 = processFile1(data.s, MAP1, week, dedupeByEmployeeNumber);
   const p2 = processFile2(data.v, MAP2, week, dedupeByEmployeeNumber).byRecruiter;
-  const flat = (by, key)=> Object.entries(by).flatMap(([rec,o])=>(o[key]||[]).map(c=>({...c, recruiter:rec, branch:o.branch||'Unassigned'})));
+  const flat = (by, key)=> Object.entries(by).flatMap(([rec,o])=>(o[key]||[]).map(c=>({...c, recruiter:rec, branch:c.branch||o.branch||'Unassigned'})));
   const totals = {schedules:0, interviews:0, shows:0, noShows:0, i9:0, placed:0};
   Object.values(p1).forEach(o=>{ totals.schedules += o.schedules||0; });
   Object.values(p2).forEach(o=>{ totals.interviews += o.scheduledDateOf||0; totals.shows += o.shows||0; totals.noShows += o.noShows||0; totals.i9 += o.i9||0; totals.placed += o.placed||0; });
@@ -8710,7 +8754,8 @@ async function ltLoad(){
  finally{if(valid()){ltState.loading=false;if(currentView==='teams')renderTeamGroups();}}
 }
 function ltRow(x,self,extra=''){
- return `<tr ${x.label===self?'class="lt-mine"':''}><td><button class="entity-link" data-lt-person="${escapeHtml(x.label)}">${escapeHtml(x.label)}</button>${x.label===self?' <span class="pill good">You</span>':''}</td>${TG_METRICS.map(([k])=>`<td>${tgNumber(x[k])}</td>`).join('')}${extra}</tr>`;
+ const signal=recruiterSignal(x.schedules,x.shows,x.scheduledDateOf,x.goal);
+ return `<tr ${x.label===self?'class="lt-mine"':''}><td><button class="entity-link" data-lt-person="${escapeHtml(x.label)}">${escapeHtml(x.label)}</button> ${recruiterSignalHtml(signal)}${x.label===self?' <span class="pill good">You</span>':''}</td>${TG_METRICS.map(([k])=>`<td class="${k==='schedules'?'rc-'+signal.schedule:k==='shows'?'rc-'+signal.visits:''}">${tgNumber(x[k])}${k==='shows'?`<small class="rc-rate">${signal.ratio===null?'Rate unavailable':signal.ratio.toFixed(1)+'% visit rate'}</small>`:''}</td>`).join('')}${extra}</tr>`;
 }
 function ltHeaders(extra=''){return `<tr><th>Recruiter</th>${TG_METRICS.map(([,l])=>`<th>${l==='Shows'?'Visits (shows)':l}</th>`).join('')}${extra}</tr>`;}
 function ltCards(r,prev,series){
@@ -8747,14 +8792,17 @@ function ltBindTeamPicker(host){
   ltState.viewingId=e.target.value;ltState.assignment=null;ltState.loaded=false;ltState.loading=false;ltState.error='';ltState.division='';ltState.requestSeq++;renderTeamGroups();
  });
 }
-function ltBreakCheck(name,date,now=new Date()){
- const today=ltToday(now),w=weekOfDate(date),daily=ltPersonal(name,date).schedules;
- const weekly=ltReport({memberships:[{name,from:w.weekStart,to:date}]},w.weekStart,date,today).total.schedules;
+function ltBreakCheck(name,date,now=new Date(),scope='day',weekTo=date){
+ const today=ltToday(now),w=weekOfDate(date),day=ltPersonal(name,date),daily=day.schedules;
+ const wk=ltReport({memberships:[{name,from:w.weekStart,to:weekTo}]},w.weekStart,weekTo,today).total,weekly=wk.schedules;
  const known=daily!==null&&weekly!==null;
- const historical=date<today;
- const late=daily!==null&&daily<10&&(historical||now.getHours()>=14);
- const mid=new Date(date+'T12:00:00').getDay()>=4&&weekly!==null&&weekly<25;
- return {name,daily,weekly,eligible:known&&daily>=10&&weekly>=50,known,late,mid,status:!known?'Awaiting data':daily>=10&&weekly>=50?'Eligible':late?'Daily goal missed':daily>=10?'Weekly goal pending':'In progress'};
+ const historical=date<today,weekDone=w.weekEnd<today;
+ const late=scope==='day'?daily!==null&&daily<10&&(historical||now.getHours()>=14):weekly!==null&&weekly<50&&weekDone;
+ const mid=!weekDone&&weekly!==null&&weekly<50&&new Date(date+'T12:00:00').getDay()>=4&&weekly<25;
+ const goalMet=scope==='day'?daily!==null&&daily>=10:weekly!==null&&weekly>=50;
+ const status=scope==='day'?(daily===null?'Awaiting daily data':goalMet?'Daily goal met'+(daily>10?' · '+(daily-10)+' above target':''):late?'Daily goal missed':'Daily goal in progress'):(weekly===null?'Awaiting weekly data':goalMet?'Weekly goal met'+(weekly>50?' · '+(weekly-50)+' above target':''):late?'Weekly goal missed':'Weekly goal in progress');
+ const daySignal=recruiterSignal(daily,day.shows,day.scheduledDateOf,10),weekSignal=recruiterSignal(weekly,wk.shows,wk.scheduledDateOf,50);
+ return {name,daily,weekly,eligible:known&&daily>=10&&weekly>=50,known,goalMet,late,mid,status,daySignal,weekSignal};
 }
 function ltCompactCards(report){
  const t=report.total,ratio=(a,b)=>a===null||b===null||!b?null:a/b*100;
@@ -8781,8 +8829,10 @@ function renderTeamGroups(){
  const days=tgDays(p.from,cutoff),byDay=new Map(report.daily.map(x=>[x.label,x]));
  const daily=days.map(date=>({date,r:{total:byDay.get(date)||Object.fromEntries(TG_METRICS.map(([k])=>[k,null]))}}));
  // Break eligibility is always tied to one day, shown explicitly when viewing a week/month.
- const checkDay=cutoff,names=[...new Set(g.memberships.filter(m=>m.from<=checkDay&&(!m.to||m.to>=checkDay)).map(m=>m.name))].filter(n=>!g.division||(getEffectiveRecruiterDivision(n,weekOfDate(checkDay).weekEnd)||'Unassigned')===g.division);
- const checks=names.map(n=>ltBreakCheck(n,checkDay,now)),eligible=checks.filter(x=>x.eligible),missed=checks.filter(x=>x.late||x.mid),unknown=checks.filter(x=>!x.known);
+ let checkDay=cutoff;if(mode!=='day'){while(checkDay>p.from&&[0,6].includes(new Date(checkDay+'T12:00:00Z').getUTCDay()))checkDay=tgShift(checkDay,-1);}
+ const weekTo=weekOfDate(checkDay).weekEnd<today?weekOfDate(checkDay).weekEnd:today;
+ const names=[...new Set(g.memberships.filter(m=>m.from<=checkDay&&(!m.to||m.to>=checkDay)).map(m=>m.name))].filter(n=>!g.division||(getEffectiveRecruiterDivision(n,weekOfDate(checkDay).weekEnd)||'Unassigned')===g.division);
+ const checks=names.map(n=>ltBreakCheck(n,checkDay,now,mode,weekTo)),eligible=checks.filter(x=>x.eligible),missed=checks.filter(x=>x.late||x.mid),unknown=checks.filter(x=>!x.known);
  const isOwn=String(a.owner_id)===owner,self=isOwn?a.recruiter_name:null,leader=ltState.users?.find(u=>String(u.id)===String(a.owner_id))?.name||Server.user.name;
  const divisions=[...new Set(g.memberships.flatMap(m=>weeksData.filter(w=>w.weekEndDate>=p.from&&tgShift(w.weekEndDate,-6)<=p.to).map(w=>getEffectiveRecruiterDivision(m.name,w.weekEndDate)||'Unassigned')))].sort();if(g.division&&!divisions.includes(g.division))divisions.push(g.division);
  const rangeText=mode==='day'?fmtDate(p.from):`${fmtDate(p.from)} – ${fmtDate(p.to)}`;
@@ -8795,10 +8845,11 @@ function renderTeamGroups(){
  ${report.uncovered?'<p class="lt-data-note">Some selected dates have no import; affected totals are unavailable.</p>':''}
  </div>
  ${ltState.directoryError?`<p class="warn-note">User list unavailable: ${escapeHtml(ltState.directoryError)} <button class="btn btn-secondary" id="ltDirectoryRetry">Retry</button></p>`:''}
- <details ${openGoals?'open':''} class="panel lt-break-card" id="ltGoalChecks" data-section="team.goals"><summary><span><strong>Schedule goals & third break</strong><small>${fmtDate(checkDay)}${checkDay===today?' · today':' · historical check'} · daily 10 + weekly 50 required</small></span><span class="lt-break-counts"><span class="pill good">${eligible.length} eligible</span>${missed.length?`<span class="pill warn">${missed.length} need attention</span>`:''}${unknown.length?`<span class="pill pending">${unknown.length} awaiting data</span>`:''}<span class="hint">View recruiters ▾</span></span></summary><div class="hp-table-wrap"><table class="ep-table"><thead><tr><th>Recruiter</th><th>Day / 10</th><th>Week to date / 50</th><th>Third break</th></tr></thead><tbody>${checks.map(x=>`<tr><td><button class="entity-link" data-lt-person="${escapeHtml(x.name)}">${escapeHtml(x.name)}</button>${x.name===self?' (You)':''}</td><td>${tgNumber(x.daily)} / 10</td><td>${tgNumber(x.weekly)} / 50</td><td><span class="pill ${x.eligible?'good':x.late||x.mid?'warn':'pending'}">${x.status}</span>${x.mid?' · below halfway after midweek':''}</td></tr>`).join('')||'<tr><td colspan="4">No assigned recruiters in this division on this day.</td></tr>'}</tbody></table></div><p class="hint">Daily shortfalls are flagged after 2 PM in your system timezone. Historical checks use the completed day. Personal weekly schedules include earlier team assignments.</p></details>
- <section class="panel" data-section="team.weekly"><div class="lt-section-head"><h3>Recruiter performance</h3>${copyBtnHtml('ltWeeklyTable')}</div><p class="hint">${rangeText} · ${report.members.length} recruiters · includes the team leader</p><div class="hp-table-wrap"><table class="ep-table" id="ltWeeklyTable"><thead>${ltHeaders('<th>Schedule target</th><th>Goal reach</th>')}</thead><tbody>${report.members.map(x=>ltRow(x,self,`<td>${tgNumber(x.goal)}</td><td>${tgRate(x.schedules,x.goal)}</td>`)).join('')||'<tr><td colspan="9">No team members in this selection.</td></tr>'}</tbody><tfoot><tr><td>Team total</td>${TG_METRICS.map(([k])=>`<td>${tgNumber(report.total[k])}</td>`).join('')}<td>${tgNumber(report.total.goal)}</td><td>${tgRate(report.total.schedules,report.total.goal)}</td></tr></tfoot></table></div></section>
+ <details ${openGoals?'open':''} class="panel lt-break-card" id="ltGoalChecks" data-section="team.goals"><summary><span><strong>Schedule goals & third break</strong><small>${fmtDate(checkDay)}${checkDay===today?' · today':' · historical check'} · daily 10 + weekly 50 required</small></span><span class="lt-break-counts"><span class="pill good">${eligible.length} eligible</span>${missed.length?`<span class="pill warn">${missed.length} need attention</span>`:''}${unknown.length?`<span class="pill pending">${unknown.length} awaiting data</span>`:''}<span class="hint">View recruiters ▾</span></span></summary><div class="hp-table-wrap"><table class="ep-table"><thead><tr><th>Recruiter</th><th>Day / 10 · ${fmtDate(checkDay).replace(/, \d{4}$/,'')}</th><th>${weekTo<today?'Week':'Week to date'} / 50</th><th>${mode==='day'?'Daily':'Weekly'} goal status</th><th>Third break</th></tr></thead><tbody>${checks.map(x=>`<tr><td><button class="entity-link" data-lt-person="${escapeHtml(x.name)}">${escapeHtml(x.name)}</button>${x.name===self?' (You)':''}</td><td class="rc-${x.daySignal.schedule}">${recruiterSignalHtml(x.daySignal)} ${tgNumber(x.daily)} / 10<small class="rc-rate">${x.daySignal.ratio===null?'Visit rate unavailable':x.daySignal.ratio.toFixed(1)+'% visit rate'}</small></td><td class="rc-${x.weekSignal.schedule}">${recruiterSignalHtml(x.weekSignal)} ${tgNumber(x.weekly)} / 50<small class="rc-rate">${x.weekSignal.ratio===null?'Visit rate unavailable':x.weekSignal.ratio.toFixed(1)+'% visit rate'}</small></td><td><span class="pill ${x.goalMet?'good':x.late||x.mid?'warn':'pending'}">${x.status}</span>${x.mid?' · below halfway after midweek':''}</td><td><span class="pill ${x.eligible?'good':'pending'}">${!x.known?'Awaiting data':x.eligible?'Eligible':'Daily and weekly targets required'}</span></td></tr>`).join('')||'<tr><td colspan="5">No assigned recruiters in this division on this day.</td></tr>'}</tbody></table></div><p class="hint">👍 schedules and visit rate both at/above minimum (10 a day / 50 a week, 70% visits) · 🟰 within 2 schedules of target or visit rate 60–69.9% · 👎 below that. Daily and weekly are judged separately. Goal status follows the selected view: daily / 10 or weekly / 50. Third-break eligibility is separate and requires both on the check date. Weekly progress includes earlier team assignments.</p></details>
+ <section class="panel" data-section="team.weekly"><div class="lt-section-head"><h3>Recruiter performance</h3>${copyBtnHtml('ltWeeklyTable')}</div><p class="hint">${rangeText} · ${report.members.length} recruiters · includes the team leader</p><p class="hint">👍 Both targets met · 🟰 within 2 schedules of target / visit rate 60–69.9% · 👎 below these ranges. Visit-rate minimum: 70%. Schedule target: 10 per assigned working day (50 for a full week).</p><div class="hp-table-wrap"><table class="ep-table" id="ltWeeklyTable"><thead>${ltHeaders('<th>Schedule target</th><th>Goal reach</th>')}</thead><tbody>${report.members.map(x=>ltRow(x,self,`<td>${tgNumber(x.goal)}</td><td>${tgRate(x.schedules,x.goal)}</td>`)).join('')||'<tr><td colspan="9">No team members in this selection.</td></tr>'}</tbody><tfoot><tr><td>Team total</td>${TG_METRICS.map(([k])=>`<td>${tgNumber(report.total[k])}</td>`).join('')}<td>${tgNumber(report.total.goal)}</td><td>${tgRate(report.total.schedules,report.total.goal)}</td></tr></tfoot></table></div></section>
  <section class="panel" data-section="team.charts"><div class="lt-section-head"><h3>Goals & activity</h3><span class="hint">${rangeText}</span></div><div class="tg-charts"><div><h4>Schedules · goal vs achieved</h4><div class="tg-chart"><canvas id="ltGoals" role="img" aria-label="Selected period schedule targets versus achieved"></canvas></div></div><div><h4>Schedules, visits & hires · daily timeline</h4><div class="tg-chart"><canvas id="ltTimeline" role="img" aria-label="Daily activity within the selected period"></canvas></div></div></div></section>
- <section class="panel" data-section="team.daily"><div class="lt-section-head"><h3>Daily breakdown</h3>${copyBtnHtml('ltTodayTable')}</div><p class="hint">${rangeText} · same team and division selection</p><div class="hp-table-wrap"><table class="ep-table" id="ltTodayTable"><thead><tr><th>Date</th>${TG_METRICS.map(([,l])=>`<th>${l}</th>`).join('')}</tr></thead><tbody>${daily.map(x=>`<tr><td>${fmtDate(x.date)}</td>${TG_METRICS.map(([k])=>`<td>${tgNumber(x.r.total[k])}</td>`).join('')}</tr>`).join('')}</tbody></table></div></section><div id="ltPersonHost"></div>`;
+ <section class="panel" data-section="team.daily"><div class="lt-section-head"><h3>Daily breakdown</h3>${copyBtnHtml('ltTodayTable')}</div><p class="hint">${rangeText} · same team and division selection</p><div class="hp-table-wrap"><table class="ep-table" id="ltTodayTable"><thead><tr><th>Date</th>${TG_METRICS.map(([,l])=>`<th>${l}</th>`).join('')}</tr></thead><tbody>${daily.map(x=>{const target=[...new Set(g.memberships.filter(m=>tgActive(g,m.name,x.date)&&(!g.division||(getEffectiveRecruiterDivision(m.name,weekOfDate(x.date).weekEnd)||'Unassigned')===g.division)).map(m=>m.name))].length*10,signal=recruiterSignal(x.r.total.schedules,x.r.total.shows,x.r.total.scheduledDateOf,target);return `<tr><td>${fmtDate(x.date)}</td>${TG_METRICS.map(([k])=>`<td class="${k==='schedules'?'rc-'+signal.schedule:k==='shows'?'rc-'+signal.visits:''}">${tgNumber(x.r.total[k])}</td>`).join('')}</tr>`;}).join('')}</tbody></table></div></section><section class="panel" data-section="team.candidates" id="ltScheduledCandidates"></section><div id="ltPersonHost"></div>`;
+ ltRenderScheduledCandidates(g);
  ltBindTeamPicker(host);
  host.querySelector('#ltDivision').onchange=e=>{ltState.division=e.target.value;renderTeamGroups();};
  host.querySelector('#ltRangeMode').onchange=e=>{ltState.rangeMode=e.target.value;renderTeamGroups();};
@@ -8808,20 +8859,25 @@ function renderTeamGroups(){
  host.querySelector('#ltCurrent').onclick=()=>{ltState.anchor=null;renderTeamGroups();};
  host.querySelector('#ltRefresh').onclick=()=>{if(Server.isAdmin())ltState.users=null;ltLoad();};
  host.querySelector('#ltDirectoryRetry')?.addEventListener('click',()=>{ltState.users=null;ltLoad();});
- host.querySelectorAll('[data-lt-person]').forEach(b=>b.onclick=()=>ltPersonDialog(b.dataset.ltPerson,g,p));
+ host.querySelectorAll('[data-lt-person]').forEach(b=>b.onclick=()=>{epState.week=weekOfDate(p.to).weekEnd;openHistoryPage('recruiters',b.dataset.ltPerson);});
  const opts={responsive:true,maintainAspectRatio:false,plugins:{noValueLabels:true,legend:{position:'bottom'}},scales:{y:{beginAtZero:true},x:{ticks:{maxRotation:45}}}};
  charts.ltGoals=safeChart(document.getElementById('ltGoals'),{type:'bar',data:{labels:report.members.map(x=>x.label),datasets:[{label:'Schedule target',data:report.members.map(x=>x.goal),backgroundColor:'#b58b38'},{label:'Achieved',data:report.members.map(x=>x.schedules),backgroundColor:'#218a86'}]},options:opts});
  charts.ltTimeline=safeChart(document.getElementById('ltTimeline'),{type:'line',data:{labels:daily.map(x=>fmtDate(x.date)),datasets:[['schedules','Schedules','#218a86'],['shows','Visits (shows)','#487ec1'],['i9','Hires','#825db3']].map(([k,label,c])=>({label,data:daily.map(x=>x.r.total[k]),borderColor:c,backgroundColor:c,spanGaps:false,tension:.2,pointRadius:3}))},options:opts});
 }
-function ltPersonDialog(name,g,p){
- if(!g.memberships.some(x=>x.name===name))return;
- const scoped={...g,memberships:g.memberships.filter(m=>m.name===name)},cutoff=p.to>ltToday()?ltToday():p.to;
- const personal=ltReport(scoped,p.from,p.to),byDay=new Map(personal.daily.map(x=>[x.label,x]));
- const rows=tgDays(p.from,cutoff).map(date=>({date,r:byDay.get(date)||Object.fromEntries(TG_METRICS.map(([k])=>[k,null]))}));
- const host=document.getElementById('ltPersonHost');host.innerHTML=`<div class="ts-overlay"><section class="ts-dialog" role="dialog" aria-modal="true" aria-label="Recruiter performance"><button class="btn btn-secondary ts-close" id="ltClosePerson">Close</button><h2>${escapeHtml(name)}</h2><p class="hint">${fmtDate(p.from)} – ${fmtDate(p.to)} · assigned team activity${g.division?' · '+escapeHtml(g.division):''}</p><div class="hp-table-wrap"><table class="ep-table"><thead><tr><th>Date</th>${TG_METRICS.map(([,l])=>`<th>${l}</th>`).join('')}</tr></thead><tbody>${rows.map(x=>`<tr><td>${fmtDate(x.date)}</td>${TG_METRICS.map(([k])=>`<td>${tgNumber(x.r[k])}</td>`).join('')}</tr>`).join('')}</tbody></table></div></section></div>`;
- const close=host.querySelector('#ltClosePerson');close.onclick=()=>{host.innerHTML='';};close.focus();host.onkeydown=e=>{if(e.key==='Escape')close.click();if(e.key==='Tab'){e.preventDefault();close.focus();}};
+async function ltRenderScheduledCandidates(g){
+ const host=document.getElementById('ltScheduledCandidates');if(!host)return;
+ const owner=String(Server.user.id),today=ltToday(),week=weekOfDate(today).weekEnd;
+ host.innerHTML='<h3>Scheduled today</h3><p class="hint">Loading candidates…</p>';
+ try{
+  const all=await scheduledTodayRows();
+  if(!host.isConnected||String(Server.user?.id)!==owner)return;
+  const rows=all.filter(c=>tgActive(g,c.recruiter,today)&&(!g.division||(branchDivisions[c.branch]||'Unassigned')===g.division));
+  const branches=[...new Set(rows.map(c=>c.branch))].sort();
+  host.innerHTML=`<div class="lt-section-head"><h3>Scheduled today · ${fmtDate(today)}</h3><label class="lt-field">Branch<select id="ltCandidateBranch"><option value="">All team branches</option>${branches.map(b=>`<option>${escapeHtml(b)}</option>`).join('')}</select></label></div><p class="hint">Created today by your assigned team · system date · EID and employee name only</p><div id="ltCandidateRows"></div>`;
+  const draw=()=>{const branch=host.querySelector('#ltCandidateBranch').value,filtered=rows.filter(c=>!branch||c.branch===branch);host.querySelector('#ltCandidateRows').innerHTML=filtered.length?`<div class="hp-table-wrap"><table class="ep-table" id="ltCandidateTable"><thead><tr><th>EID</th><th>Employee name</th></tr></thead><tbody>${filtered.map(c=>`<tr><td>${escapeHtml(c.eid)}</td><td>${escapeHtml(c.name)}</td></tr>`).join('')}</tbody></table></div>${copyBtnHtml('ltCandidateTable')}`:'<p class="hint">No scheduled candidates for today in this selection.</p>';};
+  host.querySelector('#ltCandidateBranch').onchange=draw;draw();
+ }catch(e){if(host.isConnected)host.innerHTML='<h3>Scheduled today</h3><p role="alert">Candidate data could not be loaded. Refresh the team to retry.</p>';}
 }
-
 async function ltAdminOpen(user){
  if(!Server.isAdmin())return;
  ltState.adminUser=user;ltState.adminDraft=null;
