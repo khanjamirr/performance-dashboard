@@ -5418,7 +5418,7 @@ function renderEntityDrawer(){
       <div><div class="ep-eyebrow">${mode==='recruiters'?'Recruiter':'Branch'}${single?' · '+escapeHtml(div)+(mode==='recruiters'&&e&&e.branch?' · '+escapeHtml(e.branch):''):' · comparing '+names.length}</div>
       <h3 id="epTitle">${single?`<button type="button" class="entity-link" id="epHistory" title="Open full history">${escapeHtml(name)}</button>`:names.map(escapeHtml).join(', ')}</h3>${single?'<button type="button" class="ep-histlink" id="epHistory2">Full history →</button>':''}</div>
       <button type="button" class="ep-close" aria-label="Close">&times;</button></header>
-    <div class="ep-weekbar"><label>Week <select id="epWeek">${[...weeksData].map(w=>w.weekEndDate).sort().reverse().map(d=>`<option value="${d}" ${d===epState.week?'selected':''}>Wk ${weekOfDate(d).number} · ${fmtDate(weekOfDate(d).weekStart).replace(/, \d{4}$/,'')} – ${fmtDate(d)}</option>`).join('')}</select></label>${single&&mode==='recruiters'&&Remarks.canAdd()?'<button class="btn btn-primary btn-sm" id="epAddRemark">Add remark</button>':''}</div>
+    <div class="ep-weekbar"><label>Week ending <select id="epWeek">${[...weeksData].map(w=>w.weekEndDate).sort().reverse().map(d=>`<option value="${d}" ${d===epState.week?'selected':''}>Wk ${weekOfDate(d).number} · ending ${fmtDate(d)}</option>`).join('')}</select></label>${single&&mode==='recruiters'&&Remarks.canAdd()?'<button class="btn btn-primary btn-sm" id="epAddRemark">Add remark</button>':''}</div>
     ${single ? (e ? `<div class="ep-goal"><div class="ep-goal-top"><span>Schedules vs goal</span><strong>${fmtNum(e.schedules)} <small>/ ${fmtNum(e.goal)}</small></strong><em class="${goalPct<50?'bad':goalPct<80?'warn':'good'}">${goalPct==null?'–':Math.round(goalPct)+'%'}</em></div><div class="ep-bar"><i class="${goalPct<50?'bad':goalPct<80?'warn':'good'}" style="width:${Math.min(100,goalPct||0)}%"></i><b style="left:50%"></b></div></div>
       <div class="ep-tiles">
         ${tile('Interviews', fmtNum(e.scheduledDateOf), dlt('scheduledDateOf'))}
@@ -5502,7 +5502,7 @@ async function renderHistoryCandidates(){
   const loading=stored && stored.listsSplit && !stored.listsLoaded;
   const lists=Object.fromEntries(cats.map(([k])=>[k,epCandidates(week,'recruiters',name,k)]));
   const cur=lists[historyState.cat]||[];
-  host.innerHTML=`<div class="hp-panel-head"><h3>Candidates</h3><label>Week <select id="historyCandidateWeek">${dates.map(d=>`<option value="${d}" ${d===date?'selected':''}>Wk ${weekOfDate(d).number} · ${fmtDate(d)}</option>`).join('')}</select></label></div>
+  host.innerHTML=`<div class="hp-panel-head"><h3>Candidates</h3><label>Week ending <select id="historyCandidateWeek">${dates.map(d=>`<option value="${d}" ${d===date?'selected':''}>Wk ${weekOfDate(d).number} · ${fmtDate(d)}</option>`).join('')}</select></label></div>
     <div class="ep-cats">${cats.map(([k,l])=>`<button type="button" data-history-cat="${k}" aria-pressed="${k===historyState.cat}">${l} <b>${loading?'…':fmtNum(lists[k].length)}</b></button>`).join('')}</div>
     ${loading?'<p class="hint">Loading names…</p>':cur.length?`<div class="hp-table-wrap"><table class="ep-table" id="historyCandidatesTable"><thead><tr><th>Candidate</th><th>Employee #</th><th>Date</th></tr></thead><tbody>${cur.map(c=>`<tr><td>${escapeHtml(c.name)}</td><td>${escapeHtml(c.eid)}</td><td>${escapeHtml(c.date||'')}</td></tr>`).join('')}</tbody></table></div><div class="ep-foot"><span class="hint">${cur.length} in this list</span>${copyBtnHtml('historyCandidatesTable')}</div>`:'<p class="hint">Nobody in this list for the week.</p>'}`;
   host.querySelector('#historyCandidateWeek').onchange=e=>{historyState.candidateWeek=e.target.value;renderHistoryCandidates();};
@@ -8105,7 +8105,7 @@ async function renderAlertsView(){
   const sigList = (st.signals==='wins'?wins:attention).filter(a=>!q || a.name.toLowerCase().includes(q));
   host.innerHTML = `
     <div class="al-toolbar">
-      <label class="cand-field"><span>Week</span><select id="alWeek">${weeks.map(d=>`<option value="${d}" ${d===st.week?'selected':''}>Wk ${weekOfDate(d).number} · ${fmtDate(weekOfDate(d).weekStart).replace(/, \d{4}$/,'')} – ${fmtDate(d)}${d===toIsoDateOnly(saturdayOnOrAfter(new Date()))?' (this week)':''}</option>`).join('')}</select></label>
+      <label class="cand-field"><span>Week ending</span><select id="alWeek">${weeks.map(d=>`<option value="${d}" ${d===st.week?'selected':''}>Wk ${weekOfDate(d).number} · ending ${fmtDate(d)}${d===toIsoDateOnly(saturdayOnOrAfter(new Date()))?' (this week)':''}</option>`).join('')}</select></label>
       <label class="cand-field"><span>Group by</span><select id="alGroup"><option value="division" ${st.group==='division'?'selected':''}>Division › Branch</option><option value="branch" ${st.group==='branch'?'selected':''}>Branch</option><option value="none" ${st.group==='none'?'selected':''}>No grouping</option></select></label>
       <p class="hint al-basis">${inProgress?`Week in progress — day ${elapsed} of 7. Recruiters are compared with where they should be by today (goal × ${elapsed}/7).`:`Completed week — schedules compared with each recruiter’s weekly goal (default ${DEFAULT_WEEKLY_GOAL}).`}</p>
     </div>
@@ -8415,7 +8415,7 @@ async function renderCandidatesView(){
   }
   container.innerHTML = `${candidateHubTabs()}<div class="panel cand-panel">
     <div class="cand-controls">
-      <label class="cand-field"><span>Week</span><select id="candWeek">${weeks.map(w=>`<option value="${w}" ${w===st.week?'selected':''}>Wk ${isoWeekNumber(new Date(w+'T00:00:00'))} · ${fmtDate(toIsoDateOnly(new Date(new Date(w+'T00:00:00').getTime()-6*86400000))).replace(/, \d{4}$/,'')} – ${fmtDate(w)}</option>`).join('')}</select></label>
+      <label class="cand-field"><span>Week ending</span><select id="candWeek">${weeks.map(w=>`<option value="${w}" ${w===st.week?'selected':''}>Wk ${isoWeekNumber(new Date(w+'T00:00:00'))} · ending ${fmtDate(w)}</option>`).join('')}</select></label>
       <label class="cand-field"><span>Recruiter</span><select id="candRecruiter"><option value="">All recruiters</option></select></label>
       <button type="button" class="btn btn-secondary btn-sm cand-explain-btn" id="candExplainBtn" aria-expanded="false" data-section="cand.explain">How are these counted?</button>
     </div>
@@ -8733,7 +8733,7 @@ function ltRange(mode,anchor=ltToday()){
 function ltMoveRange(mode,anchor,direction){
  const p=ltRange(mode,anchor);
  if(mode==='month'){const d=new Date(p.from+'T12:00:00Z');d.setUTCMonth(d.getUTCMonth()+direction);return d.toISOString().slice(0,10);}
- return tgShift(p.from,direction*(mode==='day'?1:7));
+ return tgShift(mode==='week'?p.to:p.from,direction*(mode==='day'?1:7));
 }
 function ltTeamPicker(){
  if(!Server.isAdmin())return '';
@@ -8788,7 +8788,7 @@ function renderTeamGroups(){
  const rangeText=mode==='day'?fmtDate(p.from):`${fmtDate(p.from)} – ${fmtDate(p.to)}`;
  host.innerHTML=`<div class="lt-sticky">
  <header class="lt-toolbar"><div class="lt-title"><h2>${escapeHtml(a.team_name)}</h2><span>${escapeHtml(leader)} · ${escapeHtml(a.recruiter_name)}</span></div>${ltTeamPicker()}
- <div class="lt-period" role="group" aria-label="Team reporting period"><label class="lt-field">View<select id="ltRangeMode"><option value="day" ${mode==='day'?'selected':''}>Day</option><option value="week" ${mode==='week'?'selected':''}>Week</option><option value="month" ${mode==='month'?'selected':''}>Month</option></select></label><button class="btn btn-secondary" id="ltPrevious" aria-label="Previous ${mode}">←</button><label class="lt-field">${mode==='month'?'Month':mode==='week'?'Week containing':'Date'}<input id="ltAnchor" type="${mode==='month'?'month':'date'}" value="${mode==='month'?anchor.slice(0,7):anchor}" max="${mode==='month'?today.slice(0,7):today}"></label><button class="btn btn-secondary" id="ltNext" aria-label="Next ${mode}" ${p.to>=today?'disabled':''}>→</button><button class="btn btn-secondary" id="ltCurrent">${mode==='day'?'Today':mode==='month'?'This month':'This week'}</button></div>
+ <div class="lt-period" role="group" aria-label="Team reporting period"><label class="lt-field">View<select id="ltRangeMode"><option value="day" ${mode==='day'?'selected':''}>Day</option><option value="week" ${mode==='week'?'selected':''}>Week</option><option value="month" ${mode==='month'?'selected':''}>Month</option></select></label><button class="btn btn-secondary" id="ltPrevious" aria-label="Previous ${mode}">←</button><label class="lt-field">${mode==='month'?'Month':mode==='week'?'Week ending':'Date'}<input id="ltAnchor" type="${mode==='month'?'month':'date'}" value="${mode==='month'?anchor.slice(0,7):mode==='week'?p.to:anchor}" max="${mode==='month'?today.slice(0,7):mode==='week'?weekOfDate(today).weekEnd:today}"></label><button class="btn btn-secondary" id="ltNext" aria-label="Next ${mode}" ${p.to>=today?'disabled':''}>→</button><button class="btn btn-secondary" id="ltCurrent">${mode==='day'?'Today':mode==='month'?'This month':'This week'}</button></div>
  <label class="lt-field">Division<select id="ltDivision"><option value="">All team divisions</option>${divisions.map(d=>`<option ${d===g.division?'selected':''}>${escapeHtml(d)}</option>`).join('')}</select></label><button class="btn btn-secondary" id="ltRefresh" aria-label="Refresh team" title="Refresh team">↻</button></header>
  <div class="lt-scope"><span><strong>${rangeText}</strong> · ${escapeHtml(g.division||'All divisions')}${p.to>today?' · through today':''}</span><span title="Dates and cutoff times use your system timezone">${escapeHtml(zone)}</span></div>
  <section class="lt-summary" aria-label="Team performance summary" data-section="team.summary"><div class="lt-stats">${ltCompactCards(report)}</div></section>
@@ -8802,9 +8802,9 @@ function renderTeamGroups(){
  ltBindTeamPicker(host);
  host.querySelector('#ltDivision').onchange=e=>{ltState.division=e.target.value;renderTeamGroups();};
  host.querySelector('#ltRangeMode').onchange=e=>{ltState.rangeMode=e.target.value;renderTeamGroups();};
- host.querySelector('#ltAnchor').onchange=e=>{const value=mode==='month'?e.target.value+'-01':e.target.value;if(tgDate(value)&&value<=today){ltState.anchor=value;renderTeamGroups();}};
+ host.querySelector('#ltAnchor').onchange=e=>{const value=mode==='month'?e.target.value+'-01':e.target.value;if(tgDate(value)&&value<=(mode==='week'?weekOfDate(today).weekEnd:today)){ltState.anchor=mode==='week'?weekOfDate(value).weekEnd:value;renderTeamGroups();}};
  host.querySelector('#ltPrevious').onclick=()=>{ltState.anchor=ltMoveRange(mode,anchor,-1);renderTeamGroups();};
- host.querySelector('#ltNext').onclick=()=>{const next=ltMoveRange(mode,anchor,1);if(next<=today){ltState.anchor=next;renderTeamGroups();}};
+ host.querySelector('#ltNext').onclick=()=>{const next=ltMoveRange(mode,anchor,1);if(next<=(mode==='week'?weekOfDate(today).weekEnd:today)){ltState.anchor=next;renderTeamGroups();}};
  host.querySelector('#ltCurrent').onclick=()=>{ltState.anchor=null;renderTeamGroups();};
  host.querySelector('#ltRefresh').onclick=()=>{if(Server.isAdmin())ltState.users=null;ltLoad();};
  host.querySelector('#ltDirectoryRetry')?.addEventListener('click',()=>{ltState.users=null;ltLoad();});
