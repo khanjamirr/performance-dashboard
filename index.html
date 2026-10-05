@@ -1109,9 +1109,9 @@ button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #183442
 .sidebar .brand{flex-wrap:wrap!important;align-items:center!important;row-gap:10px!important}
 .sidebar .brand-text{flex:1;min-width:0}
 .sidebar .brand .upload-stamp{flex:0 0 100%;width:100%;min-width:0;box-sizing:border-box;margin:0!important;padding:8px 0 0!important;border-top:1px solid #ffffff18;border-radius:0;letter-spacing:0;line-height:1.5!important;font-weight:400;color:#d3e3e8!important}
-.upload-caption{display:block;font-size:10px;color:#9ebac5;margin-bottom:2px}.upload-stamp time{display:block;font-size:11px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.upload-caption{display:block;font-size:10px;color:#9ebac5;margin-bottom:2px}.upload-stamp time{display:block;font-size:11px;white-space:nowrap;font-variant-numeric:tabular-nums}.upload-stamp time+.upload-caption{margin-top:7px}
 @media(min-width:761px){.sidebar .brand{padding-right:6px!important}.sidebar .brand h1{padding-right:24px;white-space:normal!important}body.side-collapsed .upload-stamp{display:none!important}}
-@media(max-width:760px){.sidebar .brand .upload-stamp{padding-top:2px!important;border:0}.upload-caption{display:inline;margin-right:5px}.upload-stamp time{display:inline}}
+@media(max-width:760px){.sidebar .brand .upload-stamp{padding-top:2px!important;border:0}.upload-stamp time+.upload-caption{margin:0 0 0 10px}.upload-caption{display:inline;margin-right:5px}.upload-stamp time{display:inline}}
 
 /* Compact team workspace: shared filters and KPI summary stay in view. */
 body.team-workspace .main>.topbar{display:none!important}
@@ -1122,10 +1122,10 @@ body.team-workspace .content{padding-top:10px!important}
 .lt-field{display:flex;flex-direction:column;gap:3px;font-size:10px;color:var(--text-secondary);font-weight:600}
 .lt-field select,.lt-field input{min-height:32px;height:32px;border:1px solid var(--border);border-radius:7px;padding:4px 8px;color:var(--text);font:inherit;font-size:12px;background:white;max-width:195px}
 .lt-period{display:flex;align-items:flex-end;gap:5px}.lt-toolbar .btn{min-height:32px;height:32px;padding:5px 9px;white-space:nowrap}.lt-scope{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 12px;font-size:10px;color:var(--text-secondary);margin:9px 0}
-.lt-stats{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px}.lt-stat{min-width:0;background:white;border:1px solid #dce7ea;border-top:2px solid var(--stat-color);border-radius:8px;padding:9px 8px;display:flex;flex-direction:column;gap:4px}.lt-stat>span{font-size:10px;line-height:1.3;color:var(--text-secondary);font-weight:600}.lt-stat>strong{font-size:20px;line-height:1.15;color:var(--text);overflow-wrap:anywhere}.lt-stat>small{font-size:9px;line-height:1.3;color:var(--text-secondary)}
+.lt-stats{display:flex;flex-wrap:nowrap;gap:6px;overflow-x:auto;scrollbar-width:thin}.lt-stats>.lt-stat{flex:1 1 0;min-width:92px}.lt-stat{min-width:0;background:white;border:1px solid #dce7ea;border-top:2px solid var(--stat-color);border-radius:8px;padding:9px 8px;display:flex;flex-direction:column;gap:4px}.lt-stat>span{font-size:10px;line-height:1.3;color:var(--text-secondary);font-weight:600}.lt-stat>strong{font-size:20px;line-height:1.15;color:var(--text);overflow-wrap:anywhere}.lt-stat>small{font-size:9px;line-height:1.3;color:var(--text-secondary)}
 .lt-data-note{font-size:11px;color:#93651d;margin:7px 0 0}.lt-break-card{padding:12px 16px!important}.lt-break-card summary{display:flex;justify-content:space-between;gap:10px;align-items:center;cursor:pointer;list-style:none}.lt-break-card summary::-webkit-details-marker{display:none}.lt-break-card summary strong{font-size:13px}.lt-break-card summary small{display:block;font-size:10px;color:var(--text-secondary);margin-top:4px}.lt-break-counts{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.lt-break-card .hp-table-wrap{margin-top:12px;max-height:240px;overflow:auto}.lt-break-card td,.lt-break-card th{padding:7px 10px!important}.lt-break-card .hint{font-size:10px;margin:8px 0 0}
 @media(min-width:761px){.lt-sticky{top:0}}
-@media(min-width:761px) and (max-width:1450px){.lt-stats{grid-template-columns:repeat(5,minmax(0,1fr))}.lt-stat{padding:7px 9px;gap:2px}.lt-stat>strong{font-size:18px}.lt-title{flex-basis:140px}}
+@media(min-width:761px) and (max-width:1450px){.lt-stat{padding:7px 9px;gap:2px}.lt-stat>strong{font-size:18px}.lt-title{flex-basis:140px}}
 @media(max-width:760px){.lt-sticky{padding:6px 0 8px}.lt-title{flex-basis:140px}.lt-title>span{display:none}.lt-title h2{font-size:15px}.lt-toolbar{gap:6px}.lt-period{flex-wrap:wrap}.lt-field select{max-width:160px}.lt-stats{display:flex;overflow-x:auto;padding-bottom:3px;scroll-snap-type:x proximity}.lt-stat{flex:0 0 112px;scroll-snap-align:start}.lt-break-card summary{align-items:flex-start;flex-direction:column}.lt-scope>span:last-child{display:none}}
 @media(max-height:650px){.lt-stats{display:flex;overflow-x:auto}.lt-stat{flex:0 0 115px}.lt-title>span{display:none}.lt-sticky{padding-top:4px;padding-bottom:6px}}
 @media print{.lt-sticky{position:static;box-shadow:none}.lt-toolbar .btn{display:none}}
@@ -3284,13 +3284,21 @@ const PERFORMANCE_TYPE_META = {
 };
 let uploadType = 'weekly'; // 'weekly' | 'monthly' — Uploads section sub-selector, defaults to weekly
 
+let uploadLogStamps=null, uploadLogTried=false;
 function renderUploadStamp(){
  const el=document.getElementById('liveBadge');if(!el)return;
- const dates=weeksData.map(w=>new Date(w.savedAt).getTime()).filter(t=>Number.isFinite(t)&&t>0);
- const latest=dates.length?new Date(Math.max(...dates)):null;
- el.innerHTML=latest?'<span class="upload-caption">Last upload</span><time datetime="'+latest.toISOString()+'">'+escapeHtml(latest.toLocaleString(undefined,{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}))+'</time>':'<span class="upload-caption">Last upload</span><span>No uploads yet</span>';
- el.title=latest?'Latest uploaded data · '+latest.toLocaleString()+' · '+Intl.DateTimeFormat().resolvedOptions().timeZone:'No uploaded data available';
+ const saved=(typeof KV!=='undefined'&&KV.get('lastUploads'))||{}, log=uploadLogStamps||{};
+ const fmt=d=>d.toLocaleString(undefined,{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+ const line=(src,label)=>{const x=saved[src]||log[src];const d=x&&new Date(x.at);
+   return '<span class="upload-caption">'+label+'</span>'+(d&&Number.isFinite(d.getTime())?'<time datetime="'+d.toISOString()+'" title="'+escapeHtml((x.by?'by '+x.by+' · ':'')+d.toLocaleString())+'">'+escapeHtml(fmt(d))+'</time>':'<time>—</time>');};
+ el.innerHTML=line('schedules','Created On · last upload')+line('shows','Date Of · last upload');
+ el.title='Latest Created On and Date Of uploads · '+Intl.DateTimeFormat().resolvedOptions().timeZone;
  el.dataset.status='upload';
+ // older uploads (before this was recorded): read the upload history once, if this account may
+ if(!uploadLogTried&&(!saved.schedules||!saved.shows)&&typeof Server!=='undefined'&&Server.token&&(Server.can('upload')||Server.can('settings'))){
+  uploadLogTried=true;
+  Server.rpc('dash_upload_log',{p_limit:100}).then(l=>{const o={};(l||[]).forEach(r=>{if(r.status==='done'&&(r.source==='schedules'||r.source==='shows')&&!o[r.source])o[r.source]={at:r.uploaded_at,by:r.uploaded_by};});uploadLogStamps=o;renderUploadStamp();}).catch(()=>{});
+ }
 }
 async function refreshUI(){
  document.body.classList.toggle('team-workspace',currentView==='teams');
@@ -5469,10 +5477,20 @@ function recruiterSignal(schedules,shows,interviews,target){
  const schedule=schedules==null||!target?'unknown':schedules>=target?'good':schedules>=Math.max(0,target-2)?'near':'bad';
  const ratio=shows==null||interviews==null||interviews<=0?null:shows/interviews*100;
  const visits=ratio===null?'unknown':ratio>=70?'good':ratio>=60?'near':'bad';
- const level=schedule==='bad'||visits==='bad'?'bad':schedule==='unknown'||visits==='unknown'?'unknown':schedule==='good'&&visits==='good'?'good':'near';
- return {schedule,visits,ratio,level,emoji:level==='good'?'👍':level==='bad'?'👎':'🟰',label:level==='good'?'Both minimums met':level==='bad'?'Below minimum range':level==='near'?'Close to minimum':'Insufficient data'};
+ const goalPct=schedules==null||!target?null:schedules/target*100;
+ const t=goalTier(goalPct);
+ return {schedule,visits,ratio,goalPct,level:t.level,emoji:t.emoji,label:t.label};
 }
-function recruiterSignalHtml(x){return `<span class="rc-signal rc-${x.level}" role="img" aria-label="${x.label}" title="${x.label}">${x.emoji}</span>`;}
+// Emoji by % of the schedule goal: <50 🤬 · 50–80 🫡 · 81–100 🫰 · over 100 🤩
+function goalTier(pct){
+ if(pct==null) return {level:'unknown',emoji:'',label:'No schedule data yet'};
+ const p=Math.round(pct*10)/10, txt=p.toFixed(0)+'% of schedule goal';
+ if(p<50) return {level:'bad',emoji:'🤬',label:txt+' — below 50%'};
+ if(p<=80) return {level:'near',emoji:'🫡',label:txt+' — 50–80%'};
+ if(p<=100) return {level:'good',emoji:'🫰',label:txt+' — 81–100%'};
+ return {level:'good',emoji:'🤩',label:txt+' — above goal'};
+}
+function recruiterSignalHtml(x){if(!x.emoji)return '';return `<span class="rc-signal rc-${x.level}" role="img" aria-label="${x.label}" title="${x.label}">${x.emoji}</span>`;}
 const recruiterHistoryAccess={owner:null,name:null,date:null};
 async function verifyRecruiterHistory(name){
  if(Server.isAdmin())return true;
@@ -7064,6 +7082,7 @@ async function ingestFiles(entries, {interactive=true, week=null}={}){
   const localRows = new Map();
   const allWeeks = new Set();
   let totalRows = 0, totalSkipped = 0, totalBlocked = 0;
+  const uploadStamps = {};
   Server.ownMasterUntil = Date.now() + 10*60*1000;
   try{
     for(const entry of entries){
@@ -7146,11 +7165,13 @@ async function ingestFiles(entries, {interactive=true, week=null}={}){
       const blocked = Math.max(0, batch.length - savedRows); totalBlocked += blocked;
       const fin = await Server.rpc('dash_import_finish', {p_import_id:importId, p_source:source, p_from:weekStart, p_to:week, p_rows_read:p.rowsRead, p_removed_columns:removed});
       (fin.weeks||[]).forEach(w=>allWeeks.add(w)); allWeeks.add(week);
+      uploadStamps[source]={at:new Date().toISOString(), by:Server.user.name};
       totalRows += batch.length - blocked; totalSkipped += skipped;
       if(!imported.some(x=>x.entry===entry)) imported.push({entry, source, rows:batch.length, removed}); else imported.find(x=>x.entry===entry).rows += batch.length;
       lastFolderScanLog.push({name:p.sheetLabel, status:source==='schedules'?'file1':'file2', detail:fmtNum(batch.length)+' rows for '+weekLabel+(skipped?' ('+fmtNum(skipped)+' without a date skipped)':'')+' · '+(removed.length?'removed contact column(s): '+removed.join(', '):'no contact columns found')+(fin.cleared?' · '+fmtNum(fin.cleared)+' older row(s) of this week replaced':'')+(blocked?' · '+fmtNum(blocked)+' row(s) skipped (removed weeks)':'')});
     }
     if(!imported.length && !goalSheets.length){ showToast('Nothing imported — see Settings → Data Sync Details for what was found in each file.'); return; }
+    if(Object.keys(uploadStamps).length) await storageSet('lastUploads', {...(KV.get('lastUploads')||{}), ...uploadStamps});
     if(allWeeks.size) await rebuildWeeks([...allWeeks], localRows, importProgress);
     if(goalSheets.length){ await loadAllWeeks(); await importGoalSheets(goalSheets); }
     if(allWeeks.size){ importProgress('Checking the numbers…'); await autoVerifyWeeks(true); }
@@ -8806,7 +8827,8 @@ function ltBreakCheck(name,date,now=new Date(),scope='day',weekTo=date){
 }
 function ltCompactCards(report){
  const t=report.total,ratio=(a,b)=>a===null||b===null||!b?null:a/b*100;
- const rows=TG_METRICS.map(([key,label,color])=>({key:label.toLowerCase().replace(/[^a-z]+/g,'_'),label:label==='Shows'?'Visits (shows)':label,value:tgNumber(t[key]),color,note:key==='schedules'?`${tgNumber(t.goal)} schedule target`:''}));
+ const rows=TG_METRICS.map(([key,label,color])=>({key:label.toLowerCase().replace(/[^a-z]+/g,'_'),label:label==='Shows'?'Visits (shows)':label,value:tgNumber(t[key]),color,note:key==='schedules'&&t.goal?`${tgRate(t.schedules,t.goal)} of goal`:''}));
+ rows.unshift({key:'goal',label:'Schedule goal',value:tgNumber(t.goal),color:'#a67c2e',note:'10/day · 50/week each'});
  const hpr=t.i9===null||!report.hprDenominator?null:t.i9/report.hprDenominator;
  for(const [key,label,value,target,unit,lower] of [['hires_per_recruiter','Hires / recruiter',hpr,15,'',false],['goal_reach','Goal reach',ratio(t.schedules,t.goal),90,'%',false],['show_rate','Show rate',ratio(t.shows,t.scheduledDateOf),70,'%',false],['no_show_rate','No-show rate',ratio(t.noShows,t.scheduledDateOf),20,'%',true]])rows.push({key,label,value:value===null?'Unavailable':value.toFixed(1)+unit,color:value===null?'#8496a0':(lower?value<target:value>=target)?'#218778':'#b57734',note:lower?'Less than 20%':`Minimum ${target}${unit}`});
  return rows.map(x=>`<div class="lt-stat" data-section="team.kpi.${x.key}" style="--stat-color:${x.color}"><span>${x.label}</span><strong>${x.value}</strong>${x.note?`<small>${x.note}</small>`:''}</div>`).join('');
@@ -8845,8 +8867,8 @@ function renderTeamGroups(){
  ${report.uncovered?'<p class="lt-data-note">Some selected dates have no import; affected totals are unavailable.</p>':''}
  </div>
  ${ltState.directoryError?`<p class="warn-note">User list unavailable: ${escapeHtml(ltState.directoryError)} <button class="btn btn-secondary" id="ltDirectoryRetry">Retry</button></p>`:''}
- <details ${openGoals?'open':''} class="panel lt-break-card" id="ltGoalChecks" data-section="team.goals"><summary><span><strong>Schedule goals & third break</strong><small>${fmtDate(checkDay)}${checkDay===today?' · today':' · historical check'} · daily 10 + weekly 50 required</small></span><span class="lt-break-counts"><span class="pill good">${eligible.length} eligible</span>${missed.length?`<span class="pill warn">${missed.length} need attention</span>`:''}${unknown.length?`<span class="pill pending">${unknown.length} awaiting data</span>`:''}<span class="hint">View recruiters ▾</span></span></summary><div class="hp-table-wrap"><table class="ep-table"><thead><tr><th>Recruiter</th><th>Day / 10 · ${fmtDate(checkDay).replace(/, \d{4}$/,'')}</th><th>${weekTo<today?'Week':'Week to date'} / 50</th><th>${mode==='day'?'Daily':'Weekly'} goal status</th><th>Third break</th></tr></thead><tbody>${checks.map(x=>`<tr><td><button class="entity-link" data-lt-person="${escapeHtml(x.name)}">${escapeHtml(x.name)}</button>${x.name===self?' (You)':''}</td><td class="rc-${x.daySignal.schedule}">${recruiterSignalHtml(x.daySignal)} ${tgNumber(x.daily)} / 10<small class="rc-rate">${x.daySignal.ratio===null?'Visit rate unavailable':x.daySignal.ratio.toFixed(1)+'% visit rate'}</small></td><td class="rc-${x.weekSignal.schedule}">${recruiterSignalHtml(x.weekSignal)} ${tgNumber(x.weekly)} / 50<small class="rc-rate">${x.weekSignal.ratio===null?'Visit rate unavailable':x.weekSignal.ratio.toFixed(1)+'% visit rate'}</small></td><td><span class="pill ${x.goalMet?'good':x.late||x.mid?'warn':'pending'}">${x.status}</span>${x.mid?' · below halfway after midweek':''}</td><td><span class="pill ${x.eligible?'good':'pending'}">${!x.known?'Awaiting data':x.eligible?'Eligible':'Daily and weekly targets required'}</span></td></tr>`).join('')||'<tr><td colspan="5">No assigned recruiters in this division on this day.</td></tr>'}</tbody></table></div><p class="hint">👍 schedules and visit rate both at/above minimum (10 a day / 50 a week, 70% visits) · 🟰 within 2 schedules of target or visit rate 60–69.9% · 👎 below that. Daily and weekly are judged separately. Goal status follows the selected view: daily / 10 or weekly / 50. Third-break eligibility is separate and requires both on the check date. Weekly progress includes earlier team assignments.</p></details>
- <section class="panel" data-section="team.weekly"><div class="lt-section-head"><h3>Recruiter performance</h3>${copyBtnHtml('ltWeeklyTable')}</div><p class="hint">${rangeText} · ${report.members.length} recruiters · includes the team leader</p><p class="hint">👍 Both targets met · 🟰 within 2 schedules of target / visit rate 60–69.9% · 👎 below these ranges. Visit-rate minimum: 70%. Schedule target: 10 per assigned working day (50 for a full week).</p><div class="hp-table-wrap"><table class="ep-table" id="ltWeeklyTable"><thead>${ltHeaders('<th>Schedule target</th><th>Goal reach</th>')}</thead><tbody>${report.members.map(x=>ltRow(x,self,`<td>${tgNumber(x.goal)}</td><td>${tgRate(x.schedules,x.goal)}</td>`)).join('')||'<tr><td colspan="9">No team members in this selection.</td></tr>'}</tbody><tfoot><tr><td>Team total</td>${TG_METRICS.map(([k])=>`<td>${tgNumber(report.total[k])}</td>`).join('')}<td>${tgNumber(report.total.goal)}</td><td>${tgRate(report.total.schedules,report.total.goal)}</td></tr></tfoot></table></div></section>
+ <details ${openGoals?'open':''} class="panel lt-break-card" id="ltGoalChecks" data-section="team.goals"><summary><span><strong>Schedule goals & third break</strong><small>${fmtDate(checkDay)}${checkDay===today?' · today':' · historical check'} · daily 10 + weekly 50 required</small></span><span class="lt-break-counts"><span class="pill good">${eligible.length} eligible</span>${missed.length?`<span class="pill warn">${missed.length} need attention</span>`:''}${unknown.length?`<span class="pill pending">${unknown.length} awaiting data</span>`:''}<span class="hint">View recruiters ▾</span></span></summary><div class="hp-table-wrap"><table class="ep-table"><thead><tr><th>Recruiter</th><th>Day / 10 · ${fmtDate(checkDay).replace(/, \d{4}$/,'')}</th><th>${weekTo<today?'Week':'Week to date'} / 50</th><th>${mode==='day'?'Daily':'Weekly'} goal status</th><th>Third break</th></tr></thead><tbody>${checks.map(x=>`<tr><td><button class="entity-link" data-lt-person="${escapeHtml(x.name)}">${escapeHtml(x.name)}</button>${x.name===self?' (You)':''}</td><td class="rc-${x.daySignal.schedule}">${recruiterSignalHtml(x.daySignal)} ${tgNumber(x.daily)} / 10<small class="rc-rate">${x.daySignal.ratio===null?'Visit rate unavailable':x.daySignal.ratio.toFixed(1)+'% visit rate'}</small></td><td class="rc-${x.weekSignal.schedule}">${recruiterSignalHtml(x.weekSignal)} ${tgNumber(x.weekly)} / 50<small class="rc-rate">${x.weekSignal.ratio===null?'Visit rate unavailable':x.weekSignal.ratio.toFixed(1)+'% visit rate'}</small></td><td><span class="pill ${x.goalMet?'good':x.late||x.mid?'warn':'pending'}">${x.status}</span>${x.mid?' · below halfway after midweek':''}</td><td><span class="pill ${x.eligible?'good':'pending'}">${!x.known?'Awaiting data':x.eligible?'Eligible':'Daily and weekly targets required'}</span></td></tr>`).join('')||'<tr><td colspan="5">No assigned recruiters in this division on this day.</td></tr>'}</tbody></table></div><p class="hint">🤬 under 50% of schedule goal · 🫡 50–80% · 🫰 81–100% · 🤩 above 100% (daily goal 10, weekly goal 50 — judged separately). Goal status follows the selected view: daily / 10 or weekly / 50. Third-break eligibility is separate and requires both on the check date. Weekly progress includes earlier team assignments.</p></details>
+ <section class="panel" data-section="team.weekly"><div class="lt-section-head"><h3>Recruiter performance</h3>${copyBtnHtml('ltWeeklyTable')}</div><p class="hint">${rangeText} · ${report.members.length} recruiters · includes the team leader</p><p class="hint">🤬 under 50% of schedule goal · 🫡 50–80% · 🫰 81–100% · 🤩 above 100%. Numbers: green at/above minimum, yellow within 2 schedules or 60–69.9% visits, red below. Visit-rate minimum: 70%. Schedule target: 10 per assigned working day (50 for a full week).</p><div class="hp-table-wrap"><table class="ep-table" id="ltWeeklyTable"><thead>${ltHeaders('<th>Schedule target</th><th>Goal reach</th>')}</thead><tbody>${report.members.map(x=>ltRow(x,self,`<td>${tgNumber(x.goal)}</td><td>${tgRate(x.schedules,x.goal)}</td>`)).join('')||'<tr><td colspan="9">No team members in this selection.</td></tr>'}</tbody><tfoot><tr><td>Team total</td>${TG_METRICS.map(([k])=>`<td>${tgNumber(report.total[k])}</td>`).join('')}<td>${tgNumber(report.total.goal)}</td><td>${tgRate(report.total.schedules,report.total.goal)}</td></tr></tfoot></table></div></section>
  <section class="panel" data-section="team.charts"><div class="lt-section-head"><h3>Goals & activity</h3><span class="hint">${rangeText}</span></div><div class="tg-charts"><div><h4>Schedules · goal vs achieved</h4><div class="tg-chart"><canvas id="ltGoals" role="img" aria-label="Selected period schedule targets versus achieved"></canvas></div></div><div><h4>Schedules, visits & hires · daily timeline</h4><div class="tg-chart"><canvas id="ltTimeline" role="img" aria-label="Daily activity within the selected period"></canvas></div></div></div></section>
  <section class="panel" data-section="team.daily"><div class="lt-section-head"><h3>Daily breakdown</h3>${copyBtnHtml('ltTodayTable')}</div><p class="hint">${rangeText} · same team and division selection</p><div class="hp-table-wrap"><table class="ep-table" id="ltTodayTable"><thead><tr><th>Date</th>${TG_METRICS.map(([,l])=>`<th>${l}</th>`).join('')}</tr></thead><tbody>${daily.map(x=>{const target=[...new Set(g.memberships.filter(m=>tgActive(g,m.name,x.date)&&(!g.division||(getEffectiveRecruiterDivision(m.name,weekOfDate(x.date).weekEnd)||'Unassigned')===g.division)).map(m=>m.name))].length*10,signal=recruiterSignal(x.r.total.schedules,x.r.total.shows,x.r.total.scheduledDateOf,target);return `<tr><td>${fmtDate(x.date)}</td>${TG_METRICS.map(([k])=>`<td class="${k==='schedules'?'rc-'+signal.schedule:k==='shows'?'rc-'+signal.visits:''}">${tgNumber(x.r.total[k])}</td>`).join('')}</tr>`;}).join('')}</tbody></table></div></section><section class="panel" data-section="team.candidates" id="ltScheduledCandidates"></section><div id="ltPersonHost"></div>`;
  ltRenderScheduledCandidates(g);
