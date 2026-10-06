@@ -1200,6 +1200,10 @@ body.team-workspace .content{padding-top:10px!important}
 .ta-box li>div{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.ta-where{font-size:11px;color:#5c7480;background:#eef3f5;border-radius:5px;padding:1px 6px}
 .ta-box b{color:#132f3b;font-weight:600}.ta-sev3 b{color:#a12d36}.ta-sev2 b{color:#b0562f}.ta-sev1 b{color:#8a6a1f}
 .ta .hint{font-size:12px;line-height:1.5}.ta .lt-section-head{flex-wrap:wrap;gap:4px 12px}.ta-team{display:block;font-size:10.5px;color:#7a8f99;font-weight:500}.ta-behind{display:block;font-size:10.5px;color:#a12d36;font-weight:600}.ta-matrix tr.lt-mine td{box-shadow:inset 0 1px 0 #2f8f8a,inset 0 -1px 0 #2f8f8a}.ta-matrix th.ta-grp{text-align:center;border-bottom:2px solid #dbe5e8;background:#eef4f5;color:#2c4652}.ta-matrix .ta-plain{color:#10303c;font-weight:700}.ta-highlights{padding:14px!important}.ta-highlights .ta-cols{margin:0}
+.ta-rec-head{align-items:center}.ta-tools{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.ta-brk-ctl{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.switch-chip{display:inline-flex;align-items:center;gap:7px;font:inherit;font-size:12px;font-weight:600;color:#3f5863;background:#fff;border:1px solid #d6e2e6;border-radius:999px;padding:4px 10px 4px 5px;cursor:pointer}
+.switch-chip i{width:26px;height:15px;border-radius:999px;background:#cfd9dd;position:relative;transition:background .15s}.switch-chip i:after{content:'';position:absolute;left:2px;top:2px;width:11px;height:11px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 2px #0003}
+.switch-chip[aria-checked="true"] i{background:#2f8f8a}.switch-chip[aria-checked="true"] i:after{transform:translateX(11px)}
 .ta-name{display:flex;align-items:center;gap:6px;white-space:nowrap}.ta-sub{display:block;font-size:10.5px;color:#6a808b;margin-top:3px}
 .ta-legend{margin-top:8px}.ta-legend summary{cursor:pointer;font-size:12px;color:#5c7480}
 .lt-tabs-panel{padding:0!important;overflow:hidden}.lt-tabs{display:flex;align-items:center;gap:4px;padding:8px 10px 0;border-bottom:1px solid #e1eaed;background:#f7fafb;flex-wrap:wrap}
@@ -7137,7 +7141,7 @@ const PAGE_SECTIONS = {
                 ['perf.kpi.placed','· Placed card (of hires, of shows)'],['perf.detail.placed','·· Placed — click-through details'],
                 ['perf.detail.part.trend','Card details — 12-week trend'],['perf.detail.part.divisions','Card details — division split'],['perf.detail.part.recruiters','Card details — recruiter ranking'],['perf.detail.part.branches','Card details — branch ranking'],['perf.detail.all_people','Card details — all recruiters & branches (untick = only their assigned team)'],
                 ['perf.trends','Trends charts'],['perf.leaderboards','Leaderboards (recruiter & branch snapshots)'],['perf.divisions','Division breakdown'],['perf.history','Previous 6 weeks table'],['perf.insights','Insights'],['perf.composition','Composition pies (monthly / quarterly)']],
-  teams:[['team.summary','Team — summary cards'],['team.analytics','Team highlights'],['team.analytics.wins','· Winning list'],['team.analytics.attention','· Needs attention list'],['team.analytics.branches','Team — By branch tab'],['team.recruiters','Team — recruiter table'],['team.goals','· Today & third-break columns'],['team.charts','Team — Charts tab'],['team.daily','Team — Day by day tab'],['team.candidates','Team — Scheduled today tab'],['team.kpi.schedules','· Schedules vs goal card'],['team.kpi.goal_reach','·· Goal reach % line'],['team.kpi.interviews','· Interviews card'],['team.kpi.shows','·· Shows + show rate line'],['team.kpi.no_shows','·· No shows + no-show rate line'],['team.kpi.hires','· Hires per recruiter card'],['team.kpi.hire_rate','·· Hire rate line'],['team.kpi.placed','· Placed card']],
+  teams:[['team.summary','Team — summary cards'],['team.analytics','Team highlights'],['team.analytics.wins','· Winning list'],['team.analytics.attention','· Needs attention list'],['team.analytics.branches','Team — By branch tab'],['team.recruiters','Team — recruiter table'],['team.goals','· Today & third-break columns (they can also hide these themselves)'],['team.charts','Team — Charts tab'],['team.daily','Team — Day by day tab'],['team.candidates','Team — Scheduled today tab'],['team.kpi.schedules','· Schedules vs goal card'],['team.kpi.goal_reach','·· Goal reach % line'],['team.kpi.interviews','· Interviews card'],['team.kpi.shows','·· Shows + show rate line'],['team.kpi.no_shows','·· No shows + no-show rate line'],['team.kpi.hires','· Hires per recruiter card'],['team.kpi.hire_rate','·· Hire rate line'],['team.kpi.placed','· Placed card']],
   recruiters:[['rec.table','Recruiter table'],['hist.kpis','History page — summary tiles (recruiter & branch)'],['hist.trend','History page — week-by-week chart'],['hist.goal','History page — schedules vs goal chart'],['hist.weeks','History page — every-week table'],['hist.remarks','History page — remarks'],['hist.candidates','History page — candidates']],
   branches:[['br.table','Branch table'],['hist.team','History page — recruiters in the branch']],
   candidates:[['cand.list','Category boxes and candidate list'],['cand.explain','“How are these counted?” breakdown']],
@@ -8624,6 +8628,7 @@ function drawUserForm(){
       <label class="role-opt"><input type="radio" name="ufRole" value="user" ${u.role!=='admin'?'checked':''}><span><strong>User</strong><em>Only the modules and sections you tick below</em></span></label>
       <label class="role-opt"><input type="radio" name="ufRole" value="admin" ${u.role==='admin'?'checked':''}><span><strong>Admin</strong><em>Every module, approves remarks, manages users (can’t change passwords, admins or the super admin)</em></span></label></div>` : ''}
     ${sa?'<p class="hint">The super admin always has every right.</p>':`<p class="hint admin-note" ${u.role==='admin'?'':'hidden'}>Admins see every module and section — the ticks below only apply if you change them back to User.</p><fieldset class="mod-grid"><legend>Modules this person can open</legend>${MODULES.map(m=>`<label class="mod-opt"><input type="checkbox" value="${m.key}" ${u.modules.includes(m.key)?'checked':''}><span><strong>${escapeHtml(m.label)}</strong><em>${escapeHtml(m.hint)}</em></span></label>`).join('')}</fieldset>
+    <label class="mod-opt"><input type="checkbox" data-grant="grant.break_image" ${(u.hidden_sections||[]).includes("grant.break_image")?"checked":""}><span><strong>Copy third-break lists as images</strong><em>My Team: one click copies the eligible and not-yet-eligible recruiters as a picture</em></span></label>
     <label class="mod-opt"><input type="checkbox" data-sec="copy.tables" ${(u.hidden_sections||[]).includes("copy.tables")?"":"checked"}><span><strong>Copy tables</strong><em>Allow copying tables and candidate lists to the clipboard</em></span></label>
     <fieldset class="sec-grid"><legend>What this person sees on each page <span class="hint">(untick to hide a card or section)</span></legend>${Object.entries(PAGE_SECTIONS).map(([mod,secs])=>`<details class="sec-page" data-sec-mod="${mod}" ${mod==='teams'||u.modules.includes(mod)?'':'hidden'}><summary>${escapeHtml((MODULES.find(m=>m.key===mod)||{label:mod==='teams'?'My Team':mod}).label)} <span class="sec-count"></span></summary><div class="sec-list">${secs.map(([k,l])=>`<label class="sec-opt${l.startsWith('··')?' sub sub2':l.startsWith('·')?' sub':''}"><input type="checkbox" data-sec="${k}" ${(u.hidden_sections||[]).includes(k)?'':'checked'}> ${escapeHtml(l.replace(/^·+ /,''))}</label>`).join('')}</div></details>`).join('')}</fieldset>
     <div class="field" style="margin-top:8px;max-width:340px"><label for="ufDefaultView">Default page when they sign in</label><select id="ufDefaultView"><option value="">Their own choice (first page they can open)</option>${defaultViewOptions(u).map(([v,l])=>`<option value="${v}" ${adminDefaultViews()[u.id]===v?'selected':''}>${escapeHtml(l)}</option>`).join('')}</select><span class="hint">They can still change it themselves in Settings → My account.</span></div>
@@ -8648,7 +8653,7 @@ function drawUserForm(){
     if(!isNew) p.id = u.id;
     const pw = host.querySelector('#ufPw').value; if(pw) p.password = pw;
     const roleIn = host.querySelector('input[name="ufRole"]:checked'); if(roleIn) p.role = roleIn.value;
-    if(!sa){ p.modules = [...host.querySelectorAll('.mod-grid input:checked')].map(i=>i.value); p.active = host.querySelector('#ufActive').checked; p.hidden_sections = [...host.querySelectorAll('[data-sec]:not(:checked)')].map(i=>i.dataset.sec); }
+    if(!sa){ p.modules = [...host.querySelectorAll('.mod-grid input:checked')].map(i=>i.value); p.active = host.querySelector('#ufActive').checked; p.hidden_sections = [...host.querySelectorAll('[data-sec]:not(:checked)')].map(i=>i.dataset.sec).concat([...host.querySelectorAll('[data-grant]:checked')].map(i=>i.dataset.grant)); }
     if(isNew && !pw){ host.querySelector('#ufMsg').textContent='Set a password (or click Generate).'; return; }
     try{
       const saved = await Server.rpc('dash_user_save', {p});
@@ -9203,6 +9208,8 @@ function renderTeamGroups(){
   <div class="lt-pane" data-lt-pane="cands" data-section="team.candidates" id="ltScheduledCandidates"></div>
  </section><div id="ltPersonHost"></div>`;
  ltRenderScheduledCandidates(g);
+ host.querySelector('#ltBrkToggle')?.addEventListener('click',()=>{ ltSetBreakVisible(!ltBreakVisible()); renderTeamGroups(); });
+ host.querySelector('#ltBrkImg')?.addEventListener('click',()=>{ if(!canCopyBreakImage()) return; ltCopyBreakImage(AN.breakLists, {team:a.team_name, dayLabel:AN.breakLists.dayLabel, day:AN.breakLists.day}); });
  ltBindTeamPicker(host);
  host.querySelector('#ltDivision').onchange=e=>{ltState.division=e.target.value;renderTeamGroups();};
  host.querySelector('#ltRangeMode').onchange=e=>{ltState.rangeMode=e.target.value;renderTeamGroups();};
@@ -9280,9 +9287,9 @@ function ltAnalytics(g,p,cutoff,mode,today,self,checks=[],checkDay=cutoff){
  const nWin=new Set(wins.map(w=>w.r.name)).size;
  const ck=new Map(checks.map(c=>[c.name,c])), dayLbl=checkDay===today?'Today':fmtDate(checkDay).replace(/, \d{4}$/,'');
  const tier=r=>{const t=goalTier(r.goal);return t.emoji?`<span class="rc-signal" role="img" aria-label="${t.label}" title="${t.label}">${t.emoji}</span>`:'';};
- const todayCell=c=>!c||c.daily==null?'<td class="ta-cell ta-n" data-section="team.goals">–</td>':`<td class="ta-cell ta-${c.daily>=c.dg?'g':c.daily>=c.dg*.5?'a':'r'}" data-section="team.goals">${tgNumber(c.daily)} / ${tgNumber(c.dg)}</td>`;
- const brkCell=c=>!c?'<td class="ta-n" data-section="team.goals">–</td>':`<td data-section="team.goals"><span class="pill ${c.eligible?'good':c.known?'warn':'pending'}">${!c.known?'Awaiting data':c.eligible?'Eligible':'Not yet'}</span><small class="ta-sub">${tgNumber(c.cum)} / ${tgNumber(c.required)}${c.known&&!c.eligible?` · ${tgNumber(c.required-c.cum)} more`:''}</small></td>`;
- const elig=checks.filter(c=>c.eligible).length;
+ const todayCell=c=>!c||c.daily==null?'<td class="ta-cell ta-n">–</td>':`<td class="ta-cell ta-${c.daily>=c.dg?'g':c.daily>=c.dg*.5?'a':'r'}">${tgNumber(c.daily)} / ${tgNumber(c.dg)}</td>`;
+ const brkCell=c=>!c?'<td class="ta-n">–</td>':`<td><span class="pill ${c.eligible?'good':c.known?'warn':'pending'}">${!c.known?'Awaiting data':c.eligible?'Eligible':'Not yet'}</span><small class="ta-sub">${tgNumber(c.cum)} / ${tgNumber(c.required)}${c.known&&!c.eligible?` · ${tgNumber(c.required-c.cum)} more`:''}</small></td>`;
+ const elig=checks.filter(c=>c.eligible).length, showBrk=ltBreakVisible()&&checks.length>0;
  const winMap=new Map(); wins.forEach(w=>{ if(!winMap.has(w.r.name)) winMap.set(w.r.name,{r:w.r,items:[]}); winMap.get(w.r.name).items.push(w.html); });
  const winBy=[...winMap.values()].sort((a,b)=>b.items.length-a.items.length);
  const capList=items=>items.length<=4?`<ul>${items.join('')}</ul>`:`<ul>${items.slice(0,4).join('')}</ul><details class="ta-more"><summary>Show ${items.length-4} more</summary><ul>${items.slice(4).join('')}</ul></details>`;
@@ -9291,15 +9298,15 @@ function ltAnalytics(g,p,cutoff,mode,today,self,checks=[],checkDay=cutoff){
   <div class="ta-box ta-att" data-section="team.analytics.attention"><h4>⚠️ Needs attention <span class="pill warn">${att.length}</span></h4>${att.length?capList(att.map(x=>`<li><div>${who(x.r)}${where(x.r)}</div>${x.issues.sort((m,n)=>n.sev-m.sev).map(i=>`<span class="ta-sev${i.sev}">${i.t}</span>`).join('')}</li>`)):'<p class="hint">Nobody is below the minimums. 🎉</p>'}</div>
  </div></section>`;
  const sorted=rows.slice().sort((a,b)=>(b.goal??-1)-(a.goal??-1));
- const table=`<section class="panel ta" data-section="team.recruiters"><div class="lt-section-head"><h3>Recruiters</h3><span class="hint">${rows.length} on the team${work.length?'':' · no working days yet'}</span>${checks.length?`<span class="pill ${elig?'good':'pending'}" data-section="team.goals" style="margin-left:auto">${elig} of ${checks.length} third-break eligible · ${dayLbl}</span>`:''}${copyBtnHtml('ltRecruiterTable')}</div>
+ const table=`<section class="panel ta" data-section="team.recruiters"><div class="lt-section-head ta-rec-head"><h3>Recruiters</h3><span class="hint">${rows.length} on the team${work.length?'':' · no working days yet'}</span><div class="ta-tools">${checks.length&&canSeeSection('team.goals')?`<div class="ta-brk-ctl" data-section="team.goals">${showBrk?`<span class="pill ${elig?'good':'pending'}">${elig} of ${checks.length} eligible · ${dayLbl}</span>${canCopyBreakImage()?`<button type="button" class="btn btn-secondary btn-sm" id="ltBrkImg" title="Copy eligible and not-yet-eligible recruiters as one image">📷 Copy as image</button>`:''}`:''}<button type="button" class="switch-chip" id="ltBrkToggle" role="switch" aria-checked="${showBrk}"><i></i>Third break</button></div>`:''}${copyBtnHtml('ltRecruiterTable')}</div></div>
  <div class="hp-table-wrap"><table class="ep-table ta-matrix" id="ltRecruiterTable"><thead>
- <tr><th rowspan="2">Recruiter</th><th rowspan="2">Branch</th><th class="ta-grp" colspan="3">Schedules</th><th class="ta-grp" colspan="3">Interviews</th><th class="ta-grp">Hires</th></tr>
- <tr><th>vs goal<small>${mode==='day'?'today':'so far'} · min 90%</small></th><th data-section="team.goals">${dayLbl}<small>daily goal</small></th><th data-section="team.goals">Third break<small>week so far</small></th><th>Interviews</th><th>Shows<small>min 70%</small></th><th>No shows<small>under 20%</small></th><th>Hires<small>of shows</small></th></tr></thead>
- <tbody>${sorted.map(r=>{const c=ck.get(r.name);return `<tr${r.name===self?' class="lt-mine"':''}><td><div class="ta-name">${who(r)} ${tier(r)}</div></td><td>${escapeHtml(r.branch||'–')}</td>${cell('goal',r.goal,r.pace?`${fmtNum(r.x.schedules||0)} / ${tgNumber(r.pace)}`:'')}${todayCell(c)}${brkCell(c)}<td class="ta-cell ta-n ta-plain">${num0(r.x.scheduledDateOf)}</td>${cell('show',r.show,r.x.scheduledDateOf?`${fmtNum(r.x.shows||0)} shows`:'')}${cell('noshow',r.noshow,r.x.scheduledDateOf?(r.noshow==null?'outcomes pending':`${fmtNum(r.x.noShows||0)} no shows`):'')}<td class="ta-cell ta-${band.hire(r.hire)||'n'}">${num0(r.x.i9)}<small>${r.hire==null?(r.x.shows?`of ${fmtNum(r.x.shows)} shows`:''):pc(r.hire)+' of '+fmtNum(r.x.shows)}</small></td></tr>`;}).join('')||'<tr><td colspan="9">No team members in this selection.</td></tr>'}</tbody>
- <tfoot><tr><td>Team</td><td></td><td>${pc(team.goal)}<small class="hint"> ${fmtNum(T.schedules||0)} / ${tgNumber(rows.reduce((a,r)=>a+r.pace,0))}</small></td><td data-section="team.goals"></td><td data-section="team.goals"></td><td>${num0(T.scheduledDateOf)}</td><td>${pc(team.show)}<small class="hint"> ${num0(T.shows)}</small></td><td>${pc(team.noshow)}<small class="hint"> ${num0(T.noShows)}</small></td><td>${num0(T.i9)}<small class="hint"> ${pc(team.hire)}</small></td></tr></tfoot></table></div>
+ <tr><th rowspan="2">Recruiter</th><th rowspan="2">Branch</th><th class="ta-grp" colspan="${showBrk?3:1}">Schedules</th><th class="ta-grp" colspan="3">Interviews</th><th class="ta-grp">Hires</th></tr>
+ <tr><th>vs goal<small>${mode==='day'?'today':'so far'} · min 90%</small></th>${showBrk?`<th>${dayLbl}<small>daily goal</small></th><th>Third break<small>week so far</small></th>`:''}<th>Interviews</th><th>Shows<small>min 70%</small></th><th>No shows<small>under 20%</small></th><th>Hires<small>of shows</small></th></tr></thead>
+ <tbody>${sorted.map(r=>{const c=ck.get(r.name);return `<tr${r.name===self?' class="lt-mine"':''}><td><div class="ta-name">${who(r)} ${tier(r)}</div></td><td>${escapeHtml(r.branch||'–')}</td>${cell('goal',r.goal,r.pace?`${fmtNum(r.x.schedules||0)} / ${tgNumber(r.pace)}`:'')}${showBrk?todayCell(c)+brkCell(c):''}<td class="ta-cell ta-n ta-plain">${num0(r.x.scheduledDateOf)}</td>${cell('show',r.show,r.x.scheduledDateOf?`${fmtNum(r.x.shows||0)} shows`:'')}${cell('noshow',r.noshow,r.x.scheduledDateOf?(r.noshow==null?'outcomes pending':`${fmtNum(r.x.noShows||0)} no shows`):'')}<td class="ta-cell ta-${band.hire(r.hire)||'n'}">${num0(r.x.i9)}<small>${r.hire==null?(r.x.shows?`of ${fmtNum(r.x.shows)} shows`:''):pc(r.hire)+' of '+fmtNum(r.x.shows)}</small></td></tr>`;}).join('')||'<tr><td colspan="9">No team members in this selection.</td></tr>'}</tbody>
+ <tfoot><tr><td>Team</td><td></td><td>${pc(team.goal)}<small class="hint"> ${fmtNum(T.schedules||0)} / ${tgNumber(rows.reduce((a,r)=>a+r.pace,0))}</small></td>${showBrk?'<td></td><td></td>':''}<td>${num0(T.scheduledDateOf)}</td><td>${pc(team.show)}<small class="hint"> ${num0(T.shows)}</small></td><td>${pc(team.noshow)}<small class="hint"> ${num0(T.noShows)}</small></td><td>${num0(T.i9)}<small class="hint"> ${pc(team.hire)}</small></td></tr></tfoot></table></div>
  <details class="ta-legend"><summary>How this is coloured</summary><p class="hint">Green at or above the minimum · amber close · red below. Emoji by share of schedule goal: 🤬 under 50% · 🫡 50–80% · 🫰 81–100% · 🤩 above 100%. Goals come from Settings → Goals (default ${DEFAULT_WEEKLY_GOAL} a week, daily goal = weekly ÷ 5). Third break needs the daily goal × working days so far this week. Hires are coloured by hire rate against the team average. Rates need at least 3 interviews or recorded outcomes.</p></details></section>`;
  const branches=brRows.length>1?`<div class="hp-table-wrap"><table class="ep-table ta-matrix"><thead><tr><th>Branch</th><th>Recruiters</th><th>Schedules vs goal</th><th>Interviews</th><th>Show rate</th><th>No-show rate</th><th>Hires</th></tr></thead><tbody>${brRows.map(x=>`<tr><td>${escapeHtml(x.b)}</td><td>${x.o.n}</td>${cell('goal',x.goal,`${fmtNum(x.o.s)} / ${tgNumber(x.o.pace)}`)}<td class="ta-cell ta-n ta-plain">${fmtNum(x.o.i)}</td>${cell('show',x.show,`${fmtNum(x.o.sh)} shows`)}${cell('noshow',x.noshow,`${fmtNum(x.o.ns)} no shows`)}<td class="ta-cell ta-${band.hire(x.hire)||'n'}">${fmtNum(x.o.h)}<small>${pc(x.hire)} of shows</small></td></tr>`).join('')}</tbody></table></div>`:'';
- return {highlights,table,branches};
+ return {highlights,table,branches,breakLists:{eligible:checks.filter(c=>c.eligible).map(c=>({...c,branch:ltBranchOf(c.name,p.from,cutoff)})),notyet:checks.filter(c=>c.known&&!c.eligible).map(c=>({...c,branch:ltBranchOf(c.name,p.from,cutoff)})).sort((a,b)=>(b.cum/b.required)-(a.cum/a.required)),dayLabel:fmtDate(checkDay),day:checkDay}};
 }
 // ---------- Team leads comparison (admins): every lead's team side by side ----------
 const ltLeads={owner:null,teams:null,loading:false,error:'',at:0};
@@ -9395,6 +9402,49 @@ function renderLeadsView(){
   Object.assign(ltState,{owner:String(Server.user.id),viewingId:b.dataset.ltLead,assignment:null,loaded:false,loading:false,error:'',division:leadsState.division,rangeMode:mode,anchor:leadsState.anchor});ltState.requestSeq++;
   currentView='teams'; document.querySelectorAll('#navList button').forEach(x=>x.classList.toggle('active',x.dataset.view==='teams')); refreshUI(); window.scrollTo(0,0);
  });
+}
+// Third-break columns: each person can show/hide them (this browser); admins can also take the columns away (team.goals).
+function ltBreakVisible(){ return canSeeSection('team.goals') && lsGet('ipd_show_break:'+(Server.user?.id||''))!=='0'; }
+function ltSetBreakVisible(on){ lsSet('ipd_show_break:'+(Server.user?.id||''), on?'1':'0'); }
+// Granted right (opt-in): copy the eligible / not-yet lists as an image.
+function canCopyBreakImage(){ return !!Server.user && (Server.user.role!=='user' || (Server.user.hidden_sections||[]).includes('grant.break_image')); }
+async function ltCopyBreakImage(lists, meta){
+  const W=760, P=28, rowH=46, secHead=54, headH=96, footH=40, dpr=2;
+  const secs=[{ok:true,list:lists.eligible},{ok:false,list:lists.notyet}];
+  const H=headH+secs.reduce((h,x)=>h+secHead+Math.max(1,x.list.length)*rowH+14,0)+footH;
+  const cv=document.createElement('canvas'); cv.width=W*dpr; cv.height=H*dpr; const c=cv.getContext('2d'); c.scale(dpr,dpr);
+  const font=(w,sz)=>`${w} ${sz}px Inter, "Segoe UI", system-ui, -apple-system, sans-serif`;
+  const rr=(x,y,w,h,r)=>{c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();};
+  c.fillStyle='#ffffff'; c.fillRect(0,0,W,H);
+  c.fillStyle='#2f8f8a'; c.fillRect(0,0,W,6);
+  c.fillStyle='#10303c'; c.font=font(800,22); c.fillText(`Third break · ${meta.dayLabel}`,P,48);
+  c.fillStyle='#6a808b'; c.font=font(500,13); c.fillText(`${meta.team} · ${lists.eligible.length} eligible · ${lists.notyet.length} not yet`,P,70);
+  c.textAlign='right'; c.fillText('Schedules this week',W-P,70); c.textAlign='left';
+  let y=headH;
+  secs.forEach(({ok,list})=>{
+    const acc=ok?'#1f9a6c':'#c4871a', tint=ok?'#e9f6f0':'#fdf4df';
+    const badge=(ok?'✓  ELIGIBLE':'⏳  NOT YET ELIGIBLE')+`  ·  ${list.length}`; c.font=font(700,13); const bw=c.measureText(badge).width+28;
+    c.fillStyle=tint; rr(P,y+10,bw,28,14); c.fill(); c.fillStyle=acc; c.fillText(badge,P+14,y+29);
+    c.fillStyle=acc; c.fillRect(P+bw+10,y+24,W-2*P-bw-10,1.5);
+    y+=secHead;
+    (list.length?list:[null]).forEach((x,i)=>{
+      if(i%2===0){ c.fillStyle='#f6f9fa'; c.fillRect(P-10,y,W-2*P+20,rowH); }
+      if(!x){ c.fillStyle='#6a808b'; c.font=font(500,14); c.fillText(ok?'Nobody is eligible yet.':'Everyone is eligible. 🎉',P,y+28); y+=rowH; return; }
+      c.fillStyle='#10303c'; c.font=font(600,15); c.fillText(x.name,P,y+21);
+      c.fillStyle='#7a8f99'; c.font=font(500,12); c.fillText(x.branch||'',P,y+37);
+      c.textAlign='right'; c.fillStyle=ok?'#15633f':'#8a6a1f'; c.font=font(700,16); c.fillText(`${tgNumber(x.cum)} / ${tgNumber(x.required)}`,W-P,y+21);
+      c.fillStyle='#7a8f99'; c.font=font(500,12); c.fillText(ok?(x.cum>x.required?`${tgNumber(x.cum-x.required)} above`:'on target'):`${tgNumber(Math.max(0,x.required-x.cum))} more needed`,W-P,y+37);
+      c.textAlign='left'; y+=rowH;
+    });
+    y+=14;
+  });
+  c.fillStyle='#9aa9b0'; c.font=font(500,11); c.fillText(`Needs the daily goal × working days so far this week · ${new Date().toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}`,P,H-16);
+  const blob=await new Promise(r=>cv.toBlob(r,'image/png'));
+  if(navigator.clipboard?.write && typeof ClipboardItem!=='undefined'){
+    try{ await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]); showToast('Third-break list copied as an image — paste it anywhere.'); return; }catch(e){}
+  }
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`third-break-${meta.day}.png`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  showToast('Your browser blocked image copying, so the image was downloaded instead.');
 }
 async function ltRenderScheduledCandidates(g){
  const host=document.getElementById('ltScheduledCandidates');if(!host)return;
