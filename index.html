@@ -1210,7 +1210,10 @@ body.team-workspace .content{padding-top:10px!important}
 .lt-tabs button{font:inherit;font-size:13px;font-weight:600;color:#5c7480;background:none;border:0;border-bottom:2px solid transparent;padding:9px 12px;cursor:pointer;border-radius:8px 8px 0 0}
 .lt-tabs button:hover{color:#10303c;background:#eef4f5}.lt-tabs button.active{color:#10303c;border-bottom-color:#2f8f8a;background:#fff}
 .lt-tabs-range{margin-left:auto;padding-right:6px;font-size:12px!important}.ta-more summary{cursor:pointer;font-size:12px;color:#2f8f8a;font-weight:600;margin-top:8px}.ta-more ul{margin-top:8px!important}.ta-box ul{max-height:none!important}.lt-pane{padding:16px}.lt-pane-head{display:flex;justify-content:flex-end;margin-bottom:8px}
-#ltScheduledCandidates .lt-pane-head{align-items:center;margin:8px 0 0}#ltScheduledCandidates .lt-pane-head .hint{font-size:12px}.lt-empty{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:18px;border:1px dashed #d6e2e6;border-radius:12px;background:#fbfdfd;color:#3f5863;font-size:13px}.lt-empty strong{color:#10303c;font-size:14px}.lt-empty .btn{margin-top:4px}
+#ltScheduledCandidates .lt-pane-head{align-items:center;margin:8px 0 0}#ltScheduledCandidates .lt-pane-head .hint{font-size:12px}.bc-intro{margin:0 0 10px;font-size:12.5px!important}.bc-table td{vertical-align:middle;font-variant-numeric:tabular-nums}.bc-table td small{display:block;font-size:10.5px;font-weight:600}
+.bc-branch{font-weight:700;color:#10303c;border-right:1px solid #e4ecef;background:#fbfdfd}.bc-mine td{border-bottom:0!important}.bc-other td{color:#5c7480;border-bottom:2px solid #e1eaed!important}
+.bc-up b{color:#15633f}.bc-up small{color:#1f9a6c!important}.bc-down b{color:#a12d36}.bc-down small{color:#c4565f!important}
+.lt-empty{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:18px;border:1px dashed #d6e2e6;border-radius:12px;background:#fbfdfd;color:#3f5863;font-size:13px}.lt-empty strong{color:#10303c;font-size:14px}.lt-empty .btn{margin-top:4px}
 .ta-h{margin:4px 0 8px;font-size:13px;color:#132f3b}
 .ta-matrix th small{display:block;font-weight:500;text-transform:none;letter-spacing:0;color:#7a8f99;font-size:10.5px}
 .ta-cell{font-weight:700;font-variant-numeric:tabular-nums}.ta-cell small{display:block;font-weight:500;font-size:10.5px;color:#6a808b}
@@ -9188,7 +9191,10 @@ function renderTeamGroups(){
  const a=ltState.assignment,now=new Date(),today=ltToday(now),zone=Intl.DateTimeFormat().resolvedOptions().timeZone;
  const anchor=ltState.anchor||today,mode=ltState.rangeMode||ltDefaultMode(now),p=ltRange(mode,anchor),cutoff=p.to>today?today:p.to;
  const g={...ltGroup(a),division:ltState.division},report=ltReport(g,p.from,p.to,today);
- const days=tgDays(p.from,cutoff),byDay=new Map(report.daily.map(x=>[x.label,x]));
+ // Day by day: the whole week around the chosen day (Day view), otherwise the selected period.
+ const dw=mode==='day'?weekOfDate(p.from):null, dFrom=dw?dw.weekStart:p.from, dTo=dw?dw.weekEnd:p.to, dCut=dTo>today?today:dTo;
+ const dReport=dw?ltReport(g,dFrom,dTo,today):report;
+ const days=dCut>=dFrom?tgDays(dFrom,dCut):[],byDay=new Map(dReport.daily.map(x=>[x.label,x]));
  const daily=days.map(date=>({date,r:{total:byDay.get(date)||Object.fromEntries(TG_METRICS.map(([k])=>[k,null]))}}));
  // Break eligibility is always tied to one day, shown explicitly when viewing a week/month.
  let checkDay=cutoff;if(mode!=='day'){while(checkDay>p.from&&[0,6].includes(new Date(checkDay+'T12:00:00Z').getUTCDay()))checkDay=tgShift(checkDay,-1);}
@@ -9215,10 +9221,10 @@ function renderTeamGroups(){
    <button role="tab" data-lt-tab="daily" data-section="team.daily">Day by day</button>
    ${AN.branches?'<button role="tab" data-lt-tab="branches" data-section="team.analytics.branches">By branch</button>':''}
    <button role="tab" data-lt-tab="cands" data-section="team.candidates">Scheduled candidates</button>
-   <span class="hint lt-tabs-range">${rangeText}</span>
+   <span class="hint lt-tabs-range" data-range="${escapeHtml(rangeText)}" data-week="${escapeHtml(dw?fmtDate(dFrom)+' – '+fmtDate(dTo):rangeText)}">${rangeText}</span>
   </div>
   <div class="lt-pane" data-lt-pane="charts" data-section="team.charts"><div class="tg-charts"><div><h4>Schedules · goal vs achieved</h4><div class="tg-chart"><canvas id="ltGoals" role="img" aria-label="Selected period schedule targets versus achieved"></canvas></div></div><div><h4>Schedules, visits & hires · daily timeline</h4><div class="tg-chart"><canvas id="ltTimeline" role="img" aria-label="Daily activity within the selected period"></canvas></div></div></div></div>
-  <div class="lt-pane" data-lt-pane="daily" data-section="team.daily"><div class="lt-pane-head">${copyBtnHtml('ltTodayTable')}</div><div class="hp-table-wrap"><table class="ep-table" id="ltTodayTable"><thead><tr><th>Date</th>${TG_METRICS.map(([,l])=>`<th>${l}</th>`).join('')}</tr></thead><tbody>${daily.map(x=>{const target=[...new Set(g.memberships.filter(m=>tgActive(g,m.name,x.date)&&(!g.division||(getEffectiveRecruiterDivision(m.name,weekOfDate(x.date).weekEnd)||'Unassigned')===g.division)).map(m=>m.name))].reduce((sum,n)=>sum+ltDailyGoal(n,x.date),0),signal=recruiterSignal(x.r.total.schedules,x.r.total.shows,x.r.total.scheduledDateOf,target);return `<tr><td>${fmtDate(x.date)}</td>${TG_METRICS.map(([k])=>`<td class="${k==='schedules'?'rc-'+signal.schedule:k==='shows'?'rc-'+signal.visits:''}">${tgNumber(x.r.total[k])}</td>`).join('')}</tr>`;}).join('')}</tbody></table></div></div>
+  <div class="lt-pane" data-lt-pane="daily" data-section="team.daily"><div class="lt-pane-head">${copyBtnHtml('ltTodayTable')}</div><div class="hp-table-wrap"><table class="ep-table" id="ltTodayTable"><thead><tr><th>Date</th>${TG_METRICS.map(([,l])=>`<th>${l}</th>`).join('')}</tr></thead><tbody>${daily.map(x=>{const target=[...new Set(g.memberships.filter(m=>tgActive(g,m.name,x.date)&&(!g.division||(getEffectiveRecruiterDivision(m.name,weekOfDate(x.date).weekEnd)||'Unassigned')===g.division)).map(m=>m.name))].reduce((sum,n)=>sum+ltDailyGoal(n,x.date),0),signal=recruiterSignal(x.r.total.schedules,x.r.total.shows,x.r.total.scheduledDateOf,target);return `<tr${mode==='day'&&x.date===p.from?' class="lt-mine"':''}><td>${new Date(x.date+'T12:00:00Z').toLocaleDateString(undefined,{weekday:'short',timeZone:'UTC'})} · ${fmtDate(x.date)}${mode==='day'&&x.date===p.from?' <span class="pill good">selected</span>':''}</td>${TG_METRICS.map(([k])=>`<td class="${k==='schedules'?'rc-'+signal.schedule:k==='shows'?'rc-'+signal.visits:''}">${tgNumber(x.r.total[k])}</td>`).join('')}</tr>`;}).join('')||'<tr><td colspan="7">No days yet in this week.</td></tr>'}</tbody><tfoot><tr><td>${dw?'Week so far':'Total'}</td>${TG_METRICS.map(([k])=>`<td>${tgNumber(dReport.total[k])}</td>`).join('')}</tr></tfoot></table></div></div>
   ${AN.branches?`<div class="lt-pane" data-lt-pane="branches" data-section="team.analytics.branches">${AN.branches}</div>`:''}
   <div class="lt-pane" data-lt-pane="cands" data-section="team.candidates" id="ltScheduledCandidates"></div>
  </section><div id="ltPersonHost"></div>`;
@@ -9241,7 +9247,7 @@ function renderTeamGroups(){
  charts.ltTimeline=safeChart(document.getElementById('ltTimeline'),{type:'line',data:{labels:daily.map(x=>fmtDate(x.date)),datasets:[['schedules','Schedules','#218a86'],['shows','Visits (shows)','#487ec1'],['i9','Hires','#825db3']].map(([k,label,c])=>({label,data:daily.map(x=>x.r.total[k]),borderColor:c,backgroundColor:c,spanGaps:false,tension:.2,pointRadius:3}))},options:opts});
  };
  const panes=[...host.querySelectorAll('[data-lt-tab]')], visible=panes.filter(b=>getComputedStyle(b).display!=='none');
- const show=key=>{ ltState.tab=key; panes.forEach(b=>{const on=b.dataset.ltTab===key;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));}); host.querySelectorAll('[data-lt-pane]').forEach(x=>x.hidden=x.dataset.ltPane!==key); if(key==='charts') drawCharts(); };
+ const show=key=>{ ltState.tab=key; panes.forEach(b=>{const on=b.dataset.ltTab===key;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));}); host.querySelectorAll('[data-lt-pane]').forEach(x=>x.hidden=x.dataset.ltPane!==key); const lbl=host.querySelector('.lt-tabs-range'); if(lbl) lbl.textContent=(key==='daily'||key==='charts')?lbl.dataset.week:lbl.dataset.range; if(key==='charts') drawCharts(); };
  panes.forEach(b=>b.onclick=()=>show(b.dataset.ltTab));
  if(visible.length) show(visible.some(b=>b.dataset.ltTab===ltState.tab)?ltState.tab:visible[0].dataset.ltTab); else host.querySelector('.lt-tabs-panel').hidden=true;
 }
@@ -9320,7 +9326,33 @@ function ltAnalytics(g,p,cutoff,mode,today,self,checks=[],checkDay=cutoff){
  <tbody>${sorted.map(r=>{const c=ck.get(r.name);return `<tr${r.name===self?' class="lt-mine"':''}><td><div class="ta-name">${who(r)} ${tier(r)}</div></td><td>${escapeHtml(r.branch||'–')}</td>${cell('goal',r.goal,r.pace?`${fmtNum(r.x.schedules||0)} / ${tgNumber(r.pace)}`:'')}${showBrk?todayCell(c)+brkCell(c):''}<td class="ta-cell ta-n ta-plain">${num0(r.x.scheduledDateOf)}</td>${cell('show',r.show,r.x.scheduledDateOf?`${fmtNum(r.x.shows||0)} shows`:'')}${cell('noshow',r.noshow,r.x.scheduledDateOf?(r.noshow==null?'outcomes pending':`${fmtNum(r.x.noShows||0)} no shows`):'')}<td class="ta-cell ta-${band.hire(r.hire)||'n'}">${num0(r.x.i9)}<small>${r.hire==null?(r.x.shows?`of ${fmtNum(r.x.shows)} shows`:''):pc(r.hire)+' of '+fmtNum(r.x.shows)}</small></td></tr>`;}).join('')||'<tr><td colspan="9">No team members in this selection.</td></tr>'}</tbody>
  <tfoot><tr><td>Team</td><td></td><td>${pc(team.goal)}<small class="hint"> ${fmtNum(T.schedules||0)} / ${tgNumber(rows.reduce((a,r)=>a+r.pace,0))}</small></td>${showBrk?'<td></td><td></td>':''}<td>${num0(T.scheduledDateOf)}</td><td>${pc(team.show)}<small class="hint"> ${num0(T.shows)}</small></td><td>${pc(team.noshow)}<small class="hint"> ${num0(T.noShows)}</small></td><td>${num0(T.i9)}<small class="hint"> ${pc(team.hire)}</small></td></tr></tfoot></table></div>
  <details class="ta-legend"><summary>How this is coloured</summary><p class="hint">Green at or above the minimum · amber close · red below. Emoji by share of schedule goal: 🤬 under 50% · 🫡 50–80% · 🫰 81–100% · 🤩 above 100%. Goals come from Settings → Goals (default ${DEFAULT_WEEKLY_GOAL} a week, daily goal = weekly ÷ 5). Third break needs the daily goal × working days so far this week. Hires are coloured by hire rate against the team average. Rates need at least 3 interviews or recorded outcomes.</p></details></section>`;
- const branches=brRows.length>1?`<div class="hp-table-wrap"><table class="ep-table ta-matrix"><thead><tr><th>Branch</th><th>Recruiters</th><th>Schedules vs goal</th><th>Interviews</th><th>Show rate</th><th>No-show rate</th><th>Hires</th></tr></thead><tbody>${brRows.map(x=>`<tr><td>${escapeHtml(x.b)}</td><td>${x.o.n}</td>${cell('goal',x.goal,`${fmtNum(x.o.s)} / ${tgNumber(x.o.pace)}`)}<td class="ta-cell ta-n ta-plain">${fmtNum(x.o.i)}</td>${cell('show',x.show,`${fmtNum(x.o.sh)} shows`)}${cell('noshow',x.noshow,`${fmtNum(x.o.ns)} no shows`)}<td class="ta-cell ta-${band.hire(x.hire)||'n'}">${fmtNum(x.o.h)}<small>${pc(x.hire)} of shows</small></td></tr>`).join('')}</tbody></table></div>`:'';
+ // Others at the same branches (no names shown): everyone active in the period who isn't on this team.
+ const teamNames=new Set(rows.map(r=>r.name));
+ const everyone=[...new Set(weeksData.filter(w=>w.weekEndDate>=p.from&&tgShift(w.weekEndDate,-6)<=p.to).flatMap(w=>Object.keys(w.byRecruiter||{})))].filter(n=>!teamNames.has(n)&&!excludedRecruitersSet.has(n));
+ const myBranches=[...new Set(rows.map(r=>r.branch).filter(Boolean))];
+ let branches='';
+ if(myBranches.length){
+  const oth=everyone.length?ltReport({name:'others',memberships:everyone.map(n=>({name:n,from:'1900-01-01',to:null})),division:g.division},p.from,p.to,today):{members:[]};
+  const agg=()=>({n:0,s:0,pace:0,i:0,sh:0,ns:0,h:0});
+  const add=(o,x,pace)=>{o.n++;o.s+=x.schedules||0;o.pace+=pace;o.i+=x.scheduledDateOf||0;o.sh+=x.shows||0;o.ns+=x.noShows||0;o.h+=x.i9||0;};
+  const mineBy={}, othBy={};
+  rows.forEach(r=>{ if(!r.branch) return; add(mineBy[r.branch]||(mineBy[r.branch]=agg()),r.x,r.pace); });
+  oth.members.forEach(x=>{ if(!((x.schedules||0)+(x.scheduledDateOf||0)+(x.shows||0)+(x.i9||0))) return; const b=ltBranchOf(x.label,p.from,cutoff); if(!b||!mineBy[b]) return;
+   add(othBy[b]||(othBy[b]=agg()),x,work.reduce((a2,d)=>a2+ltDailyGoal(x.label,d),0)); });
+  const met=o=>!o?null:{n:o.n,per:o.n?o.s/o.n:null,goal:rate(o.s,o.pace),i:o.i,show:rate(o.sh,o.i,3),noshow:rate(o.ns,o.i,3),h:o.h,hire:rate(o.h,o.sh,3),s:o.s,sh:o.sh,ns:o.ns};
+  const cmp=(mine,other,k,lower,fmt)=>{ const v=mine[k]; if(v==null) return '<td class="ta-n">–</td>'; const o=other?other[k]:null;
+   if(o==null) return `<td><b>${fmt(v)}</b></td>`; const d=v-o, better=lower?d<0:d>0, same=Math.abs(d)<(k==='per'?0.05:0.5);
+   return `<td class="${same?'':better?'bc-up':'bc-down'}"><b>${fmt(v)}</b>${same?'<small>level</small>':`<small>${better?'▲':'▼'} ${fmt(Math.abs(d)).replace('%',' pts')}</small>`}</td>`; };
+  const plain=(o,k,fmt)=>o&&o[k]!=null?`<td>${fmt(o[k])}</td>`:'<td class="ta-n">–</td>';
+  const one=v=>v==null?'–':(Math.round(v*10)/10).toLocaleString(), pct0=v=>v==null?'–':v.toFixed(0)+'%';
+  const cols=[['per','Schedules per recruiter',false,one],['goal','Goal reach',false,pct0],['show','Show rate',false,pct0],['noshow','No-show rate',true,pct0],['hire','Hire rate',false,pct0]];
+  const list=myBranches.map(b=>({b,mine:met(mineBy[b]),other:met(othBy[b])})).sort((x,y)=>(y.mine.s||0)-(x.mine.s||0));
+  branches=`<p class="hint bc-intro">How your team compares with the other recruiters working at the same branches in this period. Per-recruiter and rate figures make teams of different sizes comparable. ▲ your team is ahead · ▼ behind.</p>
+  <div class="hp-table-wrap"><table class="ep-table bc-table"><thead><tr><th>Branch</th><th></th><th>Recruiters</th><th>Schedules</th>${cols.map(c=>`<th>${c[1]}</th>`).join('')}<th>Interviews</th><th>Hires</th></tr></thead><tbody>
+  ${list.map(x=>`<tr class="bc-mine"><td rowspan="2" class="bc-branch">${escapeHtml(x.b)}</td><td><span class="pill good">Your team</span></td><td>${x.mine.n}</td><td>${fmtNum(x.mine.s)}</td>${cols.map(([k,,lower,f])=>cmp(x.mine,x.other,k,lower,f)).join('')}<td>${fmtNum(x.mine.i)}</td><td>${fmtNum(x.mine.h)}</td></tr>
+  <tr class="bc-other"><td><span class="pill pending">Other recruiters</span></td>${x.other?`<td>${x.other.n}</td><td>${fmtNum(x.other.s)}</td>${cols.map(([k,,,f])=>plain(x.other,k,f)).join('')}<td>${fmtNum(x.other.i)}</td><td>${fmtNum(x.other.h)}</td>`:`<td colspan="${4+cols.length}" class="ta-n">No other recruiters at this branch in this period</td>`}</tr>`).join('')}
+  </tbody></table></div>`;
+ }
  return {highlights,table,branches,breakLists:{eligible:checks.filter(c=>c.eligible).map(c=>({...c,branch:ltBranchOf(c.name,p.from,cutoff)})),notyet:checks.filter(c=>c.known&&!c.eligible).map(c=>({...c,branch:ltBranchOf(c.name,p.from,cutoff)})).sort((a,b)=>(b.cum/b.required)-(a.cum/a.required)),dayLabel:fmtDate(checkDay),day:checkDay}};
 }
 // ---------- Team leads comparison (admins): every lead's team side by side ----------
