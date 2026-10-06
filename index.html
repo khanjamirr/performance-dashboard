@@ -1199,7 +1199,15 @@ body.team-workspace .content{padding-top:10px!important}
 .ta-box li{border-top:1px dashed #e4ecef;padding-top:7px;font-size:12.5px;color:#3f5863;display:flex;flex-direction:column;gap:2px}.ta-box li:first-child{border-top:0;padding-top:0}
 .ta-box li>div{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.ta-where{font-size:11px;color:#5c7480;background:#eef3f5;border-radius:5px;padding:1px 6px}
 .ta-box b{color:#132f3b;font-weight:600}.ta-sev3 b{color:#a12d36}.ta-sev2 b{color:#b0562f}.ta-sev1 b{color:#8a6a1f}
-.ta .hint{font-size:12px;line-height:1.5}.ta .lt-section-head{flex-wrap:wrap;gap:4px 12px}.ta-team{display:block;font-size:10.5px;color:#7a8f99;font-weight:500}.ta-behind{display:block;font-size:10.5px;color:#a12d36;font-weight:600}.ta-matrix tr.lt-mine td{box-shadow:inset 0 1px 0 #2f8f8a,inset 0 -1px 0 #2f8f8a}.ta-matrix th.ta-grp{text-align:center;border-bottom:2px solid #dbe5e8;background:#eef4f5;color:#2c4652}.ta-matrix .ta-plain{color:#10303c;font-weight:700}.ta-h{margin:4px 0 8px;font-size:13px;color:#132f3b}
+.ta .hint{font-size:12px;line-height:1.5}.ta .lt-section-head{flex-wrap:wrap;gap:4px 12px}.ta-team{display:block;font-size:10.5px;color:#7a8f99;font-weight:500}.ta-behind{display:block;font-size:10.5px;color:#a12d36;font-weight:600}.ta-matrix tr.lt-mine td{box-shadow:inset 0 1px 0 #2f8f8a,inset 0 -1px 0 #2f8f8a}.ta-matrix th.ta-grp{text-align:center;border-bottom:2px solid #dbe5e8;background:#eef4f5;color:#2c4652}.ta-matrix .ta-plain{color:#10303c;font-weight:700}.ta-highlights{padding:14px!important}.ta-highlights .ta-cols{margin:0}
+.ta-name{display:flex;align-items:center;gap:6px;white-space:nowrap}.ta-sub{display:block;font-size:10.5px;color:#6a808b;margin-top:3px}
+.ta-legend{margin-top:8px}.ta-legend summary{cursor:pointer;font-size:12px;color:#5c7480}
+.lt-tabs-panel{padding:0!important;overflow:hidden}.lt-tabs{display:flex;align-items:center;gap:4px;padding:8px 10px 0;border-bottom:1px solid #e1eaed;background:#f7fafb;flex-wrap:wrap}
+.lt-tabs button{font:inherit;font-size:13px;font-weight:600;color:#5c7480;background:none;border:0;border-bottom:2px solid transparent;padding:9px 12px;cursor:pointer;border-radius:8px 8px 0 0}
+.lt-tabs button:hover{color:#10303c;background:#eef4f5}.lt-tabs button.active{color:#10303c;border-bottom-color:#2f8f8a;background:#fff}
+.lt-tabs-range{margin-left:auto;padding-right:6px;font-size:12px!important}.ta-more summary{cursor:pointer;font-size:12px;color:#2f8f8a;font-weight:600;margin-top:8px}.ta-more ul{margin-top:8px!important}.ta-box ul{max-height:none!important}.lt-pane{padding:16px}.lt-pane-head{display:flex;justify-content:flex-end;margin-bottom:8px}
+.lt-pane#ltScheduledCandidates>h3:first-child{display:none}
+.ta-h{margin:4px 0 8px;font-size:13px;color:#132f3b}
 .ta-matrix th small{display:block;font-weight:500;text-transform:none;letter-spacing:0;color:#7a8f99;font-size:10.5px}
 .ta-cell{font-weight:700;font-variant-numeric:tabular-nums}.ta-cell small{display:block;font-weight:500;font-size:10.5px;color:#6a808b}
 .ta-g{background:#e9f6f0;color:#17684a}.ta-a{background:#fdf4df;color:#8a6a1f}.ta-r{background:#fde8e8;color:#a12d36}.ta-n{color:#9aa9b0}
@@ -7129,7 +7137,7 @@ const PAGE_SECTIONS = {
                 ['perf.kpi.placed','· Placed card (of hires, of shows)'],['perf.detail.placed','·· Placed — click-through details'],
                 ['perf.detail.part.trend','Card details — 12-week trend'],['perf.detail.part.divisions','Card details — division split'],['perf.detail.part.recruiters','Card details — recruiter ranking'],['perf.detail.part.branches','Card details — branch ranking'],['perf.detail.all_people','Card details — all recruiters & branches (untick = only their assigned team)'],
                 ['perf.trends','Trends charts'],['perf.leaderboards','Leaderboards (recruiter & branch snapshots)'],['perf.divisions','Division breakdown'],['perf.history','Previous 6 weeks table'],['perf.insights','Insights'],['perf.composition','Composition pies (monthly / quarterly)']],
-  teams:[['team.summary','Team — summary cards'],['team.analytics','Team analytics (all)'],['team.analytics.wins','· Winning list'],['team.analytics.attention','· Needs attention list'],['team.analytics.matrix','· Where each recruiter stands (grid)'],['team.analytics.branches','· By branch'],['team.daily','Team — daily table'],['team.weekly','Team — weekly table'],['team.goals','Team — goal checks and breaks'],['team.charts','Team — charts'],['team.candidates','Team — today’s scheduled candidates'],['team.kpi.schedules','· Schedules vs goal card'],['team.kpi.goal_reach','·· Goal reach % line'],['team.kpi.interviews','· Interviews card'],['team.kpi.shows','·· Shows + show rate line'],['team.kpi.no_shows','·· No shows + no-show rate line'],['team.kpi.hires','· Hires per recruiter card'],['team.kpi.hire_rate','·· Hire rate line'],['team.kpi.placed','· Placed card']],
+  teams:[['team.summary','Team — summary cards'],['team.analytics','Team highlights'],['team.analytics.wins','· Winning list'],['team.analytics.attention','· Needs attention list'],['team.analytics.branches','Team — By branch tab'],['team.recruiters','Team — recruiter table'],['team.goals','· Today & third-break columns'],['team.charts','Team — Charts tab'],['team.daily','Team — Day by day tab'],['team.candidates','Team — Scheduled today tab'],['team.kpi.schedules','· Schedules vs goal card'],['team.kpi.goal_reach','·· Goal reach % line'],['team.kpi.interviews','· Interviews card'],['team.kpi.shows','·· Shows + show rate line'],['team.kpi.no_shows','·· No shows + no-show rate line'],['team.kpi.hires','· Hires per recruiter card'],['team.kpi.hire_rate','·· Hire rate line'],['team.kpi.placed','· Placed card']],
   recruiters:[['rec.table','Recruiter table'],['hist.kpis','History page — summary tiles (recruiter & branch)'],['hist.trend','History page — week-by-week chart'],['hist.goal','History page — schedules vs goal chart'],['hist.weeks','History page — every-week table'],['hist.remarks','History page — remarks'],['hist.candidates','History page — candidates']],
   branches:[['br.table','Branch table'],['hist.team','History page — recruiters in the branch']],
   candidates:[['cand.list','Category boxes and candidate list'],['cand.explain','“How are these counted?” breakdown']],
@@ -9167,7 +9175,7 @@ function renderTeamGroups(){
  const weekTo=weekOfDate(checkDay).weekEnd<today?weekOfDate(checkDay).weekEnd:today;
  const names=[...new Set(g.memberships.filter(m=>m.from<=checkDay&&(!m.to||m.to>=checkDay)).map(m=>m.name))].filter(n=>!g.division||(getEffectiveRecruiterDivision(n,weekOfDate(checkDay).weekEnd)||'Unassigned')===g.division);
  const checks=names.map(n=>ltBreakCheck(n,checkDay,now,mode,weekTo)),eligible=checks.filter(x=>x.eligible),missed=checks.filter(x=>x.late||x.mid),unknown=checks.filter(x=>!x.known);
- const isOwn=String(a.owner_id)===owner,self=isOwn?a.recruiter_name:null,leader=ltState.users?.find(u=>String(u.id)===String(a.owner_id))?.name||Server.user.name;
+ const isOwn=String(a.owner_id)===owner,self=isOwn?a.recruiter_name:null,AN=ltAnalytics(g,p,cutoff,mode,today,isOwn?a.recruiter_name:null,checks,checkDay),leader=ltState.users?.find(u=>String(u.id)===String(a.owner_id))?.name||Server.user.name;
  const divisions=[...new Set(g.memberships.flatMap(m=>weeksData.filter(w=>w.weekEndDate>=p.from&&tgShift(w.weekEndDate,-6)<=p.to).map(w=>getEffectiveRecruiterDivision(m.name,w.weekEndDate)||'Unassigned')))].sort();if(g.division&&!divisions.includes(g.division))divisions.push(g.division);
  const rangeText=mode==='day'?fmtDate(p.from):`${fmtDate(p.from)} – ${fmtDate(p.to)}`;
  host.innerHTML=`<div class="lt-sticky">
@@ -9179,11 +9187,21 @@ function renderTeamGroups(){
  ${report.uncovered?'<p class="lt-data-note">Some selected dates have no import; affected totals are unavailable.</p>':''}
  </div>
  ${ltState.directoryError?`<p class="warn-note">User list unavailable: ${escapeHtml(ltState.directoryError)} <button class="btn btn-secondary" id="ltDirectoryRetry">Retry</button></p>`:''}
- <details ${openGoals?'open':''} class="panel lt-break-card" id="ltGoalChecks" data-section="team.goals"><summary><span><strong>Schedule goals & third break</strong><small>${fmtDate(checkDay)}${checkDay===today?' · today':' · historical check'} · third break needs each recruiter’s daily goal (weekly goal ÷ 5) × working days so far this week</small></span><span class="lt-break-counts"><span class="pill good">${eligible.length} eligible</span>${missed.length?`<span class="pill warn">${missed.length} need attention</span>`:''}${unknown.length?`<span class="pill pending">${unknown.length} awaiting data</span>`:''}<span class="hint">View recruiters ▾</span></span></summary><div class="hp-table-wrap"><table class="ep-table"><thead><tr><th>Recruiter</th><th>Day / goal · ${fmtDate(checkDay).replace(/, \d{4}$/,'')}</th><th>${weekTo<today?'Week':'Week to date'} / goal</th><th>${mode==='day'?'Daily':'Weekly'} goal status</th><th>Third break · needed by ${fmtDate(checkDay).replace(/, \d{4}$/,'')}</th></tr></thead><tbody>${checks.map(x=>`<tr><td><button class="entity-link" data-lt-person="${escapeHtml(x.name)}">${escapeHtml(x.name)}</button>${x.name===self?' (You)':''}</td><td class="rc-${x.daySignal.schedule}">${recruiterSignalHtml(x.daySignal)} ${tgNumber(x.daily)} / ${tgNumber(x.dg)}<small class="rc-rate">${x.daySignal.ratio===null?'Visit rate unavailable':x.daySignal.ratio.toFixed(1)+'% visit rate'}</small></td><td class="rc-${x.weekSignal.schedule}">${recruiterSignalHtml(x.weekSignal)} ${tgNumber(x.weekly)} / ${tgNumber(x.wg)}<small class="rc-rate">${x.weekSignal.ratio===null?'Visit rate unavailable':x.weekSignal.ratio.toFixed(1)+'% visit rate'}</small></td><td><span class="pill ${x.goalMet?'good':x.late||x.mid?'warn':'pending'}">${x.status}</span>${x.mid?' · below halfway after midweek':''}</td><td><span class="pill ${x.eligible?'good':x.known?'warn':'pending'}">${!x.known?'Awaiting data':x.eligible?'Eligible':'Not yet'}</span> ${tgNumber(x.cum)} / ${x.required}${x.known&&!x.eligible?` · ${x.required-x.cum} more`:''}</td></tr>`).join('')||'<tr><td colspan="5">No assigned recruiters in this division on this day.</td></tr>'}</tbody></table></div><p class="hint">🤬 under 50% of schedule goal · 🫡 50–80% · 🫰 81–100% · 🤩 above 100% (weekly goal from Settings → Goals, default ${DEFAULT_WEEKLY_GOAL}; daily goal = weekly ÷ 5 — judged separately). Goal status follows the selected view: daily / 10 or weekly / 50. Third-break eligibility is cumulative: the week's schedules up to the check day must reach 10 × working days so far. Weekly progress includes earlier team assignments.</p></details>
- ${ltAnalytics(g,p,cutoff,mode,today,self)}
- <section class="panel" data-section="team.weekly"><div class="lt-section-head"><h3>Recruiter performance</h3>${copyBtnHtml('ltWeeklyTable')}</div><p class="hint">${rangeText} · ${report.members.length} recruiters · includes the team leader</p><p class="hint">🤬 under 50% of schedule goal · 🫡 50–80% · 🫰 81–100% · 🤩 above 100%. Numbers: green at/above minimum, yellow within 2 schedules or 60–69.9% visits, red below. Visit-rate minimum: 70%. Schedule target: each recruiter’s weekly goal from Settings → Goals (default ${DEFAULT_WEEKLY_GOAL}), split evenly across assigned working days.</p><div class="hp-table-wrap"><table class="ep-table" id="ltWeeklyTable"><thead>${ltHeaders('<th>Schedule target</th><th>Goal reach</th>')}</thead><tbody>${report.members.map(x=>ltRow(x,self,`<td>${tgNumber(x.goal)}</td><td>${tgRate(x.schedules,x.goal)}</td>`)).join('')||'<tr><td colspan="9">No team members in this selection.</td></tr>'}</tbody><tfoot><tr><td>Team total</td>${TG_METRICS.map(([k])=>`<td>${tgNumber(report.total[k])}</td>`).join('')}<td>${tgNumber(report.total.goal)}</td><td>${tgRate(report.total.schedules,report.total.goal)}</td></tr></tfoot></table></div></section>
- <section class="panel" data-section="team.charts"><div class="lt-section-head"><h3>Goals & activity</h3><span class="hint">${rangeText}</span></div><div class="tg-charts"><div><h4>Schedules · goal vs achieved</h4><div class="tg-chart"><canvas id="ltGoals" role="img" aria-label="Selected period schedule targets versus achieved"></canvas></div></div><div><h4>Schedules, visits & hires · daily timeline</h4><div class="tg-chart"><canvas id="ltTimeline" role="img" aria-label="Daily activity within the selected period"></canvas></div></div></div></section>
- <section class="panel" data-section="team.daily"><div class="lt-section-head"><h3>Daily breakdown</h3>${copyBtnHtml('ltTodayTable')}</div><p class="hint">${rangeText} · same team and division selection</p><div class="hp-table-wrap"><table class="ep-table" id="ltTodayTable"><thead><tr><th>Date</th>${TG_METRICS.map(([,l])=>`<th>${l}</th>`).join('')}</tr></thead><tbody>${daily.map(x=>{const target=[...new Set(g.memberships.filter(m=>tgActive(g,m.name,x.date)&&(!g.division||(getEffectiveRecruiterDivision(m.name,weekOfDate(x.date).weekEnd)||'Unassigned')===g.division)).map(m=>m.name))].reduce((sum,n)=>sum+ltDailyGoal(n,x.date),0),signal=recruiterSignal(x.r.total.schedules,x.r.total.shows,x.r.total.scheduledDateOf,target);return `<tr><td>${fmtDate(x.date)}</td>${TG_METRICS.map(([k])=>`<td class="${k==='schedules'?'rc-'+signal.schedule:k==='shows'?'rc-'+signal.visits:''}">${tgNumber(x.r.total[k])}</td>`).join('')}</tr>`;}).join('')}</tbody></table></div></section><section class="panel" data-section="team.candidates" id="ltScheduledCandidates"></section><div id="ltPersonHost"></div>`;
+ ${AN.highlights}
+ ${AN.table}
+ <section class="panel lt-tabs-panel">
+  <div class="lt-tabs" role="tablist" aria-label="More team detail">
+   <button role="tab" data-lt-tab="charts" data-section="team.charts">Charts</button>
+   <button role="tab" data-lt-tab="daily" data-section="team.daily">Day by day</button>
+   ${AN.branches?'<button role="tab" data-lt-tab="branches" data-section="team.analytics.branches">By branch</button>':''}
+   <button role="tab" data-lt-tab="cands" data-section="team.candidates">Scheduled today</button>
+   <span class="hint lt-tabs-range">${rangeText}</span>
+  </div>
+  <div class="lt-pane" data-lt-pane="charts" data-section="team.charts"><div class="tg-charts"><div><h4>Schedules · goal vs achieved</h4><div class="tg-chart"><canvas id="ltGoals" role="img" aria-label="Selected period schedule targets versus achieved"></canvas></div></div><div><h4>Schedules, visits & hires · daily timeline</h4><div class="tg-chart"><canvas id="ltTimeline" role="img" aria-label="Daily activity within the selected period"></canvas></div></div></div></div>
+  <div class="lt-pane" data-lt-pane="daily" data-section="team.daily"><div class="lt-pane-head">${copyBtnHtml('ltTodayTable')}</div><div class="hp-table-wrap"><table class="ep-table" id="ltTodayTable"><thead><tr><th>Date</th>${TG_METRICS.map(([,l])=>`<th>${l}</th>`).join('')}</tr></thead><tbody>${daily.map(x=>{const target=[...new Set(g.memberships.filter(m=>tgActive(g,m.name,x.date)&&(!g.division||(getEffectiveRecruiterDivision(m.name,weekOfDate(x.date).weekEnd)||'Unassigned')===g.division)).map(m=>m.name))].reduce((sum,n)=>sum+ltDailyGoal(n,x.date),0),signal=recruiterSignal(x.r.total.schedules,x.r.total.shows,x.r.total.scheduledDateOf,target);return `<tr><td>${fmtDate(x.date)}</td>${TG_METRICS.map(([k])=>`<td class="${k==='schedules'?'rc-'+signal.schedule:k==='shows'?'rc-'+signal.visits:''}">${tgNumber(x.r.total[k])}</td>`).join('')}</tr>`;}).join('')}</tbody></table></div></div>
+  ${AN.branches?`<div class="lt-pane" data-lt-pane="branches" data-section="team.analytics.branches">${AN.branches}</div>`:''}
+  <div class="lt-pane" data-lt-pane="cands" data-section="team.candidates" id="ltScheduledCandidates"></div>
+ </section><div id="ltPersonHost"></div>`;
  ltRenderScheduledCandidates(g);
  ltBindTeamPicker(host);
  host.querySelector('#ltDivision').onchange=e=>{ltState.division=e.target.value;renderTeamGroups();};
@@ -9195,9 +9213,15 @@ function renderTeamGroups(){
  host.querySelector('#ltRefresh').onclick=()=>{if(Server.isAdmin())ltState.users=null;ltLoad();};
  host.querySelector('#ltDirectoryRetry')?.addEventListener('click',()=>{ltState.users=null;ltLoad();});
  host.querySelectorAll('[data-lt-person]').forEach(b=>b.onclick=()=>{epState.week=weekOfDate(p.to).weekEnd;openHistoryPage('recruiters',b.dataset.ltPerson);});
+ const drawCharts=()=>{ if(charts.ltGoals||!document.getElementById('ltGoals'))return;
  const opts={responsive:true,maintainAspectRatio:false,plugins:{noValueLabels:true,legend:{position:'bottom'}},scales:{y:{beginAtZero:true},x:{ticks:{maxRotation:45}}}};
  charts.ltGoals=safeChart(document.getElementById('ltGoals'),{type:'bar',data:{labels:report.members.map(x=>x.label),datasets:[{label:'Schedule target',data:report.members.map(x=>x.goal),backgroundColor:'#b58b38'},{label:'Achieved',data:report.members.map(x=>x.schedules),backgroundColor:'#218a86'}]},options:opts});
  charts.ltTimeline=safeChart(document.getElementById('ltTimeline'),{type:'line',data:{labels:daily.map(x=>fmtDate(x.date)),datasets:[['schedules','Schedules','#218a86'],['shows','Visits (shows)','#487ec1'],['i9','Hires','#825db3']].map(([k,label,c])=>({label,data:daily.map(x=>x.r.total[k]),borderColor:c,backgroundColor:c,spanGaps:false,tension:.2,pointRadius:3}))},options:opts});
+ };
+ const panes=[...host.querySelectorAll('[data-lt-tab]')], visible=panes.filter(b=>getComputedStyle(b).display!=='none');
+ const show=key=>{ ltState.tab=key; panes.forEach(b=>{const on=b.dataset.ltTab===key;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));}); host.querySelectorAll('[data-lt-pane]').forEach(x=>x.hidden=x.dataset.ltPane!==key); if(key==='charts') drawCharts(); };
+ panes.forEach(b=>b.onclick=()=>show(b.dataset.ltTab));
+ if(visible.length) show(visible.some(b=>b.dataset.ltTab===ltState.tab)?ltState.tab:visible[0].dataset.ltTab); else host.querySelector('.lt-tabs-panel').hidden=true;
 }
 // ---------- Team analytics: who is winning where, who needs attention where ----------
 function ltBranchOf(name,from,to){
@@ -9205,14 +9229,14 @@ function ltBranchOf(name,from,to){
  for(const w of ws){const b=w.byRecruiter?.[name]?.branch;if(b)return b;}
  return '';
 }
-function ltAnalytics(g,p,cutoff,mode,today,self){
+function ltAnalytics(g,p,cutoff,mode,today,self,checks=[],checkDay=cutoff){
  const cur=ltReport(g,p.from,p.to,today);
  const work=cutoff>=p.from?(p.from===cutoff?[p.from]:ltWorkdays(p.from,cutoff)):[];
  const rate=(n,d,min=1)=>n==null||d==null||d<min?null:n/d*100;
  const rows=cur.members.map(x=>{
   const pace=work.filter(d=>tgActive(g,x.label,d)).reduce((a,d)=>a+ltDailyGoal(x.label,d),0);
   return {name:x.label,x,branch:ltBranchOf(x.label,p.from,cutoff),pace,
-   goal:rate(x.schedules,pace), show:rate(x.shows,x.scheduledDateOf,3), noshow:rate(x.noShows,x.scheduledDateOf,3), hire:rate(x.i9,x.shows,3)};
+   goal:rate(x.schedules,pace), show:rate(x.shows,x.scheduledDateOf,3), noshow:(x.shows||0)+(x.noShows||0)>=3?rate(x.noShows,x.scheduledDateOf,3):null, hire:rate(x.i9,x.shows,3)};
  });
  const T=cur.total, team={goal:rate(T.schedules,rows.reduce((a,r)=>a+r.pace,0)),show:rate(T.shows,T.scheduledDateOf,3),noshow:rate(T.noShows,T.scheduledDateOf,3),hire:rate(T.i9,T.shows,3)};
  // bands: fixed minimums where the business has one, otherwise vs the team's own average
@@ -9226,13 +9250,19 @@ function ltAnalytics(g,p,cutoff,mode,today,self){
  const where=r=>r.branch?`<span class="ta-where">${escapeHtml(r.branch)}</span>`:'';
  // ---- winning ----
  const wins=[];
- M.forEach(([k,l,up])=>{const c=rows.filter(r=>r[k]!=null);if(c.length<2)return;c.sort((a,b)=>up?b[k]-a[k]:a[k]-b[k]);const top=c[0];if(band[k](top[k])==='r')return;
-  wins.push({r:top,html:`<b>Best ${l.toLowerCase()}</b> · ${pc(top[k])}${team[k]!=null?` vs team ${pc(team[k])}`:''}`});});
+ // an award needs real activity behind it: enough interviews (and resolved outcomes) or shows in this period
+ const avgOf=f=>{const v=rows.map(f).filter(n=>n>0);return v.length?v.reduce((a,b)=>a+b,0)/v.length:0;};
+ const minInt=Math.max(5,Math.ceil(avgOf(r=>r.x.scheduledDateOf||0)*.5)), minShows=Math.max(3,Math.ceil(avgOf(r=>r.x.shows||0)*.5));
+ const enough=(r,k)=>{const x=r.x,iv=x.scheduledDateOf||0,res=(x.shows||0)+(x.noShows||0);
+  return k==='goal'?r.pace>0&&(x.schedules||0)>0 : k==='hire'?(x.shows||0)>=minShows : iv>=minInt&&res>=Math.max(3,Math.ceil(iv*.5));};
+ const basis={goal:x=>`${fmtNum(x.schedules)} of ${fmtNum(Math.round(x.pace))} due`,show:x=>`${fmtNum(x.shows)} of ${fmtNum(x.scheduledDateOf)} interviews showed`,noshow:x=>`${fmtNum(x.noShows)} no-show${x.noShows===1?'':'s'} from ${fmtNum(x.scheduledDateOf)} interviews`,hire:x=>`${fmtNum(x.i9)} hires from ${fmtNum(x.shows)} shows`};
+ M.forEach(([k,l,up])=>{const c=rows.filter(r=>r[k]!=null&&enough(r,k));if(c.length<2)return;c.sort((a,b)=>up?b[k]-a[k]:a[k]-b[k]);const top=c[0];if(band[k](top[k])==='r')return;
+  wins.push({r:top,html:`<b>Best ${l.toLowerCase()}</b> · ${pc(top[k])} (${basis[k]({...top.x,pace:top.pace})})${team[k]!=null?` · team ${pc(team[k])}`:''}`});});
  const mh=rows.filter(r=>r.x.i9>0).sort((a,b)=>b.x.i9-a.x.i9)[0];
  if(mh)wins.push({r:mh,html:`<b>Most hires</b> · ${fmtNum(mh.x.i9)} from ${fmtNum(mh.x.shows||0)} shows`});
  const sched=rows.filter(r=>r.x.schedules!=null).sort((a,b)=>b.x.schedules-a.x.schedules)[0];
  if(sched&&sched.x.schedules>0)wins.push({r:sched,html:`<b>Most schedules</b> · ${fmtNum(sched.x.schedules)}${sched.pace?` of ${tgNumber(sched.pace)} due so far`:''}`});
- rows.filter(r=>{const b=['goal','show','noshow'].map(k=>band[k](r[k]));return b.every(x=>x==='g');}).forEach(r=>wins.push({r,html:'<b>On target everywhere</b> · schedules, show rate and no-shows all within target'}));
+ rows.filter(r=>{const b=['goal','show','noshow'].map(k=>enough(r,k)?band[k](r[k]):'');return b.every(x=>x==='g');}).forEach(r=>wins.push({r,html:'<b>On target everywhere</b> · schedules, show rate and no-shows all within target'}));
  // ---- attention ----
  const att=rows.map(r=>{const issues=[];
   if(r.x.schedules===0&&r.pace>0)issues.push({sev:3,t:`<b>No schedules</b> this ${mode} so far (${tgNumber(r.pace)} due)`});
@@ -9248,20 +9278,28 @@ function ltAnalytics(g,p,cutoff,mode,today,self){
  const brRows=Object.entries(br).map(([b,o])=>({b,o,goal:rate(o.s,o.pace),show:rate(o.sh,o.i,3),noshow:rate(o.ns,o.i,3),hire:rate(o.h,o.sh,3)})).sort((a,b)=>(b.goal??-1)-(a.goal??-1));
  const cell=(k,v,sub)=>`<td class="ta-cell ta-${band[k](v)||'n'}">${pc(v)}${sub?`<small>${sub}</small>`:''}</td>`;
  const nWin=new Set(wins.map(w=>w.r.name)).size;
- const html=`<section class="panel ta" data-section="team.analytics"><div class="lt-section-head"><h3>Team analytics</h3><span class="hint">Schedules vs goal, interviews (shows vs no shows) and hires · who is winning where, and who needs attention${work.length?'':' · no working days yet'}</span></div>
- <div class="ta-cols">
-  <div class="ta-box ta-win" data-section="team.analytics.wins"><h4>🏆 Winning <span class="pill good">${nWin}</span></h4>${wins.length?`<ul>${wins.map(w=>`<li><div>${who(w.r)}${where(w.r)}</div><span>${w.html}</span></li>`).join('')}</ul>`:'<p class="hint">Nobody is above the minimums yet in this period.</p>'}</div>
-  <div class="ta-box ta-att" data-section="team.analytics.attention"><h4>⚠️ Needs attention <span class="pill warn">${att.length}</span></h4>${att.length?`<ul>${att.map(a=>`<li><div>${who(a.r)}${where(a.r)}</div>${a.issues.sort((x,y)=>y.sev-x.sev).map(i=>`<span class="ta-sev${i.sev}">${i.t}</span>`).join('')}</li>`).join('')}</ul>`:'<p class="hint">Nobody is below the minimums. 🎉</p>'}</div>
- </div>
- <div data-section="team.analytics.matrix"><h4 class="ta-h">Where each recruiter stands</h4>
- <div class="hp-table-wrap"><table class="ep-table ta-matrix" id="ltAnalyticsTable"><thead><tr><th rowspan="2">Recruiter</th><th rowspan="2">Branch</th><th class="ta-grp" colspan="1">Schedules</th><th class="ta-grp" colspan="3">Interviews</th><th class="ta-grp" colspan="1">Hires</th></tr>
- <tr><th>vs goal<small>to date · min 90%</small></th><th>Interviews</th><th>Shows<small>show rate · min 70%</small></th><th>No shows<small>no-show rate · under 20%</small></th><th>Hires<small>of shows · team ${pc(team.hire)}</small></th></tr></thead>
- <tbody>${rows.slice().sort((a,b)=>(b.goal??-1)-(a.goal??-1)).map(r=>`<tr><td>${who(r)}</td><td>${escapeHtml(r.branch||'–')}</td>${cell('goal',r.goal,r.pace?`${fmtNum(r.x.schedules||0)} / ${tgNumber(r.pace)}`:'')}<td class="ta-cell ta-n ta-plain">${num0(r.x.scheduledDateOf)}</td>${cell('show',r.show,r.x.scheduledDateOf?`${fmtNum(r.x.shows||0)} shows`:'')}${cell('noshow',r.noshow,r.x.scheduledDateOf?`${fmtNum(r.x.noShows||0)} no shows`:'')}<td class="ta-cell ta-${band.hire(r.hire)||'n'}">${num0(r.x.i9)}<small>${r.hire==null?(r.x.shows?`of ${fmtNum(r.x.shows)} shows`:''):pc(r.hire)+' of '+fmtNum(r.x.shows)+' shows'}</small></td></tr>`).join('')}</tbody>
- <tfoot><tr><td>Team</td><td></td><td>${pc(team.goal)}<small class="hint"> ${fmtNum(T.schedules||0)} / ${tgNumber(rows.reduce((a,r)=>a+r.pace,0))}</small></td><td>${num0(T.scheduledDateOf)}</td><td>${pc(team.show)}<small class="hint"> ${num0(T.shows)}</small></td><td>${pc(team.noshow)}<small class="hint"> ${num0(T.noShows)}</small></td><td>${num0(T.i9)}<small class="hint"> ${pc(team.hire)}</small></td></tr></tfoot></table></div>
- <p class="hint">Green at or above the minimum · amber close · red below. Hires are coloured by hire rate (hires ÷ shows) against the team average, since there’s no fixed minimum. Rates need at least 3 interviews or shows to count.</p></div>
- ${brRows.length>1?`<div data-section="team.analytics.branches"><h4 class="ta-h">By branch</h4><div class="hp-table-wrap"><table class="ep-table ta-matrix"><thead><tr><th>Branch</th><th>Recruiters</th><th>Schedules vs goal</th><th>Interviews</th><th>Show rate</th><th>No-show rate</th><th>Hires</th></tr></thead><tbody>${brRows.map(x=>`<tr><td>${escapeHtml(x.b)}</td><td>${x.o.n}</td>${cell('goal',x.goal,`${fmtNum(x.o.s)} / ${tgNumber(x.o.pace)}`)}<td class="ta-cell ta-n ta-plain">${fmtNum(x.o.i)}</td>${cell('show',x.show,`${fmtNum(x.o.sh)} shows`)}${cell('noshow',x.noshow,`${fmtNum(x.o.ns)} no shows`)}<td class="ta-cell ta-${band.hire(x.hire)||'n'}">${fmtNum(x.o.h)}<small>${pc(x.hire)} of shows</small></td></tr>`).join('')}</tbody></table></div></div>`:''}
- </section>`;
- return html;
+ const ck=new Map(checks.map(c=>[c.name,c])), dayLbl=checkDay===today?'Today':fmtDate(checkDay).replace(/, \d{4}$/,'');
+ const tier=r=>{const t=goalTier(r.goal);return t.emoji?`<span class="rc-signal" role="img" aria-label="${t.label}" title="${t.label}">${t.emoji}</span>`:'';};
+ const todayCell=c=>!c||c.daily==null?'<td class="ta-cell ta-n" data-section="team.goals">–</td>':`<td class="ta-cell ta-${c.daily>=c.dg?'g':c.daily>=c.dg*.5?'a':'r'}" data-section="team.goals">${tgNumber(c.daily)} / ${tgNumber(c.dg)}</td>`;
+ const brkCell=c=>!c?'<td class="ta-n" data-section="team.goals">–</td>':`<td data-section="team.goals"><span class="pill ${c.eligible?'good':c.known?'warn':'pending'}">${!c.known?'Awaiting data':c.eligible?'Eligible':'Not yet'}</span><small class="ta-sub">${tgNumber(c.cum)} / ${tgNumber(c.required)}${c.known&&!c.eligible?` · ${tgNumber(c.required-c.cum)} more`:''}</small></td>`;
+ const elig=checks.filter(c=>c.eligible).length;
+ const winMap=new Map(); wins.forEach(w=>{ if(!winMap.has(w.r.name)) winMap.set(w.r.name,{r:w.r,items:[]}); winMap.get(w.r.name).items.push(w.html); });
+ const winBy=[...winMap.values()].sort((a,b)=>b.items.length-a.items.length);
+ const capList=items=>items.length<=4?`<ul>${items.join('')}</ul>`:`<ul>${items.slice(0,4).join('')}</ul><details class="ta-more"><summary>Show ${items.length-4} more</summary><ul>${items.slice(4).join('')}</ul></details>`;
+ const highlights=`<section class="panel ta ta-highlights" data-section="team.analytics"><div class="ta-cols">
+  <div class="ta-box ta-win" data-section="team.analytics.wins"><h4>🏆 Winning <span class="pill good">${nWin}</span></h4>${winBy.length?capList(winBy.map(x=>`<li><div>${who(x.r)}${where(x.r)}</div>${x.items.map(h=>`<span>${h}</span>`).join('')}</li>`)):'<p class="hint">Nobody is above the minimums yet in this period.</p>'}</div>
+  <div class="ta-box ta-att" data-section="team.analytics.attention"><h4>⚠️ Needs attention <span class="pill warn">${att.length}</span></h4>${att.length?capList(att.map(x=>`<li><div>${who(x.r)}${where(x.r)}</div>${x.issues.sort((m,n)=>n.sev-m.sev).map(i=>`<span class="ta-sev${i.sev}">${i.t}</span>`).join('')}</li>`)):'<p class="hint">Nobody is below the minimums. 🎉</p>'}</div>
+ </div></section>`;
+ const sorted=rows.slice().sort((a,b)=>(b.goal??-1)-(a.goal??-1));
+ const table=`<section class="panel ta" data-section="team.recruiters"><div class="lt-section-head"><h3>Recruiters</h3><span class="hint">${rows.length} on the team${work.length?'':' · no working days yet'}</span>${checks.length?`<span class="pill ${elig?'good':'pending'}" data-section="team.goals" style="margin-left:auto">${elig} of ${checks.length} third-break eligible · ${dayLbl}</span>`:''}${copyBtnHtml('ltRecruiterTable')}</div>
+ <div class="hp-table-wrap"><table class="ep-table ta-matrix" id="ltRecruiterTable"><thead>
+ <tr><th rowspan="2">Recruiter</th><th rowspan="2">Branch</th><th class="ta-grp" colspan="3">Schedules</th><th class="ta-grp" colspan="3">Interviews</th><th class="ta-grp">Hires</th></tr>
+ <tr><th>vs goal<small>${mode==='day'?'today':'so far'} · min 90%</small></th><th data-section="team.goals">${dayLbl}<small>daily goal</small></th><th data-section="team.goals">Third break<small>week so far</small></th><th>Interviews</th><th>Shows<small>min 70%</small></th><th>No shows<small>under 20%</small></th><th>Hires<small>of shows</small></th></tr></thead>
+ <tbody>${sorted.map(r=>{const c=ck.get(r.name);return `<tr${r.name===self?' class="lt-mine"':''}><td><div class="ta-name">${who(r)} ${tier(r)}</div></td><td>${escapeHtml(r.branch||'–')}</td>${cell('goal',r.goal,r.pace?`${fmtNum(r.x.schedules||0)} / ${tgNumber(r.pace)}`:'')}${todayCell(c)}${brkCell(c)}<td class="ta-cell ta-n ta-plain">${num0(r.x.scheduledDateOf)}</td>${cell('show',r.show,r.x.scheduledDateOf?`${fmtNum(r.x.shows||0)} shows`:'')}${cell('noshow',r.noshow,r.x.scheduledDateOf?(r.noshow==null?'outcomes pending':`${fmtNum(r.x.noShows||0)} no shows`):'')}<td class="ta-cell ta-${band.hire(r.hire)||'n'}">${num0(r.x.i9)}<small>${r.hire==null?(r.x.shows?`of ${fmtNum(r.x.shows)} shows`:''):pc(r.hire)+' of '+fmtNum(r.x.shows)}</small></td></tr>`;}).join('')||'<tr><td colspan="9">No team members in this selection.</td></tr>'}</tbody>
+ <tfoot><tr><td>Team</td><td></td><td>${pc(team.goal)}<small class="hint"> ${fmtNum(T.schedules||0)} / ${tgNumber(rows.reduce((a,r)=>a+r.pace,0))}</small></td><td data-section="team.goals"></td><td data-section="team.goals"></td><td>${num0(T.scheduledDateOf)}</td><td>${pc(team.show)}<small class="hint"> ${num0(T.shows)}</small></td><td>${pc(team.noshow)}<small class="hint"> ${num0(T.noShows)}</small></td><td>${num0(T.i9)}<small class="hint"> ${pc(team.hire)}</small></td></tr></tfoot></table></div>
+ <details class="ta-legend"><summary>How this is coloured</summary><p class="hint">Green at or above the minimum · amber close · red below. Emoji by share of schedule goal: 🤬 under 50% · 🫡 50–80% · 🫰 81–100% · 🤩 above 100%. Goals come from Settings → Goals (default ${DEFAULT_WEEKLY_GOAL} a week, daily goal = weekly ÷ 5). Third break needs the daily goal × working days so far this week. Hires are coloured by hire rate against the team average. Rates need at least 3 interviews or recorded outcomes.</p></details></section>`;
+ const branches=brRows.length>1?`<div class="hp-table-wrap"><table class="ep-table ta-matrix"><thead><tr><th>Branch</th><th>Recruiters</th><th>Schedules vs goal</th><th>Interviews</th><th>Show rate</th><th>No-show rate</th><th>Hires</th></tr></thead><tbody>${brRows.map(x=>`<tr><td>${escapeHtml(x.b)}</td><td>${x.o.n}</td>${cell('goal',x.goal,`${fmtNum(x.o.s)} / ${tgNumber(x.o.pace)}`)}<td class="ta-cell ta-n ta-plain">${fmtNum(x.o.i)}</td>${cell('show',x.show,`${fmtNum(x.o.sh)} shows`)}${cell('noshow',x.noshow,`${fmtNum(x.o.ns)} no shows`)}<td class="ta-cell ta-${band.hire(x.hire)||'n'}">${fmtNum(x.o.h)}<small>${pc(x.hire)} of shows</small></td></tr>`).join('')}</tbody></table></div>`:'';
+ return {highlights,table,branches};
 }
 // ---------- Team leads comparison (admins): every lead's team side by side ----------
 const ltLeads={owner:null,teams:null,loading:false,error:'',at:0};
@@ -9291,7 +9329,7 @@ function ltLeadsHtml(p,cutoff,mode,today,division){
   const pace=r.members.reduce((a,x)=>a+work.filter(d=>tgActive(g,x.label,d)).reduce((s2,d)=>s2+ltDailyGoal(x.label,d),0),0);
   const people=r.members.length; if(!people) return null;
   const hprDen=r.hprDenominator||0;
-  return {tm,people,T,pace,goal:rate(T.schedules,pace),show:rate(T.shows,T.scheduledDateOf,3),noshow:rate(T.noShows,T.scheduledDateOf,3),hire:rate(T.i9,T.shows,3),
+  return {tm,people,T,pace,goal:rate(T.schedules,pace),show:rate(T.shows,T.scheduledDateOf,3),noshow:(T.shows||0)+(T.noShows||0)>=3?rate(T.noShows,T.scheduledDateOf,3):null,hire:rate(T.i9,T.shows,3),
    hpr:T.i9==null||!hprDen?null:T.i9/hprDen,
    behind:r.members.filter(x=>{const pc=work.filter(d=>tgActive(g,x.label,d)).reduce((s2,d)=>s2+ltDailyGoal(x.label,d),0);return pc>0&&(x.schedules||0)<pc*.5;}).length};
  }).filter(Boolean);
@@ -9305,9 +9343,14 @@ function ltLeadsHtml(p,cutoff,mode,today,division){
  const lead=r=>`<button class="entity-link" data-lt-lead="${escapeHtml(r.tm.id)}">${escapeHtml(r.tm.lead)}</button><small class="ta-team">${escapeHtml(r.tm.a.team_name||'')}</small>`;
  const M=[['goal','Schedules vs goal',true,pc],['show','Show rate',true,pc],['noshow','No-show rate',false,pc],['hpr','Hires per recruiter',true,v=>v==null?'–':v.toFixed(1)]];
  const wins=[], att=[];
- if(rows.length>1) M.forEach(([k,l,up,f])=>{const c=rows.filter(r=>r[k]!=null).sort((a,b)=>up?b[k]-a[k]:a[k]-b[k]);if(c.length<2)return;const top=c[0],low=c[c.length-1];
-  if(band[k](top[k])!=='r')wins.push({r:top,t:`<b>Best ${l.toLowerCase()}</b> · ${f(top[k])}`});
-  if(band[k](low[k])==='r')att.push({r:low,t:`<b>${up?'Lowest':'Highest'} ${l.toLowerCase()}</b> · ${f(low[k])}`});});
+ const tAvg=f=>{const v=rows.map(f).filter(n=>n>0);return v.length?v.reduce((a,b)=>a+b,0)/v.length:0;};
+ const tMinInt=Math.max(10,Math.ceil(tAvg(r=>r.T.scheduledDateOf||0)*.5)), tMinShows=Math.max(5,Math.ceil(tAvg(r=>r.T.shows||0)*.5));
+ const tEnough=(r,k)=>{const T=r.T,iv=T.scheduledDateOf||0,res=(T.shows||0)+(T.noShows||0);
+  return k==='goal'?r.pace>0&&(T.schedules||0)>0 : k==='hpr'||k==='hire'?(T.shows||0)>=tMinShows : iv>=tMinInt&&res>=Math.ceil(iv*.5);};
+ const tBasis={goal:r=>`${fmtNum(r.T.schedules)} of ${tgNumber(r.pace)} due`,show:r=>`${fmtNum(r.T.shows)} of ${fmtNum(r.T.scheduledDateOf)} interviews showed`,noshow:r=>`${fmtNum(r.T.noShows)} no-shows from ${fmtNum(r.T.scheduledDateOf)} interviews`,hpr:r=>`${fmtNum(r.T.i9)} hires`};
+ if(rows.length>1) M.forEach(([k,l,up,f])=>{const c=rows.filter(r=>r[k]!=null&&tEnough(r,k)).sort((a,b)=>up?b[k]-a[k]:a[k]-b[k]);if(c.length<2)return;const top=c[0],low=c[c.length-1];
+  if(band[k](top[k])!=='r')wins.push({r:top,t:`<b>Best ${l.toLowerCase()}</b> · ${f(top[k])} (${tBasis[k](top)})`});
+  if(band[k](low[k])==='r')att.push({r:low,t:`<b>${up?'Lowest':'Highest'} ${l.toLowerCase()}</b> · ${f(low[k])} (${tBasis[k](low)})`});});
  rows.filter(r=>r.behind).forEach(r=>att.push({r,t:`<b>${r.behind} of ${r.people}</b> recruiter${r.behind===1?'':'s'} under 50% of schedule pace`}));
  const group=list=>{const m=new Map();list.forEach(x=>{const k=x.r.tm.id;if(!m.has(k))m.set(k,{r:x.r,items:[]});m.get(k).items.push(x.t);});return [...m.values()];};
  const W=group(wins), A=group(att).sort((a,b)=>b.items.length-a.items.length);
