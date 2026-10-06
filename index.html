@@ -1134,6 +1134,28 @@ body.team-workspace .content{padding-top:10px!important}
 .hp-sticky .hp-tiles{margin-bottom:0}.hp-sel{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;font-size:13px;color:#132f3b}.hp-sel .hint{font-size:11.5px}
 .hp-tile .lt-pct{font-size:12px;margin-left:6px;vertical-align:3px}
 @media(max-width:760px){.hp-sticky{top:var(--menu-height,0px)}.hp-sticky .hp-tiles{display:flex;overflow-x:auto}.hp-sticky .hp-tile{flex:0 0 120px}.hp-sel .hint{display:none}}
+
+.kpi-v2 .kpi-card.kpi-click{cursor:pointer}.kpi-v2 .kpi-card.kpi-click:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.kpi-v2 .kpi-card.kpi-click .kpi-top .label:after{content:' ›';opacity:0;transition:opacity .15s}.kpi-v2 .kpi-card.kpi-click:hover .kpi-top .label:after{opacity:.7}
+.ki-modal{max-width:980px;width:calc(100vw - 32px);max-height:calc(100vh - 40px);display:flex;flex-direction:column;border-top:3px solid var(--accent)}
+.ki-modal .modal-header{align-items:flex-start}.ki-modal .modal-header .hint{display:block;margin-top:3px}
+.ki-modal .modal-body{overflow:auto}
+.ki-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.ki-tile{border:1px solid #e1eaed;border-radius:10px;padding:10px 12px;background:#fbfdfd;min-width:0}.ki-tile span{display:block;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#6a808b}
+.ki-tile strong{display:block;font-size:22px;margin-top:4px;font-variant-numeric:tabular-nums;color:#132f3b}.ki-tile em{display:block;font-style:normal;font-size:11.5px;color:#6a808b;margin-top:2px}
+.ki-tile.ki-ok strong,td.ki-ok strong,b.ki-ok{color:#17684a}.ki-tile.ki-low strong,td.ki-low strong,b.ki-low{color:#a12d36}
+.ki-sec{margin:0 0 18px}.ki-sec h4{margin:0 0 8px;font-size:13px;color:#132f3b}.ki-chart{height:220px}
+.ki-bars{display:flex;flex-direction:column;gap:6px}.ki-bar{display:grid;grid-template-columns:130px 1fr 70px;align-items:center;gap:10px;font-size:12.5px}.ki-bar>div{background:#eef3f4;border-radius:5px;height:12px;overflow:hidden}.ki-bar i{display:block;height:100%;background:var(--accent);border-radius:5px}.ki-bar b{text-align:right;font-variant-numeric:tabular-nums}
+.ki-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.ki-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}.ki-head h4{margin:0;margin-right:auto}.ki-search{font:inherit;font-size:12px;padding:5px 8px;border:1px solid #d6e2e6;border-radius:7px;width:140px}
+.ki-table{max-height:340px;overflow:auto}.ki-scope{margin:-6px 0 10px}
+.sec-opt.sub2{padding-left:40px;font-size:.95em;color:#4d6570}.sec-opt input:disabled+*{opacity:.5}
+@media(max-width:760px){.ki-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.ki-bar{grid-template-columns:90px 1fr 60px}.ki-search{width:100px}}
+#accountMenu.acct-flyout{position:fixed;z-index:3000;width:230px;padding:6px;border:1px solid #dbe5e8!important;border-radius:12px;background:#fff;box-shadow:0 12px 32px #1834422e,0 2px 6px #18344214;animation:acctIn .14s ease-out}
+#accountMenu.acct-flyout:before{content:'';position:absolute;left:-6px;bottom:16px;width:10px;height:10px;background:#fff;border-left:1px solid #dbe5e8;border-bottom:1px solid #dbe5e8;transform:rotate(45deg)}
+#accountMenu.acct-flyout .ribbon-btn{color:#173a47!important;background:transparent!important;border:0!important;border-radius:8px;padding:9px 11px!important;justify-content:flex-start}
+#accountMenu.acct-flyout .ribbon-btn:hover,#accountMenu.acct-flyout .ribbon-btn:focus-visible{background:#eef5f6!important}
+@keyframes acctIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
 </style>
 </head>
 <body class="locked">
@@ -1215,7 +1237,7 @@ body.team-workspace .content{padding-top:10px!important}
         <div id="settingsPane-goals" class="hidden"><div id="goalsEditor"></div></div>
         <div id="settingsPane-users" class="hidden"><div id="usersAdmin"></div><div id="teamAssignmentsAdmin"></div></div>
         <div id="settingsPane-activity" class="hidden"><div id="activityLog"></div></div>
-        <div id="settingsPane-account" class="hidden"><section class="panel"><h3>Display preferences</h3><div class="set-row"><div><strong>Remove repeat Employee Numbers</strong><span id="dedupePrefText">Deduped — each candidate counts once per week (your view only)</span></div><button type="button" class="switch" role="switch" id="settingsDedupeToggleBtn" aria-label="Remove repeat Employee Numbers" aria-checked="true"><i></i></button></div></section><div id="myAccount"></div></div>
+        <div id="settingsPane-account" class="hidden"><section class="panel"><h3>Display preferences</h3><div class="set-row"><div><strong>Remove repeat Employee Numbers</strong><span id="dedupePrefText">Deduped — each candidate counts once per week (your view only)</span></div><button type="button" class="switch" role="switch" id="settingsDedupeToggleBtn" aria-label="Remove repeat Employee Numbers" aria-checked="true"><i></i></button></div><div class="set-row"><div><strong>Default page</strong><span>The page that opens when you sign in (this browser)</span></div><select id="defaultViewSelect" aria-label="Default page"></select></div></section><div id="myAccount"></div></div>
         </div>
       </div>
       <div id="emptyState" class="empty-state">
@@ -3239,7 +3261,18 @@ document.getElementById('settingsNavBtn').addEventListener('click', ()=>{
   openSettingsModal('sync');
 });
 function closeAccountMenu(){document.getElementById('accountMenu').hidden=true;document.getElementById('userChip').setAttribute('aria-expanded','false');}
-document.getElementById('userChip').addEventListener('click',()=>{const menu=document.getElementById('accountMenu');menu.hidden=!menu.hidden;document.getElementById('userChip').setAttribute('aria-expanded',String(!menu.hidden));});
+// On desktop the account menu opens as a flyout to the right of the name; on phones it stays inline in the menu.
+function placeAccountMenu(){
+ const menu=document.getElementById('accountMenu'),chip=document.getElementById('userChip');
+ const fly=window.innerWidth>760&&!document.body.classList.contains('menu-open');
+ menu.classList.toggle('acct-flyout',fly);
+ if(!fly){menu.style.left=menu.style.bottom=menu.style.top='';return;}
+ const r=chip.getBoundingClientRect();
+ menu.style.left=Math.round(r.right+10)+'px';
+ menu.style.top='';menu.style.bottom=Math.max(8,Math.round(window.innerHeight-r.bottom))+'px';
+}
+document.getElementById('userChip').addEventListener('click',()=>{const menu=document.getElementById('accountMenu');menu.hidden=!menu.hidden;if(!menu.hidden){placeAccountMenu();menu.querySelector('button:not([hidden]):not(.hidden)')?.focus();}document.getElementById('userChip').setAttribute('aria-expanded',String(!menu.hidden));});
+window.addEventListener('resize',()=>{if(!document.getElementById('accountMenu').hidden)placeAccountMenu();});
 document.getElementById('myAccountBtn').onclick=()=>{closeAccountMenu();openSettingsModal('account');};
 document.getElementById('accountMenu').addEventListener('click',e=>{if(e.target.closest('button'))closeAccountMenu();});
 document.addEventListener('click',e=>{if(!e.target.closest('#userChipWrap'))closeAccountMenu();});
@@ -3860,6 +3893,7 @@ async function renderWeeklyView(){
   const filteredByRecruiter=Object.fromEntries(aggregateAcrossWeeks(scopedWeeksForSummary,'byRecruiter').map(r=>[r.name,r]));
   const filteredByBranch=Object.fromEntries(aggregateAcrossWeeks(scopedWeeksForSummary,'byBranch').map(r=>[r.name,r]));
 
+  perfDetailCtx = {weeks:scopedWeeksForSummary, goals:goalsForWeek||{}, teamGoal, label:weekLabel, end:isMultiWeekMode?(weeksForAggregate.at(-1)||weeksData.at(-1)):week, isMulti:isMultiWeekMode, division:universalDivision, ref:referenceWeekForDivisions};
   snapshotRowsCache['weeklyRecruiterMiniTable'] = computeSnapshotRows(filteredByRecruiter, true, goalsForWeek, recruiterDivisionsForWeek);
   snapshotRowsCache['weeklyBranchMiniTable'] = computeSnapshotRows(filteredByBranch, false, null, branchDivisions);
 
@@ -4119,6 +4153,122 @@ function sparkSvg(pts, color){
     <path d="${line}" fill="none" stroke="${color}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
     <circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="2.6" fill="${color}"/></svg>`;
 }
+let perfDetailCtx=null;
+const KPI_DETAIL = {
+  schedules:{label:'Schedules', n:'schedules', good:'up', accent:'#2f8f8a'},
+  interviews:{label:'Interviews', n:'scheduledDateOf', good:'up', accent:'#4a78c8'},
+  shows:{label:'Shows', n:'shows', good:'up', accent:'#1f9a6c', pend:true},
+  no_shows:{label:'No Shows', n:'noShows', good:'down', accent:'#c4565f', pend:true},
+  hires:{label:'Hires', n:'i9', good:'up', accent:'#7a5fb8', pend:true},
+  placed:{label:'Placed', n:'placed', good:'up', accent:'#b07a2a', pend:true},
+  hires_per_recruiter:{label:'Hires per Recruiter', n:'i9', d:'recruiters', good:'up', target:15, accent:'#7a5fb8'},
+  goal_reach:{label:'Goal Reach', n:'schedules', d:'goal', pctUnit:true, good:'up', target:90, accent:'#a67c2e'},
+  show_rate:{label:'Show Rate', n:'shows', d:'scheduledDateOf', pctUnit:true, good:'up', target:70, accent:'#1f8a84', pend:true},
+  no_show_rate:{label:'No Show Rate', n:'noShows', d:'scheduledDateOf', pctUnit:true, good:'down', target:20, accent:'#c4565f', pend:true},
+};
+function kpiDetailAllowed(key){ return !!KPI_DETAIL[key] && canSeeSection('perf.kpis') && canSeeSection('perf.kpi.'+key) && canSeeSection('perf.detail.'+key); }
+// value of a metric for a set of {totals, goal, recruiters}
+function kpiValue(def, t, goal, recruiters){
+  const num=t[def.n]||0;
+  if(!def.d) return num;
+  const den = def.d==='goal'?goal : def.d==='recruiters'?recruiters : (t[def.d]||0);
+  if(!den) return null;
+  return def.pctUnit ? num/den*100 : num/den;
+}
+function kpiFmt(def, v){ return v==null?'–':def.pctUnit?v.toFixed(1)+'%':def.d?v.toFixed(1):fmtNum(Math.round(v)); }
+function kpiGoalOf(name, weekEnd){ const g=KV.get('goals:'+weekEnd)||{}; const v=g[name]; return v!==undefined&&v!==null&&v!==''&&Number.isFinite(Number(v))?Number(v):DEFAULT_WEEKLY_GOAL; }
+function activeRecruiters(w){ return Object.entries(w.byRecruiter||{}).filter(([,r])=>(r.schedules||0)+(r.scheduledDateOf||0)+(r.shows||0)+(r.i9||0)+(r.placed||0)>0); }
+async function kpiAssignedNames(ctx){
+  if(Server.isAdmin() || canSeeSection('perf.detail.all_people')) return null;
+  try{
+    const a=await Server.rpc('dash_team_assignment_get'); if(!a) return new Set();
+    const g=ltGroup(a), from=weekOfDate(ctx.weeks[0].weekEndDate).weekStart, to=ctx.weeks.at(-1).weekEndDate;
+    return new Set(g.memberships.filter(m=>m.from<=to&&(!m.to||m.to>=from)).map(m=>m.name));
+  }catch(e){ return new Set(); }
+}
+async function openKpiInsights(key){
+  const def=KPI_DETAIL[key], ctx=perfDetailCtx; if(!def||!ctx||!kpiDetailAllowed(key)) return;
+  document.getElementById('kpiInsights')?.remove();
+  const part=k=>canSeeSection('perf.detail.part.'+k);
+  const wrap=document.createElement('div'); wrap.className='modal-overlay'; wrap.id='kpiInsights';
+  wrap.innerHTML=`<div class="modal ki-modal" role="dialog" aria-modal="true" aria-labelledby="kiTitle" style="--accent:${def.accent}"><div class="modal-header"><div><h3 id="kiTitle">${escapeHtml(def.label)}</h3><span class="hint">${escapeHtml(ctx.label)}${ctx.division?' · '+escapeHtml(ctx.division):''}</span></div><button class="modal-close" data-close aria-label="Close">&times;</button></div><div class="modal-body" id="kiBody"><p class="hint">Loading…</p></div></div>`;
+  document.body.appendChild(wrap);
+  const close=()=>{ destroyChart('kiTrend'); wrap.remove(); document.removeEventListener('keydown', onKey); };
+  const onKey=e=>{ if(e.key==='Escape') close(); };
+  document.addEventListener('keydown', onKey);
+  wrap.addEventListener('click', e=>{ if(e.target===wrap || e.target.closest('[data-close]')) close(); });
+
+  const only=await kpiAssignedNames(ctx);
+  if(!wrap.isConnected) return;
+  const keep=n=>!only||only.has(n);
+  // ---- headline numbers ----
+  const weekVal=w=>{ const sw=scopeWeekToDivision(w,ctx.division), rec=activeRecruiters(sw);
+    const goal=rec.reduce((s,[n])=>s+kpiGoalOf(n,w.weekEndDate),0); return kpiValue(def, sw.totals, goal, rec.length); };
+  const tot=sumTotals(ctx.weeks), recAll=ctx.weeks.reduce((s,w)=>s+activeRecruiters(w).length,0);
+  const cur=kpiValue(def, tot, ctx.teamGoal, recAll);
+  const endIdx=weeksData.findIndex(w=>w.weekEndDate===ctx.end.weekEndDate);
+  const hist=weeksData.slice(Math.max(0,endIdx-11), endIdx+1).filter(w=>!(def.pend&&weekIsFullyPending(w.weekEndDate)));
+  const series=hist.map(w=>({w, v:weekVal(w)}));
+  const vals=series.map(x=>x.v).filter(v=>v!=null);
+  const avg=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null;
+  const best=series.filter(x=>x.v!=null).reduce((b,x)=>!b||(def.good==='up'?x.v>b.v:x.v<b.v)?x:b,null);
+  const prev=!ctx.isMulti && endIdx>0 ? weekVal(weeksData[endIdx-1]) : null;
+  const okCls=v=>v==null||def.target==null?'':(def.good==='up'?v>=def.target:v<def.target)?'ki-ok':'ki-low';
+  const diff=(cur!=null&&prev!=null)?cur-prev:null;
+  const tile=(l,v,sub,cls='')=>`<div class="ki-tile ${cls}"><span>${l}</span><strong>${v}</strong>${sub?`<em>${sub}</em>`:''}</div>`;
+  let html=`<div class="ki-tiles">${tile(ctx.isMulti?'Selected weeks':'This week', kpiFmt(def,cur), def.target!=null?(def.good==='up'?'Minimum ':'Under ')+def.target+(def.pctUnit?'%':''):'', okCls(cur))}
+    ${tile('vs prior week', diff==null?'–':(diff>0?'+':diff<0?'−':'')+kpiFmt(def,Math.abs(diff)).replace('%',def.pctUnit?' pts':''), prev==null?'':'was '+kpiFmt(def,prev), diff==null||diff===0?'':(def.good==='up'?diff>0:diff<0)?'ki-ok':'ki-low')}
+    ${tile(vals.length+'-week average', kpiFmt(def,avg), '')}
+    ${tile('Best week', best?kpiFmt(def,best.v):'–', best?'Wk '+best.w.weekNumber+' · '+fmtDate(best.w.weekEndDate):'')}</div>`;
+
+  if(part('trend') && series.length>1) html+=`<section class="ki-sec"><h4>Last ${series.length} weeks</h4><div class="ki-chart"><canvas id="kiTrendCanvas"></canvas></div></section>`;
+
+  // ---- division split ----
+  if(part('divisions') && !ctx.division){
+    const by={};
+    ctx.weeks.forEach(w=>activeRecruiters(w).forEach(([n,r])=>{ if(excludedRecruitersSet.has(n)) return; const d=getEffectiveRecruiterDivision(n,w.weekEndDate)||'Unassigned'; const o=by[d]||(by[d]={t:emptyTotals(),goal:0,rec:0}); for(const k in o.t) o.t[k]+=r[k]||0; o.goal+=kpiGoalOf(n,w.weekEndDate); o.rec++; }));
+    const rows=Object.entries(by).map(([d,o])=>({d,v:kpiValue(def,o.t,o.goal,o.rec),o})).filter(x=>x.v!=null).sort((a,b)=>def.good==='up'?b.v-a.v:a.v-b.v);
+    const mx=Math.max(1,...rows.map(x=>Math.abs(x.v)));
+    if(rows.length) html+=`<section class="ki-sec"><h4>By division</h4><div class="ki-bars">${rows.map(x=>`<div class="ki-bar"><span>${escapeHtml(x.d)}</span><div><i style="width:${Math.max(2,Math.abs(x.v)/mx*100)}%"></i></div><b class="${okCls(x.v)}">${kpiFmt(def,x.v)}</b></div>`).join('')}</div></section>`;
+  }
+  // ---- recruiter & branch rankings ----
+  const rank=(list,isRec)=>{
+    const rows=list.map(r=>{ const goal=isRec?ctx.weeks.reduce((s,w)=>s+((w.byRecruiter||{})[r.name]?kpiGoalOf(r.name,w.weekEndDate):0),0):0;
+      const weeksActive=isRec?ctx.weeks.filter(w=>(w.byRecruiter||{})[r.name]).length:1;
+      return {...r, v:kpiValue(def,r,goal,weeksActive), goal}; }).filter(r=>r.v!=null && (def.d?((def.d==='goal'?r.goal:def.d==='recruiters'?1:r[def.d])>0):true));
+    rows.sort((a,b)=>def.good==='up'?b.v-a.v:a.v-b.v);
+    return rows;
+  };
+  const tableHtml=(id,title,rows,isRec)=>{
+    if(!rows.length) return `<section class="ki-sec"><h4>${title}</h4><p class="hint">Nothing to show for this selection.</p></section>`;
+    const sub=r=>def.d==='scheduledDateOf'?`${fmtNum(r[def.n])} / ${fmtNum(r.scheduledDateOf)}`:def.d==='goal'?`${fmtNum(r.schedules)} / ${fmtNum(r.goal)}`:'';
+    return `<section class="ki-sec"><div class="ki-head"><h4>${title}</h4><input type="search" class="ki-search" data-ki-filter="${id}" placeholder="Search…" aria-label="Search ${title}">${copyBtnHtml(id)}</div><div class="hp-table-wrap ki-table"><table class="ep-table" id="${id}"><thead><tr><th>#</th><th>${isRec?'Recruiter':'Branch'}</th><th>${escapeHtml(def.label)}</th>${def.d&&def.d!=='recruiters'?'<th>Of</th>':''}</tr></thead><tbody>${rows.map((r,i)=>`<tr data-ki-name="${escapeHtml(r.name.toLowerCase())}"><td>${i+1}</td><td>${isRec?`<button type="button" class="entity-link" data-ki-rec="${escapeHtml(r.name)}">${escapeHtml(r.name)}</button>`:escapeHtml(r.name)}</td><td class="${okCls(r.v)}"><strong>${kpiFmt(def,r.v)}</strong></td>${def.d&&def.d!=='recruiters'?`<td class="hint">${sub(r)}</td>`:''}</tr>`).join('')}</tbody></table></div></section>`;
+  };
+  const recRows=rank(aggregateAcrossWeeks(ctx.weeks,'byRecruiter').filter(r=>keep(r.name)),true);
+  let brList=aggregateAcrossWeeks(ctx.weeks,'byBranch');
+  if(only){ const mine=new Set(); ctx.weeks.forEach(w=>Object.entries(w.byRecruiter||{}).forEach(([n,r])=>{ if(only.has(n)&&r.branch) mine.add(r.branch); })); brList=brList.filter(b=>mine.has(b.name)); }
+  const brRows=def.d==='goal'||def.d==='recruiters'?[]:rank(brList,false);
+  const scopeNote=only?'<p class="hint ki-scope">Showing only your assigned team.</p>':'';
+  if(part('recruiters')||(part('branches')&&brRows.length)) html+=scopeNote+'<div class="ki-cols">'+(part('recruiters')?tableHtml('kiRecTable','Recruiters',recRows,true):'')+(part('branches')&&(def.d!=='goal'&&def.d!=='recruiters')?tableHtml('kiBrTable','Branches',brRows,false):'')+'</div>';
+  if(!html.includes('ki-sec')) html+='<p class="hint">No further details are enabled for your account.</p>';
+  const body=wrap.querySelector('#kiBody'); body.innerHTML=html;
+  body.querySelectorAll('[data-ki-filter]').forEach(inp=>inp.oninput=()=>{ const q=inp.value.trim().toLowerCase(); body.querySelectorAll('#'+inp.dataset.kiFilter+' tbody tr').forEach(tr=>tr.hidden=!!q&&!tr.dataset.kiName.includes(q)); });
+  body.querySelectorAll('[data-ki-rec]').forEach(b=>b.onclick=()=>{ const n=b.dataset.kiRec; close(); openHistoryPage('recruiters', n); });
+  const cv=body.querySelector('#kiTrendCanvas');
+  if(cv){
+    const tgt=def.target!=null?[{label:'Target', data:series.map(()=>def.target), type:'line', borderColor:'#9aa9b0', borderDash:[5,4], borderWidth:1.5, pointRadius:0, fill:false}]:[];
+    charts.kiTrend=safeChart(cv,{type:'bar',data:{labels:series.map(x=>'Wk '+x.w.weekNumber),datasets:[{label:def.label,data:series.map(x=>x.v==null?null:Math.round(x.v*10)/10),backgroundColor:series.map(x=>x.w.weekEndDate===ctx.end.weekEndDate?def.accent:def.accent+'66'),borderRadius:4},...tgt]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:!!tgt.length},tooltip:{callbacks:{label:c=>c.dataset.label+': '+kpiFmt(def,c.raw)}}},scales:{y:{beginAtZero:true}}}});
+  }
+}
+document.addEventListener('click', e=>{
+  const card=e.target.closest('#view-weekly .kpi-v2 .kpi-card'); if(!card) return;
+  const key=(card.dataset.section||'').replace('perf.kpi.','');
+  if(kpiDetailAllowed(key)) openKpiInsights(key);
+});
+document.addEventListener('keydown', e=>{
+  if(e.key!=='Enter'&&e.key!==' ') return; const card=e.target.closest&&e.target.closest('#view-weekly .kpi-v2 .kpi-card'); if(!card) return;
+  const key=(card.dataset.section||'').replace('perf.kpi.',''); if(kpiDetailAllowed(key)){ e.preventDefault(); openKpiInsights(key); }
+});
 function kpiCardHtml(o){
  const benchmark={'Goal Reach':[90,'Minimum 90%'],'Show Rate':[70,'Minimum 70%'],'Hires per Recruiter':[15,'Minimum 15'],'No Show Rate':[20,'Less than 20%']}[o.label];
  if(benchmark&&o.bar)o={...o,bar:{...o.bar,target:benchmark[0],strict:o.label==='No Show Rate'}};
@@ -4129,7 +4279,8 @@ function kpiCardHtml(o){
     const ok = o.bar.good==='up' ? o.bar.v>=o.bar.target : (o.bar.strict?o.bar.v<o.bar.target:o.bar.v<=o.bar.target);
     foot = `<div class="kpi-foot kpi-bar-wrap" title="Target ${o.bar.good==='up'?'≥':o.bar.strict?'<':'≤'} ${o.bar.target}${unit}"><div class="kpi-bar"><i style="width:${scale(o.bar.v)}%;background:${ok?'#1f9a6c':'#d0776f'}"></i><b style="left:${scale(o.bar.target)}%"></b></div><span class="kpi-foot-lbl">${o.bar.good==='up'?'≥':o.bar.strict?'<':'≤'} ${o.bar.target}${unit}</span></div>`;
   }
-  return `<div class="kpi-card${o.rate?' kpi-rate':''}" data-section="perf.kpi.${o.label.toLowerCase().replace(/[^a-z]+/g,'_').replace(/^_|_$/g,'')}" style="--accent:${o.accent}"${o.title?` title="${escapeHtml(o.title)}"`:''}><div class="kpi-top"><div class="label">${o.label}</div><span class="kpi-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${KPI_ICONS[o.icon]||''}</svg></span></div><div class="value">${o.value}</div>${benchmark?`<div class="kpi-minimum">${benchmark[1]}</div>`:''}${o.delta||''}${foot}</div>`;
+  const dk=o.label.toLowerCase().replace(/[^a-z]+/g,'_').replace(/^_|_$/g,''), clickable=kpiDetailAllowed(dk);
+  return `<div class="kpi-card${o.rate?' kpi-rate':''}${clickable?' kpi-click':''}" data-section="perf.kpi.${dk}" style="--accent:${o.accent}"${clickable?' role="button" tabindex="0"':''} title="${escapeHtml((o.title?o.title+' · ':'')+(clickable?'Click for details':''))}"><div class="kpi-top"><div class="label">${o.label}</div><span class="kpi-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${KPI_ICONS[o.icon]||''}</svg></span></div><div class="value">${o.value}</div>${benchmark?`<div class="kpi-minimum">${benchmark[1]}</div>`:''}${o.delta||''}${foot}</div>`;
 }
 function drawKpiMiniPies(weeks){
   const totals=computeDivisionBreakdown(weeks);
@@ -6538,6 +6689,26 @@ const MODULES = [
 const VIEW_MODULE = {teams:'teams',performance:'performance', recruiters:'recruiters', branches:'branches', master:'master', candidates:'candidate_hub', alerts:'alerts', pivot:'pivot'};
 
 function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+// Default page: the person's own choice (this browser) → the one an admin set for them → first page they can open.
+const DEFAULT_VIEW_LABELS = {performance:'Performance Overview', teams:'My Team', recruiters:'Recruiter Scorecards', branches:'Branch Results', alerts:'Action Center', candidates:'Candidate Hub', master:'Candidate Hub — master sheet', pivot:'Report Builder'};
+function adminDefaultViews(){ return KV.get('userDefaultViews')||{}; }
+function defaultViewOptions(u){ const can=v=>!u||u.role!=='user'||v==='teams'||(u.modules||[]).includes(VIEW_MODULE[v]); return Object.keys(DEFAULT_VIEW_LABELS).filter(v=>VIEW_MODULE[v]&&can(v)).map(v=>[v,DEFAULT_VIEW_LABELS[v]]); }
+function myDefaultViewKey(){ return 'ipd_default_view:'+(Server.user?.id||''); }
+function resolveDefaultView(){
+  const allowed=v=>v && VIEW_MODULE[v] && Server.can(VIEW_MODULE[v]);
+  const mine=lsGet(myDefaultViewKey()), admin=adminDefaultViews()[Server.user?.id];
+  return allowed(mine)?mine:allowed(admin)?admin:null;
+}
+function applyDefaultView(){
+  const v=resolveDefaultView(); if(!v) return;
+  currentView=v; document.querySelectorAll('#navList button').forEach(b=>b.classList.toggle('active', b.dataset.view===v));
+}
+function renderDefaultViewPref(){
+  const sel=document.getElementById('defaultViewSelect'); if(!sel||!Server.user) return;
+  const opts=defaultViewOptions(null).filter(([v])=>Server.can(VIEW_MODULE[v])), admin=adminDefaultViews()[Server.user.id], mine=lsGet(myDefaultViewKey())||'';
+  sel.innerHTML=`<option value="">${admin&&DEFAULT_VIEW_LABELS[admin]?'Set by admin: '+DEFAULT_VIEW_LABELS[admin]:'First page I can open'}</option>`+opts.map(([v,l])=>`<option value="${v}" ${mine===v?'selected':''}>${escapeHtml(l)}</option>`).join('');
+  sel.onchange=()=>{ try{ sel.value?localStorage.setItem(myDefaultViewKey(),sel.value):localStorage.removeItem(myDefaultViewKey()); }catch(e){} showToast(sel.value?'You’ll start on '+DEFAULT_VIEW_LABELS[sel.value]+' next time.':'Default page reset.'); };
+}
 function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
 function lsDel(k){ try{ localStorage.removeItem(k); }catch(e){} }
 function cleanErr(e){ return String((e && e.message) || e || 'Unknown error').replace(/^[A-Z_]+:\s*/,''); }
@@ -6843,7 +7014,8 @@ function renderUploadAlerts(){
 // stored per user as a deny-list; hiding is done with one generated stylesheet, so it also covers
 // anything re-rendered later.
 const PAGE_SECTIONS = {
-  performance:[['perf.kpis','KPI cards (all)'],['perf.kpi.schedules','· Schedules card'],['perf.kpi.interviews','· Interviews card'],['perf.kpi.shows','· Shows card'],['perf.kpi.no_shows','· No Shows card'],['perf.kpi.hires','· Hires card'],['perf.kpi.placed','· Placed card'],['perf.kpi.hires_per_recruiter','· Hires per Recruiter card'],['perf.kpi.goal_reach','· Goal Reach card'],['perf.kpi.show_rate','· Show Rate card'],['perf.kpi.no_show_rate','· No Show Rate card'],
+  performance:[['perf.kpis','KPI cards (all)'],['perf.kpi.schedules','· Schedules card'],['perf.detail.schedules','·· Schedules — click-through details'],['perf.kpi.interviews','· Interviews card'],['perf.detail.interviews','·· Interviews — click-through details'],['perf.kpi.shows','· Shows card'],['perf.detail.shows','·· Shows — click-through details'],['perf.kpi.no_shows','· No Shows card'],['perf.detail.no_shows','·· No Shows — click-through details'],['perf.kpi.hires','· Hires card'],['perf.detail.hires','·· Hires — click-through details'],['perf.kpi.placed','· Placed card'],['perf.detail.placed','·· Placed — click-through details'],['perf.kpi.hires_per_recruiter','· Hires per Recruiter card'],['perf.detail.hires_per_recruiter','·· Hires per Recruiter — click-through details'],['perf.kpi.goal_reach','· Goal Reach card'],['perf.detail.goal_reach','·· Goal Reach — click-through details'],['perf.kpi.show_rate','· Show Rate card'],['perf.detail.show_rate','·· Show Rate — click-through details'],['perf.kpi.no_show_rate','· No Show Rate card'],['perf.detail.no_show_rate','·· No Show Rate — click-through details'],
+                ['perf.detail.part.trend','Card details — 12-week trend'],['perf.detail.part.divisions','Card details — division split'],['perf.detail.part.recruiters','Card details — recruiter ranking'],['perf.detail.part.branches','Card details — branch ranking'],['perf.detail.all_people','Card details — all recruiters & branches (untick = only their assigned team)'],
                 ['perf.trends','Trends charts'],['perf.leaderboards','Leaderboards (recruiter & branch snapshots)'],['perf.divisions','Division breakdown'],['perf.history','Previous 6 weeks table'],['perf.insights','Insights'],['perf.composition','Composition pies (monthly / quarterly)']],
   teams:[['team.summary','Team — summary cards'],['team.daily','Team — daily table'],['team.weekly','Team — weekly table'],['team.goals','Team — goal checks and breaks'],['team.charts','Team — charts'],['team.candidates','Team — today’s scheduled candidates'],...['Schedules','Interviews','Shows','No Shows','Hires','Placed','Hires per Recruiter','Goal Reach','Show Rate','No Show Rate'].map(l=>['team.kpi.'+l.toLowerCase().replace(/[^a-z]+/g,'_'),'· '+l+' card'])],
   recruiters:[['rec.table','Recruiter table'],['hist.kpis','History page — summary tiles (recruiter & branch)'],['hist.trend','History page — week-by-week chart'],['hist.goal','History page — schedules vs goal chart'],['hist.weeks','History page — every-week table'],['hist.remarks','History page — remarks'],['hist.candidates','History page — candidates']],
@@ -7000,7 +7172,8 @@ async function afterLogin(boot){
     await loadDivisionNames(); await loadDedupeSetting(); await loadAllWeeks(); await loadExcludedRecruiters(); await loadExcludedBranches();
     await loadRecruiterDivisions(); await loadBranchDivisions(); await loadDedupeSetting(); await loadPerformerHighlightSetting();
     deleteSourceFilesAfterImport = lsGet('ipd_delete_sources')!=='0';
-    applyPermissions();
+    if(!location.hash || location.hash==='#') applyDefaultView();
+    applyPermissions(); renderDefaultViewPref();
     document.getElementById('storageModeNote').textContent = 'Signed in as '+Server.user.name+' · data is stored securely on the server.';
     refreshUI();
     setLoading(null);
@@ -8331,7 +8504,8 @@ function drawUserForm(){
       <label class="role-opt"><input type="radio" name="ufRole" value="admin" ${u.role==='admin'?'checked':''}><span><strong>Admin</strong><em>Every module, approves remarks, manages users (can’t change passwords, admins or the super admin)</em></span></label></div>` : ''}
     ${sa?'<p class="hint">The super admin always has every right.</p>':`<p class="hint admin-note" ${u.role==='admin'?'':'hidden'}>Admins see every module and section — the ticks below only apply if you change them back to User.</p><fieldset class="mod-grid"><legend>Modules this person can open</legend>${MODULES.map(m=>`<label class="mod-opt"><input type="checkbox" value="${m.key}" ${u.modules.includes(m.key)?'checked':''}><span><strong>${escapeHtml(m.label)}</strong><em>${escapeHtml(m.hint)}</em></span></label>`).join('')}</fieldset>
     <label class="mod-opt"><input type="checkbox" data-sec="copy.tables" ${(u.hidden_sections||[]).includes("copy.tables")?"":"checked"}><span><strong>Copy tables</strong><em>Allow copying tables and candidate lists to the clipboard</em></span></label>
-    <fieldset class="sec-grid"><legend>What this person sees on each page <span class="hint">(untick to hide a card or section)</span></legend>${Object.entries(PAGE_SECTIONS).map(([mod,secs])=>`<details class="sec-page" data-sec-mod="${mod}" ${mod==='teams'||u.modules.includes(mod)?'':'hidden'}><summary>${escapeHtml((MODULES.find(m=>m.key===mod)||{label:mod==='teams'?'My Team':mod}).label)} <span class="sec-count"></span></summary><div class="sec-list">${secs.map(([k,l])=>`<label class="sec-opt${l.startsWith('·')?' sub':''}"><input type="checkbox" data-sec="${k}" ${(u.hidden_sections||[]).includes(k)?'':'checked'}> ${escapeHtml(l.replace(/^· /,''))}</label>`).join('')}</div></details>`).join('')}</fieldset>
+    <fieldset class="sec-grid"><legend>What this person sees on each page <span class="hint">(untick to hide a card or section)</span></legend>${Object.entries(PAGE_SECTIONS).map(([mod,secs])=>`<details class="sec-page" data-sec-mod="${mod}" ${mod==='teams'||u.modules.includes(mod)?'':'hidden'}><summary>${escapeHtml((MODULES.find(m=>m.key===mod)||{label:mod==='teams'?'My Team':mod}).label)} <span class="sec-count"></span></summary><div class="sec-list">${secs.map(([k,l])=>`<label class="sec-opt${l.startsWith('··')?' sub sub2':l.startsWith('·')?' sub':''}"><input type="checkbox" data-sec="${k}" ${(u.hidden_sections||[]).includes(k)?'':'checked'}> ${escapeHtml(l.replace(/^·+ /,''))}</label>`).join('')}</div></details>`).join('')}</fieldset>
+    <div class="field" style="margin-top:8px;max-width:340px"><label for="ufDefaultView">Default page when they sign in</label><select id="ufDefaultView"><option value="">Their own choice (first page they can open)</option>${defaultViewOptions(u).map(([v,l])=>`<option value="${v}" ${adminDefaultViews()[u.id]===v?'selected':''}>${escapeHtml(l)}</option>`).join('')}</select><span class="hint">They can still change it themselves in Settings → My account.</span></div>
     <label class="mod-opt" style="margin-top:6px;"><input type="checkbox" id="ufActive" ${u.active?'checked':''}><span><strong>Account active</strong><em>Untick to block sign-in without deleting the account</em></span></label>`}
     <p class="auth-msg" id="ufMsg" role="alert"></p>
     <div class="user-form-actions"><button class="btn btn-secondary btn-sm" id="ufCancel">Cancel</button><button class="btn btn-primary btn-sm" id="ufSave">${isNew?'Create user':'Save changes'}</button></div>
@@ -8341,7 +8515,8 @@ function drawUserForm(){
   if(u.role==='admin') host.querySelectorAll('.mod-grid,.sec-grid').forEach(f=>f.classList.add('dimmed'));
   const secCount = ()=>host.querySelectorAll('.sec-page').forEach(d=>{ const all=d.querySelectorAll('[data-sec]').length, on=d.querySelectorAll('[data-sec]:checked').length; d.querySelector('.sec-count').textContent = on===all ? 'everything' : on+' of '+all+' shown'; });
   host.querySelectorAll('.mod-grid input').forEach(cb=>cb.addEventListener('change', ()=>{ const d=host.querySelector('.sec-page[data-sec-mod="'+cb.value+'"]'); if(d) d.hidden=!cb.checked; }));
-  host.querySelectorAll('[data-sec]').forEach(cb=>cb.addEventListener('change', secCount)); secCount();
+  const syncDetail = ()=>host.querySelectorAll('[data-sec^="perf.detail."]:not([data-sec^="perf.detail.part."]):not([data-sec="perf.detail.all_people"])').forEach(cb=>{ const card=host.querySelector('[data-sec="perf.kpi.'+cb.dataset.sec.slice(12)+'"]'); const off=card&&!card.checked; cb.disabled=off; if(off) cb.checked=false; });
+  host.querySelectorAll('[data-sec]').forEach(cb=>cb.addEventListener('change', ()=>{ syncDetail(); secCount(); })); syncDetail(); secCount();
   host.querySelector('#ufCancel').onclick=()=>{ editingUserId=null; host.innerHTML=''; };
   host.querySelector('#ufSave').onclick=async ()=>{
     const p = {name:host.querySelector('#ufName').value.trim()};
@@ -8352,6 +8527,8 @@ function drawUserForm(){
     if(isNew && !pw){ host.querySelector('#ufMsg').textContent='Set a password (or click Generate).'; return; }
     try{
       const saved = await Server.rpc('dash_user_save', {p});
+      const dvSel = host.querySelector('#ufDefaultView'); const uid = (saved&&saved.id)||u.id;
+      if(dvSel && uid!=null && (adminDefaultViews()[uid]||'')!==dvSel.value){ const m={...adminDefaultViews()}; if(dvSel.value) m[uid]=dvSel.value; else delete m[uid]; await storageSet('userDefaultViews', m); }
       // the server keeps only rights it knows; if one was dropped its SQL is out of date
       const dropped = (p.modules||[]).filter(m=>saved && Array.isArray(saved.modules) && !saved.modules.includes(m));
       if(dropped.length){
