@@ -1210,7 +1210,7 @@ body.team-workspace .content{padding-top:10px!important}
 .lt-tabs button{font:inherit;font-size:13px;font-weight:600;color:#5c7480;background:none;border:0;border-bottom:2px solid transparent;padding:9px 12px;cursor:pointer;border-radius:8px 8px 0 0}
 .lt-tabs button:hover{color:#10303c;background:#eef4f5}.lt-tabs button.active{color:#10303c;border-bottom-color:#2f8f8a;background:#fff}
 .lt-tabs-range{margin-left:auto;padding-right:6px;font-size:12px!important}.ta-more summary{cursor:pointer;font-size:12px;color:#2f8f8a;font-weight:600;margin-top:8px}.ta-more ul{margin-top:8px!important}.ta-box ul{max-height:none!important}.lt-pane{padding:16px}.lt-pane-head{display:flex;justify-content:flex-end;margin-bottom:8px}
-.lt-pane#ltScheduledCandidates>h3:first-child{display:none}
+#ltScheduledCandidates .lt-pane-head{align-items:center;margin:8px 0 0}#ltScheduledCandidates .lt-pane-head .hint{font-size:12px}.lt-empty{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:18px;border:1px dashed #d6e2e6;border-radius:12px;background:#fbfdfd;color:#3f5863;font-size:13px}.lt-empty strong{color:#10303c;font-size:14px}.lt-empty .btn{margin-top:4px}
 .ta-h{margin:4px 0 8px;font-size:13px;color:#132f3b}
 .ta-matrix th small{display:block;font-weight:500;text-transform:none;letter-spacing:0;color:#7a8f99;font-size:10.5px}
 .ta-cell{font-weight:700;font-variant-numeric:tabular-nums}.ta-cell small{display:block;font-weight:500;font-size:10.5px;color:#6a808b}
@@ -5839,13 +5839,15 @@ async function renderHistoryCandidates(){
 }
 
 // Candidates created today (system date) — falls back to the master rows if the weekly lists are restricted.
-async function scheduledTodayRows(){
-  const today=ltToday(), week=weekOfDate(today).weekEnd;
+async function scheduledRowsOn(date){
+  const week=weekOfDate(date).weekEnd;
+  if(!weeksData.some(w=>w.weekEndDate===week)) return [];
   let lists=null;
   try{ lists=(await candFromWeekLists(week))?.lists; }catch(e){}
   if(!lists) lists=candCompute(await loadCandidateWeek(week),week).lists;
-  return (lists.schedules||[]).filter(c=>c.date===today);
+  return (lists.schedules||[]).filter(c=>c.date===date);
 }
+async function scheduledTodayRows(){ return scheduledRowsOn(ltToday()); }
 async function renderHistoryToday(name){
   const host=document.getElementById('historyToday'); if(!host || !hasRecruiterHistoryAccess(name)) return;
   const today=ltToday();
@@ -9051,7 +9053,9 @@ function tgCalculate(g,from,to,weeks){
 function tgNumber(n){return n===null?'Unavailable':Number(n||0).toLocaleString('en-US',{maximumFractionDigits:1});}
 function tgRate(n,d){return n===null||d===null||!d?'—':(n/d*100).toFixed(1)+'%';}
 /* Admin-owned team assignments; leader dashboard uses local system date/time. */
-const ltState={viewingId:null,users:null,directoryError:'',requestSeq:0,rangeMode:'week',anchor:null,owner:null,assignment:null,loaded:false,loading:false,error:'',period:'current',day:null,weekDate:null,division:'',focus:null,adminDraft:null,adminUser:null,adminBusy:false};
+// Default view: Day, except Thursday 12:00 PM through Friday (local time), when the week is wrapping up.
+function ltDefaultMode(now=new Date()){ const d=now.getDay(); return (d===4&&now.getHours()>=12)||d===5?'week':'day'; }
+const ltState={viewingId:null,users:null,directoryError:'',requestSeq:0,rangeMode:null,anchor:null,owner:null,assignment:null,loaded:false,loading:false,error:'',period:'current',day:null,weekDate:null,division:'',focus:null,adminDraft:null,adminUser:null,adminBusy:false};
 function ltWeeklyGoal(name,date){const g=KV.get('goals:'+weekOfDate(date).weekEnd)||{},v=g[name];return v!==undefined&&v!==null&&v!==''&&Number.isFinite(Number(v))?Number(v):DEFAULT_WEEKLY_GOAL;}
 function ltDailyGoal(name,date){return ltWeeklyGoal(name,date)/5;}
 function ltToday(now=new Date()){return toIsoDateOnly(now);}
@@ -9172,7 +9176,7 @@ function ltCompactCards(report){
 function renderTeamGroups(){
  const host=document.getElementById('view-teams');if(!host||!Server.user)return;
  const owner=String(Server.user.id);
- if(ltState.owner!==owner)Object.assign(ltState,{owner,viewingId:owner,users:null,directoryError:'',assignment:null,loaded:false,loading:false,error:'',rangeMode:'week',anchor:null,division:'',requestSeq:(ltState.requestSeq||0)+1});
+ if(ltState.owner!==owner)Object.assign(ltState,{owner,viewingId:owner,users:null,directoryError:'',assignment:null,loaded:false,loading:false,error:'',rangeMode:null,anchor:null,division:'',requestSeq:(ltState.requestSeq||0)+1});
  if(!Server.isAdmin()&&ltState.viewingId!==owner)Object.assign(ltState,{viewingId:owner,assignment:null,loaded:false,loading:false,error:'',users:null,requestSeq:ltState.requestSeq+1});
  const openGoals=host.querySelector('#ltGoalChecks')?.open||false;
  ['ltGoals','ltTimeline'].forEach(destroyChart);
@@ -9182,7 +9186,7 @@ function renderTeamGroups(){
   if(!ltState.loaded&&!ltState.error&&!ltState.loading)ltLoad();return;
  }
  const a=ltState.assignment,now=new Date(),today=ltToday(now),zone=Intl.DateTimeFormat().resolvedOptions().timeZone;
- const anchor=ltState.anchor||today,mode=ltState.rangeMode||'week',p=ltRange(mode,anchor),cutoff=p.to>today?today:p.to;
+ const anchor=ltState.anchor||today,mode=ltState.rangeMode||ltDefaultMode(now),p=ltRange(mode,anchor),cutoff=p.to>today?today:p.to;
  const g={...ltGroup(a),division:ltState.division},report=ltReport(g,p.from,p.to,today);
  const days=tgDays(p.from,cutoff),byDay=new Map(report.daily.map(x=>[x.label,x]));
  const daily=days.map(date=>({date,r:{total:byDay.get(date)||Object.fromEntries(TG_METRICS.map(([k])=>[k,null]))}}));
@@ -9210,7 +9214,7 @@ function renderTeamGroups(){
    <button role="tab" data-lt-tab="charts" data-section="team.charts">Charts</button>
    <button role="tab" data-lt-tab="daily" data-section="team.daily">Day by day</button>
    ${AN.branches?'<button role="tab" data-lt-tab="branches" data-section="team.analytics.branches">By branch</button>':''}
-   <button role="tab" data-lt-tab="cands" data-section="team.candidates">Scheduled today</button>
+   <button role="tab" data-lt-tab="cands" data-section="team.candidates">Scheduled candidates</button>
    <span class="hint lt-tabs-range">${rangeText}</span>
   </div>
   <div class="lt-pane" data-lt-pane="charts" data-section="team.charts"><div class="tg-charts"><div><h4>Schedules · goal vs achieved</h4><div class="tg-chart"><canvas id="ltGoals" role="img" aria-label="Selected period schedule targets versus achieved"></canvas></div></div><div><h4>Schedules, visits & hires · daily timeline</h4><div class="tg-chart"><canvas id="ltTimeline" role="img" aria-label="Daily activity within the selected period"></canvas></div></div></div></div>
@@ -9468,17 +9472,29 @@ async function ltCopyBreakImage(lists, meta){
 }
 async function ltRenderScheduledCandidates(g){
  const host=document.getElementById('ltScheduledCandidates');if(!host)return;
- const owner=String(Server.user.id),today=ltToday(),week=weekOfDate(today).weekEnd;
- host.innerHTML='<h3>Scheduled today</h3><p class="hint">Loading candidates…</p>';
+ const owner=String(Server.user.id),today=ltToday(),day=ltState.candDate&&ltState.candDate<=today?ltState.candDate:today;
+ host.innerHTML='<p class="hint">Loading candidates…</p>';
+ const mine=(list,d)=>list.filter(c=>tgActive(g,c.recruiter,d)&&(!g.division||(branchDivisions[c.branch]||'Unassigned')===g.division));
  try{
-  const all=await scheduledTodayRows();
+  const rows=mine(await scheduledRowsOn(day),day);
   if(!host.isConnected||String(Server.user?.id)!==owner)return;
-  const rows=all.filter(c=>tgActive(g,c.recruiter,today)&&(!g.division||(branchDivisions[c.branch]||'Unassigned')===g.division));
+  // nothing yet? find the latest earlier day that has candidates, so the tab isn't a dead end
+  let fallback=null;
+  if(!rows.length&&day===today){ for(let i=1;i<=7&&!fallback;i++){ const d=tgShift(today,-i), r=mine(await scheduledRowsOn(d),d); if(r.length) fallback={d,n:r.length}; } }
+  if(!host.isConnected||String(Server.user?.id)!==owner)return;
+  const up=(KV.get('lastUploads')||{}).schedules, upDay=up&&up.at?ltToday(new Date(up.at)):null;
+  const why=day!==today?'':!up?'':upDay<today?`Today’s Created On file hasn’t been uploaded yet${Server.isAdmin()?` (latest: ${new Date(up.at).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})})`:''}, so today’s schedules aren’t in the dashboard yet.`:'Today’s file is uploaded, but nobody on your team has a schedule created today yet.';
   const branches=[...new Set(rows.map(c=>c.branch))].sort();
-  host.innerHTML=`<div class="lt-section-head"><h3>Scheduled today · ${fmtDate(today)}</h3><label class="lt-field">Branch<select id="ltCandidateBranch"><option value="">All team branches</option>${branches.map(b=>`<option>${escapeHtml(b)}</option>`).join('')}</select></label></div><p class="hint">Created today by your assigned team · system date · EID and employee name only</p><div id="ltCandidateRows"></div>`;
-  const draw=()=>{const branch=host.querySelector('#ltCandidateBranch').value,filtered=rows.filter(c=>!branch||c.branch===branch);host.querySelector('#ltCandidateRows').innerHTML=filtered.length?`<div class="hp-table-wrap"><table class="ep-table" id="ltCandidateTable"><thead><tr><th>EID</th><th>Employee name</th></tr></thead><tbody>${filtered.map(c=>`<tr><td>${escapeHtml(c.eid)}</td><td>${escapeHtml(c.name)}</td></tr>`).join('')}</tbody></table></div>${copyBtnHtml('ltCandidateTable')}`:'<p class="hint">No scheduled candidates for today in this selection.</p>';};
-  host.querySelector('#ltCandidateBranch').onchange=draw;draw();
- }catch(e){if(host.isConnected)host.innerHTML='<h3>Scheduled today</h3><p role="alert">Candidate data could not be loaded. Refresh the team to retry.</p>';}
+  host.innerHTML=`<div class="lt-section-head"><h3>${day===today?'Scheduled today':'Scheduled'} · ${fmtDate(day)}</h3><div class="ta-tools"><label class="lt-field">Day<input type="date" id="ltCandDate" value="${day}" max="${today}"></label>${branches.length>1?`<label class="lt-field">Branch<select id="ltCandidateBranch"><option value="">All team branches</option>${branches.map(b=>`<option>${escapeHtml(b)}</option>`).join('')}</select></label>`:''}${day!==today?'<button class="btn btn-secondary btn-sm" id="ltCandToday">Back to today</button>':''}</div></div><p class="hint">Schedules created ${day===today?'today':'on this day'} by your assigned team · EID and employee name only</p><div id="ltCandidateRows"></div>`;
+  const draw=()=>{const branch=host.querySelector('#ltCandidateBranch')?.value||'',filtered=rows.filter(c=>!branch||c.branch===branch);
+   host.querySelector('#ltCandidateRows').innerHTML=filtered.length?`<div class="hp-table-wrap"><table class="ep-table" id="ltCandidateTable"><thead><tr><th>EID</th><th>Employee name</th></tr></thead><tbody>${filtered.map(c=>`<tr><td>${escapeHtml(c.eid)}</td><td>${escapeHtml(c.name)}</td></tr>`).join('')}</tbody></table></div><div class="lt-pane-head"><span class="hint" style="margin-right:auto">${fmtNum(filtered.length)} candidate${filtered.length===1?'':'s'}</span>${copyBtnHtml('ltCandidateTable')}</div>`
+   :`<div class="lt-empty"><strong>No schedules ${day===today?'created today':'on '+fmtDate(day)} yet.</strong>${why?`<span>${escapeHtml(why)}</span>`:''}${fallback?`<button class="btn btn-secondary btn-sm" id="ltCandFallback">Show ${escapeHtml(fmtDate(fallback.d).replace(/, \d{4}$/,''))} · ${fmtNum(fallback.n)} candidate${fallback.n===1?'':'s'}</button>`:''}</div>`;
+   host.querySelector('#ltCandFallback')?.addEventListener('click',()=>{ltState.candDate=fallback.d;ltRenderScheduledCandidates(g);});};
+  host.querySelector('#ltCandidateBranch')?.addEventListener('change',draw);
+  host.querySelector('#ltCandDate').onchange=e=>{ if(tgDate(e.target.value)&&e.target.value<=today){ ltState.candDate=e.target.value===today?null:e.target.value; ltRenderScheduledCandidates(g);} };
+  host.querySelector('#ltCandToday')?.addEventListener('click',()=>{ltState.candDate=null;ltRenderScheduledCandidates(g);});
+  draw();
+ }catch(e){if(host.isConnected)host.innerHTML='<p role="alert">Candidate data could not be loaded. Refresh the team to retry.</p>';}
 }
 // ---------- One team per recruiter per day ----------
 // Every team's ranges (the lead's own recruiter name counts as a member for all dates).
