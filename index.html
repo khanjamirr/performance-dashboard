@@ -1157,24 +1157,53 @@ body.team-workspace .content{padding-top:10px!important}
 #accountMenu.acct-flyout .ribbon-btn:hover,#accountMenu.acct-flyout .ribbon-btn:focus-visible{background:#eef5f6!important}
 @keyframes acctIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
 
-.mk-grid{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:12px!important;margin-bottom:22px}
-.mk-card{display:flex!important;flex-direction:column;gap:8px;background:#fff!important;color:var(--text)!important;border:1px solid #e1eaed!important;border-radius:14px!important;padding:14px 15px 12px!important;position:relative;overflow:hidden;min-width:0;box-shadow:0 1px 2px #1834420a!important;min-height:0!important}
-.mk-card:before{content:''!important;position:absolute!important;left:0!important;top:0!important;right:0!important;width:auto!important;height:3px!important;margin:0!important;border-radius:0!important;background:var(--accent)!important;opacity:.85}
-.mk-card[data-kd]{cursor:pointer;transition:transform .15s,box-shadow .15s}.mk-card[data-kd]:hover{transform:translateY(-2px);box-shadow:0 2px 4px #1834420d,0 14px 30px #18344214!important}
+.mk-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:14px!important;margin-bottom:24px}
+.mk-card{--tint:#ffffff;display:flex!important;flex-direction:column;gap:10px;color:var(--text)!important;border:1px solid #e1eaed!important;border-radius:16px!important;padding:16px 16px 13px!important;position:relative;overflow:hidden;min-width:0;min-height:0!important;
+  background:radial-gradient(120% 70% at 100% 0%,var(--tint) 0%,#fff 62%)!important;box-shadow:0 1px 2px #1834420a,0 6px 18px #1834420a!important;transition:transform .18s ease,box-shadow .18s ease}
+.mk-good{--tint:#e6f6ee}.mk-watch{--tint:#fdf3dc}.mk-bad{--tint:#fde7ea}.mk-info{--tint:#f3eee4}.mk-pending{--tint:#eef2f4}
+.mk-card:before{content:''!important;position:absolute!important;left:0!important;top:0!important;right:0!important;width:auto!important;height:4px!important;margin:0!important;border-radius:0!important;background:linear-gradient(90deg,var(--accent),var(--st))!important;opacity:1}
+.mk-card[data-kd]{cursor:pointer}.mk-card[data-kd]:hover{transform:translateY(-3px);box-shadow:0 4px 8px #1834420f,0 18px 36px #1834421f!important}
 .mk-card [data-kd]:focus-visible,.mk-card[data-kd]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.mk-top .label{font-size:11px!important;font-weight:700!important;letter-spacing:.05em;text-transform:uppercase;color:#5c7480!important;padding:0!important;min-height:0!important}
-.mk-card .value{font-size:28px!important;font-weight:700;line-height:1.1;margin:0!important;color:#132f3b;font-variant-numeric:tabular-nums}.mk-card .value small{font-size:15px;font-weight:600;color:#7a8f99}
-.mk-rows{display:flex;flex-direction:column;gap:7px}
-.mk-row{border-top:1px dashed #e4ecef;padding-top:7px;border-radius:6px}.mk-row[data-kd]{cursor:pointer}.mk-row[data-kd]:hover{background:#f5f9fa}
-.mk-row-h{display:flex;align-items:center;gap:6px;font-size:12.5px;color:#3f5863}.mk-row-h span{margin-right:auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mk-row-h b{font-variant-numeric:tabular-nums;color:#132f3b}
-.mk-chip{font-style:normal;font-size:11px;font-weight:700;padding:1px 6px;border-radius:6px;background:#eef3f5;color:#3f5863;font-variant-numeric:tabular-nums;white-space:nowrap}.mk-chip.ok{background:#e3f4ee;color:#17684a}.mk-chip.low{background:#fde3e3;color:#a12d36}
-.mk-bar{position:relative;height:6px;border-radius:4px;background:#eef3f4;margin-top:5px}.mk-bar i{display:block;height:100%;border-radius:4px}.mk-bar s{position:absolute;top:-3px;bottom:-3px;width:2px;background:#132f3b;opacity:.55;transform:translateX(-1px)}
-.mk-row small{display:block;font-size:10.5px;color:#7a8f99;margin-top:3px}
-.mk-foot{margin-top:auto;font-size:11.5px}.mk-foot .delta{margin:0!important;font-size:11.5px!important}
-.mk-team{margin:0;gap:8px!important}.mk-compact{padding:9px 11px 9px!important;gap:4px;border-radius:9px!important}.mk-compact .value{font-size:20px!important}.mk-compact .value small{font-size:12px}.mk-compact .mk-rows{gap:2px}.mk-compact .mk-row{padding-top:3px;border-top:0}.mk-compact .mk-row-h{font-size:11.5px}
-@media(max-width:1200px){.mk-grid:not(.mk-team){grid-template-columns:repeat(3,minmax(0,1fr))!important}}
-@media(max-width:760px){.mk-grid:not(.mk-team){grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}.mk-card .value{font-size:22px!important}}
-@media(max-width:1100px){.mk-team{display:flex!important;overflow-x:auto}.mk-team>.mk-card{flex:0 0 190px}}
+.mk-top{display:flex;align-items:center;gap:8px}
+.mk-top .label{font-size:11px!important;font-weight:700!important;letter-spacing:.06em;text-transform:uppercase;color:#4f6873!important;padding:0!important;min-height:0!important;margin-right:auto}
+.mk-status{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;letter-spacing:.02em;color:var(--st);background:#fff;border:1px solid color-mix(in srgb,var(--st) 35%,#fff);border-radius:999px;padding:2px 8px 2px 3px;white-space:nowrap}
+.mk-status i{font-style:normal;display:inline-grid;place-items:center;width:15px;height:15px;border-radius:50%;background:var(--st);color:#fff;font-size:9.5px;line-height:1}
+.mk-main{display:flex;align-items:center;gap:10px}.mk-figs{flex:1;min-width:0}
+.mk-card .value{font-family:var(--font-display);font-size:32px!important;font-weight:800;letter-spacing:-.02em;line-height:1.05;margin:0!important;color:#10303c;font-variant-numeric:tabular-nums;white-space:nowrap}
+.mk-card .value small{font-size:15px;font-weight:600;color:#7a8f99;letter-spacing:0}
+.mk-sub{font-size:11.5px;color:#6a808b;margin-top:4px}
+.mk-ring{flex:0 0 auto;filter:drop-shadow(0 2px 4px #18344214)}.mk-ring-arc{transition:stroke-dasharray .6s ease}
+.mk-ring-v{font-family:var(--font-display);font-size:13px;font-weight:800;fill:#10303c}.mk-ring-s{font-size:8.5px;font-weight:600;fill:#7a8f99}
+.mk-body{display:flex;flex-direction:column;gap:6px}
+.mk-row{display:flex;align-items:center;gap:6px;font-size:12.5px;color:#3f5863;padding:3px 4px;margin:0 -4px;border-radius:7px}.mk-row[data-kd]{cursor:pointer}.mk-row[data-kd]:hover{background:#ffffffb3;box-shadow:inset 0 0 0 1px #e1eaed}
+.mk-row span{margin-right:auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}.mk-row b{font-variant-numeric:tabular-nums;color:#10303c}
+.mk-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.mk-chip{font-style:normal;font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;background:#eef3f5;color:#3f5863;font-variant-numeric:tabular-nums;white-space:nowrap}.mk-chip.ok{background:#dcf2e7;color:#15633f}.mk-chip.low{background:#fcdfe3;color:#a12d3e}
+.mk-stack{position:relative;display:flex;height:9px;border-radius:6px;overflow:visible;background:#eef3f4;margin:2px 0 3px}.mk-stack i{display:block;height:100%}.mk-stack i:first-child{border-radius:6px 0 0 6px}.mk-stack i:last-of-type{border-radius:0 6px 6px 0}
+.mk-stack s{position:absolute;top:-4px;bottom:-4px;width:2px;background:#10303c;opacity:.55;border-radius:2px}
+.mk-insight{display:flex;gap:7px;align-items:flex-start;font-size:12px;line-height:1.45;color:#2c4652;background:#ffffffc7;border:1px solid #e6eef1;border-radius:10px;padding:7px 9px}
+.mk-insight b{color:#10303c}.mk-ins-ico{flex:0 0 auto;display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;margin-top:-1px}
+.mk-ins-good{background:#dcf2e7;color:#15633f}.mk-ins-tip{background:color-mix(in srgb,var(--st) 16%,#fff);color:var(--st)}.mk-info .mk-ins-tip{background:#f3eee4;color:#8a6a1f}
+.mk-foot{margin-top:auto;display:flex;align-items:flex-end;gap:8px;padding-top:2px}.mk-foot>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.mk-foot .delta{margin:0!important;font-size:11.5px!important;font-weight:600}
+.mk-foot .delta.down{color:#6a808b!important}.mk-chip:not(.ok){background:color-mix(in srgb,var(--accent) 12%,#fff);color:color-mix(in srgb,var(--accent) 80%,#10303c)}.mk-info{--tint:color-mix(in srgb,var(--accent) 14%,#fff)}.mk-card:before{background:var(--accent)!important}.mk-foot .kpi-spark{width:96px;height:28px;flex:0 0 96px;color:var(--accent);margin:0}
+.mk-team{margin:0;gap:8px!important}.mk-compact{padding:8px 11px!important;gap:3px;border-radius:10px!important}.mk-compact .value{font-size:20px!important}.mk-compact .value small{font-size:12px}.mk-compact .mk-sub{display:none}.mk-compact .mk-body{gap:0}.mk-compact .mk-row{font-size:11.5px;padding:1px 4px}.mk-compact .mk-stack{display:none}.mk-compact:before{height:3px!important}
+@media(max-width:1250px){.mk-grid:not(.mk-team){grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:760px){.mk-grid:not(.mk-team){grid-template-columns:1fr!important;gap:10px!important}.mk-card .value{font-size:26px!important}}
+@media(max-width:1100px){.mk-team{display:flex!important;overflow-x:auto}.mk-team>.mk-card{flex:0 0 200px}}
+@media(prefers-reduced-motion:reduce){.mk-card,.mk-ring-arc{transition:none}}
+
+.ta-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:6px 0 16px}
+.ta-box{border:1px solid #e1eaed;border-radius:12px;padding:12px 14px;background:#fbfdfd}.ta-win{border-top:3px solid #1f9a6c}.ta-att{border-top:3px solid #d0776f}
+.ta-box h4{margin:0 0 8px;font-size:13.5px;display:flex;align-items:center;gap:8px}
+.ta-box ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;max-height:360px;overflow:auto}
+.ta-box li{border-top:1px dashed #e4ecef;padding-top:7px;font-size:12.5px;color:#3f5863;display:flex;flex-direction:column;gap:2px}.ta-box li:first-child{border-top:0;padding-top:0}
+.ta-box li>div{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.ta-where{font-size:11px;color:#5c7480;background:#eef3f5;border-radius:5px;padding:1px 6px}
+.ta-box b{color:#132f3b;font-weight:600}.ta-sev3 b{color:#a12d36}.ta-sev2 b{color:#b0562f}.ta-sev1 b{color:#8a6a1f}
+.ta .hint{font-size:12px;line-height:1.5}.ta .lt-section-head{flex-wrap:wrap;gap:4px 12px}.ta-team{display:block;font-size:10.5px;color:#7a8f99;font-weight:500}.ta-behind{display:block;font-size:10.5px;color:#a12d36;font-weight:600}.ta-matrix tr.lt-mine td{box-shadow:inset 0 1px 0 #2f8f8a,inset 0 -1px 0 #2f8f8a}.ta-matrix th.ta-grp{text-align:center;border-bottom:2px solid #dbe5e8;background:#eef4f5;color:#2c4652}.ta-matrix .ta-plain{color:#10303c;font-weight:700}.ta-h{margin:4px 0 8px;font-size:13px;color:#132f3b}
+.ta-matrix th small{display:block;font-weight:500;text-transform:none;letter-spacing:0;color:#7a8f99;font-size:10.5px}
+.ta-cell{font-weight:700;font-variant-numeric:tabular-nums}.ta-cell small{display:block;font-weight:500;font-size:10.5px;color:#6a808b}
+.ta-g{background:#e9f6f0;color:#17684a}.ta-a{background:#fdf4df;color:#8a6a1f}.ta-r{background:#fde8e8;color:#a12d36}.ta-n{color:#9aa9b0}
+@media(max-width:900px){.ta-cols{grid-template-columns:1fr}}
 </style>
 </head>
 <body class="locked">
@@ -1196,6 +1225,7 @@ body.team-workspace .content{padding-top:10px!important}
       <button data-view="performance" class="active"><span class="dot"></span>Performance Overview</button>
       <div class="divider"></div>
       <button data-view="teams"><span class="dot"></span>My Team</button>
+      <button data-view="leads" class="hidden"><span class="dot"></span>Team Leads</button>
       <button data-view="recruiters"><span class="dot"></span>Recruiter Scorecards</button>
       <button data-view="branches"><span class="dot"></span>Branch Results</button>
       <button data-view="candidates"><span class="dot"></span>Candidate Hub</button>
@@ -1276,6 +1306,7 @@ body.team-workspace .content{padding-top:10px!important}
         <div id="view-quarterly" class="hidden"></div>
       </div>
         <div id="view-teams" class="hidden"></div>
+        <div id="view-leads" class="hidden"></div>
         <div id="view-recruiters" class="hidden"></div>
         <div id="view-branches" class="hidden"></div>
         <div id="view-master" class="hidden"></div>
@@ -3323,6 +3354,7 @@ document.getElementById('weeklyDivisionSelect').addEventListener('change', (e)=>
 
 const VIEW_META = {
   teams:{title:'My Team',sub:'Your assigned team, today’s results and schedule goals'},
+  leads:{title:'Team Leads',sub:'Every team lead’s team side by side — who is leading and who needs support'},
   performance:{title:'Performance Overview', sub:'Interview schedules, shows, and outcomes for the selected week'},
   recruiters:{title:'Recruiter Scorecards', sub:'Show rates and outcomes by recruiter'},
   branches:{title:'Branch Results', sub:'Show rates and outcomes by branch'},
@@ -3358,7 +3390,7 @@ function renderUploadStamp(){
  }
 }
 async function refreshUI(){
- document.body.classList.toggle('team-workspace',currentView==='teams');
+ document.body.classList.toggle('team-workspace',currentView==='teams'||currentView==='leads');
  renderUploadStamp();
  if(currentView==='candidates'&&!Server.can('candidates')&&Server.can('master'))currentView='master';
   closeEntityPopover();
@@ -3382,7 +3414,7 @@ async function refreshUI(){
   // The Uploads page must stay reachable even with zero weeks saved — it's the page you use
   // to add the first one — so it's treated as always-showable, unlike Performance/Recruiter/
   // Branch which genuinely have nothing to render without data.
-  const showDashboardViews = hasData || currentView==='master' || currentView==='teams';
+  const showDashboardViews = hasData || currentView==='master' || currentView==='teams' || currentView==='leads';
   document.getElementById('emptyState').classList.toggle('hidden', showDashboardViews);
   document.getElementById('dashboardViews').classList.toggle('hidden', !showDashboardViews);
   document.getElementById('downloadDropdownWrap').classList.toggle('hidden', !hasData);
@@ -3391,11 +3423,11 @@ async function refreshUI(){
   document.getElementById('viewTitle').textContent = meta.title;
   document.getElementById('viewSub').textContent = showDashboardViews ? meta.sub : 'No data uploaded yet';
 
-  ['teams','performance','recruiters','branches','master','candidates','alerts','pivot','history'].forEach(v=>{
+  ['teams','leads','performance','recruiters','branches','master','candidates','alerts','pivot','history'].forEach(v=>{
     document.getElementById('view-'+v).classList.toggle('hidden', v!==currentView);
   });
 
-  document.getElementById('topbarCenter').classList.toggle('hidden', !showDashboardViews || ['teams','candidates','alerts','pivot','history'].includes(currentView));
+  document.getElementById('topbarCenter').classList.toggle('hidden', !showDashboardViews || ['teams','leads','candidates','alerts','pivot','history'].includes(currentView));
 
   if(currentView!=='recruiters' && currentView!=='branches' && currentView!=='master' && currentView!=='candidates' && currentView!=='alerts' && currentView!=='pivot'){
     const extra = document.getElementById('topbarExtra');
@@ -3405,9 +3437,10 @@ async function refreshUI(){
   renderPeriodPickerButton();
   closePeriodPicker();
   syncDedupeControls();
-  document.getElementById('periodPicker')?.classList.toggle('hidden', currentView==='teams' || currentView==='candidates' || currentView==='alerts' || currentView==='pivot' || currentView==='history');
+  document.getElementById('periodPicker')?.classList.toggle('hidden', currentView==='teams' || currentView==='leads' || currentView==='candidates' || currentView==='alerts' || currentView==='pivot' || currentView==='history');
   ['weeklyDivisionSelect','weeklyDivisionSelectLbl'].forEach(id=>document.getElementById(id).classList.toggle('hidden',currentView!=='performance'));
   if(currentView==='teams'){ renderTeamGroups(); return; }
+  if(currentView==='leads'){ renderLeadsView(); return; }
   if(!hasData){ if(showDashboardViews) renderMasterView(); return; }
 
   if(!currentWeekEndDate || (currentWeekEndDate!=='all-weeks' && !weeksData.find(w=>w.weekEndDate===currentWeekEndDate))){
@@ -3929,10 +3962,12 @@ async function renderWeeklyView(){
       const pend=!isMultiWeekMode && weekIsFullyPending(week.weekEndDate);
       const hpr=hiresPerRecruiter(scopedWeeksForSummary), prevHpr=prev && !isMultiWeekMode ? hiresPerRecruiter([scopeWeekToDivision(prev, universalDivision)]) : null;
       const dh=(hpr.value!=null&&prevHpr&&prevHpr.value!=null)?hpr.value-prevHpr.value:null;
+      const sp=(f,skip)=>sparkSvg(kpiSeries(week,f,skip),'currentColor');
       return mergedKpiCards({prefix:'perf', t, goal:teamGoal, pending:pend, hpr, clickable:kpiDetailAllowed,
+        spark:isMultiWeekMode?{}:{schedules:sp(w=>w.schedules),interviews:sp(w=>w.scheduledDateOf),hires:sp(w=>w.i9,true),placed:sp(w=>w.placed,true)},
         deltas:{schedules:deltaHtml(t.schedules, prevT?prevT.schedules:undefined), interviews:deltaHtml(t.scheduledDateOf, prevT?prevT.scheduledDateOf:undefined),
           hires:pend?'<span class="delta flat">Week hasn’t happened yet</span>':deltaHtml(t.i9, prevT?prevT.i9:undefined), placed:pend?'<span class="delta flat">Week hasn’t happened yet</span>':deltaHtml(t.placed, prevT?prevT.placed:undefined),
-          hpr:dh==null?'<span class="delta flat">'+(isMultiWeekMode?'Per recruiter per week':'No prior week')+'</span>':'<span class="delta '+(dh>=0?'up':'down')+'">'+(dh>=0?'+':'−')+Math.abs(dh).toFixed(1)+' vs prior week</span>'}});
+          hpr:dh==null?'<span class="delta flat">'+(isMultiWeekMode?'Per recruiter per week':'No prior week')+'</span>':'<span class="delta '+(dh>=0?'up':'down')+'">'+(dh>=0?'+':'−')+Math.abs(dh).toFixed(1)+' per recruiter vs prior week</span>'}});
     })()}</div>
 
     <section data-section="perf.trends"><div class="section-divider">Trends</div>
@@ -4167,30 +4202,65 @@ function sparkSvg(pts, color){
 let perfDetailCtx=null;
 // Paired cards: each count sits with the ratio it drives (schedules vs goal, interviews → shows / no shows,
 // shows → hires, hires → placed). Rows carry their own data-section so rights can hide a single line.
-const KPI_PARENT={schedules:['schedules'],goal_reach:['schedules','goal_reach'],interviews:['interviews'],show_rate:['interviews','shows'],no_show_rate:['interviews','no_shows'],hires:['hires'],placed:['placed'],hires_per_recruiter:['hires_per_recruiter']};
+const KPI_PARENT={schedules:['schedules'],goal_reach:['schedules','goal_reach'],interviews:['interviews'],show_rate:['interviews','shows'],no_show_rate:['interviews','no_shows'],hires:['hires','hire_rate'],placed:['placed'],hires_per_recruiter:['hires']};
 function mergedKpiCards(o){
-  const P=o.prefix, t=o.t, num=v=>v==null?'–':fmtNum(v), compact=!!o.compact;
-  const ratio=(n,d)=>n==null||!d?null:n/d*100;
+  const P=o.prefix, t=o.t, compact=!!o.compact, num=v=>v==null?'–':fmtNum(v), d=o.deltas||{}, sp=o.spark||{};
+  const ratio=(n,dd)=>n==null||!dd?null:n/dd*100;
   const click=k=>o.clickable&&o.clickable(k)?` data-kd="${k}" role="button" tabindex="0"`:'';
-  const chip=(v,target,lower)=>v==null?'':`<em class="mk-chip ${target==null?'':(lower?v<target:v>=target)?'ok':'low'}">${v.toFixed(1)}%</em>`;
-  const bar=(v,target,lower,max=100)=>compact||v==null?'':`<div class="mk-bar"><i style="width:${Math.max(1.5,Math.min(100,v/max*100))}%;background:${target==null?'var(--accent)':(lower?v<target:v>=target)?'#1f9a6c':'#d0776f'}"></i>${target!=null?`<s style="left:${Math.min(100,target/max*100)}%"></s>`:''}</div>`;
-  const row=(key,label,value,v,target,lower,note,kd)=>`<div class="mk-row"${key?` data-section="${P}.kpi.${key}"`:''}${kd?click(kd):''}><div class="mk-row-h"><span>${label}</span><b>${value}</b>${o.pending&&v==null?'':chip(v,target,lower)}</div>${bar(v,target,lower)}${note&&!compact?`<small>${note}</small>`:''}</div>`;
-  const card=(key,label,accent,value,rows,foot,kd)=>`<div class="kpi-card mk-card${compact?' mk-compact':''}" data-section="${P}.kpi.${key}" style="--accent:${accent}"${click(kd||key)}><div class="mk-top"><span class="label">${label}</span></div><div class="value">${value}</div><div class="mk-rows">${rows.join('')}</div>${foot&&!compact?`<div class="mk-foot">${foot}</div>`:''}</div>`;
-  const gr=ratio(t.schedules,o.goal), sr=o.pending?null:ratio(t.shows,t.scheduledDateOf), nr=o.pending?null:ratio(t.noShows,t.scheduledDateOf);
-  const hr=ratio(t.i9,t.shows), ph=ratio(t.placed,t.i9), ps=ratio(t.placed,t.shows), hpr=o.hpr||{};
-  const pend=o.pending?'Pending':null, d=o.deltas||{};
+  const ST={good:['On track','✓'],watch:['Watch','!'],bad:['Off track','✕'],info:['',''],pending:['Pending','…']};
+  const COL={good:'#1f9a6c',watch:'#d39a1c',bad:'#d0576a',info:'var(--accent)',pending:'#9aa9b0'};
+  const ring=(frac,center,small,status)=>{ const R=compact?15:27, W=compact?4:6, S=(R+W)*2, C=2*Math.PI*R, f=frac==null?0:Math.max(0,Math.min(1,frac));
+    return `<svg class="mk-ring" width="${S}" height="${S}" viewBox="0 0 ${S} ${S}" aria-hidden="true"><circle cx="${S/2}" cy="${S/2}" r="${R}" fill="none" stroke="#e8eff1" stroke-width="${W}"/><circle cx="${S/2}" cy="${S/2}" r="${R}" fill="none" stroke="${COL[status]}" stroke-width="${W}" stroke-linecap="round" stroke-dasharray="${(C*f).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 ${S/2} ${S/2})" class="mk-ring-arc"/>${compact?'':`<text x="50%" y="${small?'48%':'50%'}" dominant-baseline="middle" text-anchor="middle" class="mk-ring-v">${center}</text>${small?`<text x="50%" y="70%" dominant-baseline="middle" text-anchor="middle" class="mk-ring-s">${small}</text>`:''}`}</svg>`; };
+  const chip=(v,target,lower)=>v==null?'':`<em class="mk-chip ${target!=null&&(lower?v<target:v>=target)?'ok':''}">${v.toFixed(1)}%</em>`;
+  const row=(key,label,value,v,target,lower,kd)=>`<div class="mk-row"${key?` data-section="${P}.kpi.${key}"`:''}${kd?click(kd):''}><span>${label}</span><b>${value}</b>${chip(v,target,lower)}</div>`;
+  const card=({key,label,accent,status,value,sub,ringHtml,body,insight,foot,spark,kd,legacyValue})=>{
+    return `<div class="kpi-card mk-card mk-info${compact?' mk-compact':''}" data-section="${P}.kpi.${key}" style="--accent:${accent};--st:${accent}"${click(kd||key)}>
+      <div class="mk-top"><span class="label">${label}</span></div>
+      <div class="mk-main"><div class="mk-figs"><div class="value">${value}</div>${sub?`<div class="mk-sub">${sub}</div>`:''}</div></div>
+      ${body?`<div class="mk-body">${body}</div>`:''}
+      ${insight&&!compact?`<div class="mk-insight">${insight}</div>`:''}
+      ${!compact&&(foot||spark)?`<div class="mk-foot"><div>${foot||''}</div>${spark||''}</div>`:''}
+    </div>`; };
+  const pend=!!o.pending, hpr=o.hpr||{};
+  const gr=ratio(t.schedules,o.goal), sr=pend?null:ratio(t.shows,t.scheduledDateOf), nr=pend?null:ratio(t.noShows,t.scheduledDateOf);
+  const hr=pend?null:ratio(t.i9,t.shows), ph=ratio(t.placed,t.i9), ps=pend?null:ratio(t.placed,t.shows);
+  const band=(v,good,watch,lower)=>v==null?'info':lower?(v<good?'good':v<watch?'watch':'bad'):(v>=good?'good':v>=watch?'watch':'bad');
+  const worst=(...a)=>a.includes('bad')?'bad':a.includes('watch')?'watch':a.includes('good')?'good':'info';
+  const ico={up:'<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',tip:'<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>',ok:'<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'};
+  const ins=(kind,html)=>`<span class="mk-ins-ico mk-ins-${kind}">${ico[kind==='good'?'ok':'tip']}</span><span>${html}</span>`;
+
+  // insights — lead with what went well
+  const sIns = gr==null||!o.goal ? '' : gr>=100 ? ins('good',`Goal beaten by <b>${fmtNum(t.schedules-o.goal)}</b> schedules`)
+    : gr>=90 ? ins('good',`<b>${fmtNum(t.schedules)}</b> schedules booked · minimum reached`)
+    : ins('good',`<b>${fmtNum(t.schedules)}</b> schedules booked · <b>${fmtNum(Math.ceil(o.goal-t.schedules))}</b> to go for the full goal`);
+  const other=t.scheduledDateOf==null?0:Math.max(0,t.scheduledDateOf-(t.shows||0)-(t.noShows||0));
+  const seg=(v,c,l)=>v>0&&t.scheduledDateOf?`<i style="width:${v/t.scheduledDateOf*100}%;background:${c}" title="${l}: ${fmtNum(v)}"></i>`:'';
+  const stack=pend||!t.scheduledDateOf?'':`<div class="mk-stack">${seg(t.shows,'#2fa57a','Shows')}${seg(t.noShows,'#b9c7cd','No shows')}${seg(other,'#e3e9eb','Not yet resolved')}</div>`;
+  const iIns = pend||!t.shows ? '' : ins('good', sr>=70 ? `<b>${fmtNum(t.shows)}</b> candidates showed up · show rate above 70%` : `<b>${fmtNum(t.shows)}</b> candidates showed up for interviews`);
+  const hIns = !hpr.hires ? '' : ins('good', hpr.value>=15 ? `<b>${fmtNum(hpr.hires)}</b> hires · above 15 per recruiter` : `<b>${fmtNum(hpr.hires)}</b> hires made by <b>${fmtNum(hpr.recruiters)}</b> recruiters`);
+  const sSt='info', iSt='info', hSt='info';
+  const pIns = t.placed ? ins('good',`<b>${fmtNum(t.placed)}</b> hire${t.placed===1?'':'s'} placed into jobs`) : '';
   return [
-    card('schedules','Schedules vs goal','#2f8f8a',`${num(t.schedules)}<small> / ${num(o.goal)}</small>`,
-      [row('goal_reach','Goal reach',gr==null?'–':'',gr,90,false,'Minimum 90%','goal_reach')], d.schedules),
-    card('interviews','Interviews','#4a78c8',num(t.scheduledDateOf),
-      [row('shows','Shows',pend||num(t.shows),sr,70,false,'Show rate · min 70%','show_rate'),
-       row('no_shows','No shows',pend||num(t.noShows),nr,20,true,'No-show rate · under 20%','no_show_rate')], d.interviews),
-    card('hires','Hires','#7a5fb8',num(t.i9),
-      [row('','of shows',pend||num(t.shows),o.pending?null:hr,null,false,'Hire rate (share of shows)')], d.hires),
-    card('placed','Placed','#b07a2a',num(t.placed),
-      [row('','of hires',num(t.i9),ph,null,false,'Share of hires placed'),row('','of shows',pend||num(t.shows),o.pending?null:ps,null,false,'Share of shows placed')], d.placed),
-    card('hires_per_recruiter','Hires per recruiter','#7a5fb8',hpr.value==null?'–':hpr.value.toFixed(1),
-      [`<div class="mk-row"><div class="mk-row-h"><span>${num(hpr.hires)} hires ÷ ${num(hpr.recruiters)} recruiters</span><b></b><em class="mk-chip ${hpr.value==null?'':hpr.value>=15?'ok':'low'}">min 15</em></div>${bar(hpr.value,15,false,22.5)}</div>`], d.hpr)
+    card({key:'schedules',label:'Schedules vs goal',accent:'#2f8f8a',status:sSt,
+      value:`${num(t.schedules)}<small> / ${num(o.goal)}</small>`, sub:'schedules booked vs goal',
+      ringHtml:ring(gr==null?null:gr/100,gr==null?'–':Math.round(gr)+'%','',sSt),
+      body:`<div data-section="${P}.kpi.goal_reach"${click('goal_reach')} class="mk-row">${'<span>Goal reach</span><b></b>'+chip(gr,90,false)}</div>`,
+      insight:sIns, foot:d.schedules, spark:sp.schedules}),
+    card({key:'interviews',label:'Interviews',accent:'#4a78c8',status:iSt,
+      value:num(t.scheduledDateOf), sub:pend?'week hasn’t happened yet':'interviews scheduled',
+      ringHtml:ring(sr==null?null:sr/100,sr==null?'–':Math.round(sr)+'%','',iSt==='pending'?'pending':band(sr,70,60)),
+      body:stack+row('shows','<i class="mk-dot" style="background:#2fa57a"></i>Shows',pend?'Pending':num(t.shows),sr,70,false,'show_rate')+row('no_shows','<i class="mk-dot" style="background:#b9c7cd"></i>No shows',pend?'Pending':num(t.noShows),nr,20,true,'no_show_rate'),
+      insight:iIns, foot:d.interviews, spark:sp.interviews}),
+    card({key:'hires',label:'Hires per recruiter',accent:'#7a5fb8',status:hSt,kd:'hires_per_recruiter',
+      value:hpr.value==null?'–':hpr.value.toFixed(1), sub:`${num(hpr.hires)} hires · ${num(hpr.recruiters)} recruiters`,
+      ringHtml:ring(hpr.value==null?null:hpr.value/15,hpr.value==null?'–':hpr.value.toFixed(1),'of 15',hSt),
+      body:row('hire_rate','Hires from shows',pend?'Pending':`${num(t.i9)}<small class="hint"> / ${num(t.shows)}</small>`,hr,null,false,'hires'),
+      insight:hIns, foot:[d.hpr,d.hires].filter(Boolean).join(''), spark:sp.hires}),
+    card({key:'placed',label:'Placed',accent:'#b07a2a',status:pend?'pending':'info',
+      value:num(t.placed), sub:'placed into jobs',
+      ringHtml:ring(ph==null?null:ph/100,ph==null?'–':ph.toFixed(0)+'%','','info'),
+      body:row('','of hires',num(t.i9),ph,null,false)+row('','of shows',pend?'Pending':num(t.shows),ps,null,false),
+      insight:pIns, foot:d.placed, spark:sp.placed}),
   ].join('');
 }
 const KPI_DETAIL = {
@@ -6724,16 +6794,16 @@ const MODULES = [
   {key:'settings',    label:'Settings', hint:'Divisions, branch divisions, show/hide recruiters, saved weeks'},
   {key:'export',      label:'Download & share', hint:'Excel, PDF, Word, master sheet download, snapshots'},
 ];
-const VIEW_MODULE = {teams:'teams',performance:'performance', recruiters:'recruiters', branches:'branches', master:'master', candidates:'candidate_hub', alerts:'alerts', pivot:'pivot'};
+const VIEW_MODULE = {teams:'teams',leads:'teams',performance:'performance', recruiters:'recruiters', branches:'branches', master:'master', candidates:'candidate_hub', alerts:'alerts', pivot:'pivot'};
 
 function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
 // Default page: the person's own choice (this browser) → the one an admin set for them → first page they can open.
-const DEFAULT_VIEW_LABELS = {performance:'Performance Overview', teams:'My Team', recruiters:'Recruiter Scorecards', branches:'Branch Results', alerts:'Action Center', candidates:'Candidate Hub', master:'Candidate Hub — master sheet', pivot:'Report Builder'};
+const DEFAULT_VIEW_LABELS = {performance:'Performance Overview', teams:'My Team', leads:'Team Leads (admins)', recruiters:'Recruiter Scorecards', branches:'Branch Results', alerts:'Action Center', candidates:'Candidate Hub', master:'Candidate Hub — master sheet', pivot:'Report Builder'};
 function adminDefaultViews(){ return KV.get('userDefaultViews')||{}; }
-function defaultViewOptions(u){ const can=v=>!u||u.role!=='user'||v==='teams'||(u.modules||[]).includes(VIEW_MODULE[v]); return Object.keys(DEFAULT_VIEW_LABELS).filter(v=>VIEW_MODULE[v]&&can(v)).map(v=>[v,DEFAULT_VIEW_LABELS[v]]); }
+function defaultViewOptions(u){ const can=v=>v==='leads'?(u?u.role!=='user':Server.isAdmin()):(!u||u.role!=='user'||v==='teams'||(u.modules||[]).includes(VIEW_MODULE[v])); return Object.keys(DEFAULT_VIEW_LABELS).filter(v=>VIEW_MODULE[v]&&can(v)).map(v=>[v,DEFAULT_VIEW_LABELS[v]]); }
 function myDefaultViewKey(){ return 'ipd_default_view:'+(Server.user?.id||''); }
 function resolveDefaultView(){
-  const allowed=v=>v && VIEW_MODULE[v] && Server.can(VIEW_MODULE[v]);
+  const allowed=v=>v && VIEW_MODULE[v] && (v==='leads'?Server.isAdmin():Server.can(VIEW_MODULE[v]));
   const mine=lsGet(myDefaultViewKey()), admin=adminDefaultViews()[Server.user?.id];
   return allowed(mine)?mine:allowed(admin)?admin:null;
 }
@@ -6743,7 +6813,7 @@ function applyDefaultView(){
 }
 function renderDefaultViewPref(){
   const sel=document.getElementById('defaultViewSelect'); if(!sel||!Server.user) return;
-  const opts=defaultViewOptions(null).filter(([v])=>Server.can(VIEW_MODULE[v])), admin=adminDefaultViews()[Server.user.id], mine=lsGet(myDefaultViewKey())||'';
+  const opts=defaultViewOptions(null).filter(([v])=>v==='leads'?Server.isAdmin():Server.can(VIEW_MODULE[v])), admin=adminDefaultViews()[Server.user.id], mine=lsGet(myDefaultViewKey())||'';
   sel.innerHTML=`<option value="">${admin&&DEFAULT_VIEW_LABELS[admin]?'Set by admin: '+DEFAULT_VIEW_LABELS[admin]:'First page I can open'}</option>`+opts.map(([v,l])=>`<option value="${v}" ${mine===v?'selected':''}>${escapeHtml(l)}</option>`).join('');
   sel.onchange=()=>{ try{ sel.value?localStorage.setItem(myDefaultViewKey(),sel.value):localStorage.removeItem(myDefaultViewKey()); }catch(e){} showToast(sel.value?'You’ll start on '+DEFAULT_VIEW_LABELS[sel.value]+' next time.':'Default page reset.'); };
 }
@@ -7055,12 +7125,11 @@ const PAGE_SECTIONS = {
   performance:[['perf.kpis','KPI cards (all)'],
                 ['perf.kpi.schedules','· Schedules vs goal card'],['perf.detail.schedules','·· Schedules — click-through details'],['perf.kpi.goal_reach','·· Goal reach % line'],['perf.detail.goal_reach','·· Goal reach — click-through details'],
                 ['perf.kpi.interviews','· Interviews card'],['perf.detail.interviews','·· Interviews — click-through details'],['perf.kpi.shows','·· Shows + show rate line'],['perf.detail.show_rate','·· Show rate — click-through details'],['perf.kpi.no_shows','·· No shows + no-show rate line'],['perf.detail.no_show_rate','·· No-show rate — click-through details'],
-                ['perf.kpi.hires','· Hires card (hires of shows)'],['perf.detail.hires','·· Hires — click-through details'],
+                ['perf.kpi.hires','· Hires per recruiter card (with total hires)'],['perf.detail.hires_per_recruiter','·· Hires per recruiter — click-through details'],['perf.kpi.hire_rate','·· Hire rate line'],['perf.detail.hires','·· Hires — click-through details'],
                 ['perf.kpi.placed','· Placed card (of hires, of shows)'],['perf.detail.placed','·· Placed — click-through details'],
-                ['perf.kpi.hires_per_recruiter','· Hires per recruiter card'],['perf.detail.hires_per_recruiter','·· Hires per recruiter — click-through details'],
                 ['perf.detail.part.trend','Card details — 12-week trend'],['perf.detail.part.divisions','Card details — division split'],['perf.detail.part.recruiters','Card details — recruiter ranking'],['perf.detail.part.branches','Card details — branch ranking'],['perf.detail.all_people','Card details — all recruiters & branches (untick = only their assigned team)'],
                 ['perf.trends','Trends charts'],['perf.leaderboards','Leaderboards (recruiter & branch snapshots)'],['perf.divisions','Division breakdown'],['perf.history','Previous 6 weeks table'],['perf.insights','Insights'],['perf.composition','Composition pies (monthly / quarterly)']],
-  teams:[['team.summary','Team — summary cards'],['team.daily','Team — daily table'],['team.weekly','Team — weekly table'],['team.goals','Team — goal checks and breaks'],['team.charts','Team — charts'],['team.candidates','Team — today’s scheduled candidates'],['team.kpi.schedules','· Schedules vs goal card'],['team.kpi.goal_reach','·· Goal reach % line'],['team.kpi.interviews','· Interviews card'],['team.kpi.shows','·· Shows + show rate line'],['team.kpi.no_shows','·· No shows + no-show rate line'],['team.kpi.hires','· Hires card'],['team.kpi.placed','· Placed card'],['team.kpi.hires_per_recruiter','· Hires per recruiter card']],
+  teams:[['team.summary','Team — summary cards'],['team.analytics','Team analytics (all)'],['team.analytics.wins','· Winning list'],['team.analytics.attention','· Needs attention list'],['team.analytics.matrix','· Where each recruiter stands (grid)'],['team.analytics.branches','· By branch'],['team.daily','Team — daily table'],['team.weekly','Team — weekly table'],['team.goals','Team — goal checks and breaks'],['team.charts','Team — charts'],['team.candidates','Team — today’s scheduled candidates'],['team.kpi.schedules','· Schedules vs goal card'],['team.kpi.goal_reach','·· Goal reach % line'],['team.kpi.interviews','· Interviews card'],['team.kpi.shows','·· Shows + show rate line'],['team.kpi.no_shows','·· No shows + no-show rate line'],['team.kpi.hires','· Hires per recruiter card'],['team.kpi.hire_rate','·· Hire rate line'],['team.kpi.placed','· Placed card']],
   recruiters:[['rec.table','Recruiter table'],['hist.kpis','History page — summary tiles (recruiter & branch)'],['hist.trend','History page — week-by-week chart'],['hist.goal','History page — schedules vs goal chart'],['hist.weeks','History page — every-week table'],['hist.remarks','History page — remarks'],['hist.candidates','History page — candidates']],
   branches:[['br.table','Branch table'],['hist.team','History page — recruiters in the branch']],
   candidates:[['cand.list','Category boxes and candidate list'],['cand.explain','“How are these counted?” breakdown']],
@@ -7077,8 +7146,9 @@ function canSeeSection(k){ return !(Server.user && Server.user.role==='user' && 
 function applyPermissions(){
   applySectionAccess();
   const u = Server.user; if(!u) return;
-  document.querySelectorAll('#navList button[data-view]').forEach(b=>{ b.classList.toggle('hidden', !Server.can(VIEW_MODULE[b.dataset.view])); });
-  const allowedViews = Object.keys(VIEW_MODULE).filter(v=>Server.can(VIEW_MODULE[v]));
+  const viewOk = v=>v==='leads' ? Server.isAdmin() : Server.can(VIEW_MODULE[v]);
+  document.querySelectorAll('#navList button[data-view]').forEach(b=>{ b.classList.toggle('hidden', !viewOk(b.dataset.view)); });
+  const allowedViews = Object.keys(VIEW_MODULE).filter(viewOk);
   if(currentView==='history' && !canOpenHistory(historyState.mode, historyState.name)) currentView = historyState.from||'performance';
   if(currentView!=='settings' && currentView!=='history' && !allowedViews.includes(currentView) && allowedViews.length){
     currentView = allowedViews[0];
@@ -8558,7 +8628,7 @@ function drawUserForm(){
   if(u.role==='admin') host.querySelectorAll('.mod-grid,.sec-grid').forEach(f=>f.classList.add('dimmed'));
   const secCount = ()=>host.querySelectorAll('.sec-page').forEach(d=>{ const all=d.querySelectorAll('[data-sec]').length, on=d.querySelectorAll('[data-sec]:checked').length; d.querySelector('.sec-count').textContent = on===all ? 'everything' : on+' of '+all+' shown'; });
   host.querySelectorAll('.mod-grid input').forEach(cb=>cb.addEventListener('change', ()=>{ const d=host.querySelector('.sec-page[data-sec-mod="'+cb.value+'"]'); if(d) d.hidden=!cb.checked; }));
-  const LINE_PARENT={goal_reach:'schedules',shows:'interviews',no_shows:'interviews'};
+  const LINE_PARENT={goal_reach:'schedules',shows:'interviews',no_shows:'interviews',hire_rate:'hires'};
   const syncDetail = ()=>{
     ['perf','team'].forEach(pf=>Object.entries(LINE_PARENT).forEach(([l,c])=>{ const cb=host.querySelector('[data-sec="'+pf+'.kpi.'+l+'"]'), par=host.querySelector('[data-sec="'+pf+'.kpi.'+c+'"]'); if(cb&&par){ cb.disabled=!par.checked; if(!par.checked) cb.checked=false; } }));
     Object.entries(KPI_PARENT).forEach(([k,parents])=>{ const cb=host.querySelector('[data-sec="perf.detail.'+k+'"]'); if(!cb) return; const off=parents.some(p=>{ const x=host.querySelector('[data-sec="perf.kpi.'+p+'"]'); return x&&!x.checked; }); cb.disabled=off; if(off) cb.checked=false; });
@@ -9110,6 +9180,7 @@ function renderTeamGroups(){
  </div>
  ${ltState.directoryError?`<p class="warn-note">User list unavailable: ${escapeHtml(ltState.directoryError)} <button class="btn btn-secondary" id="ltDirectoryRetry">Retry</button></p>`:''}
  <details ${openGoals?'open':''} class="panel lt-break-card" id="ltGoalChecks" data-section="team.goals"><summary><span><strong>Schedule goals & third break</strong><small>${fmtDate(checkDay)}${checkDay===today?' · today':' · historical check'} · third break needs each recruiter’s daily goal (weekly goal ÷ 5) × working days so far this week</small></span><span class="lt-break-counts"><span class="pill good">${eligible.length} eligible</span>${missed.length?`<span class="pill warn">${missed.length} need attention</span>`:''}${unknown.length?`<span class="pill pending">${unknown.length} awaiting data</span>`:''}<span class="hint">View recruiters ▾</span></span></summary><div class="hp-table-wrap"><table class="ep-table"><thead><tr><th>Recruiter</th><th>Day / goal · ${fmtDate(checkDay).replace(/, \d{4}$/,'')}</th><th>${weekTo<today?'Week':'Week to date'} / goal</th><th>${mode==='day'?'Daily':'Weekly'} goal status</th><th>Third break · needed by ${fmtDate(checkDay).replace(/, \d{4}$/,'')}</th></tr></thead><tbody>${checks.map(x=>`<tr><td><button class="entity-link" data-lt-person="${escapeHtml(x.name)}">${escapeHtml(x.name)}</button>${x.name===self?' (You)':''}</td><td class="rc-${x.daySignal.schedule}">${recruiterSignalHtml(x.daySignal)} ${tgNumber(x.daily)} / ${tgNumber(x.dg)}<small class="rc-rate">${x.daySignal.ratio===null?'Visit rate unavailable':x.daySignal.ratio.toFixed(1)+'% visit rate'}</small></td><td class="rc-${x.weekSignal.schedule}">${recruiterSignalHtml(x.weekSignal)} ${tgNumber(x.weekly)} / ${tgNumber(x.wg)}<small class="rc-rate">${x.weekSignal.ratio===null?'Visit rate unavailable':x.weekSignal.ratio.toFixed(1)+'% visit rate'}</small></td><td><span class="pill ${x.goalMet?'good':x.late||x.mid?'warn':'pending'}">${x.status}</span>${x.mid?' · below halfway after midweek':''}</td><td><span class="pill ${x.eligible?'good':x.known?'warn':'pending'}">${!x.known?'Awaiting data':x.eligible?'Eligible':'Not yet'}</span> ${tgNumber(x.cum)} / ${x.required}${x.known&&!x.eligible?` · ${x.required-x.cum} more`:''}</td></tr>`).join('')||'<tr><td colspan="5">No assigned recruiters in this division on this day.</td></tr>'}</tbody></table></div><p class="hint">🤬 under 50% of schedule goal · 🫡 50–80% · 🫰 81–100% · 🤩 above 100% (weekly goal from Settings → Goals, default ${DEFAULT_WEEKLY_GOAL}; daily goal = weekly ÷ 5 — judged separately). Goal status follows the selected view: daily / 10 or weekly / 50. Third-break eligibility is cumulative: the week's schedules up to the check day must reach 10 × working days so far. Weekly progress includes earlier team assignments.</p></details>
+ ${ltAnalytics(g,p,cutoff,mode,today,self)}
  <section class="panel" data-section="team.weekly"><div class="lt-section-head"><h3>Recruiter performance</h3>${copyBtnHtml('ltWeeklyTable')}</div><p class="hint">${rangeText} · ${report.members.length} recruiters · includes the team leader</p><p class="hint">🤬 under 50% of schedule goal · 🫡 50–80% · 🫰 81–100% · 🤩 above 100%. Numbers: green at/above minimum, yellow within 2 schedules or 60–69.9% visits, red below. Visit-rate minimum: 70%. Schedule target: each recruiter’s weekly goal from Settings → Goals (default ${DEFAULT_WEEKLY_GOAL}), split evenly across assigned working days.</p><div class="hp-table-wrap"><table class="ep-table" id="ltWeeklyTable"><thead>${ltHeaders('<th>Schedule target</th><th>Goal reach</th>')}</thead><tbody>${report.members.map(x=>ltRow(x,self,`<td>${tgNumber(x.goal)}</td><td>${tgRate(x.schedules,x.goal)}</td>`)).join('')||'<tr><td colspan="9">No team members in this selection.</td></tr>'}</tbody><tfoot><tr><td>Team total</td>${TG_METRICS.map(([k])=>`<td>${tgNumber(report.total[k])}</td>`).join('')}<td>${tgNumber(report.total.goal)}</td><td>${tgRate(report.total.schedules,report.total.goal)}</td></tr></tfoot></table></div></section>
  <section class="panel" data-section="team.charts"><div class="lt-section-head"><h3>Goals & activity</h3><span class="hint">${rangeText}</span></div><div class="tg-charts"><div><h4>Schedules · goal vs achieved</h4><div class="tg-chart"><canvas id="ltGoals" role="img" aria-label="Selected period schedule targets versus achieved"></canvas></div></div><div><h4>Schedules, visits & hires · daily timeline</h4><div class="tg-chart"><canvas id="ltTimeline" role="img" aria-label="Daily activity within the selected period"></canvas></div></div></div></section>
  <section class="panel" data-section="team.daily"><div class="lt-section-head"><h3>Daily breakdown</h3>${copyBtnHtml('ltTodayTable')}</div><p class="hint">${rangeText} · same team and division selection</p><div class="hp-table-wrap"><table class="ep-table" id="ltTodayTable"><thead><tr><th>Date</th>${TG_METRICS.map(([,l])=>`<th>${l}</th>`).join('')}</tr></thead><tbody>${daily.map(x=>{const target=[...new Set(g.memberships.filter(m=>tgActive(g,m.name,x.date)&&(!g.division||(getEffectiveRecruiterDivision(m.name,weekOfDate(x.date).weekEnd)||'Unassigned')===g.division)).map(m=>m.name))].reduce((sum,n)=>sum+ltDailyGoal(n,x.date),0),signal=recruiterSignal(x.r.total.schedules,x.r.total.shows,x.r.total.scheduledDateOf,target);return `<tr><td>${fmtDate(x.date)}</td>${TG_METRICS.map(([k])=>`<td class="${k==='schedules'?'rc-'+signal.schedule:k==='shows'?'rc-'+signal.visits:''}">${tgNumber(x.r.total[k])}</td>`).join('')}</tr>`;}).join('')}</tbody></table></div></section><section class="panel" data-section="team.candidates" id="ltScheduledCandidates"></section><div id="ltPersonHost"></div>`;
@@ -9127,6 +9198,160 @@ function renderTeamGroups(){
  const opts={responsive:true,maintainAspectRatio:false,plugins:{noValueLabels:true,legend:{position:'bottom'}},scales:{y:{beginAtZero:true},x:{ticks:{maxRotation:45}}}};
  charts.ltGoals=safeChart(document.getElementById('ltGoals'),{type:'bar',data:{labels:report.members.map(x=>x.label),datasets:[{label:'Schedule target',data:report.members.map(x=>x.goal),backgroundColor:'#b58b38'},{label:'Achieved',data:report.members.map(x=>x.schedules),backgroundColor:'#218a86'}]},options:opts});
  charts.ltTimeline=safeChart(document.getElementById('ltTimeline'),{type:'line',data:{labels:daily.map(x=>fmtDate(x.date)),datasets:[['schedules','Schedules','#218a86'],['shows','Visits (shows)','#487ec1'],['i9','Hires','#825db3']].map(([k,label,c])=>({label,data:daily.map(x=>x.r.total[k]),borderColor:c,backgroundColor:c,spanGaps:false,tension:.2,pointRadius:3}))},options:opts});
+}
+// ---------- Team analytics: who is winning where, who needs attention where ----------
+function ltBranchOf(name,from,to){
+ const ws=weeksData.filter(w=>w.weekEndDate>=from&&tgShift(w.weekEndDate,-6)<=to).sort((a,b)=>b.weekEndDate.localeCompare(a.weekEndDate));
+ for(const w of ws){const b=w.byRecruiter?.[name]?.branch;if(b)return b;}
+ return '';
+}
+function ltAnalytics(g,p,cutoff,mode,today,self){
+ const cur=ltReport(g,p.from,p.to,today);
+ const work=cutoff>=p.from?(p.from===cutoff?[p.from]:ltWorkdays(p.from,cutoff)):[];
+ const rate=(n,d,min=1)=>n==null||d==null||d<min?null:n/d*100;
+ const rows=cur.members.map(x=>{
+  const pace=work.filter(d=>tgActive(g,x.label,d)).reduce((a,d)=>a+ltDailyGoal(x.label,d),0);
+  return {name:x.label,x,branch:ltBranchOf(x.label,p.from,cutoff),pace,
+   goal:rate(x.schedules,pace), show:rate(x.shows,x.scheduledDateOf,3), noshow:rate(x.noShows,x.scheduledDateOf,3), hire:rate(x.i9,x.shows,3)};
+ });
+ const T=cur.total, team={goal:rate(T.schedules,rows.reduce((a,r)=>a+r.pace,0)),show:rate(T.shows,T.scheduledDateOf,3),noshow:rate(T.noShows,T.scheduledDateOf,3),hire:rate(T.i9,T.shows,3)};
+ // bands: fixed minimums where the business has one, otherwise vs the team's own average
+ const band={
+  goal:v=>v==null?'':v>=90?'g':v>=50?'a':'r',
+  show:v=>v==null?'':v>=70?'g':v>=60?'a':'r',
+  noshow:v=>v==null?'':v<20?'g':v<30?'a':'r',
+  hire:v=>v==null||team.hire==null?'':v>=team.hire?'g':v>=team.hire*.75?'a':'r'};
+ const M=[['goal','Schedules vs goal',true],['show','Show rate',true],['noshow','No-show rate',false],['hire','Hire rate',true]];
+ const num0=v=>v==null?'–':fmtNum(v), pc=v=>v==null?'–':v.toFixed(0)+'%', who=r=>`<button class="entity-link" data-lt-person="${escapeHtml(r.name)}">${escapeHtml(r.name)}</button>${r.name===self?' <span class="hint">(You)</span>':''}`;
+ const where=r=>r.branch?`<span class="ta-where">${escapeHtml(r.branch)}</span>`:'';
+ // ---- winning ----
+ const wins=[];
+ M.forEach(([k,l,up])=>{const c=rows.filter(r=>r[k]!=null);if(c.length<2)return;c.sort((a,b)=>up?b[k]-a[k]:a[k]-b[k]);const top=c[0];if(band[k](top[k])==='r')return;
+  wins.push({r:top,html:`<b>Best ${l.toLowerCase()}</b> · ${pc(top[k])}${team[k]!=null?` vs team ${pc(team[k])}`:''}`});});
+ const mh=rows.filter(r=>r.x.i9>0).sort((a,b)=>b.x.i9-a.x.i9)[0];
+ if(mh)wins.push({r:mh,html:`<b>Most hires</b> · ${fmtNum(mh.x.i9)} from ${fmtNum(mh.x.shows||0)} shows`});
+ const sched=rows.filter(r=>r.x.schedules!=null).sort((a,b)=>b.x.schedules-a.x.schedules)[0];
+ if(sched&&sched.x.schedules>0)wins.push({r:sched,html:`<b>Most schedules</b> · ${fmtNum(sched.x.schedules)}${sched.pace?` of ${tgNumber(sched.pace)} due so far`:''}`});
+ rows.filter(r=>{const b=['goal','show','noshow'].map(k=>band[k](r[k]));return b.every(x=>x==='g');}).forEach(r=>wins.push({r,html:'<b>On target everywhere</b> · schedules, show rate and no-shows all within target'}));
+ // ---- attention ----
+ const att=rows.map(r=>{const issues=[];
+  if(r.x.schedules===0&&r.pace>0)issues.push({sev:3,t:`<b>No schedules</b> this ${mode} so far (${tgNumber(r.pace)} due)`});
+  else if(band.goal(r.goal)==='r')issues.push({sev:3,t:`<b>Schedules behind</b> · ${fmtNum(r.x.schedules)} of ${tgNumber(r.pace)} due (${pc(r.goal)}) · ${tgNumber(Math.max(0,Math.ceil(r.pace-r.x.schedules)))} short`});
+  else if(band.goal(r.goal)==='a')issues.push({sev:1,t:`<b>Schedules slightly behind</b> · ${pc(r.goal)} of pace`});
+  if(band.show(r.show)==='r')issues.push({sev:2,t:`<b>Low show rate</b> · ${pc(r.show)} on ${fmtNum(r.x.scheduledDateOf)} interviews (min 70%)`});
+  if(band.noshow(r.noshow)==='r')issues.push({sev:2,t:`<b>High no-shows</b> · ${fmtNum(r.x.noShows)} (${pc(r.noshow)}, keep under 20%)`});
+  if(band.hire(r.hire)==='r'&&r.x.i9>0)issues.push({sev:1,t:`<b>Low hire rate</b> · ${fmtNum(r.x.i9)} hires from ${fmtNum(r.x.shows)} shows (${pc(r.hire)} vs team ${pc(team.hire)})`});
+  if((r.x.shows||0)>=3&&r.x.i9===0)issues.push({sev:2,t:`<b>No hires</b> from ${fmtNum(r.x.shows)} shows`});
+  return {r,issues,score:issues.reduce((a,i)=>a+i.sev,0)};}).filter(x=>x.issues.length).sort((a,b)=>b.score-a.score||(a.r.goal??999)-(b.r.goal??999));
+ // ---- by branch ----
+ const br={};rows.forEach(r=>{const k=r.branch||'No branch yet',o=br[k]||(br[k]={n:0,s:0,pace:0,i:0,sh:0,ns:0,h:0});o.n++;o.s+=r.x.schedules||0;o.pace+=r.pace;o.i+=r.x.scheduledDateOf||0;o.sh+=r.x.shows||0;o.ns+=r.x.noShows||0;o.h+=r.x.i9||0;});
+ const brRows=Object.entries(br).map(([b,o])=>({b,o,goal:rate(o.s,o.pace),show:rate(o.sh,o.i,3),noshow:rate(o.ns,o.i,3),hire:rate(o.h,o.sh,3)})).sort((a,b)=>(b.goal??-1)-(a.goal??-1));
+ const cell=(k,v,sub)=>`<td class="ta-cell ta-${band[k](v)||'n'}">${pc(v)}${sub?`<small>${sub}</small>`:''}</td>`;
+ const nWin=new Set(wins.map(w=>w.r.name)).size;
+ const html=`<section class="panel ta" data-section="team.analytics"><div class="lt-section-head"><h3>Team analytics</h3><span class="hint">Schedules vs goal, interviews (shows vs no shows) and hires · who is winning where, and who needs attention${work.length?'':' · no working days yet'}</span></div>
+ <div class="ta-cols">
+  <div class="ta-box ta-win" data-section="team.analytics.wins"><h4>🏆 Winning <span class="pill good">${nWin}</span></h4>${wins.length?`<ul>${wins.map(w=>`<li><div>${who(w.r)}${where(w.r)}</div><span>${w.html}</span></li>`).join('')}</ul>`:'<p class="hint">Nobody is above the minimums yet in this period.</p>'}</div>
+  <div class="ta-box ta-att" data-section="team.analytics.attention"><h4>⚠️ Needs attention <span class="pill warn">${att.length}</span></h4>${att.length?`<ul>${att.map(a=>`<li><div>${who(a.r)}${where(a.r)}</div>${a.issues.sort((x,y)=>y.sev-x.sev).map(i=>`<span class="ta-sev${i.sev}">${i.t}</span>`).join('')}</li>`).join('')}</ul>`:'<p class="hint">Nobody is below the minimums. 🎉</p>'}</div>
+ </div>
+ <div data-section="team.analytics.matrix"><h4 class="ta-h">Where each recruiter stands</h4>
+ <div class="hp-table-wrap"><table class="ep-table ta-matrix" id="ltAnalyticsTable"><thead><tr><th rowspan="2">Recruiter</th><th rowspan="2">Branch</th><th class="ta-grp" colspan="1">Schedules</th><th class="ta-grp" colspan="3">Interviews</th><th class="ta-grp" colspan="1">Hires</th></tr>
+ <tr><th>vs goal<small>to date · min 90%</small></th><th>Interviews</th><th>Shows<small>show rate · min 70%</small></th><th>No shows<small>no-show rate · under 20%</small></th><th>Hires<small>of shows · team ${pc(team.hire)}</small></th></tr></thead>
+ <tbody>${rows.slice().sort((a,b)=>(b.goal??-1)-(a.goal??-1)).map(r=>`<tr><td>${who(r)}</td><td>${escapeHtml(r.branch||'–')}</td>${cell('goal',r.goal,r.pace?`${fmtNum(r.x.schedules||0)} / ${tgNumber(r.pace)}`:'')}<td class="ta-cell ta-n ta-plain">${num0(r.x.scheduledDateOf)}</td>${cell('show',r.show,r.x.scheduledDateOf?`${fmtNum(r.x.shows||0)} shows`:'')}${cell('noshow',r.noshow,r.x.scheduledDateOf?`${fmtNum(r.x.noShows||0)} no shows`:'')}<td class="ta-cell ta-${band.hire(r.hire)||'n'}">${num0(r.x.i9)}<small>${r.hire==null?(r.x.shows?`of ${fmtNum(r.x.shows)} shows`:''):pc(r.hire)+' of '+fmtNum(r.x.shows)+' shows'}</small></td></tr>`).join('')}</tbody>
+ <tfoot><tr><td>Team</td><td></td><td>${pc(team.goal)}<small class="hint"> ${fmtNum(T.schedules||0)} / ${tgNumber(rows.reduce((a,r)=>a+r.pace,0))}</small></td><td>${num0(T.scheduledDateOf)}</td><td>${pc(team.show)}<small class="hint"> ${num0(T.shows)}</small></td><td>${pc(team.noshow)}<small class="hint"> ${num0(T.noShows)}</small></td><td>${num0(T.i9)}<small class="hint"> ${pc(team.hire)}</small></td></tr></tfoot></table></div>
+ <p class="hint">Green at or above the minimum · amber close · red below. Hires are coloured by hire rate (hires ÷ shows) against the team average, since there’s no fixed minimum. Rates need at least 3 interviews or shows to count.</p></div>
+ ${brRows.length>1?`<div data-section="team.analytics.branches"><h4 class="ta-h">By branch</h4><div class="hp-table-wrap"><table class="ep-table ta-matrix"><thead><tr><th>Branch</th><th>Recruiters</th><th>Schedules vs goal</th><th>Interviews</th><th>Show rate</th><th>No-show rate</th><th>Hires</th></tr></thead><tbody>${brRows.map(x=>`<tr><td>${escapeHtml(x.b)}</td><td>${x.o.n}</td>${cell('goal',x.goal,`${fmtNum(x.o.s)} / ${tgNumber(x.o.pace)}`)}<td class="ta-cell ta-n ta-plain">${fmtNum(x.o.i)}</td>${cell('show',x.show,`${fmtNum(x.o.sh)} shows`)}${cell('noshow',x.noshow,`${fmtNum(x.o.ns)} no shows`)}<td class="ta-cell ta-${band.hire(x.hire)||'n'}">${fmtNum(x.o.h)}<small>${pc(x.hire)} of shows</small></td></tr>`).join('')}</tbody></table></div></div>`:''}
+ </section>`;
+ return html;
+}
+// ---------- Team leads comparison (admins): every lead's team side by side ----------
+const ltLeads={owner:null,teams:null,loading:false,error:'',at:0};
+async function ltLoadLeads(force){
+ const owner=String(Server.user?.id||''); if(!Server.isAdmin()||ltLeads.loading) return;
+ if(!force&&ltLeads.owner===owner&&ltLeads.teams&&Date.now()-ltLeads.at<5*60e3) return;
+ ltLeads.loading=true; ltLeads.error='';
+ try{
+  const users=ltState.users||await Server.rpc('dash_users_list');
+  const list=(users||[]).filter(u=>u.active!==false);
+  const res=await Promise.allSettled(list.map(u=>Server.rpc('dash_team_assignment_get',{p_user_id:u.id})));
+  if(String(Server.user?.id)!==owner) return;
+  ltLeads.teams=res.map((r,i)=>r.status==='fulfilled'&&r.value&&(r.value.memberships||[]).length?{id:String(list[i].id),lead:list[i].name,a:r.value}:null).filter(Boolean);
+  ltLeads.owner=owner; ltLeads.at=Date.now();
+ }catch(e){ ltLeads.error=cleanErr(e); }
+ finally{ ltLeads.loading=false; if(currentView==='leads') renderLeadsView(); }
+}
+function ltLeadsHtml(p,cutoff,mode,today,division){
+ if(!Server.isAdmin()) return '';
+ const head=`<div class="lt-section-head"><h3>How each team is doing</h3><span class="hint">Every lead’s team for the same ${mode} and division · schedules vs goal, interviews (shows vs no shows) and hires</span><button class="btn btn-secondary btn-sm" id="ltLeadsRefresh" style="margin-left:auto">↻ Refresh</button></div>`;
+ if(ltLeads.owner!==String(Server.user.id)||!ltLeads.teams){ setTimeout(()=>ltLoadLeads(),0); return `<section class="panel ta" data-section="team.leads">${head}<p class="hint">${ltLeads.error?'Could not load teams: '+escapeHtml(ltLeads.error):'Loading every team…'}</p></section>`; }
+ if(!ltLeads.teams.length) return `<section class="panel ta" data-section="team.leads">${head}<p class="hint">No teams have been assigned yet.</p></section>`;
+ const work=cutoff>=p.from?(p.from===cutoff?[p.from]:ltWorkdays(p.from,cutoff)):[];
+ const rate=(n,d,min=1)=>n==null||d==null||d<min?null:n/d*100;
+ const rows=ltLeads.teams.map(tm=>{
+  const g={...ltGroup(tm.a),division}, r=ltReport(g,p.from,p.to,today), T=r.total;
+  const pace=r.members.reduce((a,x)=>a+work.filter(d=>tgActive(g,x.label,d)).reduce((s2,d)=>s2+ltDailyGoal(x.label,d),0),0);
+  const people=r.members.length; if(!people) return null;
+  const hprDen=r.hprDenominator||0;
+  return {tm,people,T,pace,goal:rate(T.schedules,pace),show:rate(T.shows,T.scheduledDateOf,3),noshow:rate(T.noShows,T.scheduledDateOf,3),hire:rate(T.i9,T.shows,3),
+   hpr:T.i9==null||!hprDen?null:T.i9/hprDen,
+   behind:r.members.filter(x=>{const pc=work.filter(d=>tgActive(g,x.label,d)).reduce((s2,d)=>s2+ltDailyGoal(x.label,d),0);return pc>0&&(x.schedules||0)<pc*.5;}).length};
+ }).filter(Boolean);
+ if(!rows.length) return `<section class="panel ta" data-section="team.leads">${head}<p class="hint">No team members active in this period${division?' and division':''}.</p></section>`;
+ const all=rows.reduce((o,r)=>{for(const k of ['schedules','scheduledDateOf','shows','noShows','i9','placed'])o[k]+=r.T[k]||0;o.pace+=r.pace;return o;},{schedules:0,scheduledDateOf:0,shows:0,noShows:0,i9:0,placed:0,pace:0});
+ const avg={hire:rate(all.i9,all.shows,3)};
+ const band={goal:v=>v==null?'':v>=90?'g':v>=50?'a':'r',show:v=>v==null?'':v>=70?'g':v>=60?'a':'r',noshow:v=>v==null?'':v<20?'g':v<30?'a':'r',
+  hire:v=>v==null||avg.hire==null?'':v>=avg.hire?'g':v>=avg.hire*.75?'a':'r',
+  hpr:v=>v==null?'':v>=15?'g':v>=12?'a':'r'};
+ const pc=v=>v==null?'–':v.toFixed(0)+'%';
+ const lead=r=>`<button class="entity-link" data-lt-lead="${escapeHtml(r.tm.id)}">${escapeHtml(r.tm.lead)}</button><small class="ta-team">${escapeHtml(r.tm.a.team_name||'')}</small>`;
+ const M=[['goal','Schedules vs goal',true,pc],['show','Show rate',true,pc],['noshow','No-show rate',false,pc],['hpr','Hires per recruiter',true,v=>v==null?'–':v.toFixed(1)]];
+ const wins=[], att=[];
+ if(rows.length>1) M.forEach(([k,l,up,f])=>{const c=rows.filter(r=>r[k]!=null).sort((a,b)=>up?b[k]-a[k]:a[k]-b[k]);if(c.length<2)return;const top=c[0],low=c[c.length-1];
+  if(band[k](top[k])!=='r')wins.push({r:top,t:`<b>Best ${l.toLowerCase()}</b> · ${f(top[k])}`});
+  if(band[k](low[k])==='r')att.push({r:low,t:`<b>${up?'Lowest':'Highest'} ${l.toLowerCase()}</b> · ${f(low[k])}`});});
+ rows.filter(r=>r.behind).forEach(r=>att.push({r,t:`<b>${r.behind} of ${r.people}</b> recruiter${r.behind===1?'':'s'} under 50% of schedule pace`}));
+ const group=list=>{const m=new Map();list.forEach(x=>{const k=x.r.tm.id;if(!m.has(k))m.set(k,{r:x.r,items:[]});m.get(k).items.push(x.t);});return [...m.values()];};
+ const W=group(wins), A=group(att).sort((a,b)=>b.items.length-a.items.length);
+ const cell=(k,v,sub)=>`<td class="ta-cell ta-${band[k](v)||'n'}">${k==='hpr'?(v==null?'–':v.toFixed(1)):pc(v)}${sub?`<small>${sub}</small>`:''}</td>`;
+ const sorted=rows.slice().sort((a,b)=>(b.goal??-1)-(a.goal??-1));
+ return `<section class="panel ta" data-section="team.leads">${head}
+ <div class="ta-cols">
+  <div class="ta-box ta-win"><h4>🏆 Leading teams <span class="pill good">${W.length}</span></h4>${W.length?`<ul>${W.map(x=>`<li><div>${lead(x.r)}</div>${x.items.map(t=>`<span>${t}</span>`).join('')}</li>`).join('')}</ul>`:'<p class="hint">No team is ahead on a measured target yet.</p>'}</div>
+  <div class="ta-box ta-att"><h4>⚠️ Teams needing attention <span class="pill warn">${A.length}</span></h4>${A.length?`<ul>${A.map(x=>`<li><div>${lead(x.r)}</div>${x.items.map(t=>`<span class="ta-sev2">${t}</span>`).join('')}</li>`).join('')}</ul>`:'<p class="hint">Every team is within range. 🎉</p>'}</div>
+ </div>
+ <div class="hp-table-wrap"><table class="ep-table ta-matrix" id="ltLeadsTable"><thead><tr><th rowspan="2">#</th><th rowspan="2">Team lead</th><th rowspan="2">Recruiters</th><th class="ta-grp">Schedules</th><th class="ta-grp" colspan="3">Interviews</th><th class="ta-grp" colspan="2">Hires</th></tr>
+ <tr><th>vs goal<small>so far · min 90%</small></th><th>Interviews</th><th>Shows<small>show rate · min 70%</small></th><th>No shows<small>no-show rate · under 20%</small></th><th>Hires<small>of shows · avg ${pc(avg.hire)}</small></th><th>Per recruiter<small>min 15 a week</small></th></tr></thead>
+ <tbody>${sorted.map((r,i)=>`<tr${r.tm.id===String(ltState.viewingId||Server.user.id)?' class="lt-mine"':''}><td>${i+1}</td><td>${lead(r)}</td><td>${r.people}${r.behind?`<small class="ta-behind">${r.behind} behind</small>`:''}</td>${cell('goal',r.goal,`${fmtNum(r.T.schedules||0)} / ${tgNumber(r.pace)}`)}<td class="ta-cell ta-n ta-plain">${r.T.scheduledDateOf==null?'–':fmtNum(r.T.scheduledDateOf)}</td>${cell('show',r.show,r.T.scheduledDateOf?`${fmtNum(r.T.shows||0)} shows`:'')}${cell('noshow',r.noshow,r.T.scheduledDateOf?`${fmtNum(r.T.noShows||0)} no shows`:'')}<td class="ta-cell ta-${band.hire(r.hire)||'n'}">${r.T.i9==null?'–':fmtNum(r.T.i9)}<small>${r.hire==null?'':pc(r.hire)+' of shows'}</small></td>${cell('hpr',r.hpr,'')}</tr>`).join('')}</tbody>
+ <tfoot><tr><td></td><td>All teams</td><td>${rows.reduce((a,r)=>a+r.people,0)}</td><td>${pc(rate(all.schedules,all.pace))}<small class="hint"> ${fmtNum(all.schedules)} / ${tgNumber(all.pace)}</small></td><td>${fmtNum(all.scheduledDateOf)}</td><td>${pc(rate(all.shows,all.scheduledDateOf,3))}<small class="hint"> ${fmtNum(all.shows)}</small></td><td>${pc(rate(all.noShows,all.scheduledDateOf,3))}<small class="hint"> ${fmtNum(all.noShows)}</small></td><td>${fmtNum(all.i9)}<small class="hint"> ${pc(avg.hire)}</small></td><td></td></tr></tfoot></table></div>
+ <p class="hint">Click a team lead to open their team on My Team. A recruiter who is in more than one team counts in each. Hires per recruiter is per recruiter per week, the same as on Performance Overview.</p></section>`;
+}
+const leadsState={mode:'week',anchor:null,division:''};
+function renderLeadsView(){
+ const host=document.getElementById('view-leads'); if(!host||!Server.user) return;
+ if(!Server.isAdmin()){ host.innerHTML='<section class="panel"><p>Team Leads is available to admins only.</p></section>'; return; }
+ const today=ltToday(), mode=leadsState.mode, anchor=leadsState.anchor||today, p=ltRange(mode,anchor), cutoff=p.to>today?today:p.to;
+ const rangeText=mode==='day'?fmtDate(p.from):`${fmtDate(p.from)} – ${fmtDate(p.to)}`;
+ const maxAnchor=mode==='week'?weekOfDate(today).weekEnd:today;
+ const divs=[...DIVISIONS,'Unassigned'];
+ host.innerHTML=`<div class="lt-sticky"><header class="lt-toolbar"><div class="lt-title"><h2>Team Leads</h2><span>All teams · ${escapeHtml(leadsState.division||'All divisions')}</span></div>
+  <div class="lt-period" role="group" aria-label="Reporting period"><label class="lt-field">View<select id="ldMode"><option value="day" ${mode==='day'?'selected':''}>Day</option><option value="week" ${mode==='week'?'selected':''}>Week</option><option value="month" ${mode==='month'?'selected':''}>Month</option></select></label>
+  <button class="btn btn-secondary" id="ldPrev" aria-label="Previous ${mode}">←</button>
+  <label class="lt-field">${mode==='month'?'Month':mode==='week'?'Week ending':'Date'}<input id="ldAnchor" type="${mode==='month'?'month':'date'}" value="${mode==='month'?p.from.slice(0,7):mode==='week'?p.to:p.from}" max="${mode==='month'?today.slice(0,7):maxAnchor}"></label>
+  <button class="btn btn-secondary" id="ldNext" aria-label="Next ${mode}" ${ltMoveRange(mode,anchor,1)>maxAnchor?'disabled':''}>→</button><button class="btn btn-secondary" id="ldNow">This ${mode}</button></div>
+  <label class="lt-field">Division<select id="ldDiv"><option value="">All divisions</option>${divs.map(d=>`<option ${d===leadsState.division?'selected':''}>${escapeHtml(d)}</option>`).join('')}</select></label></header>
+  <div class="lt-scope"><span><strong>${rangeText}</strong>${p.to>today?' · through today':''}</span></div></div>
+  ${ltLeadsHtml(p,cutoff,mode,today,leadsState.division)}`;
+ const go=()=>renderLeadsView();
+ host.querySelector('#ldMode').onchange=e=>{leadsState.mode=e.target.value;go();};
+ host.querySelector('#ldAnchor').onchange=e=>{const v=mode==='month'?e.target.value+'-01':e.target.value;if(tgDate(v)&&v<=maxAnchor){leadsState.anchor=mode==='week'?weekOfDate(v).weekEnd:v;go();}};
+ host.querySelector('#ldPrev').onclick=()=>{leadsState.anchor=ltMoveRange(mode,anchor,-1);go();};
+ host.querySelector('#ldNext').onclick=()=>{const n=ltMoveRange(mode,anchor,1);if(n<=maxAnchor){leadsState.anchor=n;go();}};
+ host.querySelector('#ldNow').onclick=()=>{leadsState.anchor=null;go();};
+ host.querySelector('#ldDiv').onchange=e=>{leadsState.division=e.target.value;go();};
+ host.querySelector('#ltLeadsRefresh')?.addEventListener('click',()=>{ltLeads.teams=null;ltLoadLeads(true);go();});
+ host.querySelectorAll('[data-lt-lead]').forEach(b=>b.onclick=()=>{
+  Object.assign(ltState,{owner:String(Server.user.id),viewingId:b.dataset.ltLead,assignment:null,loaded:false,loading:false,error:'',division:leadsState.division,rangeMode:mode,anchor:leadsState.anchor});ltState.requestSeq++;
+  currentView='teams'; document.querySelectorAll('#navList button').forEach(x=>x.classList.toggle('active',x.dataset.view==='teams')); refreshUI(); window.scrollTo(0,0);
+ });
 }
 async function ltRenderScheduledCandidates(g){
  const host=document.getElementById('ltScheduledCandidates');if(!host)return;
