@@ -1213,7 +1213,7 @@ body.team-workspace .content{padding-top:10px!important}
 #ltScheduledCandidates .lt-pane-head{align-items:center;margin:8px 0 0}#ltScheduledCandidates .lt-pane-head .hint{font-size:12px}.bc-intro{margin:0 0 10px;font-size:12.5px!important}.bc-table td{vertical-align:middle;font-variant-numeric:tabular-nums}.bc-table td small{display:block;font-size:10.5px;font-weight:600}
 .bc-branch{font-weight:700;color:#10303c;border-right:1px solid #e4ecef;background:#fbfdfd}.bc-mine td{border-bottom:0!important}.bc-other td{color:#5c7480;border-bottom:2px solid #e1eaed!important}
 .bc-up b{color:#15633f}.bc-up small{color:#1f9a6c!important}.bc-down b{color:#a12d36}.bc-down small{color:#c4565f!important}
-.lt-empty{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:18px;border:1px dashed #d6e2e6;border-radius:12px;background:#fbfdfd;color:#3f5863;font-size:13px}.lt-empty strong{color:#10303c;font-size:14px}.lt-empty .btn{margin-top:4px}
+.lt-back{flex:0 0 auto;align-self:center}.lt-empty{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:18px;border:1px dashed #d6e2e6;border-radius:12px;background:#fbfdfd;color:#3f5863;font-size:13px}.lt-empty strong{color:#10303c;font-size:14px}.lt-empty .btn{margin-top:4px}
 .ta-h{margin:4px 0 8px;font-size:13px;color:#132f3b}
 .ta-matrix th small{display:block;font-weight:500;text-transform:none;letter-spacing:0;color:#7a8f99;font-size:10.5px}
 .ta-cell{font-weight:700;font-variant-numeric:tabular-nums}.ta-cell small{display:block;font-weight:500;font-size:10.5px;color:#6a808b}
@@ -6886,7 +6886,7 @@ function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; 
 // Default page: the person's own choice (this browser) → the one an admin set for them → first page they can open.
 const DEFAULT_VIEW_LABELS = {performance:'Performance Overview', teams:'My Team', leads:'Team Leads (admins)', recruiters:'Recruiter Scorecards', branches:'Branch Results', alerts:'Action Center', candidates:'Candidate Hub', master:'Candidate Hub — master sheet', pivot:'Report Builder'};
 function adminDefaultViews(){ return KV.get('userDefaultViews')||{}; }
-function defaultViewOptions(u){ const can=v=>v==='leads'?(u?u.role!=='user':Server.isAdmin()):(!u||u.role!=='user'||v==='teams'||(u.modules||[]).includes(VIEW_MODULE[v])); return Object.keys(DEFAULT_VIEW_LABELS).filter(v=>VIEW_MODULE[v]&&can(v)).map(v=>[v,DEFAULT_VIEW_LABELS[v]]); }
+function defaultViewOptions(u){ const can=v=>v==='teams'&&(u?u.role!=='user':Server.isAdmin())?false:v==='leads'?(u?u.role!=='user':Server.isAdmin()):(!u||u.role!=='user'||v==='teams'||(u.modules||[]).includes(VIEW_MODULE[v])); return Object.keys(DEFAULT_VIEW_LABELS).filter(v=>VIEW_MODULE[v]&&can(v)).map(v=>[v,DEFAULT_VIEW_LABELS[v]]); }
 function myDefaultViewKey(){ return 'ipd_default_view:'+(Server.user?.id||''); }
 function resolveDefaultView(){
   const allowed=v=>v && VIEW_MODULE[v] && (v==='leads'?Server.isAdmin():Server.can(VIEW_MODULE[v]));
@@ -7233,7 +7233,8 @@ function applyPermissions(){
   applySectionAccess();
   const u = Server.user; if(!u) return;
   const viewOk = v=>v==='leads' ? Server.isAdmin() : Server.can(VIEW_MODULE[v]);
-  document.querySelectorAll('#navList button[data-view]').forEach(b=>{ b.classList.toggle('hidden', !viewOk(b.dataset.view)); });
+  // Admins reach every team through Team Leads, so they don't need a separate My Team entry.
+  document.querySelectorAll('#navList button[data-view]').forEach(b=>{ b.classList.toggle('hidden', !viewOk(b.dataset.view) || (b.dataset.view==='teams' && Server.isAdmin())); });
   layoutNav();
   const allowedViews = Object.keys(VIEW_MODULE).filter(viewOk);
   if(currentView==='history' && !canOpenHistory(historyState.mode, historyState.name)) currentView = historyState.from||'performance';
@@ -9315,7 +9316,7 @@ function renderTeamGroups(){
  const divisions=[...new Set(g.memberships.flatMap(m=>weeksData.filter(w=>w.weekEndDate>=p.from&&tgShift(w.weekEndDate,-6)<=p.to).map(w=>getEffectiveRecruiterDivision(m.name,w.weekEndDate)||'Unassigned')))].sort();if(g.division&&!divisions.includes(g.division))divisions.push(g.division);
  const rangeText=mode==='day'?fmtDate(p.from):`${fmtDate(p.from)} – ${fmtDate(p.to)}`;
  host.innerHTML=`<div class="lt-sticky">
- <header class="lt-toolbar"><div class="lt-title"><h2>${escapeHtml(a.team_name)}</h2><span>${escapeHtml(leader)} · ${escapeHtml(a.recruiter_name)}</span></div>${ltTeamPicker()}
+ <header class="lt-toolbar">${Server.isAdmin()?'<button type="button" class="btn btn-secondary btn-sm lt-back" id="ltBackLeads">← All team leads</button>':''}<div class="lt-title"><h2>${escapeHtml(a.team_name)}</h2><span>${escapeHtml(leader)} · ${escapeHtml(a.recruiter_name)}</span></div>${ltTeamPicker()}
  <div class="lt-period" role="group" aria-label="Team reporting period"><label class="lt-field">View<select id="ltRangeMode"><option value="day" ${mode==='day'?'selected':''}>Day</option><option value="week" ${mode==='week'?'selected':''}>Week</option><option value="month" ${mode==='month'?'selected':''}>Month</option></select></label><button class="btn btn-secondary" id="ltPrevious" aria-label="Previous ${mode}">←</button><label class="lt-field">${mode==='month'?'Month':mode==='week'?'Week ending':'Date'}<input id="ltAnchor" type="${mode==='month'?'month':'date'}" value="${mode==='month'?anchor.slice(0,7):mode==='week'?p.to:anchor}" max="${mode==='month'?today.slice(0,7):mode==='week'?weekOfDate(today).weekEnd:today}"></label><button class="btn btn-secondary" id="ltNext" aria-label="Next ${mode}" ${p.to>=today?'disabled':''}>→</button><button class="btn btn-secondary" id="ltCurrent">${mode==='day'?'Today':mode==='month'?'This month':'This week'}</button></div>
  <label class="lt-field">Division<select id="ltDivision"><option value="">All team divisions</option>${divisions.map(d=>`<option ${d===g.division?'selected':''}>${escapeHtml(d)}</option>`).join('')}</select></label><button class="btn btn-secondary" id="ltRefresh" aria-label="Refresh team" title="Refresh team">↻</button></header>
  <div class="lt-scope"><span><strong>${rangeText}</strong> · ${escapeHtml(g.division||'All divisions')}${p.to>today?' · through today':''}</span><span title="Dates and cutoff times use your system timezone">${escapeHtml(zone)}</span></div>
@@ -9342,6 +9343,8 @@ function renderTeamGroups(){
  host.querySelector('#ltBrkToggle')?.addEventListener('click',()=>{ ltSetBreakVisible(!ltBreakVisible()); renderTeamGroups(); });
  host.querySelector('#ltBrkImg')?.addEventListener('click',()=>{ if(!canCopyBreakImage()) return; ltCopyBreakImage(AN.breakLists, {team:a.team_name, dayLabel:AN.breakLists.dayLabel, day:AN.breakLists.day}); });
  ltBindTeamPicker(host);
+ if(Server.isAdmin()){ document.querySelectorAll('#navList button[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view==='leads')); layoutNav(); }
+ host.querySelector('#ltBackLeads')?.addEventListener('click',()=>{ currentView='leads'; document.querySelectorAll('#navList button[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view==='leads')); refreshUI(); window.scrollTo(0,0); });
  host.querySelector('#ltDivision').onchange=e=>{ltState.division=e.target.value;renderTeamGroups();};
  host.querySelector('#ltRangeMode').onchange=e=>{ltState.rangeMode=e.target.value;renderTeamGroups();};
  host.querySelector('#ltAnchor').onchange=e=>{const value=mode==='month'?e.target.value+'-01':e.target.value;if(tgDate(value)&&value<=(mode==='week'?weekOfDate(today).weekEnd:today)){ltState.anchor=mode==='week'?weekOfDate(value).weekEnd:value;renderTeamGroups();}};
@@ -9540,11 +9543,11 @@ function ltLeadsHtml(p,cutoff,mode,today,division){
  <tfoot><tr><td></td><td>All teams</td><td>${rows.reduce((a,r)=>a+r.people,0)}</td><td>${pc(rate(all.schedules,all.pace))}<small class="hint"> ${fmtNum(all.schedules)} / ${tgNumber(all.pace)}</small></td><td>${fmtNum(all.scheduledDateOf)}</td><td>${pc(rate(all.shows,all.scheduledDateOf,3))}<small class="hint"> ${fmtNum(all.shows)}</small></td><td>${pc(rate(all.noShows,all.scheduledDateOf,3))}<small class="hint"> ${fmtNum(all.noShows)}</small></td><td>${fmtNum(all.i9)}<small class="hint"> ${pc(avg.hire)}</small></td><td></td></tr>${[offTeam&&['Not on a team',offTeam,'ta-off'],overall&&['All recruiters',overall,'ta-overall']].filter(Boolean).map(([l,x,cls])=>`<tr class="${cls}"><td></td><td>${l}${cls==='ta-overall'?'<small class="ta-team">same people as Performance Overview</small>':'<small class="ta-team">activity on days they had no team</small>'}</td><td>${x.people}</td><td>${pc(x.goal)}<small class="hint"> ${fmtNum(x.T.schedules||0)} / ${tgNumber(x.pace)}</small></td><td>${x.T.scheduledDateOf==null?'–':fmtNum(x.T.scheduledDateOf)}</td><td>${pc(x.show)}<small class="hint"> ${fmtNum(x.T.shows||0)}</small></td><td>${pc(x.noshow)}<small class="hint"> ${fmtNum(x.T.noShows||0)}</small></td><td>${x.T.i9==null?'–':fmtNum(x.T.i9)}<small class="hint"> ${pc(x.hire)}</small></td><td>${x.hpr==null?'–':x.hpr.toFixed(1)}</td></tr>`).join('')}</tfoot></table></div>
  <p class="hint">“All teams” covers only recruiters on a team; “All recruiters” adds everyone else and matches Performance Overview${p.to>today?' (Overview compares this week against the full-week goal, so its goal % is lower mid-week; here goals count only the working days so far)':''}. Click a team lead to open their team on My Team. Hires per recruiter is per recruiter per week, the same as on Performance Overview.</p></section>`;
 }
-const leadsState={mode:'week',anchor:null,division:''};
+const leadsState={mode:null,anchor:null,division:''};
 function renderLeadsView(){
  const host=document.getElementById('view-leads'); if(!host||!Server.user) return;
  if(!Server.isAdmin()){ host.innerHTML='<section class="panel"><p>Team Leads is available to admins only.</p></section>'; return; }
- const today=ltToday(), mode=leadsState.mode, anchor=leadsState.anchor||today, p=ltRange(mode,anchor), cutoff=p.to>today?today:p.to;
+ const today=ltToday(), mode=leadsState.mode||ltDefaultMode(), anchor=leadsState.anchor||today, p=ltRange(mode,anchor), cutoff=p.to>today?today:p.to;
  const rangeText=mode==='day'?fmtDate(p.from):`${fmtDate(p.from)} – ${fmtDate(p.to)}`;
  const maxAnchor=mode==='week'?weekOfDate(today).weekEnd:today;
  const divs=[...DIVISIONS,'Unassigned'];
@@ -9565,7 +9568,7 @@ function renderLeadsView(){
  host.querySelector('#ldDiv').onchange=e=>{leadsState.division=e.target.value;go();};
  host.querySelector('#ltLeadsRefresh')?.addEventListener('click',()=>{ltLeads.teams=null;ltLoadLeads(true);go();});
  host.querySelectorAll('[data-lt-lead]').forEach(b=>b.onclick=()=>{
-  Object.assign(ltState,{owner:String(Server.user.id),viewingId:b.dataset.ltLead,assignment:null,loaded:false,loading:false,error:'',division:leadsState.division,rangeMode:mode,anchor:leadsState.anchor});ltState.requestSeq++;
+  Object.assign(ltState,{owner:String(Server.user.id),viewingId:b.dataset.ltLead,assignment:null,loaded:false,loading:false,error:'',division:leadsState.division,rangeMode:leadsState.mode,anchor:leadsState.anchor});ltState.requestSeq++;
   currentView='teams'; document.querySelectorAll('#navList button').forEach(x=>x.classList.toggle('active',x.dataset.view==='teams')); refreshUI(); window.scrollTo(0,0);
  });
 }
