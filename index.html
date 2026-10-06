@@ -1277,6 +1277,10 @@ body.team-workspace .content{padding-top:10px!important}
   #navMoreSheet .nav-ico{display:block!important;width:21px;height:21px;flex:0 0 21px}
   @keyframes sheetUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 }
+.mk-avg{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;padding:7px 9px;border-radius:10px;background:color-mix(in srgb,var(--accent) 8%,#fff);border:1px solid color-mix(in srgb,var(--accent) 18%,#fff);font-size:12px;color:#3f5863}
+.mk-avg span{flex-basis:100%;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:color-mix(in srgb,var(--accent) 70%,#10303c)}
+.mk-avg b{font-variant-numeric:tabular-nums;color:#10303c;font-size:13px}.mk-avg em{font-style:normal;margin-left:3px;color:#6a808b}
+.mk-compact .mk-avg{padding:4px 7px;gap:2px 8px;font-size:11px}.mk-compact .mk-avg span{font-size:9px}.mk-compact .mk-avg b{font-size:11.5px}
 </style>
 </head>
 <body class="locked">
@@ -4047,7 +4051,7 @@ async function renderWeeklyView(){
       const hpr=hiresPerRecruiter(scopedWeeksForSummary), prevHpr=prev && !isMultiWeekMode ? hiresPerRecruiter([scopeWeekToDivision(prev, universalDivision)]) : null;
       const dh=(hpr.value!=null&&prevHpr&&prevHpr.value!=null)?hpr.value-prevHpr.value:null;
       const sp=(f,skip)=>sparkSvg(kpiSeries(week,f,skip),'currentColor');
-      return mergedKpiCards({prefix:'perf', t, goal:teamGoal, pending:pend, hpr, clickable:kpiDetailAllowed,
+      return mergedKpiCards({prefix:'perf', t, goal:teamGoal, pending:pend, hpr, clickable:kpiDetailAllowed, weeks:isMultiWeekMode?(isAllWeeks?weeksData.length:weeksForAggregate.length):1,
         spark:isMultiWeekMode?{}:{schedules:sp(w=>w.schedules),interviews:sp(w=>w.scheduledDateOf),hires:sp(w=>w.i9,true),placed:sp(w=>w.placed,true)},
         deltas:{schedules:deltaHtml(t.schedules, prevT?prevT.schedules:undefined), interviews:deltaHtml(t.scheduledDateOf, prevT?prevT.scheduledDateOf:undefined),
           hires:pend?'<span class="delta flat">Week hasn’t happened yet</span>':deltaHtml(t.i9, prevT?prevT.i9:undefined), placed:pend?'<span class="delta flat">Week hasn’t happened yet</span>':deltaHtml(t.placed, prevT?prevT.placed:undefined),
@@ -4297,11 +4301,12 @@ function mergedKpiCards(o){
     return `<svg class="mk-ring" width="${S}" height="${S}" viewBox="0 0 ${S} ${S}" aria-hidden="true"><circle cx="${S/2}" cy="${S/2}" r="${R}" fill="none" stroke="#e8eff1" stroke-width="${W}"/><circle cx="${S/2}" cy="${S/2}" r="${R}" fill="none" stroke="${COL[status]}" stroke-width="${W}" stroke-linecap="round" stroke-dasharray="${(C*f).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 ${S/2} ${S/2})" class="mk-ring-arc"/>${compact?'':`<text x="50%" y="${small?'48%':'50%'}" dominant-baseline="middle" text-anchor="middle" class="mk-ring-v">${center}</text>${small?`<text x="50%" y="70%" dominant-baseline="middle" text-anchor="middle" class="mk-ring-s">${small}</text>`:''}`}</svg>`; };
   const chip=(v,target,lower)=>v==null?'':`<em class="mk-chip ${target!=null&&(lower?v<target:v>=target)?'ok':''}">${v.toFixed(1)}%</em>`;
   const row=(key,label,value,v,target,lower,kd)=>`<div class="mk-row"${key?` data-section="${P}.kpi.${key}"`:''}${kd?click(kd):''}><span>${label}</span><b>${value}</b>${chip(v,target,lower)}</div>`;
-  const card=({key,label,accent,status,value,sub,ringHtml,body,insight,foot,spark,kd,legacyValue})=>{
+  const card=({key,label,accent,status,value,sub,ringHtml,body,insight,foot,spark,kd,legacyValue,avg})=>{
     return `<div class="kpi-card mk-card mk-info${compact?' mk-compact':''}" data-section="${P}.kpi.${key}" style="--accent:${accent};--st:${accent}"${click(kd||key)}>
       <div class="mk-top"><span class="label">${label}</span></div>
       <div class="mk-main"><div class="mk-figs"><div class="value">${value}</div>${sub?`<div class="mk-sub">${sub}</div>`:''}</div></div>
       ${body?`<div class="mk-body">${body}</div>`:''}
+      ${avg?`<div class="mk-avg"><span>Per week (avg)</span>${avg}</div>`:''}
       ${insight&&!compact?`<div class="mk-insight">${insight}</div>`:''}
       ${!compact&&(foot||spark)?`<div class="mk-foot"><div>${foot||''}</div>${spark||''}</div>`:''}
     </div>`; };
@@ -4323,28 +4328,32 @@ function mergedKpiCards(o){
   const iIns = pend||!t.shows ? '' : ins('good', sr>=70 ? `<b>${fmtNum(t.shows)}</b> candidates showed up · show rate above 70%` : `<b>${fmtNum(t.shows)}</b> candidates showed up for interviews`);
   const hIns = !hpr.hires ? '' : ins('good', hpr.value>=15 ? `<b>${fmtNum(hpr.hires)}</b> hires · above 15 per recruiter` : `<b>${fmtNum(hpr.hires)}</b> hires made by <b>${fmtNum(hpr.recruiters)}</b> recruiters`);
   const sSt='info', iSt='info', hSt='info';
+  // weekly averages when the selection spans more than one week
+  const W=o.weeks>1?o.weeks:0, av=v=>v==null?'–':fmtNum(Math.round(v/W)), it=(v,l)=>`<b>${av(v)}</b>${l?`<em>${l}</em>`:''}`;
+  const avgS=W?it(t.schedules,'schedules')+(o.goal?it(o.goal,'goal'):''):'', avgI=W?it(t.scheduledDateOf,'interviews')+(pend?'':it(t.shows,'shows')+it(t.noShows,'no shows')):'';
+  const avgH=W?it(hpr.hires,'hires')+(pend?'':it(t.shows,'shows')):'', avgP=W?it(t.placed,'placed'):'';
   const pIns = t.placed ? ins('good',`<b>${fmtNum(t.placed)}</b> hire${t.placed===1?'':'s'} placed into jobs`) : '';
   return [
     card({key:'schedules',label:'Schedules vs goal',accent:'#2f8f8a',status:sSt,
       value:`${num(t.schedules)}<small> / ${num(o.goal)}</small>`, sub:'schedules booked vs goal',
       ringHtml:ring(gr==null?null:gr/100,gr==null?'–':Math.round(gr)+'%','',sSt),
       body:`<div data-section="${P}.kpi.goal_reach"${click('goal_reach')} class="mk-row">${'<span>Goal reach</span><b></b>'+chip(gr,90,false)}</div>`,
-      insight:sIns, foot:d.schedules, spark:sp.schedules}),
+      insight:sIns, foot:d.schedules, spark:sp.schedules, avg:avgS}),
     card({key:'interviews',label:'Interviews',accent:'#4a78c8',status:iSt,
       value:num(t.scheduledDateOf), sub:pend?'week hasn’t happened yet':'interviews scheduled',
       ringHtml:ring(sr==null?null:sr/100,sr==null?'–':Math.round(sr)+'%','',iSt==='pending'?'pending':band(sr,70,60)),
       body:stack+row('shows','<i class="mk-dot" style="background:#2fa57a"></i>Shows',pend?'Pending':num(t.shows),sr,70,false,'show_rate')+row('no_shows','<i class="mk-dot" style="background:#b9c7cd"></i>No shows',pend?'Pending':num(t.noShows),nr,20,true,'no_show_rate'),
-      insight:iIns, foot:d.interviews, spark:sp.interviews}),
+      insight:iIns, foot:d.interviews, spark:sp.interviews, avg:avgI}),
     card({key:'hires',label:'Hires per recruiter',accent:'#7a5fb8',status:hSt,kd:'hires_per_recruiter',
       value:hpr.value==null?'–':hpr.value.toFixed(1), sub:`${num(hpr.hires)} hires · ${num(hpr.recruiters)} recruiters`,
       ringHtml:ring(hpr.value==null?null:hpr.value/15,hpr.value==null?'–':hpr.value.toFixed(1),'of 15',hSt),
       body:row('hire_rate','Hires from shows',pend?'Pending':`${num(t.i9)}<small class="hint"> / ${num(t.shows)}</small>`,hr,null,false,'hires'),
-      insight:hIns, foot:[d.hpr,d.hires].filter(Boolean).join(''), spark:sp.hires}),
+      insight:hIns, foot:[d.hpr,d.hires].filter(Boolean).join(''), spark:sp.hires, avg:avgH}),
     card({key:'placed',label:'Placed',accent:'#b07a2a',status:pend?'pending':'info',
       value:num(t.placed), sub:'placed into jobs',
       ringHtml:ring(ph==null?null:ph/100,ph==null?'–':ph.toFixed(0)+'%','','info'),
       body:row('','of hires',num(t.i9),ph,null,false)+row('','of shows',pend?'Pending':num(t.shows),ps,null,false),
-      insight:pIns, foot:d.placed, spark:sp.placed}),
+      insight:pIns, foot:d.placed, spark:sp.placed, avg:avgP}),
   ].join('');
 }
 const KPI_DETAIL = {
@@ -9283,9 +9292,9 @@ function ltBreakCheck(name,date,now=new Date(),scope='day',weekTo=date){
  const daySignal=recruiterSignal(daily,day.shows,day.scheduledDateOf,dg),weekSignal=recruiterSignal(weekly,wk.shows,wk.scheduledDateOf,wg);
  return {name,wg,dg,daily,weekly,cum,required,eligible:cum!==null&&cum>=required,known:cum!==null,goalMet,late,mid,status,daySignal,weekSignal};
 }
-function ltCompactCards(report){
+function ltCompactCards(report,weeks=1){
  const t=report.total, hpr=t.i9===null||!report.hprDenominator?{value:null,hires:t.i9,recruiters:report.hprDenominator}:{value:t.i9/report.hprDenominator,hires:t.i9,recruiters:report.hprDenominator};
- return mergedKpiCards({prefix:'team', t, goal:t.goal, hpr, compact:true});
+ return mergedKpiCards({prefix:'team', t, goal:t.goal, hpr, compact:true, weeks});
 }
 function renderTeamGroups(){
  const host=document.getElementById('view-teams');if(!host||!Server.user)return;
@@ -9320,7 +9329,7 @@ function renderTeamGroups(){
  <div class="lt-period" role="group" aria-label="Team reporting period"><label class="lt-field">View<select id="ltRangeMode"><option value="day" ${mode==='day'?'selected':''}>Day</option><option value="week" ${mode==='week'?'selected':''}>Week</option><option value="month" ${mode==='month'?'selected':''}>Month</option></select></label><button class="btn btn-secondary" id="ltPrevious" aria-label="Previous ${mode}">←</button><label class="lt-field">${mode==='month'?'Month':mode==='week'?'Week ending':'Date'}<input id="ltAnchor" type="${mode==='month'?'month':'date'}" value="${mode==='month'?anchor.slice(0,7):mode==='week'?p.to:anchor}" max="${mode==='month'?today.slice(0,7):mode==='week'?weekOfDate(today).weekEnd:today}"></label><button class="btn btn-secondary" id="ltNext" aria-label="Next ${mode}" ${p.to>=today?'disabled':''}>→</button><button class="btn btn-secondary" id="ltCurrent">${mode==='day'?'Today':mode==='month'?'This month':'This week'}</button></div>
  <label class="lt-field">Division<select id="ltDivision"><option value="">All team divisions</option>${divisions.map(d=>`<option ${d===g.division?'selected':''}>${escapeHtml(d)}</option>`).join('')}</select></label><button class="btn btn-secondary" id="ltRefresh" aria-label="Refresh team" title="Refresh team">↻</button></header>
  <div class="lt-scope"><span><strong>${rangeText}</strong> · ${escapeHtml(g.division||'All divisions')}${p.to>today?' · through today':''}</span><span title="Dates and cutoff times use your system timezone">${escapeHtml(zone)}</span></div>
- <section class="lt-summary" aria-label="Team performance summary" data-section="team.summary"><div class="kpi-grid mk-grid mk-team">${ltCompactCards(report)}</div></section>
+ <section class="lt-summary" aria-label="Team performance summary" data-section="team.summary"><div class="kpi-grid mk-grid mk-team">${ltCompactCards(report, mode==='month'?Math.round(ltWorkdays(p.from,cutoff).length/5*10)/10:1)}</div></section>
  ${report.uncovered?'<p class="lt-data-note">Some selected dates have no import; affected totals are unavailable.</p>':''}
  </div>
  ${ltState.directoryError?`<p class="warn-note">User list unavailable: ${escapeHtml(ltState.directoryError)} <button class="btn btn-secondary" id="ltDirectoryRetry">Retry</button></p>`:''}
