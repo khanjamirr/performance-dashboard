@@ -1277,7 +1277,7 @@ body.team-workspace .content{padding-top:10px!important}
   #navMoreSheet .nav-ico{display:block!important;width:21px;height:21px;flex:0 0 21px}
   @keyframes sheetUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 }
-.mk-avg{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;padding:7px 9px;border-radius:10px;background:color-mix(in srgb,var(--accent) 8%,#fff);border:1px solid color-mix(in srgb,var(--accent) 18%,#fff);font-size:12px;color:#3f5863}
+.mk-pair{font-style:normal;white-space:nowrap}.mk-avgs{display:flex;flex-direction:column;gap:6px}.mk-avg{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;padding:7px 9px;border-radius:10px;background:color-mix(in srgb,var(--accent) 8%,#fff);border:1px solid color-mix(in srgb,var(--accent) 18%,#fff);font-size:12px;color:#3f5863}
 .mk-avg span{flex-basis:100%;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:color-mix(in srgb,var(--accent) 70%,#10303c)}
 .mk-avg b{font-variant-numeric:tabular-nums;color:#10303c;font-size:13px}.mk-avg em{font-style:normal;margin-left:3px;color:#6a808b}
 .mk-compact .mk-avg{padding:4px 7px;gap:2px 8px;font-size:11px}.mk-compact .mk-avg span{font-size:9px}.mk-compact .mk-avg b{font-size:11.5px}
@@ -4306,7 +4306,7 @@ function mergedKpiCards(o){
       <div class="mk-top"><span class="label">${label}</span></div>
       <div class="mk-main"><div class="mk-figs"><div class="value">${value}</div>${sub?`<div class="mk-sub">${sub}</div>`:''}</div></div>
       ${body?`<div class="mk-body">${body}</div>`:''}
-      ${avg?`<div class="mk-avg"><span>Per week (avg)</span>${avg}</div>`:''}
+      ${avg?`<div class="mk-avgs">${avg}</div>`:''}
       ${insight&&!compact?`<div class="mk-insight">${insight}</div>`:''}
       ${!compact&&(foot||spark)?`<div class="mk-foot"><div>${foot||''}</div>${spark||''}</div>`:''}
     </div>`; };
@@ -4329,9 +4329,15 @@ function mergedKpiCards(o){
   const hIns = !hpr.hires ? '' : ins('good', hpr.value>=15 ? `<b>${fmtNum(hpr.hires)}</b> hires · above 15 per recruiter` : `<b>${fmtNum(hpr.hires)}</b> hires made by <b>${fmtNum(hpr.recruiters)}</b> recruiters`);
   const sSt='info', iSt='info', hSt='info';
   // weekly averages when the selection spans more than one week
-  const W=o.weeks>1?o.weeks:0, av=v=>v==null?'–':fmtNum(Math.round(v/W)), it=(v,l)=>`<b>${av(v)}</b>${l?`<em>${l}</em>`:''}`;
-  const avgS=W?it(t.schedules,'schedules')+(o.goal?it(o.goal,'goal'):''):'', avgI=W?it(t.scheduledDateOf,'interviews')+(pend?'':it(t.shows,'shows')+it(t.noShows,'no shows')):'';
-  const avgH=W?it(hpr.hires,'hires')+(pend?'':it(t.shows,'shows')):'', avgP=W?it(t.placed,'placed'):'';
+  // …and per recruiter (per recruiter per week across several weeks: active recruiter-weeks, as for hires per recruiter)
+  const W=o.weeks>1?o.weeks:0, R=hpr.recruiters||0;
+  const fmtA=(v,n)=>{ if(v==null||!n) return '–'; const x=v/n; return x>=100?fmtNum(Math.round(x)):(Math.round(x*10)/10).toLocaleString(); };
+  const block=(title,n,items)=>!n?'':`<div class="mk-avg"><span>${title}</span>${items.filter(Boolean).map(([v,l])=>`<i class="mk-pair"><b>${fmtA(v,n)}</b><em>${l}</em></i>`).join('')}</div>`;
+  const both=items=>block('Per week (avg)',W,items)+block(W?'Per recruiter per week':'Per recruiter',R,items);
+  const avgS=both([[t.schedules,'schedules'],o.goal?[o.goal,'goal']:null]);
+  const avgI=both([[t.scheduledDateOf,'interviews'],pend?null:[t.shows,'shows'],pend?null:[t.noShows,'no shows']]);
+  const avgH=block('Per week (avg)',W,[[hpr.hires,'hires'],pend?null:[t.shows,'shows']])+block(W?'Per recruiter per week':'Per recruiter',R,[pend?null:[t.shows,'shows'],[t.scheduledDateOf,'interviews']]);
+  const avgP=both([[t.placed,'placed']]);
   const pIns = t.placed ? ins('good',`<b>${fmtNum(t.placed)}</b> hire${t.placed===1?'':'s'} placed into jobs`) : '';
   return [
     card({key:'schedules',label:'Schedules vs goal',accent:'#2f8f8a',status:sSt,
