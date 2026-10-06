@@ -1223,6 +1223,12 @@ body.team-workspace .content{padding-top:10px!important}
 .ut-tile{border:1px solid #e1eaed;border-radius:10px;padding:10px 12px;background:#fbfdfd}.ut-tile span{display:block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#5c7480}
 .ut-tile time{display:block;font-size:16px;font-weight:700;color:#10303c;margin-top:3px}.ut-tile em{display:block;font-style:normal;font-size:11.5px;color:#7a8f99;margin-top:2px}
 @media(max-width:600px){.upload-times-grid{grid-template-columns:1fr}}
+.rights-bar{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;padding:10px 12px;margin:4px 0 12px;border:1px dashed #cfdde2;border-radius:10px;background:#f7fbfb}
+.rights-bar label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:#3f5863}.rights-bar select{min-width:280px;max-width:100%}
+.rights-bar .hint{flex-basis:100%;margin:0;color:#17684a}.rights-bar .hint:empty{display:none}
+.ar-tools{display:flex;gap:10px;align-items:center;margin-bottom:8px}.ar-tools input[type=search]{flex:1;padding:7px 10px;border:1px solid #d6e2e6;border-radius:8px;font:inherit}
+.ar-list{max-height:320px;overflow:auto;border:1px solid #e1eaed;border-radius:10px}.ar-row{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border-top:1px solid #eef3f5;cursor:pointer}.ar-row:first-child{border-top:0}.ar-row:hover{background:#f7fbfb}
+.ar-row span{display:flex;flex-direction:column}.ar-row em{font-style:normal;font-size:11.5px;color:#7a8f99}
 </style>
 </head>
 <body class="locked">
@@ -8613,10 +8619,11 @@ async function renderUsersAdmin(){
       <td class="mod-chips">${u.role!=='user'?'<span class="hint">Everything'+(u.role==='admin'?' · manages users':'')+'</span>':(u.modules.length?u.modules.map(m=>`<span class="mod-chip">${escapeHtml(modLabel(m))}</span>`).join(''):'<span class="hint">No modules</span>')}${u.role==='user' && (u.hidden_sections||[]).length?`<span class="hint" style="display:block;margin-top:4px;">${u.hidden_sections.length} section${u.hidden_sections.length===1?'':'s'} hidden</span>`:''}</td>
       <td>${u.active?'Active':'<span class="pill bad">Disabled</span>'}</td>
       <td>${u.last_login_at?new Date(u.last_login_at).toLocaleString():'Never'}</td>
-      <td style="white-space:nowrap;text-align:right;"><button class="btn btn-primary btn-sm" data-team-user="${u.id}">Team assignments</button> ${Server.isSuperAdmin() || u.role==='user' || u.id===Server.user.id ? `<button class="btn btn-secondary btn-sm" data-edit-user="${u.id}">Edit</button>` : '<span class="hint">Super admin only</span>'}${u.role==='super_admin' || u.id===Server.user.id || (!Server.isSuperAdmin() && u.role!=='user')?'':` <button class="btn btn-danger btn-sm" data-del-user="${u.id}">Delete</button>`}</td>
+      <td style="white-space:nowrap;text-align:right;"><button class="btn btn-primary btn-sm" data-team-user="${u.id}">Team assignments</button> ${u.role==='user'?`<button class="btn btn-secondary btn-sm" data-dup-user="${u.id}" title="New user with the same rights">Duplicate</button> `:''}${Server.isSuperAdmin() || u.role==='user' || u.id===Server.user.id ? `<button class="btn btn-secondary btn-sm" data-edit-user="${u.id}">Edit</button>` : '<span class="hint">Super admin only</span>'}${u.role==='super_admin' || u.id===Server.user.id || (!Server.isSuperAdmin() && u.role!=='user')?'':` <button class="btn btn-danger btn-sm" data-del-user="${u.id}">Delete</button>`}</td>
     </tr>`).join('')}</tbody></table></div></div>`;
   host.querySelectorAll('[data-team-user]').forEach(b=>b.onclick=()=>ltAdminOpen(usersCache.find(u=>String(u.id)===b.dataset.teamUser)));
-  host.querySelector('#addUserBtn').onclick=()=>{ editingUserId='new'; drawUserForm(); };
+  host.querySelector('#addUserBtn').onclick=()=>{ userFormPreset=null; editingUserId='new'; drawUserForm(); };
+  host.querySelectorAll('[data-dup-user]').forEach(b=>b.onclick=()=>{ const src=usersCache.find(x=>String(x.id)===b.dataset.dupUser); if(!src) return; userFormPreset={...rightsOf(src), from:src.name}; editingUserId='new'; drawUserForm(); document.getElementById('userForm')?.scrollIntoView({block:'start'}); });
   host.querySelectorAll('[data-edit-user]').forEach(b=>b.onclick=()=>{ editingUserId=b.dataset.editUser; drawUserForm(); });
   host.querySelectorAll('[data-del-user]').forEach(b=>b.onclick=async ()=>{
     const u = usersCache.find(x=>x.id===b.dataset.delUser);
@@ -8625,17 +8632,62 @@ async function renderUsersAdmin(){
   });
   if(editingUserId) drawUserForm();
 }
+// Rights = modules + page sections + granted extras + default page. Never name, password, role or active.
+let userFormPreset = null;
+function readFormRights(host){
+  return { modules:[...host.querySelectorAll('.mod-grid input:checked')].map(i=>i.value),
+    hidden_sections:[...host.querySelectorAll('[data-sec]:not(:checked)')].map(i=>i.dataset.sec).concat([...host.querySelectorAll('[data-grant]:checked')].map(i=>i.dataset.grant)),
+    defaultView: host.querySelector('#ufDefaultView')?.value||'' };
+}
+function rightsOf(u){ return {modules:[...(u.modules||[])], hidden_sections:[...(u.hidden_sections||[])], defaultView:adminDefaultViews()[u.id]||''}; }
+function applyFormRights(host, r){
+  host.querySelectorAll('.mod-grid input').forEach(i=>{ i.checked=r.modules.includes(i.value); i.dispatchEvent(new Event('change')); });
+  host.querySelectorAll('[data-sec]').forEach(i=>{ i.disabled=false; i.checked=!r.hidden_sections.includes(i.dataset.sec); });
+  host.querySelectorAll('[data-grant]').forEach(i=>{ i.checked=r.hidden_sections.includes(i.dataset.grant); });
+  const dv=host.querySelector('#ufDefaultView'); if(dv) dv.value=[...dv.options].some(o=>o.value===r.defaultView)?r.defaultView:'';
+  host.querySelector('[data-sec]')?.dispatchEvent(new Event('change'));
+}
+function rightsSummary(r){ const hid=r.hidden_sections.filter(k=>!k.startsWith('grant.')).length, gr=r.hidden_sections.filter(k=>k.startsWith('grant.')).length; return `${r.modules.length} module${r.modules.length===1?'':'s'}${hid?` · ${hid} hidden section${hid===1?'':'s'}`:' · all sections'}${gr?` · ${gr} extra right${gr===1?'':'s'}`:''}`; }
+async function applyRightsToOthers(sourceName, r, excludeId){
+  const pool=(usersCache||[]).filter(u=>u.role==='user'&&String(u.id)!==String(excludeId));
+  if(!pool.length){ showToast('There are no other standard users to copy to.'); return; }
+  const wrap=document.createElement('div'); wrap.className='modal-overlay';
+  wrap.innerHTML=`<div class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="arTitle"><div class="modal-header"><h3 id="arTitle">Apply ${escapeHtml(sourceName)}’s rights to…</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div>
+   <div class="modal-body"><p class="hint" style="margin:0 0 8px">${escapeHtml(rightsSummary(r))}. Names, passwords and active status don’t change. Rights are replaced, not merged.</p>
+   <div class="ar-tools"><input type="search" id="arSearch" placeholder="Search people…"><label><input type="checkbox" id="arAll"> Select all</label></div>
+   <div class="ar-list">${pool.map(u=>{const same=JSON.stringify([...u.modules].sort())===JSON.stringify([...r.modules].sort())&&JSON.stringify([...(u.hidden_sections||[])].sort())===JSON.stringify([...r.hidden_sections].sort());return `<label class="ar-row" data-name="${escapeHtml(u.name.toLowerCase())}"><input type="checkbox" value="${escapeHtml(String(u.id))}"><span><strong>${escapeHtml(u.name)}</strong><em>${same?'Already has the same rights':escapeHtml(rightsSummary(rightsOf(u)))}</em></span></label>`;}).join('')}</div></div>
+   <div class="modal-footer"><button class="btn btn-secondary" data-close>Cancel</button><button class="btn btn-primary" id="arGo" disabled>Apply to 0 people</button></div></div>`;
+  document.body.appendChild(wrap);
+  const close=()=>wrap.remove(), boxes=()=>[...wrap.querySelectorAll('.ar-list input')], go=wrap.querySelector('#arGo');
+  const upd=()=>{ const n=boxes().filter(b=>b.checked).length; go.disabled=!n; go.textContent=`Apply to ${n} ${n===1?'person':'people'}`; };
+  wrap.addEventListener('click',e=>{ if(e.target===wrap||e.target.closest('[data-close]')) close(); });
+  wrap.querySelector('.ar-list').addEventListener('change',upd);
+  wrap.querySelector('#arAll').onchange=e=>{ boxes().filter(b=>!b.closest('.ar-row').hidden).forEach(b=>b.checked=e.target.checked); upd(); };
+  wrap.querySelector('#arSearch').oninput=e=>{ const q=e.target.value.trim().toLowerCase(); wrap.querySelectorAll('.ar-row').forEach(x=>x.hidden=!!q&&!x.dataset.name.includes(q)); };
+  go.onclick=async()=>{
+    const ids=boxes().filter(b=>b.checked).map(b=>b.value), targets=pool.filter(u=>ids.includes(String(u.id)));
+    if(!confirm(`Replace the rights of ${targets.length} ${targets.length===1?'person':'people'} with ${sourceName}’s?`)) return;
+    go.disabled=true; let ok=0; const failed=[]; const dv={...adminDefaultViews()};
+    for(const t of targets){ go.textContent=`Applying… ${ok+failed.length+1} / ${targets.length}`;
+      try{ await Server.rpc('dash_user_save',{p:{id:t.id,name:t.name,modules:r.modules,hidden_sections:r.hidden_sections,active:t.active}}); ok++; if(r.defaultView) dv[t.id]=r.defaultView; else delete dv[t.id]; }catch(e){ failed.push(t.name+' ('+cleanErr(e)+')'); } }
+    if(ok) await storageSet('userDefaultViews',dv);
+    close(); showToast(`Rights applied to ${ok} ${ok===1?'person':'people'}.`+(failed.length?' Failed: '+failed.join(', '):''));
+    renderUsersAdmin();
+  };
+}
 function drawUserForm(){
   const host = document.getElementById('userForm'); if(!host) return;
   const isNew = editingUserId==='new';
-  const u = isNew ? {name:'', modules:['performance','recruiters','branches'], hidden_sections:[], active:true, role:'user'} : usersCache.find(x=>x.id===editingUserId);
+  const preset = isNew ? userFormPreset : null;
+  const u = isNew ? {name:'', modules:preset?preset.modules:['performance','recruiters','branches'], hidden_sections:preset?preset.hidden_sections:[], active:true, role:'user'} : usersCache.find(x=>x.id===editingUserId);
   if(!u){ host.innerHTML=''; return; }
   const sa = u.role==='super_admin';
   const elevated = u.role!=='user';                  // super admin / admin: every module
   const meSuper = Server.isSuperAdmin();
   const pwLocked = sa || (!meSuper && !isNew);       // only the super admin sets passwords for existing accounts
   host.innerHTML = `<div class="user-form">
-    <h4>${isNew?'New user':'Edit '+escapeHtml(u.name)}</h4>
+    <h4>${isNew?(preset?'New user · rights copied from '+escapeHtml(preset.from):'New user'):'Edit '+escapeHtml(u.name)}</h4>
+    ${sa?'':`<div class="rights-bar"><label>Copy rights from<select id="ufCopyFrom"><option value="">Choose a person…</option>${(usersCache||[]).filter(x=>x.role==='user'&&x.id!==u.id).map(x=>`<option value="${escapeHtml(String(x.id))}">${escapeHtml(x.name)} — ${escapeHtml(rightsSummary(rightsOf(x)))}</option>`).join('')}</select></label>${isNew?'':`<button type="button" class="btn btn-secondary btn-sm" id="ufApplyOthers" title="Give other people exactly these rights">Apply these rights to others…</button>`}<span class="hint" id="ufCopyNote" role="status"></span></div>`}
     <div class="field-row">
       <div class="field"><label for="ufName">Name (used to sign in)</label><input id="ufName" value="${escapeHtml(u.name)}" autocomplete="off"></div>
       <div class="field"><label for="ufPw">${isNew?'Password':'New password (leave blank to keep)'}</label><div class="pw-wrap"><input id="ufPw" type="text" autocomplete="new-password" placeholder="${isNew?'At least 8 characters, letters and numbers':''}" ${pwLocked?'disabled':''}><button type="button" class="pw-toggle" id="ufGen" ${pwLocked?'disabled':''}>Generate</button></div>${sa?'<span class="hint">Change your own password under My account.</span>':pwLocked?'<span class="hint">Only the super admin can change passwords.</span>':''}</div>
@@ -8663,6 +8715,11 @@ function drawUserForm(){
     Object.entries(KPI_PARENT).forEach(([k,parents])=>{ const cb=host.querySelector('[data-sec="perf.detail.'+k+'"]'); if(!cb) return; const off=parents.some(p=>{ const x=host.querySelector('[data-sec="perf.kpi.'+p+'"]'); return x&&!x.checked; }); cb.disabled=off; if(off) cb.checked=false; });
   };
   host.querySelectorAll('[data-sec]').forEach(cb=>cb.addEventListener('change', ()=>{ syncDetail(); secCount(); })); syncDetail(); secCount();
+  if(preset && preset.defaultView){ const dv=host.querySelector('#ufDefaultView'); if(dv) dv.value=preset.defaultView; }
+  userFormPreset=null;
+  host.querySelector('#ufCopyFrom')?.addEventListener('change',e=>{ const src=usersCache.find(x=>String(x.id)===e.target.value); if(!src) return;
+    applyFormRights(host, rightsOf(src)); host.querySelector('#ufCopyNote').textContent=`Copied from ${src.name} — review, then ${isNew?'create the user':'save'}.`; e.target.value=''; });
+  host.querySelector('#ufApplyOthers')?.addEventListener('click',()=>{ applyRightsToOthers(host.querySelector('#ufName').value.trim()||u.name, readFormRights(host), u.id); });
   host.querySelector('#ufCancel').onclick=()=>{ editingUserId=null; host.innerHTML=''; };
   host.querySelector('#ufSave').onclick=async ()=>{
     const p = {name:host.querySelector('#ufName').value.trim()};
