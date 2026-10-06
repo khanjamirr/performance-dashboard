@@ -1156,6 +1156,25 @@ body.team-workspace .content{padding-top:10px!important}
 #accountMenu.acct-flyout .ribbon-btn{color:#173a47!important;background:transparent!important;border:0!important;border-radius:8px;padding:9px 11px!important;justify-content:flex-start}
 #accountMenu.acct-flyout .ribbon-btn:hover,#accountMenu.acct-flyout .ribbon-btn:focus-visible{background:#eef5f6!important}
 @keyframes acctIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
+
+.mk-grid{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:12px!important;margin-bottom:22px}
+.mk-card{display:flex!important;flex-direction:column;gap:8px;background:#fff!important;color:var(--text)!important;border:1px solid #e1eaed!important;border-radius:14px!important;padding:14px 15px 12px!important;position:relative;overflow:hidden;min-width:0;box-shadow:0 1px 2px #1834420a!important;min-height:0!important}
+.mk-card:before{content:''!important;position:absolute!important;left:0!important;top:0!important;right:0!important;width:auto!important;height:3px!important;margin:0!important;border-radius:0!important;background:var(--accent)!important;opacity:.85}
+.mk-card[data-kd]{cursor:pointer;transition:transform .15s,box-shadow .15s}.mk-card[data-kd]:hover{transform:translateY(-2px);box-shadow:0 2px 4px #1834420d,0 14px 30px #18344214!important}
+.mk-card [data-kd]:focus-visible,.mk-card[data-kd]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mk-top .label{font-size:11px!important;font-weight:700!important;letter-spacing:.05em;text-transform:uppercase;color:#5c7480!important;padding:0!important;min-height:0!important}
+.mk-card .value{font-size:28px!important;font-weight:700;line-height:1.1;margin:0!important;color:#132f3b;font-variant-numeric:tabular-nums}.mk-card .value small{font-size:15px;font-weight:600;color:#7a8f99}
+.mk-rows{display:flex;flex-direction:column;gap:7px}
+.mk-row{border-top:1px dashed #e4ecef;padding-top:7px;border-radius:6px}.mk-row[data-kd]{cursor:pointer}.mk-row[data-kd]:hover{background:#f5f9fa}
+.mk-row-h{display:flex;align-items:center;gap:6px;font-size:12.5px;color:#3f5863}.mk-row-h span{margin-right:auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mk-row-h b{font-variant-numeric:tabular-nums;color:#132f3b}
+.mk-chip{font-style:normal;font-size:11px;font-weight:700;padding:1px 6px;border-radius:6px;background:#eef3f5;color:#3f5863;font-variant-numeric:tabular-nums;white-space:nowrap}.mk-chip.ok{background:#e3f4ee;color:#17684a}.mk-chip.low{background:#fde3e3;color:#a12d36}
+.mk-bar{position:relative;height:6px;border-radius:4px;background:#eef3f4;margin-top:5px}.mk-bar i{display:block;height:100%;border-radius:4px}.mk-bar s{position:absolute;top:-3px;bottom:-3px;width:2px;background:#132f3b;opacity:.55;transform:translateX(-1px)}
+.mk-row small{display:block;font-size:10.5px;color:#7a8f99;margin-top:3px}
+.mk-foot{margin-top:auto;font-size:11.5px}.mk-foot .delta{margin:0!important;font-size:11.5px!important}
+.mk-team{margin:0;gap:8px!important}.mk-compact{padding:9px 11px 9px!important;gap:4px;border-radius:9px!important}.mk-compact .value{font-size:20px!important}.mk-compact .value small{font-size:12px}.mk-compact .mk-rows{gap:2px}.mk-compact .mk-row{padding-top:3px;border-top:0}.mk-compact .mk-row-h{font-size:11.5px}
+@media(max-width:1200px){.mk-grid:not(.mk-team){grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(max-width:760px){.mk-grid:not(.mk-team){grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}.mk-card .value{font-size:22px!important}}
+@media(max-width:1100px){.mk-team{display:flex!important;overflow-x:auto}.mk-team>.mk-card{flex:0 0 190px}}
 </style>
 </head>
 <body class="locked">
@@ -3906,23 +3925,15 @@ async function renderWeeklyView(){
   container.innerHTML = `
     ${universalDivision ? `<div class="hint" style="margin-bottom:10px;">Viewing <strong>${escapeHtml(universalDivision)}</strong> only</div>` : ''}
 
-    <div class="kpi-grid kpi-v2" data-section="perf.kpis">
-      ${kpiCardHtml({label:'Schedules', icon:'cal', accent:'#2f8f8a', value:fmtNum(t.schedules), delta:'<div class="delta flat">'+(isMultiWeekMode?'Combined':'Created that week')+'</div>', spark:kpiSeries(week, w=>w.schedules)})}
-      ${kpiCardHtml({label:'Interviews', icon:'chat', accent:'#4a78c8', value:fmtNum(t.scheduledDateOf), delta:deltaHtml(t.scheduledDateOf, prevT? prevT.scheduledDateOf: undefined), spark:kpiSeries(week, w=>w.scheduledDateOf)})}
-      ${kpiCardHtml({label:'Shows', icon:'check', accent:'#1f9a6c', value:fmtNum(t.shows), delta:deltaHtml(t.shows, prevT? prevT.shows: undefined), spark:kpiSeries(week, w=>w.shows, true)})}
-      ${kpiCardHtml({label:'No Shows', icon:'x', accent:'#c4565f', value:fmtNum(t.noShows), delta:deltaHtml(t.noShows, prevT? prevT.noShows: undefined, false), spark:kpiSeries(week, w=>w.noShows, true)})}
-      ${kpiCardHtml({label:'Hires', icon:'hire', accent:'#7a5fb8', value:fmtNum(t.i9), delta:deltaHtml(t.i9, prevT? prevT.i9: undefined), spark:kpiSeries(week, w=>w.i9, true), title:'Interviews this week whose I-9 dropdown is Yes'})}
-      ${kpiCardHtml({label:'Placed', icon:'brief', accent:'#b07a2a', value:fmtNum(t.placed), delta:deltaHtml(t.placed, prevT? prevT.placed: undefined), spark:kpiSeries(week, w=>w.placed, true), title:'Interviews this week whose Status Reason is Assigned'})}
-      ${(()=>{ const hpr = hiresPerRecruiter(scopedWeeksForSummary), prevHpr = prev && !isMultiWeekMode ? hiresPerRecruiter([scopeWeekToDivision(prev, universalDivision)]) : null;
-        const d = (hpr.value!=null && prevHpr && prevHpr.value!=null) ? hpr.value-prevHpr.value : null;
-        return kpiCardHtml({rate:true, label:'Hires per Recruiter', icon:'hire', accent:'#7a5fb8', value: hpr.value==null?'\u2013':hpr.value.toFixed(1),
-          delta: d==null ? '<div class="delta flat">'+fmtNum(hpr.hires)+' hires ÷ '+fmtNum(hpr.recruiters)+' recruiters</div>' : '<span class="delta '+(d>=0?'up':'down')+'">'+(d>=0?'+':'−')+Math.abs(d).toFixed(1)+' vs prior week · '+fmtNum(hpr.hires)+' ÷ '+fmtNum(hpr.recruiters)+'</span>',
-          bar: hpr.value==null ? null : {v:hpr.value, target:HIRES_PER_RECRUITER_TARGET, max:HIRES_PER_RECRUITER_TARGET*1.5, good:'up', unit:''},
-          title:'Total hires ÷ number of recruiters with activity'+(isMultiWeekMode?' (per recruiter per week)':' this week')}); })()}
-      ${kpiCardHtml({rate:true, label:'Goal Reach', icon:'target', accent:'#a67c2e', value:goalReachPct!==null?goalReachPct.toFixed(1)+'%':'\u2013', delta:'<div class="delta flat">'+(isMultiWeekMode?'Combined':'Minimum 90%')+'</div>', bar:goalReachPct!==null?{v:goalReachPct, target:100, good:'up'}:null})}
-      ${(()=>{ const pend=!isMultiWeekMode && weekIsFullyPending(week.weekEndDate); return kpiCardHtml({label:'Show Rate', icon:'trend', rate:true, accent:'#1f8a84', value:pend?'Pending':fmtPct(t.shows,t.scheduledDateOf), delta:pend?'<div class="delta flat">Week hasn\u2019t happened yet</div>':deltaHtml(showRate, prevShowRate, true, true), bar:pend||!t.scheduledDateOf?null:{v:showRate, target:60, good:'up'}})
-        + kpiCardHtml({rate:true, label:'No Show Rate', icon:'down', accent:'#c4565f', value:pend?'Pending':fmtPct(t.noShows,t.scheduledDateOf), delta:pend?'<div class="delta flat">Week hasn\u2019t happened yet</div>':deltaHtml(noShowRate, prevNoShowRate, false, true), bar:pend||!t.scheduledDateOf?null:{v:noShowRate, target:40, good:'down'}}); })()}
-    </div>
+    <div class="kpi-grid mk-grid" data-section="perf.kpis">${(()=>{
+      const pend=!isMultiWeekMode && weekIsFullyPending(week.weekEndDate);
+      const hpr=hiresPerRecruiter(scopedWeeksForSummary), prevHpr=prev && !isMultiWeekMode ? hiresPerRecruiter([scopeWeekToDivision(prev, universalDivision)]) : null;
+      const dh=(hpr.value!=null&&prevHpr&&prevHpr.value!=null)?hpr.value-prevHpr.value:null;
+      return mergedKpiCards({prefix:'perf', t, goal:teamGoal, pending:pend, hpr, clickable:kpiDetailAllowed,
+        deltas:{schedules:deltaHtml(t.schedules, prevT?prevT.schedules:undefined), interviews:deltaHtml(t.scheduledDateOf, prevT?prevT.scheduledDateOf:undefined),
+          hires:pend?'<span class="delta flat">Week hasn’t happened yet</span>':deltaHtml(t.i9, prevT?prevT.i9:undefined), placed:pend?'<span class="delta flat">Week hasn’t happened yet</span>':deltaHtml(t.placed, prevT?prevT.placed:undefined),
+          hpr:dh==null?'<span class="delta flat">'+(isMultiWeekMode?'Per recruiter per week':'No prior week')+'</span>':'<span class="delta '+(dh>=0?'up':'down')+'">'+(dh>=0?'+':'−')+Math.abs(dh).toFixed(1)+' vs prior week</span>'}});
+    })()}</div>
 
     <section data-section="perf.trends"><div class="section-divider">Trends</div>
     ${trendExplorerHtml()}</section>
@@ -4154,6 +4165,34 @@ function sparkSvg(pts, color){
     <circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="2.6" fill="${color}"/></svg>`;
 }
 let perfDetailCtx=null;
+// Paired cards: each count sits with the ratio it drives (schedules vs goal, interviews → shows / no shows,
+// shows → hires, hires → placed). Rows carry their own data-section so rights can hide a single line.
+const KPI_PARENT={schedules:['schedules'],goal_reach:['schedules','goal_reach'],interviews:['interviews'],show_rate:['interviews','shows'],no_show_rate:['interviews','no_shows'],hires:['hires'],placed:['placed'],hires_per_recruiter:['hires_per_recruiter']};
+function mergedKpiCards(o){
+  const P=o.prefix, t=o.t, num=v=>v==null?'–':fmtNum(v), compact=!!o.compact;
+  const ratio=(n,d)=>n==null||!d?null:n/d*100;
+  const click=k=>o.clickable&&o.clickable(k)?` data-kd="${k}" role="button" tabindex="0"`:'';
+  const chip=(v,target,lower)=>v==null?'':`<em class="mk-chip ${target==null?'':(lower?v<target:v>=target)?'ok':'low'}">${v.toFixed(1)}%</em>`;
+  const bar=(v,target,lower,max=100)=>compact||v==null?'':`<div class="mk-bar"><i style="width:${Math.max(1.5,Math.min(100,v/max*100))}%;background:${target==null?'var(--accent)':(lower?v<target:v>=target)?'#1f9a6c':'#d0776f'}"></i>${target!=null?`<s style="left:${Math.min(100,target/max*100)}%"></s>`:''}</div>`;
+  const row=(key,label,value,v,target,lower,note,kd)=>`<div class="mk-row"${key?` data-section="${P}.kpi.${key}"`:''}${kd?click(kd):''}><div class="mk-row-h"><span>${label}</span><b>${value}</b>${o.pending&&v==null?'':chip(v,target,lower)}</div>${bar(v,target,lower)}${note&&!compact?`<small>${note}</small>`:''}</div>`;
+  const card=(key,label,accent,value,rows,foot,kd)=>`<div class="kpi-card mk-card${compact?' mk-compact':''}" data-section="${P}.kpi.${key}" style="--accent:${accent}"${click(kd||key)}><div class="mk-top"><span class="label">${label}</span></div><div class="value">${value}</div><div class="mk-rows">${rows.join('')}</div>${foot&&!compact?`<div class="mk-foot">${foot}</div>`:''}</div>`;
+  const gr=ratio(t.schedules,o.goal), sr=o.pending?null:ratio(t.shows,t.scheduledDateOf), nr=o.pending?null:ratio(t.noShows,t.scheduledDateOf);
+  const hr=ratio(t.i9,t.shows), ph=ratio(t.placed,t.i9), ps=ratio(t.placed,t.shows), hpr=o.hpr||{};
+  const pend=o.pending?'Pending':null, d=o.deltas||{};
+  return [
+    card('schedules','Schedules vs goal','#2f8f8a',`${num(t.schedules)}<small> / ${num(o.goal)}</small>`,
+      [row('goal_reach','Goal reach',gr==null?'–':'',gr,90,false,'Minimum 90%','goal_reach')], d.schedules),
+    card('interviews','Interviews','#4a78c8',num(t.scheduledDateOf),
+      [row('shows','Shows',pend||num(t.shows),sr,70,false,'Show rate · min 70%','show_rate'),
+       row('no_shows','No shows',pend||num(t.noShows),nr,20,true,'No-show rate · under 20%','no_show_rate')], d.interviews),
+    card('hires','Hires','#7a5fb8',num(t.i9),
+      [row('','of shows',pend||num(t.shows),o.pending?null:hr,null,false,'Hire rate (share of shows)')], d.hires),
+    card('placed','Placed','#b07a2a',num(t.placed),
+      [row('','of hires',num(t.i9),ph,null,false,'Share of hires placed'),row('','of shows',pend||num(t.shows),o.pending?null:ps,null,false,'Share of shows placed')], d.placed),
+    card('hires_per_recruiter','Hires per recruiter','#7a5fb8',hpr.value==null?'–':hpr.value.toFixed(1),
+      [`<div class="mk-row"><div class="mk-row-h"><span>${num(hpr.hires)} hires ÷ ${num(hpr.recruiters)} recruiters</span><b></b><em class="mk-chip ${hpr.value==null?'':hpr.value>=15?'ok':'low'}">min 15</em></div>${bar(hpr.value,15,false,22.5)}</div>`], d.hpr)
+  ].join('');
+}
 const KPI_DETAIL = {
   schedules:{label:'Schedules', n:'schedules', good:'up', accent:'#2f8f8a'},
   interviews:{label:'Interviews', n:'scheduledDateOf', good:'up', accent:'#4a78c8'},
@@ -4166,7 +4205,7 @@ const KPI_DETAIL = {
   show_rate:{label:'Show Rate', n:'shows', d:'scheduledDateOf', pctUnit:true, good:'up', target:70, accent:'#1f8a84', pend:true},
   no_show_rate:{label:'No Show Rate', n:'noShows', d:'scheduledDateOf', pctUnit:true, good:'down', target:20, accent:'#c4565f', pend:true},
 };
-function kpiDetailAllowed(key){ return !!KPI_DETAIL[key] && canSeeSection('perf.kpis') && canSeeSection('perf.kpi.'+key) && canSeeSection('perf.detail.'+key); }
+function kpiDetailAllowed(key){ return !!KPI_DETAIL[key] && !!KPI_PARENT[key] && canSeeSection('perf.kpis') && KPI_PARENT[key].every(k=>canSeeSection('perf.kpi.'+k)) && canSeeSection('perf.detail.'+key); }
 // value of a metric for a set of {totals, goal, recruiters}
 function kpiValue(def, t, goal, recruiters){
   const num=t[def.n]||0;
@@ -4261,13 +4300,12 @@ async function openKpiInsights(key){
   }
 }
 document.addEventListener('click', e=>{
-  const card=e.target.closest('#view-weekly .kpi-v2 .kpi-card'); if(!card) return;
-  const key=(card.dataset.section||'').replace('perf.kpi.','');
-  if(kpiDetailAllowed(key)) openKpiInsights(key);
+  const el=e.target.closest('#view-weekly .mk-grid [data-kd]'); if(!el) return;
+  e.stopPropagation(); if(kpiDetailAllowed(el.dataset.kd)) openKpiInsights(el.dataset.kd);
 });
 document.addEventListener('keydown', e=>{
-  if(e.key!=='Enter'&&e.key!==' ') return; const card=e.target.closest&&e.target.closest('#view-weekly .kpi-v2 .kpi-card'); if(!card) return;
-  const key=(card.dataset.section||'').replace('perf.kpi.',''); if(kpiDetailAllowed(key)){ e.preventDefault(); openKpiInsights(key); }
+  if(e.key!=='Enter'&&e.key!==' ') return; const el=e.target.closest&&e.target.closest('#view-weekly .mk-grid [data-kd]'); if(!el||el!==e.target) return;
+  if(kpiDetailAllowed(el.dataset.kd)){ e.preventDefault(); openKpiInsights(el.dataset.kd); }
 });
 function kpiCardHtml(o){
  const benchmark={'Goal Reach':[90,'Minimum 90%'],'Show Rate':[70,'Minimum 70%'],'Hires per Recruiter':[15,'Minimum 15'],'No Show Rate':[20,'Less than 20%']}[o.label];
@@ -7014,10 +7052,15 @@ function renderUploadAlerts(){
 // stored per user as a deny-list; hiding is done with one generated stylesheet, so it also covers
 // anything re-rendered later.
 const PAGE_SECTIONS = {
-  performance:[['perf.kpis','KPI cards (all)'],['perf.kpi.schedules','· Schedules card'],['perf.detail.schedules','·· Schedules — click-through details'],['perf.kpi.interviews','· Interviews card'],['perf.detail.interviews','·· Interviews — click-through details'],['perf.kpi.shows','· Shows card'],['perf.detail.shows','·· Shows — click-through details'],['perf.kpi.no_shows','· No Shows card'],['perf.detail.no_shows','·· No Shows — click-through details'],['perf.kpi.hires','· Hires card'],['perf.detail.hires','·· Hires — click-through details'],['perf.kpi.placed','· Placed card'],['perf.detail.placed','·· Placed — click-through details'],['perf.kpi.hires_per_recruiter','· Hires per Recruiter card'],['perf.detail.hires_per_recruiter','·· Hires per Recruiter — click-through details'],['perf.kpi.goal_reach','· Goal Reach card'],['perf.detail.goal_reach','·· Goal Reach — click-through details'],['perf.kpi.show_rate','· Show Rate card'],['perf.detail.show_rate','·· Show Rate — click-through details'],['perf.kpi.no_show_rate','· No Show Rate card'],['perf.detail.no_show_rate','·· No Show Rate — click-through details'],
+  performance:[['perf.kpis','KPI cards (all)'],
+                ['perf.kpi.schedules','· Schedules vs goal card'],['perf.detail.schedules','·· Schedules — click-through details'],['perf.kpi.goal_reach','·· Goal reach % line'],['perf.detail.goal_reach','·· Goal reach — click-through details'],
+                ['perf.kpi.interviews','· Interviews card'],['perf.detail.interviews','·· Interviews — click-through details'],['perf.kpi.shows','·· Shows + show rate line'],['perf.detail.show_rate','·· Show rate — click-through details'],['perf.kpi.no_shows','·· No shows + no-show rate line'],['perf.detail.no_show_rate','·· No-show rate — click-through details'],
+                ['perf.kpi.hires','· Hires card (hires of shows)'],['perf.detail.hires','·· Hires — click-through details'],
+                ['perf.kpi.placed','· Placed card (of hires, of shows)'],['perf.detail.placed','·· Placed — click-through details'],
+                ['perf.kpi.hires_per_recruiter','· Hires per recruiter card'],['perf.detail.hires_per_recruiter','·· Hires per recruiter — click-through details'],
                 ['perf.detail.part.trend','Card details — 12-week trend'],['perf.detail.part.divisions','Card details — division split'],['perf.detail.part.recruiters','Card details — recruiter ranking'],['perf.detail.part.branches','Card details — branch ranking'],['perf.detail.all_people','Card details — all recruiters & branches (untick = only their assigned team)'],
                 ['perf.trends','Trends charts'],['perf.leaderboards','Leaderboards (recruiter & branch snapshots)'],['perf.divisions','Division breakdown'],['perf.history','Previous 6 weeks table'],['perf.insights','Insights'],['perf.composition','Composition pies (monthly / quarterly)']],
-  teams:[['team.summary','Team — summary cards'],['team.daily','Team — daily table'],['team.weekly','Team — weekly table'],['team.goals','Team — goal checks and breaks'],['team.charts','Team — charts'],['team.candidates','Team — today’s scheduled candidates'],...['Schedules','Interviews','Shows','No Shows','Hires','Placed','Hires per Recruiter','Goal Reach','Show Rate','No Show Rate'].map(l=>['team.kpi.'+l.toLowerCase().replace(/[^a-z]+/g,'_'),'· '+l+' card'])],
+  teams:[['team.summary','Team — summary cards'],['team.daily','Team — daily table'],['team.weekly','Team — weekly table'],['team.goals','Team — goal checks and breaks'],['team.charts','Team — charts'],['team.candidates','Team — today’s scheduled candidates'],['team.kpi.schedules','· Schedules vs goal card'],['team.kpi.goal_reach','·· Goal reach % line'],['team.kpi.interviews','· Interviews card'],['team.kpi.shows','·· Shows + show rate line'],['team.kpi.no_shows','·· No shows + no-show rate line'],['team.kpi.hires','· Hires card'],['team.kpi.placed','· Placed card'],['team.kpi.hires_per_recruiter','· Hires per recruiter card']],
   recruiters:[['rec.table','Recruiter table'],['hist.kpis','History page — summary tiles (recruiter & branch)'],['hist.trend','History page — week-by-week chart'],['hist.goal','History page — schedules vs goal chart'],['hist.weeks','History page — every-week table'],['hist.remarks','History page — remarks'],['hist.candidates','History page — candidates']],
   branches:[['br.table','Branch table'],['hist.team','History page — recruiters in the branch']],
   candidates:[['cand.list','Category boxes and candidate list'],['cand.explain','“How are these counted?” breakdown']],
@@ -8515,7 +8558,11 @@ function drawUserForm(){
   if(u.role==='admin') host.querySelectorAll('.mod-grid,.sec-grid').forEach(f=>f.classList.add('dimmed'));
   const secCount = ()=>host.querySelectorAll('.sec-page').forEach(d=>{ const all=d.querySelectorAll('[data-sec]').length, on=d.querySelectorAll('[data-sec]:checked').length; d.querySelector('.sec-count').textContent = on===all ? 'everything' : on+' of '+all+' shown'; });
   host.querySelectorAll('.mod-grid input').forEach(cb=>cb.addEventListener('change', ()=>{ const d=host.querySelector('.sec-page[data-sec-mod="'+cb.value+'"]'); if(d) d.hidden=!cb.checked; }));
-  const syncDetail = ()=>host.querySelectorAll('[data-sec^="perf.detail."]:not([data-sec^="perf.detail.part."]):not([data-sec="perf.detail.all_people"])').forEach(cb=>{ const card=host.querySelector('[data-sec="perf.kpi.'+cb.dataset.sec.slice(12)+'"]'); const off=card&&!card.checked; cb.disabled=off; if(off) cb.checked=false; });
+  const LINE_PARENT={goal_reach:'schedules',shows:'interviews',no_shows:'interviews'};
+  const syncDetail = ()=>{
+    ['perf','team'].forEach(pf=>Object.entries(LINE_PARENT).forEach(([l,c])=>{ const cb=host.querySelector('[data-sec="'+pf+'.kpi.'+l+'"]'), par=host.querySelector('[data-sec="'+pf+'.kpi.'+c+'"]'); if(cb&&par){ cb.disabled=!par.checked; if(!par.checked) cb.checked=false; } }));
+    Object.entries(KPI_PARENT).forEach(([k,parents])=>{ const cb=host.querySelector('[data-sec="perf.detail.'+k+'"]'); if(!cb) return; const off=parents.some(p=>{ const x=host.querySelector('[data-sec="perf.kpi.'+p+'"]'); return x&&!x.checked; }); cb.disabled=off; if(off) cb.checked=false; });
+  };
   host.querySelectorAll('[data-sec]').forEach(cb=>cb.addEventListener('change', ()=>{ syncDetail(); secCount(); })); syncDetail(); secCount();
   host.querySelector('#ufCancel').onclick=()=>{ editingUserId=null; host.innerHTML=''; };
   host.querySelector('#ufSave').onclick=async ()=>{
@@ -9025,14 +9072,8 @@ function ltBreakCheck(name,date,now=new Date(),scope='day',weekTo=date){
  return {name,wg,dg,daily,weekly,cum,required,eligible:cum!==null&&cum>=required,known:cum!==null,goalMet,late,mid,status,daySignal,weekSignal};
 }
 function ltCompactCards(report){
- const t=report.total,ratio=(a,b)=>a===null||b===null||!b?null:a/b*100;
- const pctHtml=(v,target,lower)=>v===null?'':`<em class="lt-pct ${(lower?v<target:v>=target)?'ok':'low'}">${v.toFixed(1)}%</em>`;
- const merged={schedules:[ratio(t.schedules,t.goal),90,false,`of ${tgNumber(t.goal)} goal · min 90%`],shows:[ratio(t.shows,t.scheduledDateOf),70,false,'show rate · min 70%'],noShows:[ratio(t.noShows,t.scheduledDateOf),20,true,'no-show rate · under 20%']};
- const rows=[{key:'goal',label:'Schedule goal',value:tgNumber(t.goal),color:'#a67c2e',note:'from Settings → Goals'}];
- TG_METRICS.forEach(([key,label,color])=>{const m=merged[key];rows.push({key:label.toLowerCase().replace(/[^a-z]+/g,'_'),label:label==='Shows'?'Visits (shows)':label,value:tgNumber(t[key])+(m?pctHtml(m[0],m[1],m[2]):''),color,note:m?m[3]:''});});
- const hpr=t.i9===null||!report.hprDenominator?null:t.i9/report.hprDenominator;
- rows.push({key:'hires_per_recruiter',label:'Hires / recruiter',value:hpr===null?'Unavailable':hpr.toFixed(1),color:hpr===null?'#8496a0':hpr>=15?'#218778':'#b57734',note:'Minimum 15'});
- return rows.map(x=>`<div class="lt-stat" data-section="team.kpi.${x.key}" style="--stat-color:${x.color}"><span>${x.label}</span><strong>${x.value}</strong>${x.note?`<small>${x.note}</small>`:''}</div>`).join('');
+ const t=report.total, hpr=t.i9===null||!report.hprDenominator?{value:null,hires:t.i9,recruiters:report.hprDenominator}:{value:t.i9/report.hprDenominator,hires:t.i9,recruiters:report.hprDenominator};
+ return mergedKpiCards({prefix:'team', t, goal:t.goal, hpr, compact:true});
 }
 function renderTeamGroups(){
  const host=document.getElementById('view-teams');if(!host||!Server.user)return;
@@ -9064,7 +9105,7 @@ function renderTeamGroups(){
  <div class="lt-period" role="group" aria-label="Team reporting period"><label class="lt-field">View<select id="ltRangeMode"><option value="day" ${mode==='day'?'selected':''}>Day</option><option value="week" ${mode==='week'?'selected':''}>Week</option><option value="month" ${mode==='month'?'selected':''}>Month</option></select></label><button class="btn btn-secondary" id="ltPrevious" aria-label="Previous ${mode}">←</button><label class="lt-field">${mode==='month'?'Month':mode==='week'?'Week ending':'Date'}<input id="ltAnchor" type="${mode==='month'?'month':'date'}" value="${mode==='month'?anchor.slice(0,7):mode==='week'?p.to:anchor}" max="${mode==='month'?today.slice(0,7):mode==='week'?weekOfDate(today).weekEnd:today}"></label><button class="btn btn-secondary" id="ltNext" aria-label="Next ${mode}" ${p.to>=today?'disabled':''}>→</button><button class="btn btn-secondary" id="ltCurrent">${mode==='day'?'Today':mode==='month'?'This month':'This week'}</button></div>
  <label class="lt-field">Division<select id="ltDivision"><option value="">All team divisions</option>${divisions.map(d=>`<option ${d===g.division?'selected':''}>${escapeHtml(d)}</option>`).join('')}</select></label><button class="btn btn-secondary" id="ltRefresh" aria-label="Refresh team" title="Refresh team">↻</button></header>
  <div class="lt-scope"><span><strong>${rangeText}</strong> · ${escapeHtml(g.division||'All divisions')}${p.to>today?' · through today':''}</span><span title="Dates and cutoff times use your system timezone">${escapeHtml(zone)}</span></div>
- <section class="lt-summary" aria-label="Team performance summary" data-section="team.summary"><div class="lt-stats">${ltCompactCards(report)}</div></section>
+ <section class="lt-summary" aria-label="Team performance summary" data-section="team.summary"><div class="kpi-grid mk-grid mk-team">${ltCompactCards(report)}</div></section>
  ${report.uncovered?'<p class="lt-data-note">Some selected dates have no import; affected totals are unavailable.</p>':''}
  </div>
  ${ltState.directoryError?`<p class="warn-note">User list unavailable: ${escapeHtml(ltState.directoryError)} <button class="btn btn-secondary" id="ltDirectoryRetry">Retry</button></p>`:''}
