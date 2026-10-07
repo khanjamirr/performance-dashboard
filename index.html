@@ -8819,7 +8819,7 @@ function alertsGoalRows(weekEnd){
     const g = goals[name]; const goal = (g!==undefined && g!==null && g!=='') ? Number(g) : DEFAULT_WEEKLY_GOAL;
     const sched = r.schedules||0, pct = goal>0 ? sched/goal*100 : null;
     const expected = goal*workdays/5, pace = expected>0 ? sched/expected*100 : null;
-    const score = inProgress ? (pace==null ? 100 : pace) : pct;
+    const score = pct;   // always against the full weekly goal
     return {name, branch:r.branch||lastBranch[name]||'', division:getEffectiveRecruiterDivision(name, weekEnd)||'Unassigned', sched, goal, pct, pace, score, expected,
       projected: inProgress && workdays ? Math.round(sched/workdays*5) : sched, shows:r.shows||0, interviews:r.scheduledDateOf||0, hires:r.i9||0, noActivity:!((r.schedules||0)+(r.scheduledDateOf||0))};
   }).filter(r=>r.goal>0);
@@ -8858,10 +8858,10 @@ async function renderAlertsView(){
   const w = weekOfDate(st.week);
   const bar = r=>{ const v=Math.min(100, r.pct||0); return `<div class="al-bar" title="${fmtNum(r.sched)} of ${fmtNum(r.goal)} schedules"><i style="width:${v}%"></i>${inProgress?`<u style="left:${Math.min(100, elapsed/5*100)}%" title="Where they should be by today"></u>`:''}<b style="left:50%"></b></div>`; };
   const card = (r, sev)=>`<div class="al-card ${sev}">
-      <div class="al-head"><button type="button" class="al-name" data-al-remarks="${escapeHtml(r.name)}">${escapeHtml(r.name)}</button><span class="al-pct" title="${inProgress?'Schedules vs where they should be by today':'Schedules vs weekly goal'}">${Math.round(r.score)}%${inProgress?'<small>of today’s target</small>':''}</span></div>
+      <div class="al-head"><button type="button" class="al-name" data-al-remarks="${escapeHtml(r.name)}">${escapeHtml(r.name)}</button><span class="al-pct" title="Schedules vs weekly goal">${Math.round(r.score)}%<small>of weekly goal</small></span></div>
       <div class="al-sub">${escapeHtml(r.division)}${r.branch?' · '+escapeHtml(r.branch):''}</div>
       ${bar(r)}
-      <div class="al-facts"><span><strong>${fmtNum(r.sched)}</strong> / ${fmtNum(r.goal)} schedules</span>${inProgress?`<span>${Math.round(r.pct)}% of the full week · on track for ~${fmtNum(r.projected)}</span>`:`<span>${fmtNum(r.shows)} shows · ${fmtNum(r.hires)} hires</span>`}</div>
+      <div class="al-facts"><span><strong>${fmtNum(r.sched)}</strong> / ${fmtNum(r.goal)} schedules</span>${inProgress?`<span>on track for ~${fmtNum(r.projected)} · ${fmtNum(Math.round(r.expected))} due by today</span>`:`<span>${fmtNum(r.shows)} shows · ${fmtNum(r.hires)} hires</span>`}</div>
       ${alertsRemarkLine(r.name, st.week)}
       <div class="al-actions">${Remarks.canAdd()?`<button class="btn btn-secondary btn-sm" data-al-add="${escapeHtml(r.name)}">Add remark</button>`:''}<button class="link-btn" data-al-remarks="${escapeHtml(r.name)}">${Remarks.forRecruiter(r.name).length?'Remarks ('+Remarks.forRecruiter(r.name).length+')':'History'}</button></div>
     </div>`;
@@ -8871,7 +8871,7 @@ async function renderAlertsView(){
     <div class="al-toolbar">
       <label class="cand-field"><span>Week ending</span><select id="alWeek">${weeks.map(d=>`<option value="${d}" ${d===st.week?'selected':''}>Wk ${weekOfDate(d).number} · ending ${fmtDate(d)}${d===toIsoDateOnly(saturdayOnOrAfter(new Date()))?' (this week)':''}</option>`).join('')}</select></label>
       <label class="cand-field"><span>Group by</span><select id="alGroup"><option value="division" ${st.group==='division'?'selected':''}>Division › Branch</option><option value="branch" ${st.group==='branch'?'selected':''}>Branch</option><option value="none" ${st.group==='none'?'selected':''}>No grouping</option></select></label>
-      <p class="hint al-basis">${inProgress?`Week in progress — ${elapsed} of 5 working days so far. Recruiters are compared with where they should be by today (weekly goal × ${elapsed}/5). Recruiters with no schedules yet are included.`:`Completed week — schedules compared with each recruiter’s weekly goal (default ${DEFAULT_WEEKLY_GOAL}).`}</p>
+      <p class="hint al-basis">${inProgress?`Week in progress — ${elapsed} of 5 working days so far. Groups compare schedules with each recruiter’s full weekly goal; each card also shows where they should be by today. Recruiters with no schedules yet are included.`:`Completed week — schedules compared with each recruiter’s weekly goal (default ${DEFAULT_WEEKLY_GOAL}).`}</p>
     </div>
     <div class="al-tiles" data-section="alerts.summary">
       <button type="button" class="al-tile bad" data-jump="alBelow"><span>Below 50% of goal</span><strong>${below.length}</strong><em>${noRemark?noRemark+' without a remark':'all have remarks'}</em></button>
