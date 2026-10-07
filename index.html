@@ -1227,7 +1227,7 @@ body.team-workspace .content{padding-top:10px!important}
 .bm-msg{color:#a12d36;font-size:12.5px;min-height:1em;margin:8px 0 0}.bm-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
 .bt-week{display:flex;align-items:center;gap:8px;justify-content:center;margin-bottom:8px}.bt-rows{display:flex;flex-direction:column;gap:6px;margin:8px 0}
 .bt-row{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:6px 10px;border:1px solid #e1eaed;border-radius:9px}.bt-row span{font-size:13px;font-weight:600;color:#10303c}.bt-row input{width:110px;padding:6px 8px;border:1px solid #d6e2e6;border-radius:7px;font:inherit;text-align:right}
-.bt-add select{width:100%;padding:7px;border:1px dashed #cfdde2;border-radius:8px;font:inherit;color:#3f5863}.bt-sum{font-size:12.5px;color:#17684a;margin:10px 0 0}.bt-sum.warn{color:#a12d36}
+.bt-add input{width:100%;padding:8px 10px;border:1px dashed #cfdde2;border-radius:8px;font:inherit}.bt-add select{width:100%;padding:7px;border:1px dashed #cfdde2;border-radius:8px;font:inherit;color:#3f5863}.bt-sum{font-size:12.5px;color:#17684a;margin:10px 0 0}.bt-sum.warn{color:#a12d36}
 .lt-empty{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:18px;border:1px dashed #d6e2e6;border-radius:12px;background:#fbfdfd;color:#3f5863;font-size:13px}.lt-empty strong{color:#10303c;font-size:14px}.lt-empty .btn{margin-top:4px}
 .ta-h{margin:4px 0 8px;font-size:13px;color:#132f3b}
 .ta-matrix th small{display:block;font-weight:500;text-transform:none;letter-spacing:0;color:#7a8f99;font-size:10.5px}
@@ -1296,6 +1296,54 @@ body.team-workspace .content{padding-top:10px!important}
 .mk-avg span{flex-basis:100%;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:color-mix(in srgb,var(--accent) 70%,#10303c)}
 .mk-avg b{font-variant-numeric:tabular-nums;color:#10303c;font-size:13px}.mk-avg em{font-style:normal;margin-left:3px;color:#6a808b}
 .mk-compact .mk-avg{padding:4px 7px;gap:2px 8px;font-size:11px}.mk-compact .mk-avg span{font-size:9px}.mk-compact .mk-avg b{font-size:11.5px}
+
+.lt-tabs-panel .lt-tabs{gap:6px;padding:10px 12px;border-bottom:1px solid #e8eff1;background:#fff}
+.lt-tabs-panel .lt-tabs button{border:1px solid transparent;border-radius:999px;padding:7px 16px;font-size:13px;background:#f2f6f7;color:#3f5863}
+.lt-tabs-panel .lt-tabs button:hover{background:#e8f0f2;color:#10303c}
+.lt-tabs-panel .lt-tabs button.active{background:#10303c;color:#fff;border-color:#10303c}
+.lt-tabs-panel .lt-tabs button.hidden{display:none}
+.lt-pane-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}.lt-pane-head h4{margin:0 auto 0 0;font-size:13px;color:#10303c}
+.lt-daily-chart{margin-top:18px}.lt-daily-chart h4{margin:0 0 8px;font-size:13px;color:#10303c}
+.lt-subbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}.lt-subbar [data-merge-open]{margin-left:auto}
+.lt-seg{display:inline-flex;background:#f2f6f7;border-radius:10px;padding:3px;gap:2px}
+.lt-seg button{font:inherit;font-size:12.5px;font-weight:600;border:0;background:none;color:#5c7480;padding:7px 12px;border-radius:8px;cursor:pointer}
+.lt-seg button.on{background:#fff;color:#10303c;box-shadow:0 1px 3px #1834421f}
+.bm-modal{max-width:620px;width:calc(100vw - 32px)}
+.bm-group.on{border-color:#2f8f8a;background:#f3faf9}
+.bm-form{border:1px solid #e1eaed;border-radius:12px;padding:12px;margin-top:4px}.bm-form h4{margin:0 0 10px;font-size:13.5px;color:#10303c}
+.bm-search{display:flex;align-items:center;gap:10px;margin-top:4px}.bm-search input{flex:1;padding:8px 10px;border:1px solid #d6e2e6;border-radius:8px;font:inherit}.bm-search span{font-size:12px;color:#5c7480;white-space:nowrap}
+.bm-note{margin:12px 0 0;font-size:12px!important}
+@media(max-width:760px){.lt-subbar [data-merge-open]{margin-left:0}.lt-seg{width:100%}.lt-seg button{flex:1}}
+
+.rt-table th{white-space:nowrap}.rt-table th small{display:block;font-weight:500;text-transform:none;letter-spacing:0;color:#8a9ca5;font-size:10.5px}
+.rt-table td,.rt-table th{background:transparent}.rt-table tbody tr:hover td{background:#f7fafb}
+.rt-table .num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.rt-table td{padding-top:10px!important;padding-bottom:10px!important}
+.rt-name{display:flex;align-items:center;gap:6px;white-space:nowrap}.rt-branch{display:block;color:#8a9ca5;font-size:11px;margin-top:2px}
+.rt-of{color:#8a9ca5;margin-left:3px;font-size:12px}.rt-pct{display:inline-block;min-width:34px;margin-left:6px;font-size:11.5px;color:#7a8f99}
+.rt-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:1px}
+.rt-bg-g{background:#2fa57a}.rt-bg-a{background:#e0a520}.rt-bg-r{background:#d0576a}.rt-bg-n{background:#cfd9dd}
+.rt-g{color:#17845a}.rt-a{color:#a47712}.rt-r{color:#b33b4b}.rt-n{color:#9aa9b0}
+.rt-ok{color:#17845a;font-weight:600;font-size:12.5px}.rt-more{color:#a47712;font-weight:600;font-size:12.5px}
+.rt-table tfoot td{background:#f5f8f9;font-weight:600}
+
+/* ---------- access mode ---------- */
+body.access-mode .acc-host{position:relative;outline:2px dashed #7a5fb855;outline-offset:2px;border-radius:10px}
+.acc-chip{position:absolute;top:6px;right:6px;z-index:60;display:inline-flex;align-items:center;gap:4px;font:600 11px/1 inherit;font-family:inherit;padding:5px 8px;border-radius:999px;border:1px solid #c9b8ef;background:#f4effd;color:#5b3fa0;cursor:pointer;box-shadow:0 2px 6px #18344222}
+.acc-chip:hover{background:#5b3fa0;color:#fff}.acc-chip span{font-size:11px}
+#accessBar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:300;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;background:#2b1f4d;color:#fff;box-shadow:0 12px 30px #0006;font-size:13px;max-width:calc(100vw - 24px);flex-wrap:wrap;white-space:nowrap}
+#accessBar .btn-secondary{background:#ffffff1a;color:#fff;border-color:#ffffff33}
+#accessModeBtn.active{background:#efe8fb!important;color:#5b3fa0!important}
+.acc-modal{max-width:720px;width:calc(100vw - 32px)}
+.acc-tools{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}.acc-tools input{flex:1;min-width:180px;padding:8px 10px;border:1px solid #d6e2e6;border-radius:8px;font:inherit}.acc-bulk{font-size:12px;color:#5c7480}
+.acc-list{border:1px solid #e1eaed;border-radius:10px;max-height:52vh;overflow:auto}
+.acc-row{display:grid;grid-template-columns:minmax(140px,1fr) repeat(auto-fit,minmax(90px,120px));align-items:center;gap:8px;padding:8px 12px;border-top:1px solid #eef3f5}.acc-row:first-child{border-top:0}
+.acc-headrow{position:sticky;top:0;background:#f5f8f9;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#5c7480;z-index:1}
+.acc-row em{font-style:normal;font-size:11px;color:#a12d36}.acc-elev{background:#fbfdfd;grid-template-columns:1fr auto}
+.acc-tg{position:relative;display:inline-block;width:36px;height:20px;cursor:pointer}.acc-tg input{opacity:0;width:0;height:0}.acc-tg i{position:absolute;inset:0;border-radius:999px;background:#cfd9dd;transition:background .15s}
+.acc-tg i:after{content:'';position:absolute;left:3px;top:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 2px #0003}
+.acc-tg input:checked+i{background:#2f8f8a}.acc-tg input:checked+i:after{transform:translateX(16px)}.acc-tg input:focus-visible+i{outline:2px solid #5b3fa0;outline-offset:2px}
+#accMsg{margin-right:auto}
 </style>
 </head>
 <body class="locked">
@@ -1329,6 +1377,7 @@ body.team-workspace .content{padding-top:10px!important}
     </nav>
     <div class="side-label side-label-tools">Tools</div>
     <div class="ribbon-actions">
+      <button class="ribbon-btn hidden" id="accessModeBtn" title="Super admin: choose who can see or edit each part of this page, right here"><svg class="rb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span class="rb-label">Manage access</span></button>
       <button class="ribbon-btn" id="clearAllFiltersBtn" title="Reset every dashboard filter and selection to the latest available week"><svg class="rb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8z"/><path d="M17 3l4 4M21 3l-4 4"/></svg><span class="rb-label">Clear all filters</span></button>
       <div class="download-dropdown-wrap hidden" id="downloadDropdownWrap">
         <button class="ribbon-btn" id="downloadDropdownBtn"><svg class="rb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg><span class="rb-label">Download</span></button>
@@ -1663,7 +1712,10 @@ async function saveBranchDivisions(){
 }
 // Original branch names as uploaded (before any merge).
 function allRawBranches(){
-  const s=new Set();
+  const s=new Set(Object.keys(branchDivisions||{}));
+  branchMergeList().forEach(g=>g.members.forEach(b=>s.add(b)));
+  (weeksData||[]).forEach(w=>Object.entries(w.byBranch||{}).forEach(([b,v])=>{ (v&&v.mergedFrom||[b]).forEach(x=>s.add(x)); }));
+  branchMergeList().forEach(g=>s.delete(g.name)); branchMergeList().forEach(g=>g.members.forEach(b=>s.add(b)));
   [...KV.entries()].forEach(([k,v])=>{ if(!k.startsWith('weekly:')||k.endsWith(LISTS_SUFFIX)||!v) return; [v.deduped,v.raw,v].forEach(x=>Object.keys((x&&x.byBranch)||{}).forEach(b=>s.add(b))); });
   return [...s].filter(b=>b&&b!=='Unassigned').sort((a,b)=>a.localeCompare(b));
 }
@@ -1675,42 +1727,49 @@ async function saveBranchMerges(list){
 }
 function openBranchMergeDialog(){
   if(!Server.isAdmin()) return;
-  let list=branchMergeList().map(g=>({name:g.name,members:[...g.members]})), editing=null;
-  const wrap=document.createElement('div'); wrap.className='modal-overlay';
-  const raw=allRawBranches();
+  document.getElementById('bmDialog')?.remove();
+  const wrap=document.createElement('div'); wrap.className='modal-overlay'; wrap.id='bmDialog';
+  let editing=null, picked=new Set(), q='', name='', busy=false;
   const draw=()=>{
-    const taken=new Set(list.flatMap((g,i)=>i===editing?[]:g.members));
-    const cur=editing==null?null:list[editing];
-    wrap.innerHTML=`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="bmTitle"><div class="modal-header"><h3 id="bmTitle">Merge branches</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div>
+    const list=branchMergeList(), raw=allRawBranches();
+    const owner=b=>list.find((g,i)=>i!==editing&&g.members.includes(b));
+    const shown=raw.filter(b=>!q||b.toLowerCase().includes(q));
+    wrap.innerHTML=`<div class="modal bm-modal" role="dialog" aria-modal="true" aria-labelledby="bmTitle"><div class="modal-header"><h3 id="bmTitle">Merge branches</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div>
      <div class="modal-body">
-      <p class="hint" style="margin-top:0">Merged branches are counted as one everywhere — Performance Overview, Branch Results, team pages and candidate lists — for everyone. The uploaded data isn’t changed, so you can split them again any time.</p>
-      ${cur?`<div class="bm-edit"><label class="bm-name">Merged branch name<input id="bmName" maxlength="80" value="${escapeHtml(cur.name)}" placeholder="e.g. Memphis area"></label>
-        <input type="search" id="bmSearch" placeholder="Search branches…">
-        <div class="bm-list">${raw.map(b=>`<label class="bm-opt${taken.has(b)?' off':''}" data-name="${escapeHtml(b.toLowerCase())}"><input type="checkbox" value="${escapeHtml(b)}" ${cur.members.includes(b)?'checked':''} ${taken.has(b)?'disabled':''}><span>${escapeHtml(b)}${taken.has(b)?` <em>in ${escapeHtml(list.find(g=>g.members.includes(b))?.name||'another group')}</em>`:''}</span></label>`).join('')||'<p class="hint">No branches found in the uploaded data.</p>'}</div>
-        <p class="bm-msg" id="bmMsg" role="alert"></p>
-        <div class="bm-actions"><button class="btn btn-secondary btn-sm" id="bmCancelEdit">Back</button><button class="btn btn-primary btn-sm" id="bmDone">${cur.members.length?'Update group':'Add group'}</button></div></div>`
-      :`${list.length?`<div class="bm-groups">${list.map((g,i)=>`<div class="bm-group"><div><strong>${escapeHtml(g.name)}</strong><span>${g.members.map(escapeHtml).join(' · ')}</span></div><button class="btn btn-secondary btn-sm" data-bm-edit="${i}">Edit</button><button class="btn btn-danger btn-sm" data-bm-split="${i}">Split</button></div>`).join('')}</div>`:'<p class="hint">No merged branches yet.</p>'}
-        <button class="btn btn-secondary" id="bmNew">+ New merged branch</button>`}
-     </div>
-     ${cur?'':`<div class="modal-footer"><button class="btn btn-secondary" data-close>Cancel</button><button class="btn btn-primary" id="bmSave">Save for everyone</button></div>`}</div>`;
-    wrap.querySelector('#bmNew')?.addEventListener('click',()=>{ list.push({name:'',members:[]}); editing=list.length-1; draw(); });
-    wrap.querySelectorAll('[data-bm-edit]').forEach(b=>b.onclick=()=>{ editing=Number(b.dataset.bmEdit); draw(); });
-    wrap.querySelectorAll('[data-bm-split]').forEach(b=>b.onclick=()=>{ list.splice(Number(b.dataset.bmSplit),1); draw(); });
-    wrap.querySelector('#bmSearch')?.addEventListener('input',e=>{ const q=e.target.value.trim().toLowerCase(); wrap.querySelectorAll('.bm-opt').forEach(x=>x.hidden=!!q&&!x.dataset.name.includes(q)); });
-    wrap.querySelector('#bmCancelEdit')?.addEventListener('click',()=>{ if(cur&&!cur.name&&!cur.members.length) list.splice(editing,1); editing=null; draw(); });
-    wrap.querySelector('#bmDone')?.addEventListener('click',()=>{
-      const name=wrap.querySelector('#bmName').value.trim(), members=[...wrap.querySelectorAll('.bm-list input:checked')].map(i=>i.value), msg=wrap.querySelector('#bmMsg');
-      if(!name){ msg.textContent='Give the merged branch a name.'; return; }
-      if(members.length<2){ msg.textContent='Tick at least 2 branches to merge.'; return; }
-      if(list.some((g,i)=>i!==editing&&g.name.toLowerCase()===name.toLowerCase())){ msg.textContent='Another merged branch already has that name.'; return; }
-      if(raw.includes(name)&&!members.includes(name)){ msg.textContent='That name belongs to a branch that isn’t in this group — choose another name.'; return; }
-      list[editing]={name,members}; editing=null; draw();
-    });
-    wrap.querySelector('#bmSave')?.addEventListener('click',async()=>{ const btn=wrap.querySelector('#bmSave'); btn.disabled=true; btn.textContent='Saving…';
-      if(await saveBranchMerges(list.filter(g=>g.name&&g.members.length>1))){ showToast(list.length?'Merged branches saved — everyone now sees them combined.':'All branches split back.'); wrap.remove(); } else { btn.disabled=false; btn.textContent='Save for everyone'; } });
+      ${list.length?`<div class="bm-groups">${list.map((g,i)=>`<div class="bm-group${i===editing?' on':''}"><div><strong>${escapeHtml(g.name)}</strong><span>${g.members.map(escapeHtml).join(' + ')}</span></div><button class="btn btn-secondary btn-sm" data-bm-edit="${i}">Edit</button><button class="btn btn-secondary btn-sm" data-bm-split="${i}">Split</button></div>`).join('')}</div>`:''}
+      <div class="bm-form">
+       <h4>${editing==null?'New merged branch':'Edit “'+escapeHtml(list[editing]?.name||'')+'”'}</h4>
+       <label class="bm-name">Name<input id="bmName" maxlength="80" value="${escapeHtml(name)}" placeholder="e.g. Memphis area"></label>
+       <div class="bm-search"><input type="search" id="bmSearch" value="${escapeHtml(q)}" placeholder="Search ${raw.length} branches…" autocomplete="off"><span>${picked.size} selected</span></div>
+       <div class="bm-list">${shown.map(b=>{ const o=owner(b); return `<label class="bm-opt${o?' off':''}"><input type="checkbox" value="${escapeHtml(b)}" ${picked.has(b)?'checked':''} ${o?'disabled':''}><span>${escapeHtml(b)}${o?` <em>in ${escapeHtml(o.name)}</em>`:''}</span></label>`; }).join('')||`<p class="hint" style="padding:10px 12px;margin:0">${raw.length?'No branch matches “'+escapeHtml(q)+'”.':'No branches found yet — upload data first.'}</p>`}</div>
+       <p class="bm-msg" id="bmMsg" role="alert"></p>
+       <div class="bm-actions">${editing!=null?'<button class="btn btn-secondary btn-sm" id="bmCancelEdit">Cancel edit</button>':''}<button class="btn btn-primary" id="bmDone" ${busy?'disabled':''}>${busy?'Saving…':editing==null?`Merge ${picked.size||''} branches`:'Save changes'}</button></div>
+      </div>
+      <p class="hint bm-note">Merged branches count as one everywhere, for everyone. The uploaded data isn’t changed — Split brings the branches back.</p>
+     </div></div>`;
+    const keepFocus=sel=>{ const el=wrap.querySelector(sel); if(el){ el.focus(); const v=el.value; el.setSelectionRange?.(v.length,v.length); } };
+    wrap.querySelector('#bmName').oninput=e=>{ name=e.target.value; };
+    wrap.querySelector('#bmSearch').oninput=e=>{ q=e.target.value.trim().toLowerCase(); draw(); keepFocus('#bmSearch'); };
+    wrap.querySelectorAll('.bm-list input').forEach(i=>i.onchange=()=>{ i.checked?picked.add(i.value):picked.delete(i.value); wrap.querySelector('.bm-search span').textContent=picked.size+' selected'; const d=wrap.querySelector('#bmDone'); if(editing==null) d.textContent=`Merge ${picked.size||''} branches`; });
+    wrap.querySelectorAll('[data-bm-edit]').forEach(b=>b.onclick=()=>{ editing=Number(b.dataset.bmEdit); const g=list[editing]; name=g.name; picked=new Set(g.members); q=''; draw(); });
+    wrap.querySelector('#bmCancelEdit')?.addEventListener('click',()=>{ editing=null; name=''; picked=new Set(); draw(); });
+    wrap.querySelectorAll('[data-bm-split]').forEach(b=>b.onclick=async()=>{ const g=list[Number(b.dataset.bmSplit)]; if(!confirm(`Split “${g.name}” back into ${g.members.length} branches?`)) return;
+      if(await saveBranchMerges(list.filter(x=>x!==g))){ showToast(`“${g.name}” split back into its branches.`); editing=null; name=''; picked=new Set(); draw(); } });
+    wrap.querySelector('#bmDone').onclick=async()=>{
+      const msg=wrap.querySelector('#bmMsg'), nm=name.trim(), members=[...picked];
+      if(!nm){ msg.textContent='Give the merged branch a name.'; return; }
+      if(members.length<2){ msg.textContent='Tick at least 2 branches.'; return; }
+      if(list.some((g,i)=>i!==editing&&g.name.toLowerCase()===nm.toLowerCase())){ msg.textContent='Another merged branch already has that name.'; return; }
+      if(raw.includes(nm)&&!members.includes(nm)){ msg.textContent='That name belongs to a branch that isn’t in this group — choose another name.'; return; }
+      const next=list.map(g=>({name:g.name,members:[...g.members]})); if(editing==null) next.push({name:nm,members}); else next[editing]={name:nm,members};
+      busy=true; draw();
+      const ok=await saveBranchMerges(next); busy=false;
+      if(ok){ showToast(`Saved — “${nm}” now combines ${members.length} branches for everyone.`); editing=null; name=''; picked=new Set(); q=''; }
+      draw();
+    };
   };
   wrap.addEventListener('click',e=>{ if(e.target===wrap||e.target.closest('[data-close]')) wrap.remove(); });
-  document.body.appendChild(wrap); draw();
+  document.body.appendChild(wrap); draw(); wrap.querySelector('#bmName')?.focus();
 }
 
 let currentWeekEndDate = null; // currently viewed week in "Weekly" tab
@@ -5676,7 +5735,7 @@ async function renderPeopleView(mode){
     <div class="people-layout-grid">
       <div>
         <div class="panel" data-section="${mode==='recruiters'?'rec.table':'br.table'}">
-          <div class="panel-head"><h3>${mode==='recruiters'?'Recruiter':'Branch'} Detail</h3><div style="display:flex;align-items:center;gap:10px;"><span class="hint">Click a row for its trend · Ctrl/Cmd-click to compare · click a column to sort · &#9660; to filter${mode==='recruiters'?' · Remarks are saved per week':''}</span>${copyBtnHtml('peopleTable_'+mode)}${downloadBtnHtml('peopleTable_'+mode, (mode==='recruiters'?'recruiter':'branch')+'-performance.xlsx')}</div></div>
+          <div class="panel-head"><h3>${mode==='recruiters'?'Recruiter':'Branch'} Detail</h3><div style="display:flex;align-items:center;gap:10px;"><span class="hint">Click a row for its trend · Ctrl/Cmd-click to compare · click a column to sort · &#9660; to filter${mode==='recruiters'?' · Remarks are saved per week':''}</span>${mode==='branches'&&Server.isAdmin()?`<button type="button" class="btn btn-secondary btn-sm" data-merge-open onclick="openBranchMergeDialog()">⇄ Merge branches${branchMergeList().length?' · '+branchMergeList().length:''}</button>`:''}${copyBtnHtml('peopleTable_'+mode)}${downloadBtnHtml('peopleTable_'+mode, (mode==='recruiters'?'recruiter':'branch')+'-performance.xlsx')}</div></div>
           <table id="peopleTable_${mode}"></table>
         </div>
       </div>
@@ -6085,7 +6144,7 @@ async function ltRenderMultiBranch(g,p,cutoff){
       <label class="lt-field">To<input type="date" id="mbTo" value="${to}" max="${today}"></label>
       <div class="mb-seg" role="group" aria-label="Group by"><button type="button" data-mb-group="day" class="${group==='day'?'on':''}" ${span>31?'disabled title="Daily view covers up to 31 days"':''}>Daily</button><button type="button" data-mb-group="week" class="${group==='week'?'on':''}">Weekly</button></div>
       <label class="mb-all"><input type="checkbox" id="mbAll" ${st.all?'checked':''}> Show all recruiters</label>
-      <span class="hint mb-sum">${multi} recruiter${multi===1?'':'s'} scheduled at more than one branch</span>${admin?`<button type="button" class="btn btn-secondary btn-sm" id="mbMerge" title="Count several branches as one, for everyone">⇄ Merge branches${branchMergeList().length?` · ${branchMergeList().length}`:''}</button>`:''}${people.length?copyBtnHtml('ltMultiBranchTable'):''}
+      <span class="hint mb-sum">${multi} recruiter${multi===1?'':'s'} scheduled at more than one branch</span>${people.length?copyBtnHtml('ltMultiBranchTable'):''}
     </div>
     ${people.length?`<div class="hp-table-wrap"><table class="ep-table mb-table" id="ltMultiBranchTable"><thead><tr><th>Recruiter</th><th>Branch</th>${cols.map(c=>`<th class="mb-num">${head(c)}</th>`).join('')}<th class="mb-num">Total<small>vs target</small></th></tr></thead><tbody>
     ${people.map(x=>{ const totC=c=>x.branches.reduce((a,b)=>a+(x.br[b][c]||0),0), totT=c=>{ let t=null; x.branches.forEach(b=>{ const v=cellTarget(x.name,b,c); if(v!=null) t=(t||0)+v; }); return t; };
@@ -6100,7 +6159,6 @@ async function ltRenderMultiBranch(g,p,cutoff){
     host.querySelector('#mbTo').onchange=e=>{ if(tgDate(e.target.value)){ st.to=e.target.value; if(st.to<st.from) st.from=st.to; go(); } };
     host.querySelectorAll('[data-mb-group]').forEach(b=>b.onclick=()=>{ st.group=b.dataset.mbGroup; go(); });
     host.querySelector('#mbAll').onchange=e=>{ st.all=e.target.checked; go(); };
-    host.querySelector('#mbMerge')?.addEventListener('click',openBranchMergeDialog);
     host.querySelectorAll('[data-lt-person]').forEach(b=>b.onclick=()=>{ epState.week=weekOfDate(to).weekEnd; openHistoryPage('recruiters',b.dataset.ltPerson); });
     host.querySelectorAll('[data-mb-edit]').forEach(b=>b.onclick=()=>{ const n=b.dataset.mbEdit; openBranchTargetEditor(n, weeks.map(w=>({w,branches:[...new Set([...(act[n+'|'+w]||[]),...Object.keys(branchSplitOverride(n,w)||{})])]})), go); });
   }catch(e){ console.error(e); if(host.isConnected) host.innerHTML='<p role="alert">Schedules could not be loaded. Refresh the team to retry.</p>'; }
@@ -6108,7 +6166,7 @@ async function ltRenderMultiBranch(g,p,cutoff){
 // Admin editor: set a recruiter's target per branch for each week (blank = equal share of what's left).
 function openBranchTargetEditor(name, weekList, done){
   if(!Server.isAdmin()) return;
-  const allBranches=[...new Set([...Object.keys(branchDivisions||{}),...weeksData.flatMap(w=>Object.keys(w.byBranch||{}))])].sort();
+  const allBranches=[...new Set([...weeksData.flatMap(w=>Object.keys(w.byBranch||{})),...Object.keys(branchDivisions||{})])].filter(b=>b&&b!=='Unassigned').sort((a,b)=>a.localeCompare(b));
   let wi=Math.max(0,weekList.length-1);
   const wrap=document.createElement('div'); wrap.className='modal-overlay';
   const draw=()=>{
@@ -6119,7 +6177,7 @@ function openBranchTargetEditor(name, weekList, done){
       <div class="bt-week">${weekList.length>1?`<button class="btn btn-secondary btn-sm" data-bt-move="-1" ${wi===0?'disabled':''}>←</button>`:''}<strong>Wk ${weekOfDate(w).number} · ${fmtDate(weekOfDate(w).weekStart).replace(/, \d{4}$/,'')} – ${fmtDate(w)}</strong>${weekList.length>1?`<button class="btn btn-secondary btn-sm" data-bt-move="1" ${wi===weekList.length-1?'disabled':''}>→</button>`:''}</div>
       <p class="hint">Weekly goal <b>${fmtNum(cur.goal)}</b> (Settings → Goals). Type a number for a branch to fix it; leave blank and it gets an equal share of what’s left.</p>
       <div class="bt-rows">${list.map(b=>`<label class="bt-row"><span>${escapeHtml(b)}</span><input type="number" min="0" step="0.5" data-bt="${escapeHtml(b)}" value="${ov[b]??''}" placeholder="auto ${(Math.round(cur.targets[b]*10)/10)||0}"></label>`).join('')||'<p class="hint">No branches yet this week — add one below.</p>'}</div>
-      <div class="bt-add"><select id="btAdd"><option value="">+ Add a branch…</option>${allBranches.filter(b=>!list.includes(b)).map(b=>`<option>${escapeHtml(b)}</option>`).join('')}</select></div>
+      <div class="bt-add"><input id="btAdd" list="btAddList" placeholder="+ Add a branch — type to search…" autocomplete="off"><datalist id="btAddList">${allBranches.filter(b=>!list.includes(b)).map(b=>`<option value="${escapeHtml(b)}">`).join('')}</datalist></div>
       <p class="bt-sum" id="btSum"></p>
      </div>
      <div class="modal-footer" style="justify-content:space-between"><button class="btn btn-secondary" id="btReset" ${branchSplitOverride(name,w)?'':'disabled'}>Reset to automatic</button><span><button class="btn btn-secondary" data-close>Cancel</button> <button class="btn btn-primary" id="btSave">Save</button></span></div></div>`;
@@ -6128,7 +6186,7 @@ function openBranchTargetEditor(name, weekList, done){
       el.textContent=rest?`Fixed ${(Math.round(used*10)/10).toLocaleString()} · ${(Math.round(Math.max(0,cur.goal-used)*10)/10).toLocaleString()} shared by ${rest} branch${rest===1?'':'es'}`:`Total ${(Math.round(used*10)/10).toLocaleString()} of ${fmtNum(cur.goal)}${Math.abs(used-cur.goal)>0.01?' — doesn’t match the weekly goal':''}`; };
     wrap.querySelectorAll('[data-bt]').forEach(i=>i.oninput=sum); sum();
     wrap.querySelectorAll('[data-bt-move]').forEach(b=>b.onclick=()=>{ wi+=Number(b.dataset.btMove); draw(); });
-    wrap.querySelector('#btAdd').onchange=e=>{ if(!e.target.value) return; weekList[wi].branches=[...new Set([...weekList[wi].branches,e.target.value])]; const keep={}; wrap.querySelectorAll('[data-bt]').forEach(i=>{ if(i.value!=='') keep[i.dataset.bt]=i.value; }); draw(); Object.entries(keep).forEach(([b,v])=>{ const i=wrap.querySelector(`[data-bt="${CSS.escape(b)}"]`); if(i) i.value=v; }); sum(); };
+    wrap.querySelector('#btAdd').onchange=e=>{ if(!e.target.value||!allBranches.includes(e.target.value)) return; weekList[wi].branches=[...new Set([...weekList[wi].branches,e.target.value])]; const keep={}; wrap.querySelectorAll('[data-bt]').forEach(i=>{ if(i.value!=='') keep[i.dataset.bt]=i.value; }); draw(); Object.entries(keep).forEach(([b,v])=>{ const i=wrap.querySelector(`[data-bt="${CSS.escape(b)}"]`); if(i) i.value=v; }); sum(); };
     const save=async map=>{ const key='branchSplit:'+w, all={...(KV.get(key)||{})}; if(map&&Object.keys(map).length) all[name]=map; else delete all[name];
       if(await storageSet(key,all)!==null){ showToast(map?'Branch targets saved.':'Back to automatic split.'); close(); done&&done(); } };
     wrap.querySelector('#btSave').onclick=()=>{ const map={}; wrap.querySelectorAll('[data-bt]').forEach(i=>{ if(i.value!==''&&Number(i.value)>=0) map[i.dataset.bt]=Number(i.value); }); save(Object.keys(map).length?map:null); };
@@ -7444,7 +7502,7 @@ const PAGE_SECTIONS = {
                 ['perf.kpi.placed','· Placed card (of hires, of shows)'],['perf.detail.placed','·· Placed — click-through details'],
                 ['perf.detail.part.trend','Card details — 12-week trend'],['perf.detail.part.divisions','Card details — division split'],['perf.detail.part.recruiters','Card details — recruiter ranking'],['perf.detail.part.branches','Card details — branch ranking'],['perf.detail.all_people','Card details — all recruiters & branches (untick = only their assigned team)'],
                 ['perf.trends','Trends charts'],['perf.leaderboards','Leaderboards (recruiter & branch snapshots)'],['perf.divisions','Division breakdown'],['perf.history','Previous 6 weeks table'],['perf.insights','Insights'],['perf.composition','Composition pies (monthly / quarterly)']],
-  teams:[['team.summary','Team — summary cards'],['team.analytics','Team highlights'],['team.analytics.wins','· Winning list'],['team.analytics.attention','· Needs attention list'],['team.analytics.branches','Team — By branch tab'],['team.recruiters','Team — recruiter table'],['team.goals','· Today & third-break columns (they can also hide these themselves)'],['team.charts','Team — Charts tab'],['team.daily','Team — Day by day tab'],['team.multibranch','Team — Multi-branch tab (schedules per branch)'],['team.candidates','Team — Scheduled today tab'],['team.kpi.schedules','· Schedules vs goal card'],['team.kpi.goal_reach','·· Goal reach % line'],['team.kpi.interviews','· Interviews card'],['team.kpi.shows','·· Shows + show rate line'],['team.kpi.no_shows','·· No shows + no-show rate line'],['team.kpi.hires','· Hires per recruiter card'],['team.kpi.hire_rate','·· Hire rate line'],['team.kpi.placed','· Placed card']],
+  teams:[['team.summary','Team — summary cards'],['team.analytics','Team highlights'],['team.analytics.wins','· Winning list'],['team.analytics.attention','· Needs attention list'],['team.analytics.branches','Team — Branches: team vs other recruiters'],['team.recruiters','Team — recruiter table'],['team.goals','· Today & third-break columns (they can also hide these themselves)'],['team.daily','Team — Daily tab'],['team.charts','· Daily chart'],['team.candidates','Team — Candidates tab'],['team.multibranch','Team — Branches: recruiters at several branches'],['team.kpi.schedules','· Schedules vs goal card'],['team.kpi.goal_reach','·· Goal reach % line'],['team.kpi.interviews','· Interviews card'],['team.kpi.shows','·· Shows + show rate line'],['team.kpi.no_shows','·· No shows + no-show rate line'],['team.kpi.hires','· Hires per recruiter card'],['team.kpi.hire_rate','·· Hire rate line'],['team.kpi.placed','· Placed card']],
   recruiters:[['rec.table','Recruiter table'],['hist.kpis','History page — summary tiles (recruiter & branch)'],['hist.trend','History page — week-by-week chart'],['hist.goal','History page — schedules vs goal chart'],['hist.weeks','History page — every-week table'],['hist.remarks','History page — remarks'],['hist.candidates','History page — candidates']],
   branches:[['br.table','Branch table'],['hist.team','History page — recruiters in the branch']],
   candidates:[['cand.list','Category boxes and candidate list'],['cand.explain','“How are these counted?” breakdown']],
@@ -7460,6 +7518,8 @@ function applySectionAccess(){
 function canSeeSection(k){ return !(Server.user && Server.user.role==='user' && (Server.user.hidden_sections||[]).includes(k)); }
 function applyPermissions(){
   applySectionAccess();
+  document.getElementById('accessModeBtn')?.classList.toggle('hidden', !(Server.user&&Server.isSuperAdmin()));
+  if(!(Server.user&&Server.isSuperAdmin())) setAccessMode(false);
   const u = Server.user; if(!u) return;
   const viewOk = v=>v==='leads' ? Server.isAdmin() : Server.can(VIEW_MODULE[v]);
   // Admins reach every team through Team Leads, so they don't need a separate My Team entry.
@@ -7610,7 +7670,7 @@ async function afterLogin(boot){
     if(boot) Server.startPollingFrom(Server.since); else await Server.startPolling();
     setTimeout(async ()=>{ await Server.loadListsInBackground(); setTimeout(()=>autoVerifyWeeks(true), 500); }, 300);
     if(Server.isAdmin() && Server.user.default_password) showToast('You are still using the setup password. Change it in Settings → My account.');
-    if(Server.isAdmin()){ checkDatabaseSchema(); loadUploadAlerts(true); }
+    if(Server.isAdmin()){ checkDatabaseSchema(); loadUploadAlerts(true); ltLeadsFromCache(); setTimeout(()=>ltLoadLeads(),1500); }
   }catch(e){
     console.error(e);
     if(Server.token) showToast('Could not load the dashboard: '+cleanErr(e));
@@ -7652,6 +7712,14 @@ const MAP1 = {createdOn:'Created On', recruiter:'Created By', branch:'Branch', e
 const MAP2 = {dateOf:'Date Of', recruiter:'Created By', branch:'Branch', attendance:'Attendance', employeeNumber:'Employee Number', candidateName:'Candidate Name', finalizedOn:'Finalized On', backgroundScreening:'Background Screening Status', statusReason:'Status Reason', i9Status:'I-9 Status', i9Completed:'I-9 Completed', checkedIn:'Checked In'};
 const SOURCE_LABEL = {schedules:'Created On (schedules)', shows:'Date Of (shows)'};
 const IMPORT_BATCH = 1000;
+const NET_PARALLEL = 4;   // requests in flight at once during uploads/rebuilds
+// Run async jobs with a small concurrency limit; results keep their order.
+async function runPool(jobs, limit=NET_PARALLEL, onDone){
+  const out=new Array(jobs.length); let next=0, done=0;
+  const worker=async()=>{ while(next<jobs.length){ const i=next++; out[i]=await jobs[i](); done++; if(onDone) onDone(done, jobs.length); } };
+  await Promise.all(Array.from({length:Math.min(limit,jobs.length)},worker));
+  return out;
+}
 let deleteSourceFilesAfterImport = true;
 
 function pad2(n){ return String(n).padStart(2,'0'); }
@@ -7778,11 +7846,11 @@ async function ingestFiles(entries, {interactive=true, week=null}={}){
     for(const p of prepared){
       const {entry, source, batch, removed, skipped} = p;
       const importId = await Server.rpc('dash_import_begin', {p_source:source, p_file_name:p.sheetLabel+' · '+weekLabel});
-      let savedRows = 0;
-      for(let i=0;i<batch.length;i+=IMPORT_BATCH){
-        importProgress('Saving '+entry.name+': '+fmtNum(Math.min(i+IMPORT_BATCH, batch.length))+' / '+fmtNum(batch.length)+' rows…');
-        savedRows += Number(await Server.rpc('dash_import_rows', {p_import_id:importId, p_source:source, p_rows:batch.slice(i,i+IMPORT_BATCH)}))||0;
-      }
+      const chunks=[]; for(let i=0;i<batch.length;i+=IMPORT_BATCH) chunks.push(batch.slice(i,i+IMPORT_BATCH));
+      importProgress('Saving '+entry.name+': 0 / '+fmtNum(batch.length)+' rows…');
+      const counts = await runPool(chunks.map(rows=>()=>Server.rpc('dash_import_rows', {p_import_id:importId, p_source:source, p_rows:rows})), NET_PARALLEL,
+        (d,n)=>importProgress('Saving '+entry.name+': '+fmtNum(Math.min(d*IMPORT_BATCH,batch.length))+' / '+fmtNum(batch.length)+' rows…'));
+      const savedRows = counts.reduce((a,c)=>a+(Number(c)||0),0);
       const blocked = Math.max(0, batch.length - savedRows); totalBlocked += blocked;
       const fin = await Server.rpc('dash_import_finish', {p_import_id:importId, p_source:source, p_from:weekStart, p_to:week, p_rows_read:p.rowsRead, p_removed_columns:removed});
       (fin.weeks||[]).forEach(w=>allWeeks.add(w)); allWeeks.add(week);
@@ -7795,7 +7863,8 @@ async function ingestFiles(entries, {interactive=true, week=null}={}){
     if(Object.keys(uploadStamps).length) await storageSet('lastUploads', {...(KV.get('lastUploads')||{}), ...uploadStamps});
     if(allWeeks.size) await rebuildWeeks([...allWeeks], localRows, importProgress);
     if(goalSheets.length){ await loadAllWeeks(); await importGoalSheets(goalSheets); }
-    if(allWeeks.size){ importProgress('Checking the numbers…'); await autoVerifyWeeks(true); }
+    // the full recount runs in the background once the upload has finished
+    if(allWeeks.size) setTimeout(()=>autoVerifyWeeks(true), 4000);
     // Raw files are deleted only after their rows are safely on the server.
     let deleted=0;
     if(deleteSourceFilesAfterImport){
@@ -7867,11 +7936,11 @@ async function rebuildWeeks(weeks, localRows, progress){
     if(!page.length) break; index.push(...page); after = page[page.length-1].id;
   }
   const need = index.filter(r=>!localRows || !localRows.has(r.id)).map(r=>r.id);
-  const data = new Map();
-  for(let i=0;i<need.length;i+=500){
-    if(progress) progress('Fetching rows… '+fmtNum(Math.min(i+500,need.length))+' / '+fmtNum(need.length));
-    (await Server.rpc('dash_rows_by_ids', {p_ids:need.slice(i,i+500)})).forEach(r=>data.set(r.id, r.data));
-  }
+  const data = new Map(), idChunks=[];
+  for(let i=0;i<need.length;i+=500) idChunks.push(need.slice(i,i+500));
+  if(idChunks.length && progress) progress('Fetching rows… 0 / '+fmtNum(need.length));
+  await runPool(idChunks.map(ids=>async()=>{ (await Server.rpc('dash_rows_by_ids', {p_ids:ids})).forEach(r=>data.set(r.id, r.data)); }), NET_PARALLEL,
+    (d)=>{ if(progress) progress('Fetching rows… '+fmtNum(Math.min(d*500,need.length))+' / '+fmtNum(need.length)); });
   const get = id => (localRows && localRows.get(id)) || data.get(id);
   const per = new Map(list.map(w=>[w,{s:[],v:[]}]));
   index.forEach(r=>{
@@ -8732,20 +8801,28 @@ function alertsGroupHtml(items, info, renderItem, wrapClass){
   return bucket(items, x=>(info(x)||{}).division).map(([div,list])=>`<details class="al-group" open><summary><h4>${escapeHtml(div)} <span class="al-count">${list.length}</span></h4></summary>${branchBlocks(list)}</details>`).join('');
 }
 function alertsGoalRows(weekEnd){
-  const week = weeksData.find(w=>w.weekEndDate===weekEnd); if(!week) return {rows:[], inProgress:false, elapsed:7};
+  const week = weeksData.find(w=>w.weekEndDate===weekEnd); if(!week) return {rows:[], inProgress:false, elapsed:5, workdays:5};
   const goals = KV.get('goals:'+weekEnd) || {};
-  const today = startOfToday(), end = new Date(weekEnd+'T00:00:00'), start = new Date(end); start.setDate(start.getDate()-6);
-  const inProgress = today>=start && today<=end;
-  const elapsed = inProgress ? Math.min(7, Math.max(1, Math.round((today-start)/86400000)+1)) : 7;
-  const rows = Object.entries(week.byRecruiter||{}).filter(([n])=>n && n!=='Unassigned' && !excludedRecruitersSet.has(n)).map(([name,r])=>{
+  const todayIso = ltToday(), ws = weekOfDate(weekEnd).weekStart;
+  const inProgress = todayIso>=ws && todayIso<=weekEnd;
+  // pace uses working days (Mon–Fri) so far, like the team pages: daily goal = weekly goal ÷ 5
+  const workdays = inProgress ? ltWorkdays(ws, todayIso).length : 5;
+  // everyone expected to work this week: active this week, a goal set for this week, or active in the previous 2 weeks
+  const idx = weeksData.findIndex(w=>w.weekEndDate===weekEnd);
+  const prior = weeksData.slice(Math.max(0,idx-2), Math.max(0,idx));
+  const lastBranch = {};
+  prior.forEach(w=>Object.entries(w.byRecruiter||{}).forEach(([n,r])=>{ if(r&&r.branch) lastBranch[n]=r.branch; }));
+  const names = new Set([...Object.keys(week.byRecruiter||{}), ...Object.keys(goals).filter(n=>Number(goals[n])>0), ...prior.flatMap(w=>Object.entries(w.byRecruiter||{}).filter(([,r])=>(r.schedules||0)+(r.scheduledDateOf||0)>0).map(([n])=>n))]);
+  const rows = [...names].filter(n=>n && n!=='Unassigned' && !excludedRecruitersSet.has(n)).map(name=>{
+    const r = (week.byRecruiter||{})[name] || {};
     const g = goals[name]; const goal = (g!==undefined && g!==null && g!=='') ? Number(g) : DEFAULT_WEEKLY_GOAL;
     const sched = r.schedules||0, pct = goal>0 ? sched/goal*100 : null;
-    const expected = goal*elapsed/7, pace = goal>0 ? sched/expected*100 : null;
-    const score = inProgress ? pace : pct;
-    return {name, branch:r.branch||'', division:getEffectiveRecruiterDivision(name, weekEnd)||'Unassigned', sched, goal, pct, pace, score, projected: inProgress ? Math.round(sched/elapsed*7) : sched,
-      shows:r.shows||0, interviews:r.scheduledDateOf||0, hires:r.i9||0};
+    const expected = goal*workdays/5, pace = expected>0 ? sched/expected*100 : null;
+    const score = inProgress ? (pace==null ? 100 : pace) : pct;
+    return {name, branch:r.branch||lastBranch[name]||'', division:getEffectiveRecruiterDivision(name, weekEnd)||'Unassigned', sched, goal, pct, pace, score, expected,
+      projected: inProgress && workdays ? Math.round(sched/workdays*5) : sched, shows:r.shows||0, interviews:r.scheduledDateOf||0, hires:r.i9||0, noActivity:!((r.schedules||0)+(r.scheduledDateOf||0))};
   }).filter(r=>r.goal>0);
-  return {rows, inProgress, elapsed};
+  return {rows, inProgress, elapsed:workdays, workdays};
 }
 function alertsRemarkLine(name, week){
   const all = Remarks.forWeek(name, week);
@@ -8778,7 +8855,7 @@ async function renderAlertsView(){
   const pending = Remarks.canApprove() ? Remarks.pending().sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at))) : [];
   const noRemark = below.filter(r=>!Remarks.forWeek(r.name, st.week).some(x=>(x.status||'approved')==='approved')).length;
   const w = weekOfDate(st.week);
-  const bar = r=>{ const v=Math.min(100, r.pct||0); return `<div class="al-bar" title="${fmtNum(r.sched)} of ${fmtNum(r.goal)} schedules"><i style="width:${v}%"></i>${inProgress?`<u style="left:${Math.min(100, elapsed/7*100)}%" title="Where they should be by today"></u>`:''}<b style="left:50%"></b></div>`; };
+  const bar = r=>{ const v=Math.min(100, r.pct||0); return `<div class="al-bar" title="${fmtNum(r.sched)} of ${fmtNum(r.goal)} schedules"><i style="width:${v}%"></i>${inProgress?`<u style="left:${Math.min(100, elapsed/5*100)}%" title="Where they should be by today"></u>`:''}<b style="left:50%"></b></div>`; };
   const card = (r, sev)=>`<div class="al-card ${sev}">
       <div class="al-head"><button type="button" class="al-name" data-al-remarks="${escapeHtml(r.name)}">${escapeHtml(r.name)}</button><span class="al-pct">${Math.round(r.pct)}%</span></div>
       <div class="al-sub">${escapeHtml(r.division)}${r.branch?' · '+escapeHtml(r.branch):''}</div>
@@ -8793,7 +8870,7 @@ async function renderAlertsView(){
     <div class="al-toolbar">
       <label class="cand-field"><span>Week ending</span><select id="alWeek">${weeks.map(d=>`<option value="${d}" ${d===st.week?'selected':''}>Wk ${weekOfDate(d).number} · ending ${fmtDate(d)}${d===toIsoDateOnly(saturdayOnOrAfter(new Date()))?' (this week)':''}</option>`).join('')}</select></label>
       <label class="cand-field"><span>Group by</span><select id="alGroup"><option value="division" ${st.group==='division'?'selected':''}>Division › Branch</option><option value="branch" ${st.group==='branch'?'selected':''}>Branch</option><option value="none" ${st.group==='none'?'selected':''}>No grouping</option></select></label>
-      <p class="hint al-basis">${inProgress?`Week in progress — day ${elapsed} of 7. Recruiters are compared with where they should be by today (goal × ${elapsed}/7).`:`Completed week — schedules compared with each recruiter’s weekly goal (default ${DEFAULT_WEEKLY_GOAL}).`}</p>
+      <p class="hint al-basis">${inProgress?`Week in progress — ${elapsed} of 5 working days so far. Recruiters are compared with where they should be by today (weekly goal × ${elapsed}/5). Recruiters with no schedules yet are included.`:`Completed week — schedules compared with each recruiter’s weekly goal (default ${DEFAULT_WEEKLY_GOAL}).`}</p>
     </div>
     <div class="al-tiles" data-section="alerts.summary">
       <button type="button" class="al-tile bad" data-jump="alBelow"><span>Below 50% of goal</span><strong>${below.length}</strong><em>${noRemark?noRemark+' without a remark':'all have remarks'}</em></button>
@@ -9557,17 +9634,17 @@ function renderTeamGroups(){
  ${AN.table}
  <section class="panel lt-tabs-panel">
   <div class="lt-tabs" role="tablist" aria-label="More team detail">
-   <button role="tab" data-lt-tab="charts" data-section="team.charts">Charts</button>
-   <button role="tab" data-lt-tab="daily" data-section="team.daily">Day by day</button>
-   ${AN.branches?'<button role="tab" data-lt-tab="branches" data-section="team.analytics.branches">By branch</button>':''}
-   <button role="tab" data-lt-tab="multi" data-section="team.multibranch">Multi-branch</button>
-   <button role="tab" data-lt-tab="cands" data-section="team.candidates">Scheduled candidates</button>
+   <button role="tab" data-lt-tab="daily" data-section="team.daily">Daily</button>
+   <button role="tab" data-lt-tab="branches">Branches</button>
+   <button role="tab" data-lt-tab="cands" data-section="team.candidates">Candidates</button>
    <span class="hint lt-tabs-range" data-range="${escapeHtml(rangeText)}" data-week="${escapeHtml(dw?fmtDate(dFrom)+' – '+fmtDate(dTo):rangeText)}">${rangeText}</span>
   </div>
-  <div class="lt-pane" data-lt-pane="charts" data-section="team.charts"><div class="tg-charts"><div><h4>Schedules · goal vs achieved</h4><div class="tg-chart"><canvas id="ltGoals" role="img" aria-label="Selected period schedule targets versus achieved"></canvas></div></div><div><h4>Schedules, visits & hires · daily timeline</h4><div class="tg-chart"><canvas id="ltTimeline" role="img" aria-label="Daily activity within the selected period"></canvas></div></div></div></div>
-  <div class="lt-pane" data-lt-pane="daily" data-section="team.daily"><div class="lt-pane-head">${copyBtnHtml('ltTodayTable')}</div><div class="hp-table-wrap"><table class="ep-table" id="ltTodayTable"><thead><tr><th>Date</th>${TG_METRICS.map(([,l])=>`<th>${l}</th>`).join('')}</tr></thead><tbody>${daily.map(x=>{const target=[...new Set(g.memberships.filter(m=>tgActive(g,m.name,x.date)&&(!g.division||(getEffectiveRecruiterDivision(m.name,weekOfDate(x.date).weekEnd)||'Unassigned')===g.division)).map(m=>m.name))].reduce((sum,n)=>sum+ltDailyGoal(n,x.date),0),signal=recruiterSignal(x.r.total.schedules,x.r.total.shows,x.r.total.scheduledDateOf,target);return `<tr${mode==='day'&&x.date===p.from?' class="lt-mine"':''}><td>${new Date(x.date+'T12:00:00Z').toLocaleDateString(undefined,{weekday:'short',timeZone:'UTC'})} · ${fmtDate(x.date)}${mode==='day'&&x.date===p.from?' <span class="pill good">selected</span>':''}</td>${TG_METRICS.map(([k])=>`<td class="${k==='schedules'?'rc-'+signal.schedule:k==='shows'?'rc-'+signal.visits:''}">${tgNumber(x.r.total[k])}</td>`).join('')}</tr>`;}).join('')||'<tr><td colspan="7">No days yet in this week.</td></tr>'}</tbody><tfoot><tr><td>${dw?'Week so far':'Total'}</td>${TG_METRICS.map(([k])=>`<td>${tgNumber(dReport.total[k])}</td>`).join('')}</tr></tfoot></table></div></div>
-  ${AN.branches?`<div class="lt-pane" data-lt-pane="branches" data-section="team.analytics.branches">${AN.branches}</div>`:''}
-  <div class="lt-pane" data-lt-pane="multi" data-section="team.multibranch" id="ltMultiBranch"></div>
+  <div class="lt-pane" data-lt-pane="daily" data-section="team.daily"><div class="lt-pane-head"><h4>Day by day</h4>${copyBtnHtml('ltTodayTable')}</div><div class="hp-table-wrap"><table class="ep-table" id="ltTodayTable"><thead><tr><th>Date</th>${TG_METRICS.map(([,l])=>`<th>${l}</th>`).join('')}</tr></thead><tbody>${daily.map(x=>{const target=[...new Set(g.memberships.filter(m=>tgActive(g,m.name,x.date)&&(!g.division||(getEffectiveRecruiterDivision(m.name,weekOfDate(x.date).weekEnd)||'Unassigned')===g.division)).map(m=>m.name))].reduce((sum,n)=>sum+ltDailyGoal(n,x.date),0),signal=recruiterSignal(x.r.total.schedules,x.r.total.shows,x.r.total.scheduledDateOf,target);return `<tr${mode==='day'&&x.date===p.from?' class="lt-mine"':''}><td>${new Date(x.date+'T12:00:00Z').toLocaleDateString(undefined,{weekday:'short',timeZone:'UTC'})} · ${fmtDate(x.date)}${mode==='day'&&x.date===p.from?' <span class="pill good">selected</span>':''}</td>${TG_METRICS.map(([k])=>`<td class="${k==='schedules'?'rc-'+signal.schedule:k==='shows'?'rc-'+signal.visits:''}">${tgNumber(x.r.total[k])}</td>`).join('')}</tr>`;}).join('')||'<tr><td colspan="7">No days yet in this week.</td></tr>'}</tbody><tfoot><tr><td>${dw?'Week so far':'Total'}</td>${TG_METRICS.map(([k])=>`<td>${tgNumber(dReport.total[k])}</td>`).join('')}</tr></tfoot></table></div><div class="lt-daily-chart" data-section="team.charts"><h4>Schedules, visits &amp; hires</h4><div class="tg-chart"><canvas id="ltTimeline" role="img" aria-label="Daily activity"></canvas></div></div></div>
+  <div class="lt-pane" data-lt-pane="branches">
+   <div class="lt-subbar"><div class="lt-seg" role="group" aria-label="Branch view"><button type="button" data-br="compare" data-section="team.analytics.branches">Team vs other recruiters</button><button type="button" data-br="multi" data-section="team.multibranch">Recruiters at several branches</button></div>${Server.isAdmin()?`<button type="button" class="btn btn-secondary btn-sm" data-merge-open>⇄ Merge branches${branchMergeList().length?` · ${branchMergeList().length}`:''}</button>`:''}</div>
+   <div data-br-pane="compare" data-section="team.analytics.branches">${AN.branches||'<div class="lt-empty"><strong>No branch to compare yet.</strong><span>Your team’s branches appear here once they have activity in this period.</span></div>'}</div>
+   <div data-br-pane="multi" data-section="team.multibranch" id="ltMultiBranch"></div>
+  </div>
   <div class="lt-pane" data-lt-pane="cands" data-section="team.candidates" id="ltScheduledCandidates"></div>
  </section><div id="ltPersonHost"></div>`;
  ltRenderScheduledCandidates(g);
@@ -9585,13 +9662,18 @@ function renderTeamGroups(){
  host.querySelector('#ltRefresh').onclick=()=>{if(Server.isAdmin())ltState.users=null;ltLoad();};
  host.querySelector('#ltDirectoryRetry')?.addEventListener('click',()=>{ltState.users=null;ltLoad();});
  host.querySelectorAll('[data-lt-person]').forEach(b=>b.onclick=()=>{epState.week=weekOfDate(p.to).weekEnd;openHistoryPage('recruiters',b.dataset.ltPerson);});
- const drawCharts=()=>{ if(charts.ltGoals||!document.getElementById('ltGoals'))return;
+ const drawCharts=()=>{ if(charts.ltTimeline||!document.getElementById('ltTimeline'))return;
  const opts={responsive:true,maintainAspectRatio:false,plugins:{noValueLabels:true,legend:{position:'bottom'}},scales:{y:{beginAtZero:true},x:{ticks:{maxRotation:45}}}};
- charts.ltGoals=safeChart(document.getElementById('ltGoals'),{type:'bar',data:{labels:report.members.map(x=>x.label),datasets:[{label:'Schedule target',data:report.members.map(x=>x.goal),backgroundColor:'#b58b38'},{label:'Achieved',data:report.members.map(x=>x.schedules),backgroundColor:'#218a86'}]},options:opts});
  charts.ltTimeline=safeChart(document.getElementById('ltTimeline'),{type:'line',data:{labels:daily.map(x=>fmtDate(x.date)),datasets:[['schedules','Schedules','#218a86'],['shows','Visits (shows)','#487ec1'],['i9','Hires','#825db3']].map(([k,label,c])=>({label,data:daily.map(x=>x.r.total[k]),borderColor:c,backgroundColor:c,spanGaps:false,tension:.2,pointRadius:3}))},options:opts});
  };
- const panes=[...host.querySelectorAll('[data-lt-tab]')], visible=panes.filter(b=>getComputedStyle(b).display!=='none');
- const show=key=>{ ltState.tab=key; panes.forEach(b=>{const on=b.dataset.ltTab===key;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));}); host.querySelectorAll('[data-lt-pane]').forEach(x=>x.hidden=x.dataset.ltPane!==key); const lbl=host.querySelector('.lt-tabs-range'); if(lbl) lbl.textContent=key==='multi'?'':(key==='daily'||key==='charts')?lbl.dataset.week:lbl.dataset.range; if(key==='charts') drawCharts(); if(key==='multi') ltRenderMultiBranch(g,p,cutoff); };
+ const brBtns=[...host.querySelectorAll('[data-br]')], brVis=brBtns.filter(b=>getComputedStyle(b).display!=='none');
+ if(!brVis.length) host.querySelector('[data-lt-tab="branches"]')?.classList.add('hidden');
+ const showBr=k=>{ if(!brVis.some(b=>b.dataset.br===k)) k=brVis[0]?.dataset.br; if(!k) return; ltState.brTab=k; brBtns.forEach(b=>b.classList.toggle('on',b.dataset.br===k)); host.querySelectorAll('[data-br-pane]').forEach(x=>x.hidden=x.dataset.brPane!==k); if(k==='multi') ltRenderMultiBranch(g,p,cutoff); };
+ brBtns.forEach(b=>b.onclick=()=>showBr(b.dataset.br));
+ host.querySelectorAll('[data-merge-open]').forEach(b=>b.onclick=openBranchMergeDialog);
+ if(ltState.tab==='charts') ltState.tab='daily'; if(ltState.tab==='multi'){ ltState.tab='branches'; ltState.brTab='multi'; }
+ const panes=[...host.querySelectorAll('[data-lt-tab]')], visible=panes.filter(b=>getComputedStyle(b).display!=='none'&&!b.classList.contains('hidden'));
+ const show=key=>{ ltState.tab=key; panes.forEach(b=>{const on=b.dataset.ltTab===key;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));}); host.querySelectorAll('[data-lt-pane]').forEach(x=>x.hidden=x.dataset.ltPane!==key); const lbl=host.querySelector('.lt-tabs-range'); if(lbl) lbl.textContent=key==='daily'?lbl.dataset.week:key==='branches'?lbl.dataset.range:''; if(key==='daily') drawCharts(); if(key==='branches') showBr(ltState.brTab||'compare'); };
  panes.forEach(b=>b.onclick=()=>show(b.dataset.ltTab));
  if(visible.length) show(visible.some(b=>b.dataset.ltTab===ltState.tab)?ltState.tab:visible[0].dataset.ltTab); else host.querySelector('.lt-tabs-panel').hidden=true;
 }
@@ -9664,12 +9746,17 @@ function ltAnalytics(g,p,cutoff,mode,today,self,checks=[],checkDay=cutoff){
  </div></section>`;
  const sorted=rows.slice().sort((a,b)=>(b.goal??-1)-(a.goal??-1));
  const table=`<section class="panel ta" data-section="team.recruiters"><div class="lt-section-head ta-rec-head"><h3>Recruiters</h3><span class="hint">${rows.length} on the team${work.length?'':' · no working days yet'}</span><div class="ta-tools">${checks.length&&canSeeSection('team.goals')?`<div class="ta-brk-ctl" data-section="team.goals">${showBrk?`<span class="pill ${elig?'good':'pending'}">${elig} of ${checks.length} eligible · ${dayLbl}</span>${canCopyBreakImage()?`<button type="button" class="btn btn-secondary btn-sm" id="ltBrkImg" title="Copy eligible and not-yet-eligible recruiters as one image">📷 Copy as image</button>`:''}`:''}<button type="button" class="switch-chip" id="ltBrkToggle" role="switch" aria-checked="${showBrk}"><i></i>Third break</button></div>`:''}${copyBtnHtml('ltRecruiterTable')}</div></div>
- <div class="hp-table-wrap"><table class="ep-table ta-matrix" id="ltRecruiterTable"><thead>
- <tr><th rowspan="2">Recruiter</th><th rowspan="2">Branch</th><th class="ta-grp" colspan="${showBrk?3:1}">Schedules</th><th class="ta-grp" colspan="3">Interviews</th><th class="ta-grp">Hires</th></tr>
- <tr><th>vs goal<small>${mode==='day'?'today':'so far'} · min 90%</small></th>${showBrk?`<th>${dayLbl}<small>daily goal</small></th><th>Third break<small>week so far</small></th>`:''}<th>Interviews</th><th>Shows<small>min 70%</small></th><th>No shows<small>under 20%</small></th><th>Hires<small>of shows</small></th></tr></thead>
- <tbody>${sorted.map(r=>{const c=ck.get(r.name);return `<tr${r.name===self?' class="lt-mine"':''}><td><div class="ta-name">${who(r)} ${tier(r)}</div></td><td>${escapeHtml(r.branch||'–')}</td>${cell('goal',r.goal,r.pace?`${fmtNum(r.x.schedules||0)} / ${tgNumber(r.pace)}`:'')}${showBrk?todayCell(c)+brkCell(c):''}<td class="ta-cell ta-n ta-plain">${num0(r.x.scheduledDateOf)}</td>${cell('show',r.show,r.x.scheduledDateOf?`${fmtNum(r.x.shows||0)} shows`:'')}${cell('noshow',r.noshow,r.x.scheduledDateOf?(r.noshow==null?'outcomes pending':`${fmtNum(r.x.noShows||0)} no shows`):'')}<td class="ta-cell ta-${band.hire(r.hire)||'n'}">${num0(r.x.i9)}<small>${r.hire==null?(r.x.shows?`of ${fmtNum(r.x.shows)} shows`:''):pc(r.hire)+' of '+fmtNum(r.x.shows)}</small></td></tr>`;}).join('')||'<tr><td colspan="9">No team members in this selection.</td></tr>'}</tbody>
- <tfoot><tr><td>Team</td><td></td><td>${pc(team.goal)}<small class="hint"> ${fmtNum(T.schedules||0)} / ${tgNumber(rows.reduce((a,r)=>a+r.pace,0))}</small></td>${showBrk?'<td></td><td></td>':''}<td>${num0(T.scheduledDateOf)}</td><td>${pc(team.show)}<small class="hint"> ${num0(T.shows)}</small></td><td>${pc(team.noshow)}<small class="hint"> ${num0(T.noShows)}</small></td><td>${num0(T.i9)}<small class="hint"> ${pc(team.hire)}</small></td></tr></tfoot></table></div>
- <details class="ta-legend"><summary>How this is coloured</summary><p class="hint">Green at or above the minimum · amber close · red below. Emoji by share of schedule goal: 🤬 under 50% · 🫡 50–80% · 🫰 81–100% · 🤩 above 100%. Goals come from Settings → Goals (default ${DEFAULT_WEEKLY_GOAL} a week, daily goal = weekly ÷ 5). Third break needs the daily goal × working days so far this week. Hires are coloured by hire rate against the team average. Rates need at least 3 interviews or recorded outcomes.</p></details></section>`;
+ <div class="hp-table-wrap"><table class="ep-table rt-table" id="ltRecruiterTable"><thead><tr>
+  <th>Recruiter</th><th class="num">Schedules<small>${mode==='day'?'today':'so far'} vs goal</small></th>${showBrk?`<th class="num">${dayLbl}<small>daily goal</small></th><th>Third break</th>`:''}<th class="num">Interviews</th><th class="num">Shows</th><th class="num">No shows</th><th class="num">Hires</th></tr></thead>
+ <tbody>${sorted.map(r=>{ const c=ck.get(r.name), x=r.x;
+   const rate=(v,k)=>v==null?'':`<span class="rt-pct rt-${band[k](v)||'n'}">${pc(v)}</span>`;
+   const today=!showBrk?'':!c||c.daily==null?'<td class="num rt-n">–</td>':`<td class="num"><span class="rt-${c.daily>=c.dg?'g':c.daily>=c.dg*.5?'a':'r'}">${tgNumber(c.daily)}</span><span class="rt-of">/ ${tgNumber(c.dg)}</span></td>`;
+   const brk=!showBrk?'':!c||!c.known?'<td class="rt-n">–</td>':c.eligible?'<td><span class="rt-ok">✓ Eligible</span></td>':`<td><span class="rt-more">${tgNumber(Math.max(0,c.required-c.cum))} more</span></td>`;
+   return `<tr${r.name===self?' class="lt-mine"':''}><td><div class="rt-name">${who(r)} ${tier(r)}</div>${r.branch?`<small class="rt-branch">${escapeHtml(r.branch)}</small>`:''}</td>
+   <td class="num"><span class="rt-dot rt-bg-${band.goal(r.goal)||'n'}"></span><b>${num0(x.schedules)}</b><span class="rt-of">/ ${tgNumber(r.pace)}</span></td>${today}${brk}
+   <td class="num">${num0(x.scheduledDateOf)}</td><td class="num"><b>${num0(x.shows)}</b>${rate(r.show,'show')}</td><td class="num"><b>${num0(x.noShows)}</b>${rate(r.noshow,'noshow')}</td><td class="num"><b>${num0(x.i9)}</b></td></tr>`; }).join('')||'<tr><td colspan="8">No team members in this selection.</td></tr>'}</tbody>
+ <tfoot><tr><td>Team</td><td class="num"><b>${fmtNum(T.schedules||0)}</b><span class="rt-of">/ ${tgNumber(rows.reduce((a,r)=>a+r.pace,0))}</span> <span class="rt-pct">${pc(team.goal)}</span></td>${showBrk?'<td></td><td></td>':''}<td class="num">${num0(T.scheduledDateOf)}</td><td class="num"><b>${num0(T.shows)}</b><span class="rt-pct">${pc(team.show)}</span></td><td class="num"><b>${num0(T.noShows)}</b><span class="rt-pct">${pc(team.noshow)}</span></td><td class="num"><b>${num0(T.i9)}</b></td></tr></tfoot></table></div>
+ <details class="ta-legend"><summary>How to read this</summary><p class="hint">Dot: green at 90%+ of the schedule goal so far, amber 50–89%, red under 50%. Show rate is green at 70%+, no-show rate green under 20%. Emoji: 🤬 under 50% · 🫡 50–80% · 🫰 81–100% · 🤩 above 100% of goal. Third break needs the daily goal × working days so far this week.</p></details></section>`;
  // Others at the same branches (no names shown): everyone active in the period who isn't on this team.
  const teamNames=new Set(rows.map(r=>r.name));
  const everyone=[...new Set(weeksData.filter(w=>w.weekEndDate>=p.from&&tgShift(w.weekEndDate,-6)<=p.to).flatMap(w=>Object.keys(w.byRecruiter||{})))].filter(n=>!teamNames.has(n)&&!excludedRecruitersSet.has(n));
@@ -9701,21 +9788,37 @@ function ltAnalytics(g,p,cutoff,mode,today,self,checks=[],checkDay=cutoff){
 }
 // ---------- Team leads comparison (admins): every lead's team side by side ----------
 const ltLeads={owner:null,teams:null,loading:false,error:'',at:0};
+// Team list for Team Leads: shown at once from a saved copy (this browser), refreshed in the background.
+const LEADS_LS=()=> 'ipd_leads_cache:'+(Server.user?.id||'');
+function ltLeadsFromCache(){ if(ltLeads.teams&&ltLeads.owner===String(Server.user?.id)) return; try{ const c=JSON.parse(localStorage.getItem(LEADS_LS())||'null'); if(c&&Array.isArray(c.teams)){ Object.assign(ltLeads,{owner:String(Server.user.id),teams:c.teams,at:c.at||0}); } }catch(e){} }
 async function ltLoadLeads(force){
  const owner=String(Server.user?.id||''); if(!Server.isAdmin()||ltLeads.loading) return;
- if(!force&&ltLeads.owner===owner&&ltLeads.teams&&Date.now()-ltLeads.at<5*60e3) return;
+ ltLeadsFromCache();
+ if(!force&&ltLeads.owner===owner&&ltLeads.teams&&Date.now()-ltLeads.at<2*60e3) return;
  ltLeads.loading=true; ltLeads.error='';
+ const before=JSON.stringify(ltLeads.teams||null);
  try{
-  const users=ltState.users||await Server.rpc('dash_users_list');
+  const users=ltState.users||await Server.rpc('dash_users_list'); if(!Array.isArray(users)) throw Error('Could not load the user list'); if(!ltState.users) ltState.users=users;
   const list=(users||[]).filter(u=>u.active!==false);
   const res=await Promise.allSettled(list.map(u=>Server.rpc('dash_team_assignment_get',{p_user_id:u.id})));
   if(String(Server.user?.id)!==owner) return;
   ltLeads.teams=res.map((r,i)=>r.status==='fulfilled'&&r.value&&(r.value.memberships||[]).length?{id:String(list[i].id),lead:list[i].name,a:r.value}:null).filter(Boolean);
   ltLeads.owner=owner; ltLeads.at=Date.now();
+  try{ localStorage.setItem(LEADS_LS(), JSON.stringify({at:ltLeads.at,teams:ltLeads.teams})); }catch(e){}
  }catch(e){ ltLeads.error=cleanErr(e); }
- finally{ ltLeads.loading=false; if(currentView==='leads') renderLeadsView(); }
+ finally{ ltLeads.loading=false; if(currentView==='leads' && (force || JSON.stringify(ltLeads.teams||null)!==before)) renderLeadsView(); }
 }
+// remember the heavy table for the same period / division / data
+const ltLeadsMemo={key:'',html:''};
 function ltLeadsHtml(p,cutoff,mode,today,division){
+ if(!Server.isAdmin()) return '';
+ const memoKey=[p.from,p.to,cutoff,mode,division,ltLeads.at,(ltLeads.teams||[]).length,weeksData.length,weeksData.map(w=>w.savedAt||'').join(),JSON.stringify(KV.get('branchMerges')||null),ltState.viewingId].join('|');
+ if(ltLeads.teams&&ltLeadsMemo.key===memoKey) return ltLeadsMemo.html;
+ const html=ltLeadsHtmlBuild(p,cutoff,mode,today,division);
+ if(ltLeads.teams&&!ltLeads.loading) { ltLeadsMemo.key=memoKey; ltLeadsMemo.html=html; }
+ return html;
+}
+function ltLeadsHtmlBuild(p,cutoff,mode,today,division){
  if(!Server.isAdmin()) return '';
  const head=`<div class="lt-section-head"><h3>How each team is doing</h3><span class="hint">Every lead’s team for the same ${mode} and division · schedules vs goal, interviews (shows vs no shows) and hires</span><button class="btn btn-secondary btn-sm" id="ltLeadsRefresh" style="margin-left:auto">↻ Refresh</button></div>`;
  if(ltLeads.owner!==String(Server.user.id)||!ltLeads.teams){ setTimeout(()=>ltLoadLeads(),0); return `<section class="panel ta" data-section="team.leads">${head}<p class="hint">${ltLeads.error?'Could not load teams: '+escapeHtml(ltLeads.error):'Loading every team…'}</p></section>`; }
@@ -9789,19 +9892,24 @@ function renderLeadsView(){
   <button class="btn btn-secondary" id="ldNext" aria-label="Next ${mode}" ${ltMoveRange(mode,anchor,1)>maxAnchor?'disabled':''}>→</button><button class="btn btn-secondary" id="ldNow">This ${mode}</button></div>
   <label class="lt-field">Division<select id="ldDiv"><option value="">All divisions</option>${divs.map(d=>`<option ${d===leadsState.division?'selected':''}>${escapeHtml(d)}</option>`).join('')}</select></label></header>
   <div class="lt-scope"><span><strong>${rangeText}</strong>${p.to>today?' · through today':''}</span></div></div>
-  ${ltLeadsHtml(p,cutoff,mode,today,leadsState.division)}`;
+  <div id="ldBody"><section class="panel"><p class="hint">Loading teams…</p></section></div>`;
  const go=()=>renderLeadsView();
+ const fill=()=>{ const body=host.querySelector('#ldBody'); if(!body) return; body.innerHTML=ltLeadsHtml(p,cutoff,mode,today,leadsState.division); bindLeadsBody(); };
+ if(ltLeads.teams&&ltLeadsMemo.html) fill(); else requestAnimationFrame(()=>setTimeout(fill,0));
+ if(ltLeads.teams) setTimeout(()=>ltLoadLeads(),50);
  host.querySelector('#ldMode').onchange=e=>{leadsState.mode=e.target.value;go();};
  host.querySelector('#ldAnchor').onchange=e=>{const v=mode==='month'?e.target.value+'-01':e.target.value;if(tgDate(v)&&v<=maxAnchor){leadsState.anchor=mode==='week'?weekOfDate(v).weekEnd:v;go();}};
  host.querySelector('#ldPrev').onclick=()=>{leadsState.anchor=ltMoveRange(mode,anchor,-1);go();};
  host.querySelector('#ldNext').onclick=()=>{const n=ltMoveRange(mode,anchor,1);if(n<=maxAnchor){leadsState.anchor=n;go();}};
  host.querySelector('#ldNow').onclick=()=>{leadsState.anchor=null;go();};
  host.querySelector('#ldDiv').onchange=e=>{leadsState.division=e.target.value;go();};
- host.querySelector('#ltLeadsRefresh')?.addEventListener('click',()=>{ltLeads.teams=null;ltLoadLeads(true);go();});
+ function bindLeadsBody(){
+ host.querySelector('#ltLeadsRefresh')?.addEventListener('click',()=>{ltLoadLeads(true);});
  host.querySelectorAll('[data-lt-lead]').forEach(b=>b.onclick=()=>{
   Object.assign(ltState,{owner:String(Server.user.id),viewingId:b.dataset.ltLead,assignment:null,loaded:false,loading:false,error:'',division:leadsState.division,rangeMode:leadsState.mode,anchor:leadsState.anchor});ltState.requestSeq++;
   currentView='teams'; document.querySelectorAll('#navList button').forEach(x=>x.classList.toggle('active',x.dataset.view==='teams')); refreshUI(); window.scrollTo(0,0);
  });
+ }
 }
 // Third-break columns: each person can show/hide them (this browser); admins can also take the columns away (team.goals).
 function ltBreakVisible(){ return canSeeSection('team.goals') && lsGet('ipd_show_break:'+(Server.user?.id||''))!=='0'; }
@@ -9976,6 +10084,88 @@ document.addEventListener('keydown', e=>{
   const t=e.target; if(t && (t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable)) return;
   const search=document.querySelector('#topbarExtra input[type="search"]'); if(search){ e.preventDefault(); search.focus(); }
 });
+// ---------- Manage access in place (super admin) ----------
+const PAGE_MODULE = {performance:'performance', recruiters:'recruiters', branches:'branches', candidates:'candidates', master:'master', alerts:'alerts', pivot:'pivot'};
+const PAGE_EDIT = {performance:['upload','export'], recruiters:['remarks','export'], branches:['export'], candidates:['master_edit','export'], master:['master_edit','export'], alerts:['remarks','remarks_approve'], pivot:['export'], teams:['grant.break_image'], leads:[]};
+const EDIT_LABEL = {'grant.break_image':'Copy third-break list as image'};
+let accessMode=false, accessObs=null;
+function sectionLabel(key){ for(const secs of Object.values(PAGE_SECTIONS)) for(const [k,l] of secs) if(k===key) return l.replace(/^·+ /,''); return null; }
+function setAccessMode(on){
+  accessMode=!!on && !!Server.user && Server.isSuperAdmin();
+  document.body.classList.toggle('access-mode', accessMode);
+  document.getElementById('accessModeBtn')?.classList.toggle('active', accessMode);
+  let bar=document.getElementById('accessBar');
+  if(accessMode){
+    if(!bar){ bar=document.createElement('div'); bar.id='accessBar'; document.body.appendChild(bar); }
+    bar.innerHTML=`<span>🔒 <b>Access mode</b> — click a lock to choose who sees it</span><button type="button" class="btn btn-secondary btn-sm" id="accPage">Page access…</button><button type="button" class="btn btn-primary btn-sm" id="accDone">Done</button>`;
+    bar.querySelector('#accDone').onclick=()=>setAccessMode(false);
+    bar.querySelector('#accPage').onclick=()=>openAccessEditor({page:currentView});
+    decorateAccess();
+    if(!accessObs){ let t; accessObs=new MutationObserver(()=>{ clearTimeout(t); t=setTimeout(decorateAccess,120); }); }
+    accessObs.observe(document.getElementById('dashboardViews')||document.body,{childList:true,subtree:true});
+  } else {
+    bar?.remove(); accessObs?.disconnect(); document.querySelectorAll('.acc-chip').forEach(x=>x.remove()); document.querySelectorAll('.acc-host').forEach(x=>x.classList.remove('acc-host'));
+  }
+}
+function decorateAccess(){
+  if(!accessMode) return;
+  document.querySelectorAll('#dashboardViews [data-section]').forEach(el=>{
+    const key=el.dataset.section, label=sectionLabel(key); if(!label||el.offsetParent===null) return;
+    if(el.querySelector(':scope > .acc-chip')) return;
+    el.classList.add('acc-host');
+    const chip=document.createElement('button'); chip.type='button'; chip.className='acc-chip'; chip.title='Who can see: '+label;
+    chip.innerHTML='🔒<span>Access</span>';
+    chip.addEventListener('click',e=>{ e.preventDefault(); e.stopPropagation(); openAccessEditor({section:key,label}); });
+    el.appendChild(chip);
+  });
+}
+async function openAccessEditor({section,label,page}){
+  if(!Server.isSuperAdmin()) return;
+  let users;
+  try{ users=(usersCache&&usersCache.length)?usersCache:await Server.rpc('dash_users_list'); usersCache=users; }catch(e){ showToast('Could not load users: '+cleanErr(e)); return; }
+  const std=users.filter(u=>u.role==='user'), elev=users.filter(u=>u.role!=='user');
+  const mod=page?PAGE_MODULE[page]:null, edits=page?(PAGE_EDIT[page]||[]):[];
+  const modLabel=k=>EDIT_LABEL[k]||(MODULES.find(m=>m.key===k)||{label:k}).label;
+  const has=(u,k)=>k.startsWith('grant.')?(u.hidden_sections||[]).includes(k):(u.modules||[]).includes(k);
+  const cols=section?[{k:'view',l:'Can see'}]:[...(mod?[{k:mod,l:'Can open'}]:[]),...edits.map(k=>({k,l:modLabel(k)}))];
+  const val=(u,c)=>section?!(u.hidden_sections||[]).includes(section):has(u,c.k);
+  const state=new Map(std.map(u=>[u.id,Object.fromEntries(cols.map(c=>[c.k,val(u,c)]))]));
+  const title=section?`Who can see “${label}”`:`Access to ${escapeHtml((VIEW_META[page]||{title:page}).title)}`;
+  const wrap=document.createElement('div'); wrap.className='modal-overlay';
+  wrap.innerHTML=`<div class="modal acc-modal" role="dialog" aria-modal="true" aria-labelledby="accTitle"><div class="modal-header"><h3 id="accTitle">${escapeHtml(title)}</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div>
+   <div class="modal-body">
+    ${!cols.length?'<p class="hint">This page has no separate rights — it follows each person’s team assignment.</p>':`
+    <div class="acc-tools"><input type="search" id="accSearch" placeholder="Search people…">${cols.map(c=>`<span class="acc-bulk">${escapeHtml(c.l)}: <button type="button" class="link-btn" data-all="${c.k}">all</button> · <button type="button" class="link-btn" data-none="${c.k}">none</button></span>`).join('')}</div>
+    <div class="acc-list"><div class="acc-row acc-headrow"><span>Person</span>${cols.map(c=>`<span>${escapeHtml(c.l)}</span>`).join('')}</div>
+    ${std.map(u=>`<div class="acc-row" data-name="${escapeHtml(u.name.toLowerCase())}"><span><b>${escapeHtml(u.name)}</b>${u.active?'':' <em>disabled</em>'}</span>${cols.map(c=>`<label class="acc-tg"><input type="checkbox" data-u="${escapeHtml(String(u.id))}" data-k="${c.k}" ${state.get(u.id)[c.k]?'checked':''}><i></i></label>`).join('')}</div>`).join('')||'<p class="hint" style="padding:10px">No standard users yet.</p>'}
+    ${elev.length?`<div class="acc-row acc-elev"><span>${elev.map(u=>escapeHtml(u.name)).join(', ')}</span><span class="hint">Admins — always have everything</span></div>`:''}</div>`}
+   </div>
+   <div class="modal-footer"><span class="hint" id="accMsg"></span><button class="btn btn-secondary" data-close>Cancel</button>${cols.length?'<button class="btn btn-primary" id="accSave">Save</button>':''}</div></div>`;
+  document.body.appendChild(wrap);
+  const close=()=>wrap.remove();
+  wrap.addEventListener('click',e=>{ if(e.target===wrap||e.target.closest('[data-close]')) close(); });
+  wrap.querySelector('#accSearch')?.addEventListener('input',e=>{ const q=e.target.value.trim().toLowerCase(); wrap.querySelectorAll('.acc-row[data-name]').forEach(r=>r.hidden=!!q&&!r.dataset.name.includes(q)); });
+  const setAll=(k,on)=>wrap.querySelectorAll(`.acc-row:not([hidden]) input[data-k="${k}"]`).forEach(i=>{ i.checked=on; });
+  wrap.querySelectorAll('[data-all]').forEach(b=>b.onclick=()=>setAll(b.dataset.all,true));
+  wrap.querySelectorAll('[data-none]').forEach(b=>b.onclick=()=>setAll(b.dataset.none,false));
+  wrap.querySelector('#accSave')?.addEventListener('click',async()=>{
+    const btn=wrap.querySelector('#accSave'), msg=wrap.querySelector('#accMsg'); btn.disabled=true;
+    const changed=std.filter(u=>cols.some(c=>{ const i=wrap.querySelector(`input[data-u="${CSS.escape(String(u.id))}"][data-k="${c.k}"]`); return i&&i.checked!==state.get(u.id)[c.k]; }));
+    let ok=0; const fail=[];
+    for(const u of changed){
+      let modules=[...(u.modules||[])], hidden=[...(u.hidden_sections||[])];
+      cols.forEach(c=>{ const on=wrap.querySelector(`input[data-u="${CSS.escape(String(u.id))}"][data-k="${c.k}"]`).checked;
+        if(section){ hidden=hidden.filter(k=>k!==section); if(!on) hidden.push(section); }
+        else if(c.k.startsWith('grant.')){ hidden=hidden.filter(k=>k!==c.k); if(on) hidden.push(c.k); }
+        else { modules=modules.filter(k=>k!==c.k); if(on) modules.push(c.k); } });
+      msg.textContent=`Saving ${ok+fail.length+1} of ${changed.length}…`;
+      try{ await Server.rpc('dash_user_save',{p:{id:u.id,name:u.name,modules,hidden_sections:hidden,active:u.active}}); Object.assign(u,{modules,hidden_sections:hidden}); ok++; }catch(e){ fail.push(u.name); }
+    }
+    close(); showToast(changed.length?`Access updated for ${ok} ${ok===1?'person':'people'}.`+(fail.length?' Failed: '+fail.join(', '):''):'No changes.');
+  });
+}
+document.addEventListener('click',e=>{ if(e.target.closest('#accessModeBtn')) setAccessMode(!accessMode); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&accessMode&&!document.querySelector('.modal-overlay')) setAccessMode(false); });
 // Menu groups: hide a heading when none of its items is available. On phones the bottom bar keeps
 // four items (always including the open page) and the rest go into a "More" sheet.
 function layoutNav(){
