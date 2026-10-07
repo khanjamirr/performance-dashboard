@@ -1344,6 +1344,7 @@ body.access-mode .acc-host{position:relative;outline:2px dashed #7a5fb855;outlin
 .acc-tg i:after{content:'';position:absolute;left:3px;top:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 2px #0003}
 .acc-tg input:checked+i{background:#2f8f8a}.acc-tg input:checked+i:after{transform:translateX(16px)}.acc-tg input:focus-visible+i{outline:2px solid #5b3fa0;outline-offset:2px}
 #accMsg{margin-right:auto}
+.al-pct small{display:block;font-size:10px;font-weight:600;color:#8a9ca5;text-align:right;letter-spacing:0}
 </style>
 </head>
 <body class="locked">
@@ -8857,10 +8858,10 @@ async function renderAlertsView(){
   const w = weekOfDate(st.week);
   const bar = r=>{ const v=Math.min(100, r.pct||0); return `<div class="al-bar" title="${fmtNum(r.sched)} of ${fmtNum(r.goal)} schedules"><i style="width:${v}%"></i>${inProgress?`<u style="left:${Math.min(100, elapsed/5*100)}%" title="Where they should be by today"></u>`:''}<b style="left:50%"></b></div>`; };
   const card = (r, sev)=>`<div class="al-card ${sev}">
-      <div class="al-head"><button type="button" class="al-name" data-al-remarks="${escapeHtml(r.name)}">${escapeHtml(r.name)}</button><span class="al-pct">${Math.round(r.pct)}%</span></div>
+      <div class="al-head"><button type="button" class="al-name" data-al-remarks="${escapeHtml(r.name)}">${escapeHtml(r.name)}</button><span class="al-pct" title="${inProgress?'Schedules vs where they should be by today':'Schedules vs weekly goal'}">${Math.round(r.score)}%${inProgress?'<small>of today’s target</small>':''}</span></div>
       <div class="al-sub">${escapeHtml(r.division)}${r.branch?' · '+escapeHtml(r.branch):''}</div>
       ${bar(r)}
-      <div class="al-facts"><span><strong>${fmtNum(r.sched)}</strong> / ${fmtNum(r.goal)} schedules</span>${inProgress?`<span>pace ${Math.round(r.pace)}% · on track for ~${fmtNum(r.projected)}</span>`:`<span>${fmtNum(r.shows)} shows · ${fmtNum(r.hires)} hires</span>`}</div>
+      <div class="al-facts"><span><strong>${fmtNum(r.sched)}</strong> / ${fmtNum(r.goal)} schedules</span>${inProgress?`<span>${Math.round(r.pct)}% of the full week · on track for ~${fmtNum(r.projected)}</span>`:`<span>${fmtNum(r.shows)} shows · ${fmtNum(r.hires)} hires</span>`}</div>
       ${alertsRemarkLine(r.name, st.week)}
       <div class="al-actions">${Remarks.canAdd()?`<button class="btn btn-secondary btn-sm" data-al-add="${escapeHtml(r.name)}">Add remark</button>`:''}<button class="link-btn" data-al-remarks="${escapeHtml(r.name)}">${Remarks.forRecruiter(r.name).length?'Remarks ('+Remarks.forRecruiter(r.name).length+')':'History'}</button></div>
     </div>`;
