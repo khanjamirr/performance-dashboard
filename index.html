@@ -929,6 +929,7 @@ button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #183442
 .al-grid.compact{margin-top:12px}
 .al-card{border:1px solid #e1eaed;border-left:4px solid #d64545;border-radius:12px;padding:12px 14px;background:#fff;display:flex;flex-direction:column;gap:6px}
 .al-card.warn{border-left-color:#e0a020}
+.al-card[data-al-card]{cursor:pointer;transition:box-shadow .15s,transform .15s}.al-card[data-al-card]:hover{box-shadow:0 8px 20px #18344218;transform:translateY(-1px)}.al-card[data-al-card]:focus-visible{outline:2px solid #2f8f8a;outline-offset:2px}
 .al-card.bad{background:linear-gradient(90deg,#fff5f5,#fff 40%)}
 .al-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .al-name{background:none;border:0;padding:0;font:inherit;font-weight:700;font-size:14px;color:#132f3b;cursor:pointer;text-align:left}
@@ -1390,6 +1391,7 @@ body.on-history .top-back{display:none!important}
 #view-history.hp-mode-table .hp-chartsec{display:none!important}
 #view-history.hp-mode-charts>section:not(.hp-chartsec){display:none!important}
 .hp-chart-note{margin:-4px 0 14px;font-size:12px}
+.ep-held{color:#8a9ba3!important;font-style:italic;font-size:12px}
 .hs-head{flex-wrap:wrap;gap:8px 12px}.hs-ctl{display:flex;align-items:center;gap:6px;margin-left:auto;flex-wrap:wrap}
 .hs-ctl input[type=date]{padding:6px 8px;border:1px solid #cfdde2;border-radius:8px;font:inherit;font-size:12.5px;background:#fff}
 .hs-filter{margin:4px 0 10px}
@@ -1801,11 +1803,20 @@ async function saveBranchMerges(list){
   _aliasKey=''; await loadAllWeeks(); addMergedBranchDivisions(); candState.cache?.clear?.(); refreshUI();
   return true;
 }
-function openBranchMergeDialog(){
+// Branch Results: Ctrl/Cmd-click rows to select branches, then "Merge N selected"
+function openBranchMergeFromTable(){ const sel=selectedPieTargets.branches||[]; openBranchMergeDialog(sel.length>=2?sel:null); }
+function updateMergeSelectedBtn(){ const n=(selectedPieTargets.branches||[]).length;
+  document.querySelectorAll('#view-branches [data-merge-open]').forEach(b=>{ b.textContent=n>=2?`⇄ Merge ${n} selected`:`⇄ Merge branches${branchMergeList().length?' · '+branchMergeList().length:''}`; b.classList.toggle('btn-primary',n>=2); b.classList.toggle('btn-secondary',n<2); }); }
+function openBranchMergeDialog(pre){
   if(!Server.isAdmin()) return;
   document.getElementById('bmDialog')?.remove();
   const wrap=document.createElement('div'); wrap.className='modal-overlay'; wrap.id='bmDialog';
   let editing=null, picked=new Set(), q='', name='', busy=false;
+  // started from rows selected in Branch Results: pre-tick them (a merged branch opens for editing)
+  if(Array.isArray(pre) && pre.length){ const list=branchMergeList(), groups=pre.map(n=>list.findIndex(g=>g.name===n)).filter(i=>i>=0);
+    const raws=pre.filter(n=>!list.some(g=>g.name===n));
+    if(groups.length===1){ editing=groups[0]; name=list[editing].name; picked=new Set([...list[editing].members, ...raws]); }
+    else { picked=new Set(raws); groups.forEach(i=>list[i].members.forEach(m=>picked.add(m))); } }
   const draw=()=>{
     const list=branchMergeList(), raw=allRawBranches();
     const owner=b=>list.find((g,i)=>i!==editing&&g.members.includes(b));
@@ -1995,12 +2006,44 @@ function resolveWeekRecord(stored){
   return stored;
 }
 
+// Shows / no shows for an interview day are only final once that day ends, so (except for admins)
+// today's — and any later day's — shows and no shows stay hidden until tomorrow, everywhere.
+const HELD_KEYS=[['shows','showsList'],['noShows','noShowsList']];
+function showsHeld(){ return !(typeof Server!=='undefined' && Server.user && Server.isAdmin()); }
+function isHeldShowDay(d){ return showsHeld() && !!d && d>=toIsoDateOnly(new Date()); }
+function holdTodaysShows(w){
+  if(!w || !w.weekEndDate || !showsHeld()) return w;
+  const today=toIsoDateOnly(new Date());
+  if(w.weekEndDate<today) return w;
+  const strip=(o,fallbackHeld)=>{
+    if(!o) return {o, held:{shows:0,noShows:0}};
+    const n={...o}, held={shows:0,noShows:0};
+    if(o.daily){ n.daily={}; Object.entries(o.daily).forEach(([d,t])=>{ if(d>=today){ const c={...t}; HELD_KEYS.forEach(([k])=>{ held[k]+=c[k]||0; if(k in c) c[k]=0; }); n.daily[d]=c; } else n.daily[d]=t; }); }
+    HELD_KEYS.forEach(([k,l])=>{
+      if(Array.isArray(o[l])){ const keep=o[l].filter(c=>!(c&&c.date>=today)); if(!o.daily) held[k]+=o[l].length-keep.length; n[l]=keep; }
+      if(!o.daily && !Array.isArray(o[l]) && fallbackHeld) held[k]+=fallbackHeld[k]||0;
+      if(typeof n[k]==='number') n[k]=Math.max(0,n[k]-held[k]);
+    });
+    return {o:n, held};
+  };
+  const out={...w, showsHeldFrom:today, byRecruiter:{}, byBranch:{...(w.byBranch||{})}, totals:{...(w.totals||{})}};
+  const byBranchHeld={}, tot={shows:0,noShows:0};
+  Object.entries(w.byRecruiter||{}).forEach(([name,r])=>{ const {o,held}=strip(r); out.byRecruiter[name]=o;
+    HELD_KEYS.forEach(([k])=>{ tot[k]+=held[k]; const b=r&&r.branch; if(b){ const bh=byBranchHeld[b]||(byBranchHeld[b]={shows:0,noShows:0}); bh[k]+=held[k]; } }); });
+  Object.entries(w.byBranch||{}).forEach(([b,r])=>{ out.byBranch[b]=strip(r, byBranchHeld[b]).o; });
+  HELD_KEYS.forEach(([k])=>{ if(typeof out.totals[k]==='number') out.totals[k]=Math.max(0,out.totals[k]-tot[k]); });
+  return out;
+}
+// after midnight, yesterday's shows become final: reload once the date changes
+let heldDay=toIsoDateOnly(new Date());
+setInterval(async()=>{ const d=toIsoDateOnly(new Date()); if(d===heldDay) return; heldDay=d;
+  try{ if(typeof Server!=='undefined' && Server.user && weeksData.length){ await loadAllWeeks(); refreshUI(); } }catch(e){} }, 60000);
 async function loadAllWeeks(){
   const keys = await storageListKeys('weekly:');
   const out = [];
   for(const k of keys){
     const rec = await storageGet(k);
-    if(rec) out.push(applyBranchMerges(normalizeWeekRecord(resolveWeekRecord(rec))));
+    if(rec) out.push(holdTodaysShows(applyBranchMerges(normalizeWeekRecord(resolveWeekRecord(rec)))));
   }
   out.sort((a,b)=> a.weekEndDate.localeCompare(b.weekEndDate));
   weeksData = out;
@@ -5821,7 +5864,7 @@ async function renderPeopleView(mode){
     <div class="people-layout-grid">
       <div>
         <div class="panel" data-section="${mode==='recruiters'?'rec.table':'br.table'}">
-          <div class="panel-head"><h3>${mode==='recruiters'?'Recruiter':'Branch'} Detail</h3><div style="display:flex;align-items:center;gap:10px;"><span class="hint">Click a row for its trend · Ctrl/Cmd-click to compare · click a column to sort · &#9660; to filter${mode==='recruiters'?' · Remarks are saved per week':''}</span>${mode==='branches'&&Server.isAdmin()?`<button type="button" class="btn btn-secondary btn-sm" data-merge-open onclick="openBranchMergeDialog()">⇄ Merge branches${branchMergeList().length?' · '+branchMergeList().length:''}</button>`:''}${copyBtnHtml('peopleTable_'+mode)}${downloadBtnHtml('peopleTable_'+mode, (mode==='recruiters'?'recruiter':'branch')+'-performance.xlsx')}</div></div>
+          <div class="panel-head"><h3>${mode==='recruiters'?'Recruiter':'Branch'} Detail</h3><div style="display:flex;align-items:center;gap:10px;"><span class="hint">Click a row for its trend · Ctrl/Cmd-click to compare · click a column to sort · &#9660; to filter${mode==='recruiters'?' · Remarks are saved per week':''}</span>${mode==='branches'&&Server.isAdmin()?`<button type="button" class="btn btn-secondary btn-sm" data-merge-open onclick="openBranchMergeFromTable()">${(selectedPieTargets.branches||[]).length>=2?`⇄ Merge ${(selectedPieTargets.branches||[]).length} selected`:`⇄ Merge branches${branchMergeList().length?' · '+branchMergeList().length:''}`}</button>`:''}${copyBtnHtml('peopleTable_'+mode)}${downloadBtnHtml('peopleTable_'+mode, (mode==='recruiters'?'recruiter':'branch')+'-performance.xlsx')}</div></div>
           <table id="peopleTable_${mode}"></table>
         </div>
       </div>
@@ -6117,8 +6160,9 @@ async function openHistoryPage(mode, name){
 }
 function leaveHistoryPage(viaPop){
   if(currentView!=='history') return;
-  if(!viaPop && historyState.pushed){ history.back(); return; } // popstate brings us back here with viaPop
+  // Leave directly (history.back() could land on an older entry — another recruiter, or a moved week).
   historyState.pushed=false;
+  if(!viaPop) try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){}
   currentView = historyState.from || 'performance';
   document.querySelectorAll('#navList button').forEach(b=>b.classList.toggle('active', b.dataset.view===currentView));
   if(location.hash==='#history') try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){}
@@ -6205,7 +6249,7 @@ async function scheduledTodayRows(){ return scheduledRowsOn(ltToday()); }
 // Candidate-level lists are only sent by the server to accounts with the candidate-names right.
 function canSeeTeamNames(){ return !!Server.user && (Server.user.role!=='user' || (Server.user.hidden_sections||[]).includes('grant.team_names')); }
 function noNamesRightHtml(what){
-  return `<div class="lt-empty"><strong>${escapeHtml(what)} need the “See their team’s candidate names” right.</strong><span>${Server.isSuperAdmin()?'Use the 🔒 Access button (bottom right) → “Who can open / edit this page…” and turn on “See their team’s candidate names”.':'Your account doesn’t have it yet — ask your admin to turn it on.'}</span></div>`;
+  return `<div class="lt-empty"><strong>${escapeHtml(what)} need the “See their team’s candidate names” right.</strong><span>${Server.isSuperAdmin()?'Open Tools → Manage access → “Who can open / edit this page…” and turn on “See their team’s candidate names”.':'Your account doesn’t have it yet — ask your admin to turn it on.'}</span></div>`;
 }
 // Every schedule row (with its own branch and date) between two dates.
 // Name-free summary for people without the candidate-names right:
@@ -6672,6 +6716,7 @@ function renderPeopleTable(mode, allRows, displayRows){
       selectedPieTargets[mode]=selectRows(selectedPieTargets[mode],name,multi);
       table.querySelectorAll('tbody tr[data-pie-name]').forEach(r=>{const checked=selectedPieTargets[mode].includes(r.dataset.pieName);r.setAttribute('aria-selected',String(checked));r.classList.toggle('comparison-selected',checked);if(!checked){r.querySelectorAll('td').forEach(td=>{if(td.style.background==='var(--indigo-light)')td.style.background='';});r.style.background='';r.querySelectorAll('.pill.good').forEach(p=>{if(p.textContent==='Selected')p.remove();});}});
       if(selectedPieTargets[mode].length)openEntityPopover(mode,selectedPieTargets[mode],row);else closeEntityPopover();
+      if(mode==='branches') updateMergeSelectedBtn();
     };
     row.addEventListener('click',e=>{ if(e.target.closest('[data-remarks]')) return; const hn=e.target.closest('[data-history-name]'); if(hn && !(e.ctrlKey||e.metaKey)){ e.stopPropagation(); openHistoryPage(mode, hn.dataset.historyName); return; } select(e.ctrlKey||e.metaKey); });
     row.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(e.ctrlKey||e.metaKey);}});
@@ -9137,7 +9182,7 @@ async function renderAlertsView(){
   const noRemark = below.filter(r=>!Remarks.forWeek(r.name, st.week).some(x=>(x.status||'approved')==='approved')).length;
   const w = weekOfDate(st.week);
   const bar = r=>{ const v=Math.min(100, r.pct||0); return `<div class="al-bar" title="${fmtNum(r.sched)} of ${fmtNum(r.goal)} schedules"><i style="width:${v}%"></i>${inProgress?`<u style="left:${Math.min(100, elapsed/5*100)}%" title="Where they should be by today"></u>`:''}<b style="left:50%"></b></div>`; };
-  const card = (r, sev)=>`<div class="al-card ${sev}">
+  const card = (r, sev)=>`<div class="al-card ${sev}" data-al-card="${escapeHtml(r.name)}" tabindex="0" role="button" aria-label="Open remarks for ${escapeHtml(r.name)}">
       <div class="al-head"><button type="button" class="al-name" data-al-remarks="${escapeHtml(r.name)}">${escapeHtml(r.name)}</button><span class="al-pct" title="Schedules vs weekly goal">${Math.round(r.score)}%<small>of weekly goal</small></span></div>
       <div class="al-sub">${escapeHtml(r.division)}${r.branch?' · '+escapeHtml(r.branch):''}</div>
       ${bar(r)}
@@ -9157,7 +9202,7 @@ async function renderAlertsView(){
       <button type="button" class="al-tile bad" data-jump="alBelow"><span>Below 50% of goal</span><strong>${below.length}</strong><em>${noRemark?noRemark+' without a remark':'all have remarks'}</em></button>
       <button type="button" class="al-tile warn" data-jump="alWatch"><span>50–79% of goal</span><strong>${watch.length}</strong><em>keep an eye on</em></button>
       <div class="al-tile good"><span>On track (80%+)</span><strong>${onTrack.length}</strong><em>of ${rows.length} recruiters</em></div>
-      ${`<div class="al-tile"><span>Other signals</span><strong>${attention.length}</strong><em>show rate, no-shows, activity</em></div>`}
+      
     </div>
     ${pending.length?`<section class="panel al-section" id="alApprovals" data-section="alerts.approvals"><div class="panel-head"><div><h3>Remarks awaiting approval</h3><span class="hint">Only you and the author can see these until they’re approved.</span></div></div>
       <div class="al-approvals">${pending.map(r=>`<div class="al-appr" data-id="${escapeHtml(r.id)}"><div class="al-appr-meta"><strong>${escapeHtml(r.recruiter)}</strong> · Wk ${weekOfDate(r.week_end_date).number} · by ${escapeHtml(r.author||'')} · ${new Date(r.created_at).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</div><div class="al-appr-text">${escapeHtml(r.remark)}</div><div class="al-actions"><button class="btn btn-primary btn-sm" data-appr="1">Approve</button><button class="btn btn-secondary btn-sm" data-appr="0">Reject</button><button class="link-btn" data-appr-edit="${escapeHtml(r.recruiter)}" data-week="${r.week_end_date}">Edit…</button></div></div>`).join('')}</div></section>`:''}
@@ -9178,6 +9223,10 @@ async function renderAlertsView(){
   host.querySelectorAll('[data-jump]').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.jump)?.scrollIntoView({behavior:'smooth', block:'start'}));
   host.querySelectorAll('[data-sig]').forEach(b=>b.onclick=()=>{ st.signals=b.dataset.sig; renderAlertsView(); });
   host.querySelectorAll('[data-al-remarks]').forEach(b=>b.onclick=()=>openRemarksModal(b.dataset.alRemarks, st.week));
+  // the whole card opens the remarks (buttons inside keep their own action)
+  host.querySelectorAll('[data-al-card]').forEach(c=>{ const open=()=>openRemarksModal(c.dataset.alCard, st.week);
+    c.addEventListener('click',e=>{ if(e.target.closest('button,a,input,select,textarea,.acc-chip')) return; if(String(window.getSelection?.()||'').length) return; open(); });
+    c.addEventListener('keydown',e=>{ if(e.target===c&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); open(); } }); });
   host.querySelectorAll('[data-al-add]').forEach(b=>b.onclick=()=>{ const r = rows.find(x=>x.name===b.dataset.alAdd); openRemarksModal(b.dataset.alAdd, st.week, b.dataset.suggest || (r ? `${r.sched} of ${r.goal} schedules (${Math.round(r.pct)}%)${inProgress?' after '+elapsed+' day'+(elapsed===1?'':'s'):''}. Reason / plan: ` : '')); });
   host.querySelectorAll('[data-appr]').forEach(b=>b.onclick=async ()=>{ const id=b.closest('.al-appr').dataset.id; b.disabled=true; try{ await Remarks.review(id, b.dataset.appr==='1'); showToast(b.dataset.appr==='1'?'Remark approved.':'Remark rejected.'); }catch(e){ showToast('Could not update: '+cleanErr(e)); } renderAlertsView(); });
   host.querySelectorAll('[data-appr-edit]').forEach(b=>b.onclick=()=>openRemarksModal(b.dataset.apprEdit, b.dataset.week));
@@ -9462,7 +9511,7 @@ async function candFromWeekLists(week){
     for(const r of got) mergeWeeklyLists(v, await decodeKvValue(r.key, r.value));
     v.listsLoaded = true;
   }
-  const flat = (part, list)=> Object.entries(v[part].byRecruiter).flatMap(([rec,o])=>(o[list]||[]).map(c=>({...c, recruiter:rec, branch:branchAlias(c.branch||o.branch||'Unassigned')})));
+  const flat = (part, list)=> Object.entries(v[part].byRecruiter).flatMap(([rec,o])=>(o[list]||[]).filter(c=>!((list==='showsList'||list==='noShowsList') && isHeldShowDay(c&&c.date))).map(c=>({...c, recruiter:rec, branch:branchAlias(c.branch||o.branch||'Unassigned')})));
   const mode = dedupeByEmployeeNumber ? 'deduped' : 'raw', T = v[mode].totals || {};
   const totals = {schedules:T.schedules||0, interviews:T.scheduledDateOf||0, shows:T.shows||0, noShows:T.noShows||0, i9:T.i9||0, placed:T.placed||0};
   const lists = {}, counted = {};
@@ -9871,9 +9920,9 @@ function ltBreakCheck(name,date,now=new Date(),scope='day',weekTo=date){
  const daySignal=recruiterSignal(daily,day.shows,day.scheduledDateOf,dg),weekSignal=recruiterSignal(weekly,wk.shows,wk.scheduledDateOf,wg);
  return {name,wg,dg,daily,weekly,cum,required,eligible:cum!==null&&cum>=required,known:cum!==null,goalMet,late,mid,status,daySignal,weekSignal};
 }
-function ltCompactCards(report,weeks=1){
+function ltCompactCards(report,weeks=1,pending=false){
  const t=report.total, hpr=t.i9===null||!report.hprDenominator?{value:null,hires:t.i9,recruiters:report.hprDenominator}:{value:t.i9/report.hprDenominator,hires:t.i9,recruiters:report.hprDenominator};
- return mergedKpiCards({prefix:'team', t, goal:t.goal, hpr, compact:true, weeks});
+ return mergedKpiCards({prefix:'team', t, goal:t.goal, hpr, compact:true, weeks, pending});
 }
 function renderTeamGroups(){
  const host=document.getElementById('view-teams');if(!host||!Server.user)return;
@@ -9908,7 +9957,7 @@ function renderTeamGroups(){
  <div class="lt-period" role="group" aria-label="Team reporting period"><label class="lt-field">View<select id="ltRangeMode"><option value="day" ${mode==='day'?'selected':''}>Day</option><option value="week" ${mode==='week'?'selected':''}>Week</option><option value="month" ${mode==='month'?'selected':''}>Month</option></select></label><button class="btn btn-secondary" id="ltPrevious" aria-label="Previous ${mode}">←</button><label class="lt-field">${mode==='month'?'Month':mode==='week'?'Week ending':'Date'}<input id="ltAnchor" type="${mode==='month'?'month':'date'}" value="${mode==='month'?anchor.slice(0,7):mode==='week'?p.to:anchor}" max="${mode==='month'?today.slice(0,7):mode==='week'?weekOfDate(today).weekEnd:today}"></label><button class="btn btn-secondary" id="ltNext" aria-label="Next ${mode}" ${p.to>=today?'disabled':''}>→</button><button class="btn btn-secondary" id="ltCurrent">${mode==='day'?'Today':mode==='month'?'This month':'This week'}</button></div>
  <label class="lt-field">Division<select id="ltDivision"><option value="">All team divisions</option>${divisions.map(d=>`<option ${d===g.division?'selected':''}>${escapeHtml(d)}</option>`).join('')}</select></label><button class="btn btn-secondary" id="ltRefresh" aria-label="Refresh team" title="Refresh team">↻</button></header>
  <div class="lt-scope"><span><strong>${rangeText}</strong> · ${escapeHtml(g.division||'All divisions')}${p.to>today?' · through today':''}</span><span title="Dates and cutoff times use your system timezone">${escapeHtml(zone)}</span></div>
- <section class="lt-summary" aria-label="Team performance summary" data-section="team.summary"><div class="kpi-grid mk-grid mk-team">${ltCompactCards(report, mode==='month'?Math.round(ltWorkdays(p.from,cutoff).length/5*10)/10:1)}</div></section>
+ <section class="lt-summary" aria-label="Team performance summary" data-section="team.summary"><div class="kpi-grid mk-grid mk-team">${ltCompactCards(report, mode==='month'?Math.round(ltWorkdays(p.from,cutoff).length/5*10)/10:1, mode==='day'&&isHeldShowDay(p.from))}</div></section>
  ${report.uncovered?'<p class="lt-data-note">Some selected dates have no import; affected totals are unavailable.</p>':''}
  </div>
  ${ltState.directoryError?`<p class="warn-note">User list unavailable: ${escapeHtml(ltState.directoryError)} <button class="btn btn-secondary" id="ltDirectoryRetry">Retry</button></p>`:''}
@@ -9921,7 +9970,7 @@ function renderTeamGroups(){
    <button role="tab" data-lt-tab="cands" data-section="team.candidates">Candidates</button>
    <span class="hint lt-tabs-range" data-range="${escapeHtml(rangeText)}" data-week="${escapeHtml(dw?fmtDate(dFrom)+' – '+fmtDate(dTo):rangeText)}">${rangeText}</span>
   </div>
-  <div class="lt-pane" data-lt-pane="daily" data-section="team.daily"><div class="lt-pane-head"><h4>Day by day</h4>${copyBtnHtml('ltTodayTable')}</div><div class="hp-table-wrap"><table class="ep-table" id="ltTodayTable"><thead><tr><th>Date</th>${TG_METRICS.map(([,l])=>`<th>${l}</th>`).join('')}</tr></thead><tbody>${daily.map(x=>{const target=[...new Set(g.memberships.filter(m=>tgActive(g,m.name,x.date)&&(!g.division||(getEffectiveRecruiterDivision(m.name,weekOfDate(x.date).weekEnd)||'Unassigned')===g.division)).map(m=>m.name))].reduce((sum,n)=>sum+ltDailyGoal(n,x.date),0),signal=recruiterSignal(x.r.total.schedules,x.r.total.shows,x.r.total.scheduledDateOf,target);return `<tr${mode==='day'&&x.date===p.from?' class="lt-mine"':''}><td>${new Date(x.date+'T12:00:00Z').toLocaleDateString(undefined,{weekday:'short',timeZone:'UTC'})} · ${fmtDate(x.date)}${mode==='day'&&x.date===p.from?' <span class="pill good">selected</span>':''}</td>${TG_METRICS.map(([k])=>`<td class="${k==='schedules'?'rc-'+signal.schedule:k==='shows'?'rc-'+signal.visits:''}">${tgNumber(x.r.total[k])}</td>`).join('')}</tr>`;}).join('')||'<tr><td colspan="7">No days yet in this week.</td></tr>'}</tbody><tfoot><tr><td>${dw?'Week so far':'Total'}</td>${TG_METRICS.map(([k])=>`<td>${tgNumber(dReport.total[k])}</td>`).join('')}</tr></tfoot></table></div><div class="lt-daily-chart" data-section="team.charts"><h4>Schedules, visits &amp; hires</h4><div class="tg-chart"><canvas id="ltTimeline" role="img" aria-label="Daily activity"></canvas></div></div></div>
+  <div class="lt-pane" data-lt-pane="daily" data-section="team.daily"><div class="lt-pane-head"><h4>Day by day</h4>${copyBtnHtml('ltTodayTable')}</div><div class="hp-table-wrap"><table class="ep-table" id="ltTodayTable"><thead><tr><th>Date</th>${TG_METRICS.map(([,l])=>`<th>${l}</th>`).join('')}</tr></thead><tbody>${daily.map(x=>{const target=[...new Set(g.memberships.filter(m=>tgActive(g,m.name,x.date)&&(!g.division||(getEffectiveRecruiterDivision(m.name,weekOfDate(x.date).weekEnd)||'Unassigned')===g.division)).map(m=>m.name))].reduce((sum,n)=>sum+ltDailyGoal(n,x.date),0),signal=recruiterSignal(x.r.total.schedules,x.r.total.shows,x.r.total.scheduledDateOf,target);return `<tr${mode==='day'&&x.date===p.from?' class="lt-mine"':''}><td>${new Date(x.date+'T12:00:00Z').toLocaleDateString(undefined,{weekday:'short',timeZone:'UTC'})} · ${fmtDate(x.date)}${mode==='day'&&x.date===p.from?' <span class="pill good">selected</span>':''}</td>${TG_METRICS.map(([k])=>(k==='shows'||k==='noShows')&&isHeldShowDay(x.date)?`<td class="ep-held" title="Shows are final once the day ends — they appear tomorrow">tomorrow</td>`:`<td class="${k==='schedules'?'rc-'+signal.schedule:k==='shows'?'rc-'+signal.visits:''}">${tgNumber(x.r.total[k])}</td>`).join('')}</tr>`;}).join('')||'<tr><td colspan="7">No days yet in this week.</td></tr>'}</tbody><tfoot><tr><td>${dw?'Week so far':'Total'}</td>${TG_METRICS.map(([k])=>`<td>${tgNumber(dReport.total[k])}</td>`).join('')}</tr></tfoot></table></div><div class="lt-daily-chart" data-section="team.charts"><h4>Schedules, visits &amp; hires</h4><div class="tg-chart"><canvas id="ltTimeline" role="img" aria-label="Daily activity"></canvas></div></div></div>
   <div class="lt-pane" data-lt-pane="branches">
    <div class="lt-subbar"><div class="lt-seg" role="group" aria-label="Branch view"><button type="button" data-br="compare" data-section="team.analytics.branches">Team vs other recruiters</button><button type="button" data-br="multi" data-section="team.multibranch">Recruiters at several branches</button></div>${Server.isAdmin()?`<button type="button" class="btn btn-secondary btn-sm" data-merge-open>⇄ Merge branches${branchMergeList().length?` · ${branchMergeList().length}`:''}</button>`:''}</div>
    <div data-br-pane="compare" data-section="team.analytics.branches">${AN.branches||'<div class="lt-empty"><strong>No branch to compare yet.</strong><span>Your team’s branches appear here once they have activity in this period.</span></div>'}</div>
@@ -10383,21 +10432,9 @@ function sectionLabel(key){ for(const secs of Object.values(PAGE_SECTIONS)) for(
 function setupAccessHelpers(){
   const sa=!!Server.user&&Server.isSuperAdmin();
   document.body.classList.toggle('access-ready', sa);
-  let fab=document.getElementById('accessFab');
-  if(!sa){ fab?.remove(); document.getElementById('accessFabMenu')?.remove(); if(!accessMode){ accessObs?.disconnect(); document.querySelectorAll('.acc-chip').forEach(x=>x.remove()); } return; }
-  if(!fab){
-    fab=document.createElement('button'); fab.type='button'; fab.id='accessFab'; fab.title='Choose who can see or edit this page and its sections';
-    fab.innerHTML='🔒 <span>Access</span>'; document.body.appendChild(fab);
-    const menu=document.createElement('div'); menu.id='accessFabMenu'; menu.hidden=true; document.body.appendChild(menu);
-    try{ document.body.classList.toggle('acc-hover-off', localStorage.getItem('ipd_acc_hover_off')==='1'); }catch(e){}
-    const close=()=>{ menu.hidden=true; };
-    fab.onclick=e=>{ e.stopPropagation(); menu.innerHTML=`<button type="button" data-a="page">Who can open / edit this page…</button><button type="button" data-a="locks">${accessMode?'Hide':'Show'} all section locks</button><button type="button" data-a="hover">${document.body.classList.contains('acc-hover-off')?'Turn on':'Turn off'} locks on hover</button><p>${document.body.classList.contains('acc-hover-off')?'Hover locks are off — use “Show all section locks” when you want to change access.':'Tip: rest the pointer on any card or section for a moment, then click its 🔒 lock.'}</p>`;
-      menu.hidden=!menu.hidden;
-      menu.querySelector('[data-a="page"]').onclick=()=>{ close(); openAccessEditor({page:currentView==='history'?historyState.from:currentView}); };
-      menu.querySelector('[data-a="locks"]').onclick=()=>{ close(); setAccessMode(!accessMode); };
-      menu.querySelector('[data-a="hover"]').onclick=()=>{ close(); const off=!document.body.classList.contains('acc-hover-off'); document.body.classList.toggle('acc-hover-off',off); try{ localStorage.setItem('ipd_acc_hover_off',off?'1':'0'); }catch(e){} showToast(off?'Hover locks turned off.':'Hover locks turned on.'); }; };
-    document.addEventListener('click',e=>{ if(!e.target.closest('#accessFabMenu,#accessFab')) close(); });
-  }
+  document.getElementById('accessFab')?.remove();
+  if(!sa){ document.getElementById('accessFabMenu')?.remove(); if(!accessMode){ accessObs?.disconnect(); document.querySelectorAll('.acc-chip').forEach(x=>x.remove()); } return; }
+  try{ document.body.classList.toggle('acc-hover-off', localStorage.getItem('ipd_acc_hover_off')==='1'); }catch(e){}
   if(!accessObs){ let t; accessObs=new MutationObserver(()=>{ clearTimeout(t); t=setTimeout(decorateAccess,150); }); }
   accessObs.observe(document.getElementById('dashboardViews')||document.body,{childList:true,subtree:true});
   decorateAccess();
@@ -10478,7 +10515,23 @@ async function openAccessEditor({section,label,page}){
     close(); showToast(changed.length?`Access updated for ${ok} ${ok===1?'person':'people'}.`+(fail.length?' Failed: '+fail.join(', '):''):'No changes.');
   });
 }
-document.addEventListener('click',e=>{ if(e.target.closest('#accessModeBtn')) setAccessMode(!accessMode); });
+// Sidebar "Manage access" opens a small menu (replaces the old floating Access button).
+function openAccessMenu(btn){
+  let menu=document.getElementById('accessFabMenu');
+  if(menu && !menu.hidden){ menu.hidden=true; return; }
+  if(!menu){ menu=document.createElement('div'); menu.id='accessFabMenu'; document.body.appendChild(menu);
+    document.addEventListener('click',e=>{ if(!e.target.closest('#accessFabMenu,#accessModeBtn')) menu.hidden=true; }); }
+  const off=document.body.classList.contains('acc-hover-off'), close=()=>{ menu.hidden=true; };
+  menu.innerHTML=`<button type="button" data-a="page">Who can open / edit this page…</button><button type="button" data-a="locks">${accessMode?'Hide':'Show'} all section locks</button><button type="button" data-a="hover">${off?'Turn on':'Turn off'} locks on hover</button><p>${off?'Hover locks are off — use “Show all section locks” when you want to change access.':'Tip: rest the pointer on any card or section for a moment, then click its 🔒 lock.'}</p>`;
+  menu.hidden=false;
+  const r=btn.getBoundingClientRect(), mobile=window.innerWidth<=760;
+  if(mobile){ Object.assign(menu.style,{left:'12px',right:'12px',top:'auto',bottom:'calc(80px + env(safe-area-inset-bottom))',width:'auto'}); }
+  else { const h=menu.offsetHeight||200; Object.assign(menu.style,{left:Math.round(r.right+10)+'px',right:'auto',bottom:'auto',top:Math.max(12,Math.min(r.top,window.innerHeight-h-12))+'px',width:'280px'}); }
+  menu.querySelector('[data-a="page"]').onclick=()=>{ close(); openAccessEditor({page:currentView==='history'?historyState.from:currentView}); };
+  menu.querySelector('[data-a="locks"]').onclick=()=>{ close(); setAccessMode(!accessMode); };
+  menu.querySelector('[data-a="hover"]').onclick=()=>{ close(); const o=!document.body.classList.contains('acc-hover-off'); document.body.classList.toggle('acc-hover-off',o); try{ localStorage.setItem('ipd_acc_hover_off',o?'1':'0'); }catch(e){} showToast(o?'Hover locks turned off.':'Hover locks turned on.'); };
+}
+document.addEventListener('click',e=>{ const b=e.target.closest('#accessModeBtn'); if(b){ e.stopPropagation(); openAccessMenu(b); } });
 // only the innermost section under the mouse shows its lock
 let accHot=null;
 document.addEventListener('mouseover',e=>{ if(!document.body.classList.contains('access-ready')) return; const h=e.target.closest('.acc-host'); if(h===accHot) return; accHot?.classList.remove('acc-hot'); accHot=h; h?.classList.add('acc-hot'); });
