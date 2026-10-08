@@ -6373,7 +6373,7 @@ async function scheduledRowsOn(date){
 // Team-only candidate names: admins/uploaders publish each week's schedule rows (EID, name, recruiter,
 // branch, day) to dash_team_cand_rows; dash_team_candidates then returns only the caller's own team.
 let teamCandTimer=null, teamCandBusy=false, teamCandMissing=false;
-function syncTeamCandidatesSoon(){ clearTimeout(teamCandTimer); teamCandTimer=setTimeout(()=>syncTeamCandidates().catch(()=>{}),2500); }
+function syncTeamCandidatesSoon(){ clearTimeout(teamCandTimer); teamCandTimer=setTimeout(()=>{ syncTeamCandidates().catch(()=>{}); DivReport.publish().catch(()=>{}); },2500); }
 async function syncTeamCandidates(){
   if(teamCandBusy || teamCandMissing || !Server.user || Server.teamNamesOnly()) return;
   if(!(Server.isAdmin() || (Server.can('upload') && Server.can('candidates')))) return;
@@ -7820,6 +7820,7 @@ const Server = {
       if(pending.length){ await loadAllWeeks(); LiveReload.schedule([]); }
       setTimeout(()=>backfillBranchDaily().catch(()=>{}),2000);
       setTimeout(()=>syncTeamCandidates().catch(()=>{}),3500);
+      setTimeout(()=>DivReport.publish().catch(()=>{}),6000);
       // one-time conversion of weeks saved in the older all-in-one format
       if(Server.can('upload') || Server.can('master_edit')){
         const old = [...KV.entries()].filter(([k,v])=>k.startsWith('weekly:') && hasInlineLists(v)).map(([k])=>k);
@@ -10880,7 +10881,11 @@ const DivReport=(()=>{
  function loadState(){ if(stateFor===stateKey()&&state) return; stateFor=stateKey(); state=fresh(); try{ const s=JSON.parse(localStorage.getItem(stateFor)||'null'); if(s&&typeof s==='object') state={...state,...s,flags:{...state.flags,...(s.flags||{})}}; }catch(e){} }
  function save(){ try{ localStorage.setItem(stateKey(),JSON.stringify(state)); }catch(e){} }
  // ---------- rights ----------
- const canSupabase=()=>!!Server.user&&(Server.isAdmin()||Server.can('master')||Server.can('candidates'));
+ // direct: people who may read candidate rows load them as-is; everyone else with Division Reporting
+ // reads the name-free copy the dashboard publishes to dash_divreport_rows (see division_reporting.sql)
+ const canDirect=()=>!!Server.user&&(Server.isAdmin()||Server.can('master')||Server.can('candidates'));
+ const canSupabase=()=>!!Server.user&&(canDirect()||Server.can('divreport'));
+ let pubMissing=false;
  const canFlags=()=>state&&state.source==='upload'?true:(Server.isAdmin()||canSeeCandidates());
  // ---------- Supabase rows → report rows ----------
  // Branch names carry both parts: "Louisville, KY - PLX", "Charlotte, NC (PLX)", "Gildan - Charleston, SC".
@@ -10926,6 +10931,15 @@ const DivReport=(()=>{
   weeks.forEach(w=>(sbWeeks.get(w)||[]).forEach(r=>{ const k=[r.eid||r.candidate,r.recruiter,r.dateAdded,r.apptDate,r.location].join('|'); if(seen.has(k)) return; seen.add(k); out.push(r); }));
   return out;
  }
+ // name-free published rows for a date window
+ async function fetchPublished(){
+  const {from,to}=sbRange(); let lo=from, hi=to;
+  [state.scheduleDate,state.interviewDate,tgShift(state.weekEnd,-6),state.weekEnd].forEach(d=>{ if(d&&d<lo) lo=d; if(d&&d>hi) hi=d; });
+  const got=(await Server.rpc('dash_divreport_rows',{p_from:lo,p_to:hi}))||[], seen=new Set();
+  const rows=got.filter(r=>{ if(!r.k) return true; if(seen.has(r.k)) return false; seen.add(r.k); return true; });
+  return rows.map(r=>({client:r.c||'—', location:r.l?branchAlias(r.l):'(No location)', recruiter:r.r||'', candidate:'', eid:'', dateAdded:r.d||'', apptDate:r.a||'',
+   branchSchedule:r.b||'', onboardingStage:r.o||'', ebStatusReason:r.e||''}));
+ }
  async function loadData(){
   if(state.source==='upload'){
    data=uploaded?uploaded.rows.map((r,i)=>({...r,id:i})):[];
@@ -10935,10 +10949,11 @@ const DivReport=(()=>{
   const weeks=weeksNeeded(), r0=sbRange(), key=weeks.join(',')+'|'+r0.from+'|'+r0.to+'|'+state.scheduleDate+'|'+state.interviewDate+'|'+state.weekEnd;
   if(key===sbKey&&meta) return;
   if(loading) return loading;
-  loading=(async()=>{ const rows=await fetchSupabase(weeks), {from,to}=sbRange();
+  loading=(async()=>{ const rows=canDirect()?await fetchSupabase(weeks):await fetchPublished(), {from,to}=sbRange();
    const ws=tgShift(state.weekEnd,-6), keep=d=>!!d&&((d>=from&&d<=to)||d===state.scheduleDate||d===state.interviewDate||(d>=ws&&d<=state.weekEnd));
    data=rows.filter(r=>keep(r.dateAdded)||keep(r.apptDate)).map((r,i)=>({...r,id:i})); sbKey=key;
    meta={kind:'supabase',label:fmtDate(from).replace(/, \d{4}$/,'')+' – '+fmtDate(to),count:data.length,weeks}; })();
+  loading.catch(e=>{ if(/Could not find|does not exist|schema cache/i.test(e.message||'')) pubMissing=true; });
   try{ await loading; } finally{ loading=null; }
  }
  // earlier versions kept a shared copy of the upload — remove it, nothing is stored now
@@ -10964,7 +10979,7 @@ const DivReport=(()=>{
   }catch(e){ status(cleanErr(e)||'This file couldn’t be read.',true); }
  }
  function clearUpload(){ uploaded=null; if(state.source==='upload'){ data=[]; meta=null; } status('Uploaded data cleared.'); build(); }
- async function useSource(src){ state.source=src; status(src==='supabase'?'Loading dashboard data…':''); build(); try{ await loadData(); selectAll(); status(src==='supabase'&&meta?'Using dashboard data · '+meta.label+' · '+meta.count.toLocaleString()+' rows.':''); }catch(e){ status('Couldn’t load dashboard data: '+cleanErr(e),true); } build(); }
+ async function useSource(src){ state.source=src; status(src==='supabase'?'Loading dashboard data…':''); build(); try{ await loadData(); selectAll(); status(src==='supabase'&&meta?'Using dashboard data · '+meta.label+' · '+meta.count.toLocaleString()+' rows.':''); }catch(e){ status(/Could not find|does not exist|schema cache/i.test(e.message||'')?'Dashboard data for Division Reporting needs a one-time database update — ask your admin to run division_reporting.sql.':/FORBIDDEN/.test(e.message||'')?'Your account doesn’t have Division Reporting access yet — ask your admin.':'Couldn’t load dashboard data: '+cleanErr(e),true); } build(); }
  // a new source starts with every client and location ticked
  function selectAll(){ if(!data.length) return; state.clients=[...new Set(data.map(r=>r.client))]; state.locations=[...new Set(data.map(r=>r.location))]; }
  function tickAllIfEmpty(force){ if(!data.length) return; const cs=new Set(data.map(r=>r.client)), ls=new Set(data.map(r=>r.location));
@@ -11035,7 +11050,7 @@ const DivReport=(()=>{
         <span class="dr-row"><button type="button" class="btn btn-primary btn-sm" id="dr-upload">${uploaded?'Replace file':'Choose Excel file'}</button>${uploaded?'<button type="button" class="btn btn-secondary btn-sm" id="dr-clear">Clear uploaded data</button>':''}</span>
         <span class="dr-drop" id="dr-drop">${uploaded?`Loaded: <b>${esc(uploaded.fileName)}</b> · ${uploaded.rows.length.toLocaleString()} rows`:'…or drop the file here'}</span></span></label>
        <label class="dr-src ${state.source==='supabase'?'on':''} ${canSupabase()?'':'off'}"><input type="radio" name="dr-src" value="supabase" ${state.source==='supabase'?'checked':''} ${canSupabase()?'':'disabled'}>
-        <span class="dr-src-body"><b>Dashboard data (Supabase)</b><em>${canSupabase()?'The Created On and Date Of rows already uploaded to the dashboard, for the dates you pick (past 28 days unless you change it). Rows created or with an appointment in that range are used.':'Needs the Candidate Hub right — ask your admin.'}</em>
+        <span class="dr-src-body"><b>Dashboard data (Supabase)</b><em>${canSupabase()?(canDirect()?'':'Counts only — no candidate names. ')+'The Created On and Date Of rows already uploaded to the dashboard, for the dates you pick (past 28 days unless you change it). Rows created or with an appointment in that range are used.':'Needs the Division Reporting right — ask your admin.'}</em>
         ${canSupabase()?`<span class="dr-row"><label class="dr-field">From<input type="date" id="dr-sb-from" value="${sbRange().from}" max="${localDay(new Date())}"></label><label class="dr-field">To<input type="date" id="dr-sb-to" value="${sbRange().to}" max="${localDay(new Date())}"></label></span><span class="dr-row dr-quick">${[[7,'7 days'],[28,'28 days'],[90,'90 days']].map(([n,l])=>`<button type="button" class="dr-chip ${!state.sbToDate&&sbRange().from===tgShift(localDay(new Date()),-(n-1))?'on':''}" data-sb-days="${n}">Past ${l}</button>`).join('')}</span>`:''}</span></label>
       </div>
       <input type="file" id="dr-file" accept=".xlsx,.xls" hidden>
@@ -11232,7 +11247,26 @@ const DivReport=(()=>{
   if(data.length&&!state._init){ tickAllIfEmpty(true); state._init=true; }
   build();
  }
- return {show};
+ // ---------- publishing the name-free copy (admins / uploaders, in the background) ----------
+ let pubBusy=false;
+ // one-way key so a row published in two weeks (created in one, appointment in the next) counts once — no names leave
+ function fnv(str){ let h=0x811c9dc5; for(let i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,0x01000193)>>>0; } return h.toString(36)+':'+str.length.toString(36); }
+ async function publish(){
+  if(pubBusy||!Server.user) return; if(!(Server.isAdmin()||(Server.can('upload')&&canDirect()))) return;
+  pubBusy=true;
+  try{
+   let have; try{ have=await Server.rpc('dash_divreport_weeks')||{}; }catch(e){ return; }   // SQL not installed yet
+   const weeks=weekList().reverse().slice(0,16);
+   for(const w of weeks){
+    const v=KV.get('weekly:'+w); const sig=String(v&&v.savedAt||w);
+    if(have[w]===sig) continue;
+    const rows=((await Server.rpc('dash_week_rows',{p_week:w}))||[]).filter(r=>r&&r.data).map(r=>{ const d=r.data, pick=(...ks)=>{ for(const k of ks){ const x=d[k]; if(x!=null&&String(x).trim()!=='') return String(x).trim(); } return ''; };
+     const m=mapSupabaseRow(d,!!r.s), h=fnv((m.eid||m.candidate)+'|'+m.recruiter+'|'+m.dateAdded+'|'+m.apptDate+'|'+pick('Branch')); return {k:h,d:m.dateAdded,a:m.apptDate,r:m.recruiter,l:pick('Job Site','Location')||pick('Branch'),c:m.client==='—'?'':m.client,b:m.branchSchedule,o:m.onboardingStage,e:m.ebStatusReason}; });
+    await Server.rpc('dash_divreport_put',{p_week:w,p_saved_at:sig,p_rows:rows});
+   }
+  }catch(e){ console.warn('division report publish',e); } finally{ pubBusy=false; }
+ }
+ return {show, publish};
 })();
 function renderDivReportView(){ DivReport.show(); }
 
