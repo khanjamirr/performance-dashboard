@@ -1385,6 +1385,10 @@ body.on-history .top-back{display:none!important}
 #view-history.hp-mode-table .hp-chartsec{display:none!important}
 #view-history.hp-mode-charts>section:not(.hp-chartsec){display:none!important}
 .hp-chart-note{margin:-4px 0 14px;font-size:12px}
+.hs-head{flex-wrap:wrap;gap:8px 12px}.hs-ctl{display:flex;align-items:center;gap:6px;margin-left:auto;flex-wrap:wrap}
+.hs-ctl input[type=date]{padding:6px 8px;border:1px solid #cfdde2;border-radius:8px;font:inherit;font-size:12.5px;background:#fff}
+.hs-filter{margin:4px 0 10px}
+@media(max-width:760px){.hs-ctl{margin-left:0;flex-basis:100%}}
 @media(max-width:760px){
   #view-history .hp-head{padding:10px 0 8px;margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px}
   #view-history .hp-head .hp-top{flex-wrap:wrap}
@@ -6177,6 +6181,21 @@ async function syncTeamCandidates(){
     }
   }finally{ teamCandBusy=false; }
 }
+// Schedule rows created between two dates (inclusive). Team-only accounts get just their team from the server.
+async function scheduleRowsBetween(from,to){
+  if(!canSeeCandidates() && !Server.teamNamesOnly())
+    return (await Server.rpc('dash_team_candidates',{p_from:from,p_to:to})||[]).map(c=>({...c, date:String(c.date||'').slice(0,10), eid:c.eid||'–', branch:branchAlias(c.branch||'Unassigned')}));
+  const weeks=new Set(); for(let d=from; d<=to; d=tgShift(d,1)) weeks.add(weekOfDate(d).weekEnd);
+  const out=[];
+  for(const week of weeks){
+    if(!weeksData.some(w=>w.weekEndDate===week)) continue;
+    let lists=null;
+    try{ lists=(await candFromWeekLists(week))?.lists; }catch(e){}
+    if(!lists) lists=candCompute(await loadCandidateWeek(week),week).lists;
+    (lists.schedules||[]).forEach(c=>{ if(c.date>=from && c.date<=to) out.push(c); });
+  }
+  return out;
+}
 async function scheduledTodayRows(){ return scheduledRowsOn(ltToday()); }
 // Candidate-level lists are only sent by the server to accounts with the candidate-names right.
 function canSeeTeamNames(){ return !!Server.user && (Server.user.role!=='user' || (Server.user.hidden_sections||[]).includes('grant.team_names')); }
@@ -6343,22 +6362,46 @@ function openBranchTargetEditor(name, weekList, done){
 async function renderHistoryToday(name){
   const host=document.getElementById('historyToday'); if(!host || !hasRecruiterHistoryAccess(name)) return;
   const today=ltToday();
-  const head='<div class="hp-panel-head"><h3>Scheduled today</h3><span class="hint">'+fmtDate(today)+'</span></div>';
+  if(historyState.schedFor!==name){ historyState.schedFor=name; historyState.schedDay=null; historyState.schedSpan='day'; historyState.schedBranch=''; }
+  const span=historyState.schedSpan==='week'?'week':'day';
+  let day=historyState.schedDay&&historyState.schedDay<=today?historyState.schedDay:today;
+  const wk=weekOfDate(day), from=span==='week'?wk.weekStart:day, to=span==='week'?(wk.weekEnd<today?wk.weekEnd:today):day;
+  const short=d=>fmtDate(d).replace(/, \d{4}$/,'');
+  const label=span==='week'?`Wk ${wk.number} · ${short(wk.weekStart)} – ${fmtDate(wk.weekEnd)}`:(day===today?'Today · ':'')+fmtDate(day);
+  const atLatest=span==='week'?wk.weekEnd>=today:day>=today;
+  const ctl=`<div class="hs-ctl"><div class="hp-toggle" role="tablist" aria-label="Day or week"><button type="button" data-sspan="day" class="${span==='day'?'on':''}">Day</button><button type="button" data-sspan="week" class="${span==='week'?'on':''}">Week</button></div>
+    <button type="button" class="btn btn-secondary btn-sm" data-sstep="-1" aria-label="Previous ${span}">←</button>
+    <input type="date" id="histSchedDate" value="${day}" max="${today}" aria-label="Pick a day${span==='week'?' in the week':''}">
+    <button type="button" class="btn btn-secondary btn-sm" data-sstep="1" ${atLatest?'disabled':''} aria-label="Next ${span}">→</button>
+    ${!atLatest?'<button type="button" class="btn btn-secondary btn-sm" data-sstep="0">Today</button>':''}</div>`;
+  const head=(extra)=>`<div class="hp-panel-head hs-head"><h3>Scheduled candidates</h3><span class="hint">${escapeHtml(label)}${extra||''}</span>${ctl}</div>`;
   const teamOnly=!canSeeCandidates();
-  host.innerHTML=head+'<p class="hint">Loading…</p>';
+  const bind=()=>{
+    host.querySelectorAll('[data-sspan]').forEach(b=>b.onclick=()=>{ historyState.schedSpan=b.dataset.sspan; renderHistoryToday(name); });
+    host.querySelectorAll('[data-sstep]').forEach(b=>b.onclick=()=>{ const n=Number(b.dataset.sstep); let d=n===0?today:tgShift(day, n*(span==='week'?7:1)); if(d>today) d=today; historyState.schedDay=d===today?null:d; renderHistoryToday(name); });
+    const inp=host.querySelector('#histSchedDate'); if(inp) inp.onchange=e=>{ const v=e.target.value; if(tgDate(v)&&v<=today){ historyState.schedDay=v===today?null:v; renderHistoryToday(name); } };
+  };
+  host.innerHTML=head()+'<p class="hint">Loading…</p>'; bind();
   try{
-    const all=teamOnly&&!Server.teamNamesOnly()?(await Server.rpc('dash_team_candidates',{p_from:today,p_to:today})||[]):await scheduledTodayRows();
-    const rows=all.filter(c=>c.recruiter===name);
-    if(!host.isConnected || historyState.name!==name) return;
+    const all=await scheduleRowsBetween(from,to);
+    if(!host.isConnected || historyState.name!==name || historyState.schedFor!==name) return;
+    const rows=all.filter(c=>c.recruiter===name).sort((a,b)=>String(b.date).localeCompare(a.date)||String(a.name).localeCompare(b.name));
     const branches=[...new Set(rows.map(c=>c.branch))].sort();
-    host.innerHTML=`<div class="hp-panel-head"><h3>Scheduled today</h3><span class="hint">${fmtDate(today)} · ${escapeHtml(branches.join(', ')||'no branch yet')} · ${fmtNum(rows.length)} candidate${rows.length===1?'':'s'}</span>${branches.length>1?`<select id="histTodayBranch" style="margin-left:auto"><option value="">All branches</option>${branches.map(b=>`<option>${escapeHtml(b)}</option>`).join('')}</select>`:''}</div><div id="histTodayRows"></div>`;
-    const draw=()=>{ const b=host.querySelector('#histTodayBranch')?.value||'', list=rows.filter(c=>!b||c.branch===b);
-      host.querySelector('#histTodayRows').innerHTML=list.length?`<div class="hp-table-wrap"><table class="ep-table" id="histTodayTable"><thead><tr><th>EID</th><th>Employee name</th></tr></thead><tbody>${list.map(c=>`<tr><td class="mono">${escapeHtml(c.eid)}</td><td>${escapeHtml(c.name)}</td></tr>`).join('')}</tbody></table></div><div class="ep-foot"><span></span>${copyBtnHtml('histTodayTable')}</div>`:'<p class="hint">Nobody scheduled today yet.</p>'; };
-    host.querySelector('#histTodayBranch')?.addEventListener('change',draw); draw();
+    if(historyState.schedBranch && !branches.includes(historyState.schedBranch)) historyState.schedBranch='';
+    const days=[...new Set(rows.map(c=>c.date))];
+    host.innerHTML=head(` · ${fmtNum(rows.length)} candidate${rows.length===1?'':'s'}${branches.length?' · '+escapeHtml(branches.join(', ')):''}`)
+      +(branches.length>1?`<div class="hs-filter"><label class="lt-field">Branch<select id="histSchedBranch"><option value="">All branches (${fmtNum(rows.length)})</option>${branches.map(b=>`<option value="${escapeHtml(b)}" ${historyState.schedBranch===b?'selected':''}>${escapeHtml(b)} (${fmtNum(rows.filter(c=>c.branch===b).length)})</option>`).join('')}</select></label></div>`:'')
+      +'<div id="histTodayRows"></div>';
+    bind();
+    const draw=()=>{ const b=historyState.schedBranch||'', list=rows.filter(c=>!b||c.branch===b), showDate=span==='week', showBr=branches.length>1&&!b;
+      host.querySelector('#histTodayRows').innerHTML=list.length?`<div class="hp-table-wrap"><table class="ep-table" id="histTodayTable"><thead><tr>${showDate?'<th>Date</th>':''}<th>EID</th><th>Employee name</th>${showBr?'<th>Branch</th>':''}</tr></thead><tbody>${list.map(c=>`<tr>${showDate?`<td>${escapeHtml(short(c.date))}</td>`:''}<td class="mono">${escapeHtml(c.eid||'–')}</td><td>${escapeHtml(c.name)}</td>${showBr?`<td>${escapeHtml(c.branch||'')}</td>`:''}</tr>`).join('')}</tbody></table></div><div class="ep-foot"><span class="hint">${fmtNum(list.length)} candidate${list.length===1?'':'s'}${showDate&&days.length?` over ${days.length} day${days.length===1?'':'s'}`:''}</span>${copyBtnHtml('histTodayTable')}</div>`
+        :`<p class="hint">${span==='week'?'No schedules created in this week.':day===today?'Nobody scheduled today yet.':'No schedules created on this day.'}</p>`; };
+    host.querySelector('#histSchedBranch')?.addEventListener('change',e=>{ historyState.schedBranch=e.target.value; draw(); });
+    draw();
   }catch(e){ if(!host.isConnected) return; const m=e.message||'';
-    host.innerHTML=head+(teamOnly&&/FORBIDDEN/.test(m)?noNamesRightHtml('Candidate names (EID and employee name)')
+    host.innerHTML=head()+(teamOnly&&/FORBIDDEN/.test(m)?noNamesRightHtml('Candidate names (EID and employee name)')
       :teamOnly&&/Could not find|does not exist|schema cache/i.test(m)?`<div class="lt-empty"><strong>Team candidate names need a one-time database update.</strong><span>${Server.isAdmin()?'Run team_candidates.sql in the Supabase SQL Editor, then reload once as an admin.':'Your admin needs to finish setting this up.'}</span></div>`
-      :'<p class="hint">Today’s candidates could not be loaded ('+escapeHtml(cleanErr(e))+').</p>'); }
+      :'<p class="hint">Scheduled candidates could not be loaded ('+escapeHtml(cleanErr(e))+').</p>'); bind(); }
 }
 function renderHistoryView(){
   const el=document.getElementById('view-history'); if(!el) return;
@@ -10205,13 +10248,17 @@ async function ltRenderScheduledCandidates(g){
   if(!host.isConnected||String(Server.user?.id)!==owner)return;
   const up=(KV.get('lastUploads')||{}).schedules, upDay=up&&up.at?ltToday(new Date(up.at)):null;
   const why=day!==today?'':!up?'':upDay<today?`Today’s Created On file hasn’t been uploaded yet${Server.isAdmin()?` (latest: ${new Date(up.at).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})})`:''}, so today’s schedules aren’t in the dashboard yet.`:'Today’s file is uploaded, but nobody on your team has a schedule created today yet.';
-  const branches=[...new Set(rows.map(c=>c.branch))].sort();
-  host.innerHTML=`<div class="lt-section-head"><h3>${day===today?'Scheduled today':'Scheduled'} · ${fmtDate(day)}</h3><div class="ta-tools"><label class="lt-field">Day<input type="date" id="ltCandDate" value="${day}" max="${today}"></label>${branches.length>1?`<label class="lt-field">Branch<select id="ltCandidateBranch"><option value="">All team branches</option>${branches.map(b=>`<option>${escapeHtml(b)}</option>`).join('')}</select></label>`:''}${day!==today?'<button class="btn btn-secondary btn-sm" id="ltCandToday">Back to today</button>':''}</div></div><p class="hint">Schedules created ${day===today?'today':'on this day'} by your assigned team · EID and employee name only</p><div id="ltCandidateRows"></div>`;
-  const draw=()=>{const branch=host.querySelector('#ltCandidateBranch')?.value||'',filtered=rows.filter(c=>!branch||c.branch===branch);
-   host.querySelector('#ltCandidateRows').innerHTML=filtered.length?`<div class="hp-table-wrap"><table class="ep-table" id="ltCandidateTable"><thead><tr><th>EID</th><th>Employee name</th></tr></thead><tbody>${filtered.map(c=>`<tr><td>${escapeHtml(c.eid)}</td><td>${escapeHtml(c.name)}</td></tr>`).join('')}</tbody></table></div><div class="lt-pane-head"><span class="hint" style="margin-right:auto">${fmtNum(filtered.length)} candidate${filtered.length===1?'':'s'}</span>${copyBtnHtml('ltCandidateTable')}</div>`
-   :`<div class="lt-empty"><strong>No schedules ${day===today?'created today':'on '+fmtDate(day)} yet.</strong>${why?`<span>${escapeHtml(why)}</span>`:''}${fallback?`<button class="btn btn-secondary btn-sm" id="ltCandFallback">Show ${escapeHtml(fmtDate(fallback.d).replace(/, \d{4}$/,''))} · ${fmtNum(fallback.n)} candidate${fallback.n===1?'':'s'}</button>`:''}</div>`;
+  // team members working that day (plus anyone with rows), with their count for the day
+  const cnt={}; rows.forEach(c=>{ cnt[c.recruiter]=(cnt[c.recruiter]||0)+1; });
+  const members=[...new Set([...(g.memberships||[]).filter(m=>m.from<=day&&(!m.to||m.to>=day)).map(m=>m.name), ...Object.keys(cnt)])]
+    .sort((a,b)=>(cnt[b]||0)-(cnt[a]||0)||a.localeCompare(b));
+  if(ltState.candMember && !members.includes(ltState.candMember)) ltState.candMember='';
+  host.innerHTML=`<div class="lt-section-head"><h3>${day===today?'Scheduled today':'Scheduled'} · ${fmtDate(day)}</h3><div class="ta-tools"><label class="lt-field">Day<input type="date" id="ltCandDate" value="${day}" max="${today}"></label>${members.length?`<label class="lt-field">Team member<select id="ltCandidateMember"><option value="">All team members (${fmtNum(rows.length)})</option>${members.map(n=>`<option value="${escapeHtml(n)}" ${ltState.candMember===n?'selected':''}>${escapeHtml(n)} (${fmtNum(cnt[n]||0)})</option>`).join('')}</select></label>`:''}${day!==today?'<button class="btn btn-secondary btn-sm" id="ltCandToday">Back to today</button>':''}</div></div><p class="hint">Schedules created ${day===today?'today':'on this day'} by your assigned team · EID and employee name only</p><div id="ltCandidateRows"></div>`;
+  const draw=()=>{const who=ltState.candMember||'',filtered=rows.filter(c=>!who||c.recruiter===who).sort((a,b)=>String(a.recruiter).localeCompare(b.recruiter)||String(a.name).localeCompare(b.name));
+   host.querySelector('#ltCandidateRows').innerHTML=filtered.length?`<div class="hp-table-wrap"><table class="ep-table" id="ltCandidateTable"><thead><tr>${who?'':'<th>Team member</th>'}<th>EID</th><th>Employee name</th></tr></thead><tbody>${filtered.map(c=>`<tr>${who?'':`<td>${escapeHtml(c.recruiter)}</td>`}<td>${escapeHtml(c.eid||'–')}</td><td>${escapeHtml(c.name)}</td></tr>`).join('')}</tbody></table></div><div class="lt-pane-head"><span class="hint" style="margin-right:auto">${fmtNum(filtered.length)} candidate${filtered.length===1?'':'s'}${who?' · '+escapeHtml(who):''}</span>${copyBtnHtml('ltCandidateTable')}</div>`
+   :`<div class="lt-empty"><strong>No schedules ${who?'for '+escapeHtml(who)+' ':''}${day===today?'created today':'on '+fmtDate(day)} yet.</strong>${why?`<span>${escapeHtml(why)}</span>`:''}${fallback?`<button class="btn btn-secondary btn-sm" id="ltCandFallback">Show ${escapeHtml(fmtDate(fallback.d).replace(/, \d{4}$/,''))} · ${fmtNum(fallback.n)} candidate${fallback.n===1?'':'s'}</button>`:''}</div>`;
    host.querySelector('#ltCandFallback')?.addEventListener('click',()=>{ltState.candDate=fallback.d;ltRenderScheduledCandidates(g);});};
-  host.querySelector('#ltCandidateBranch')?.addEventListener('change',draw);
+  host.querySelector('#ltCandidateMember')?.addEventListener('change',e=>{ ltState.candMember=e.target.value; draw(); });
   host.querySelector('#ltCandDate').onchange=e=>{ if(tgDate(e.target.value)&&e.target.value<=today){ ltState.candDate=e.target.value===today?null:e.target.value; ltRenderScheduledCandidates(g);} };
   host.querySelector('#ltCandToday')?.addEventListener('click',()=>{ltState.candDate=null;ltRenderScheduledCandidates(g);});
   draw();
