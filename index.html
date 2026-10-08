@@ -7986,7 +7986,9 @@ const Server = {
     try{ const g=await this.call('dash_my_grants',{p_token:this.token}); if(Array.isArray(g)&&g.length) user.hidden_sections=[...new Set([...(user.hidden_sections||[]), ...g])]; }catch(e){}
     return user; },
   teamNamesOnly(){ return !!this.user && this.user.role==='user' && (this.user.hidden_sections||[]).includes(TEAM_SCOPE); },
-  can(m){ if(m==='candidate_hub')return this.can('candidates')||this.can('master'); if(m==='candidates'&&this.teamNamesOnly()) return false; return !!this.user && (m==='teams' || this.user.role==='super_admin' || this.user.role==='admin' || (this.user.modules||[]).includes(m) || (GRANT_MODULES.includes(m)&&(this.user.hidden_sections||[]).includes('grant.'+m))); },
+  can(m){ if(m==='candidate_hub')return this.can('candidates')||this.can('master'); if(m==='candidates'&&this.teamNamesOnly()) return false;
+    if(m==='teams'&&this.user&&this.user.role==='user'&&(this.user.hidden_sections||[]).includes('grant.no_team')) return false;
+    return !!this.user && (m==='teams' || this.user.role==='super_admin' || this.user.role==='admin' || (this.user.modules||[]).includes(m) || (GRANT_MODULES.includes(m)&&(this.user.hidden_sections||[]).includes('grant.'+m))); },
   isAdmin(){ return !!this.user && (this.user.role==='super_admin' || this.user.role==='admin'); },
   isSuperAdmin(){ return !!this.user && this.user.role==='super_admin'; },
   expired(){
@@ -9862,7 +9864,7 @@ async function renderUsersAdmin(){
   const modLabel = k=> (MODULES.find(m=>m.key===k)||{label:k}).label;
   const pageName=k=>{ const pg=UF_PAGES.find(x=>x.mod===k); return pg?pg.label:null; };
   const summary=u=>{ if(u.role!=='user') return '<span class="ua-all">Full access'+(u.role==='admin'?' · manages users':'')+'</span>';
-    const pages=(u.modules||[]).map(pageName).filter(Boolean), extras=(u.modules||[]).filter(k=>!pageName(k)).map(k=>UF_EXTRA_LABEL[k]||modLabel(k)), hid=(u.hidden_sections||[]).filter(k=>!k.startsWith('grant.')&&k!=='copy.tables').length;
+    const pages=[...((u.hidden_sections||[]).includes('grant.no_team')?[]:['My Team']), ...(u.modules||[]).map(pageName).filter(Boolean)], extras=(u.modules||[]).filter(k=>!pageName(k)).map(k=>UF_EXTRA_LABEL[k]||modLabel(k)), hid=(u.hidden_sections||[]).filter(k=>!k.startsWith('grant.')&&k!=='copy.tables').length;
     return (pages.length?pages.map(x=>`<span class="mod-chip">${escapeHtml(x)}</span>`).join(''):'<span class="hint">No pages yet</span>')
       +((extras.length||hid)?`<span class="ua-more">${extras.length?escapeHtml(extras.length+' extra right'+(extras.length===1?'':'s')):''}${extras.length&&hid?' · ':''}${hid?hid+' section'+(hid===1?'':'s')+' hidden':''}</span>`:''); };
   const when=t=>{ if(!t) return 'Never'; const d=new Date(t), m=(Date.now()-d)/60000; return m<2?'Just now':m<60?Math.round(m)+' min ago':m<1440?Math.round(m/60)+' h ago':m<10080?Math.round(m/1440)+' d ago':d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}); };
@@ -9905,7 +9907,7 @@ let userFormPreset = null;
 // The user editor groups rights by page: switch the page on, then its extras and visible sections.
 const UF_PAGES = [
   {mod:'performance', label:'Overview', desc:'Weekly, monthly and quarterly results', sec:'performance'},
-  {mod:null, label:'My Team', desc:'Team leads always see their own team', sec:'teams', extras:['grant.team_names','grant.break_image']},
+  {mod:null, offGrant:'grant.no_team', label:'My Team', desc:'Their own team, day by day — for team leads with a team assigned', sec:'teams', extras:['grant.team_names','grant.break_image']},
   {mod:'recruiters', label:'Recruiters', desc:'Recruiter table, trends and history', sec:'recruiters', extras:['remarks']},
   {mod:'branches', label:'Branches', desc:'Branch table, trends and history', sec:'branches'},
   {mod:'alerts', label:'Action Center', desc:'Who is below goal and other signals', sec:'alerts', extras:['remarks_approve']},
@@ -9923,7 +9925,7 @@ const UF_PRESETS = [
 ];
 function readFormRights(host){
   return { modules:[...host.querySelectorAll('input[data-mod]:checked')].map(i=>i.value),
-    hidden_sections:[...host.querySelectorAll('[data-sec]:not(:checked)')].map(i=>i.dataset.sec).concat([...host.querySelectorAll('[data-grant]:checked')].map(i=>i.dataset.grant)),
+    hidden_sections:[...host.querySelectorAll('[data-sec]:not(:checked)')].map(i=>i.dataset.sec).concat([...host.querySelectorAll('[data-grant]:checked')].map(i=>i.dataset.grant)).concat([...host.querySelectorAll('[data-grant-off]:not(:checked)')].map(i=>i.dataset.grantOff)),
     defaultView: host.querySelector('#ufDefaultView')?.value||'' };
 }
 function rightsOf(u){ return {modules:[...(u.modules||[])], hidden_sections:[...(u.hidden_sections||[])], defaultView:adminDefaultViews()[u.id]||''}; }
@@ -9931,6 +9933,7 @@ function applyFormRights(host, r){
   host.querySelectorAll('input[data-mod]').forEach(i=>{ i.checked=r.modules.includes(i.value); i.dispatchEvent(new Event('change')); });
   host.querySelectorAll('[data-sec]').forEach(i=>{ i.disabled=false; i.checked=!r.hidden_sections.includes(i.dataset.sec); });
   host.querySelectorAll('[data-grant]').forEach(i=>{ i.checked=r.hidden_sections.includes(i.dataset.grant); });
+  host.querySelectorAll('[data-grant-off]').forEach(i=>{ i.checked=!r.hidden_sections.includes(i.dataset.grantOff); i.dispatchEvent(new Event('change')); });
   const dv=host.querySelector('#ufDefaultView'); if(dv) dv.value=[...dv.options].some(o=>o.value===r.defaultView)?r.defaultView:'';
   host.querySelector('[data-sec]')?.dispatchEvent(new Event('change'));
 }
@@ -9980,7 +9983,7 @@ function drawUserForm(){
   const secBox=key=>PAGE_SECTIONS[key]?`<details class="sec-page" data-sec-mod="${key}"><summary>Choose what they see on this page <span class="sec-count"></span></summary><div class="sec-list">${PAGE_SECTIONS[key].map(([k,l])=>`<label class="sec-opt${l.startsWith('··')?' sub sub2':l.startsWith('·')?' sub':''}"><input type="checkbox" data-sec="${k}" ${hidden(k)?'':'checked'}> ${escapeHtml(l.replace(/^·+ /,''))}</label>`).join('')}</div></details>`:'';
   const pageRow=pg=>{ if(pg.mod) used.add(pg.mod);
     return `<div class="uf-page${pg.mod==='candidates'?' keep-extras':''}">
-      <div class="uf-page-main">${pg.mod?`<label class="uf-switch"><input type="checkbox" data-mod value="${pg.mod}" ${has(pg.mod)?'checked':''}><i aria-hidden="true"></i></label>`:'<span class="uf-always">Always</span>'}
+      <div class="uf-page-main">${pg.mod?`<label class="uf-switch"><input type="checkbox" data-mod value="${pg.mod}" ${has(pg.mod)?'checked':''}><i aria-hidden="true"></i></label>`:pg.offGrant?`<label class="uf-switch"><input type="checkbox" data-grant-off="${pg.offGrant}" ${hidden(pg.offGrant)?'':'checked'}><i aria-hidden="true"></i></label>`:'<span class="uf-always">Always</span>'}
         <div class="uf-page-txt"><strong>${escapeHtml(pg.label)}</strong><span>${escapeHtml(pg.desc)}</span></div></div>
       ${(pg.extras||[]).length?`<div class="uf-extras">${pg.extras.map(extra).join('')}</div>`:''}
       ${secBox(pg.sec)}</div>`; };
@@ -10017,9 +10020,10 @@ function drawUserForm(){
     <footer class="uf-foot"><p class="auth-msg" id="ufMsg" role="alert"></p><button class="btn btn-secondary" id="ufCancel">Cancel</button><button class="btn btn-primary" id="ufSave">${isNew?'Create user':'Save changes'}</button></footer>
   </div>`;
   host.classList.add('uf-open'); document.body.classList.add('uf-lock');
-  const countPages=()=>{ const el=host.querySelector('#ufPageCount'); if(!el) return; const on=[...host.querySelectorAll('.uf-page input[data-mod]')].filter(i=>i.closest('.uf-page-main')&&i.checked).length, all=host.querySelectorAll('.uf-page-main input[data-mod]').length; el.textContent=on+' of '+all+' pages on'; };
-  host.querySelectorAll('.uf-page-main input[data-mod]').forEach(i=>i.addEventListener('change',()=>{ i.closest('.uf-page').classList.toggle('off',!i.checked); countPages(); }));
-  host.querySelectorAll('.uf-page-main input[data-mod]').forEach(i=>i.closest('.uf-page').classList.toggle('off',!i.checked)); countPages();
+  const mainSw='.uf-page-main input[data-mod], .uf-page-main input[data-grant-off]';
+  const countPages=()=>{ const el=host.querySelector('#ufPageCount'); if(!el) return; const all=[...host.querySelectorAll(mainSw)]; el.textContent=all.filter(i=>i.checked).length+' of '+all.length+' pages on'; };
+  host.querySelectorAll(mainSw).forEach(i=>i.addEventListener('change',()=>{ i.closest('.uf-page').classList.toggle('off',!i.checked); countPages(); }));
+  host.querySelectorAll(mainSw).forEach(i=>i.closest('.uf-page').classList.toggle('off',!i.checked)); countPages();
   host.querySelectorAll('[data-preset]').forEach(b=>b.onclick=()=>{ const pr=UF_PRESETS[+b.dataset.preset]; const keepHidden=[...host.querySelectorAll('[data-sec]:not(:checked)')].map(i=>i.dataset.sec); applyFormRights(host,{modules:pr.modules,hidden_sections:[...keepHidden,...(pr.grants||[])],defaultView:host.querySelector('#ufDefaultView')?.value||''});
     host.querySelectorAll('[data-preset]').forEach(x=>x.classList.toggle('on',x===b)); const n=host.querySelector('#ufCopyNote'); if(n) n.textContent=pr.name+' rights filled in — review, then '+(isNew?'create the user.':'save.'); });
   const closeForm=()=>{ editingUserId=null; host.innerHTML=''; host.classList.remove('uf-open'); document.body.classList.remove('uf-lock'); };
@@ -10047,7 +10051,7 @@ function drawUserForm(){
     if(!isNew) p.id = u.id;
     const pw = host.querySelector('#ufPw').value; if(pw) p.password = pw;
     const roleIn = host.querySelector('input[name="ufRole"]:checked'); if(roleIn) p.role = roleIn.value;
-    if(!sa){ p.modules = [...host.querySelectorAll('input[data-mod]:checked')].map(i=>i.value); p.active = host.querySelector('#ufActive').checked; p.hidden_sections = [...host.querySelectorAll('[data-sec]:not(:checked)')].map(i=>i.dataset.sec).concat([...host.querySelectorAll('[data-grant]:checked')].map(i=>i.dataset.grant)); }
+    if(!sa){ p.modules = [...host.querySelectorAll('input[data-mod]:checked')].map(i=>i.value); p.active = host.querySelector('#ufActive').checked; p.hidden_sections = [...host.querySelectorAll('[data-sec]:not(:checked)')].map(i=>i.dataset.sec).concat([...host.querySelectorAll('[data-grant]:checked')].map(i=>i.dataset.grant)).concat([...host.querySelectorAll('[data-grant-off]:not(:checked)')].map(i=>i.dataset.grantOff)); }
     if(isNew && !pw){ host.querySelector('#ufMsg').textContent='Set a password (or click Generate).'; return; }
     try{
       const saved = await Server.rpc('dash_user_save', {p});
