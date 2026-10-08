@@ -1328,7 +1328,18 @@ body.team-workspace .content{padding-top:10px!important}
 .rt-table tfoot td{background:#f5f8f9;font-weight:600}
 
 /* ---------- access mode ---------- */
-body.access-mode .acc-host{position:relative;outline:2px dashed #7a5fb855;outline-offset:2px;border-radius:10px}
+body.access-ready .acc-host{position:relative}
+body.access-ready:not(.access-mode) .acc-chip{opacity:0;pointer-events:none;transition:opacity .12s}
+body.access-ready:not(.access-mode) .acc-host.acc-hot>.acc-chip,body.access-ready:not(.access-mode) .acc-chip:focus-visible{opacity:1;pointer-events:auto}
+body.access-ready:not(.access-mode) .acc-host.acc-hot{outline:2px dashed #7a5fb855;outline-offset:2px;border-radius:10px}
+body.access-mode .acc-host{outline:2px dashed #7a5fb855;outline-offset:2px;border-radius:10px}
+#accessFab{position:fixed;right:18px;bottom:18px;z-index:290;display:inline-flex;align-items:center;gap:6px;padding:10px 14px;border-radius:999px;border:1px solid #c9b8ef;background:#5b3fa0;color:#fff;font:inherit;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 10px 24px #2b1f4d55}
+#accessFab:hover{background:#4a3285}
+#accessFabMenu{position:fixed;right:18px;bottom:66px;z-index:291;width:280px;background:#fff;border:1px solid #e1eaed;border-radius:14px;box-shadow:0 18px 40px #18344233;padding:6px}
+#accessFabMenu button{display:block;width:100%;text-align:left;padding:10px 12px;border:0;border-radius:10px;background:none;font:inherit;font-size:13.5px;font-weight:600;color:#173a47;cursor:pointer}
+#accessFabMenu button:hover{background:#f4effd;color:#5b3fa0}#accessFabMenu p{margin:4px 12px 8px;font-size:11.5px;color:#7a8f99}
+body.access-mode #accessFab{display:none}
+@media(max-width:760px){#accessFab{bottom:calc(76px + env(safe-area-inset-bottom));right:12px;padding:9px 12px}#accessFabMenu{bottom:calc(124px + env(safe-area-inset-bottom));right:12px}}
 .acc-chip{position:absolute;top:6px;right:6px;z-index:60;display:inline-flex;align-items:center;gap:4px;font:600 11px/1 inherit;font-family:inherit;padding:5px 8px;border-radius:999px;border:1px solid #c9b8ef;background:#f4effd;color:#5b3fa0;cursor:pointer;box-shadow:0 2px 6px #18344222}
 .acc-chip:hover{background:#5b3fa0;color:#fff}.acc-chip span{font-size:11px}
 #accessBar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:300;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;background:#2b1f4d;color:#fff;box-shadow:0 12px 30px #0006;font-size:13px;max-width:calc(100vw - 24px);flex-wrap:wrap;white-space:nowrap}
@@ -7503,7 +7514,7 @@ const PAGE_SECTIONS = {
                 ['perf.kpi.placed','· Placed card (of hires, of shows)'],['perf.detail.placed','·· Placed — click-through details'],
                 ['perf.detail.part.trend','Card details — 12-week trend'],['perf.detail.part.divisions','Card details — division split'],['perf.detail.part.recruiters','Card details — recruiter ranking'],['perf.detail.part.branches','Card details — branch ranking'],['perf.detail.all_people','Card details — all recruiters & branches (untick = only their assigned team)'],
                 ['perf.trends','Trends charts'],['perf.leaderboards','Leaderboards (recruiter & branch snapshots)'],['perf.divisions','Division breakdown'],['perf.history','Previous 6 weeks table'],['perf.insights','Insights'],['perf.composition','Composition pies (monthly / quarterly)']],
-  teams:[['team.summary','Team — summary cards'],['team.analytics','Team highlights'],['team.analytics.wins','· Winning list'],['team.analytics.attention','· Needs attention list'],['team.analytics.branches','Team — Branches: team vs other recruiters'],['team.recruiters','Team — recruiter table'],['team.goals','· Today & third-break columns (they can also hide these themselves)'],['team.daily','Team — Daily tab'],['team.charts','· Daily chart'],['team.candidates','Team — Candidates tab'],['team.multibranch','Team — Branches: recruiters at several branches'],['team.kpi.schedules','· Schedules vs goal card'],['team.kpi.goal_reach','·· Goal reach % line'],['team.kpi.interviews','· Interviews card'],['team.kpi.shows','·· Shows + show rate line'],['team.kpi.no_shows','·· No shows + no-show rate line'],['team.kpi.hires','· Hires per recruiter card'],['team.kpi.hire_rate','·· Hire rate line'],['team.kpi.placed','· Placed card']],
+  teams:[['team.summary','Team — summary cards'],['team.analytics','Team highlights'],['team.analytics.wins','· Winning list'],['team.analytics.attention','· Needs attention list'],['team.analytics.branches','Team — Branches: team vs other recruiters'],['team.leads','Team Leads page — comparison table (admins)'],['team.recruiters','Team — recruiter table'],['team.goals','· Today & third-break columns (they can also hide these themselves)'],['team.daily','Team — Daily tab'],['team.charts','· Daily chart'],['team.candidates','Team — Candidates tab'],['team.multibranch','Team — Branches: recruiters at several branches'],['team.kpi.schedules','· Schedules vs goal card'],['team.kpi.goal_reach','·· Goal reach % line'],['team.kpi.interviews','· Interviews card'],['team.kpi.shows','·· Shows + show rate line'],['team.kpi.no_shows','·· No shows + no-show rate line'],['team.kpi.hires','· Hires per recruiter card'],['team.kpi.hire_rate','·· Hire rate line'],['team.kpi.placed','· Placed card']],
   recruiters:[['rec.table','Recruiter table'],['hist.kpis','History page — summary tiles (recruiter & branch)'],['hist.trend','History page — week-by-week chart'],['hist.goal','History page — schedules vs goal chart'],['hist.weeks','History page — every-week table'],['hist.remarks','History page — remarks'],['hist.candidates','History page — candidates']],
   branches:[['br.table','Branch table'],['hist.team','History page — recruiters in the branch']],
   candidates:[['cand.list','Category boxes and candidate list'],['cand.explain','“How are these counted?” breakdown']],
@@ -7521,6 +7532,7 @@ function applyPermissions(){
   applySectionAccess();
   document.getElementById('accessModeBtn')?.classList.toggle('hidden', !(Server.user&&Server.isSuperAdmin()));
   if(!(Server.user&&Server.isSuperAdmin())) setAccessMode(false);
+  setupAccessHelpers();
   const u = Server.user; if(!u) return;
   const viewOk = v=>v==='leads' ? Server.isAdmin() : Server.can(VIEW_MODULE[v]);
   // Admins reach every team through Team Leads, so they don't need a separate My Team entry.
@@ -10091,6 +10103,27 @@ const PAGE_EDIT = {performance:['upload','export'], recruiters:['remarks','expor
 const EDIT_LABEL = {'grant.break_image':'Copy third-break list as image'};
 let accessMode=false, accessObs=null;
 function sectionLabel(key){ for(const secs of Object.values(PAGE_SECTIONS)) for(const [k,l] of secs) if(k===key) return l.replace(/^·+ /,''); return null; }
+// Super admin: locks appear on hover everywhere (no mode needed); "Show all locks" pins them all on.
+function setupAccessHelpers(){
+  const sa=!!Server.user&&Server.isSuperAdmin();
+  document.body.classList.toggle('access-ready', sa);
+  let fab=document.getElementById('accessFab');
+  if(!sa){ fab?.remove(); document.getElementById('accessFabMenu')?.remove(); if(!accessMode){ accessObs?.disconnect(); document.querySelectorAll('.acc-chip').forEach(x=>x.remove()); } return; }
+  if(!fab){
+    fab=document.createElement('button'); fab.type='button'; fab.id='accessFab'; fab.title='Choose who can see or edit this page and its sections';
+    fab.innerHTML='🔒 <span>Access</span>'; document.body.appendChild(fab);
+    const menu=document.createElement('div'); menu.id='accessFabMenu'; menu.hidden=true; document.body.appendChild(menu);
+    const close=()=>{ menu.hidden=true; };
+    fab.onclick=e=>{ e.stopPropagation(); menu.innerHTML=`<button type="button" data-a="page">Who can open / edit this page…</button><button type="button" data-a="locks">${accessMode?'Hide':'Show'} all section locks</button><p>Tip: hover any card or section and click its 🔒 lock.</p>`;
+      menu.hidden=!menu.hidden;
+      menu.querySelector('[data-a="page"]').onclick=()=>{ close(); openAccessEditor({page:currentView==='history'?historyState.from:currentView}); };
+      menu.querySelector('[data-a="locks"]').onclick=()=>{ close(); setAccessMode(!accessMode); }; };
+    document.addEventListener('click',e=>{ if(!e.target.closest('#accessFabMenu,#accessFab')) close(); });
+  }
+  if(!accessObs){ let t; accessObs=new MutationObserver(()=>{ clearTimeout(t); t=setTimeout(decorateAccess,150); }); }
+  accessObs.observe(document.getElementById('dashboardViews')||document.body,{childList:true,subtree:true});
+  decorateAccess();
+}
 function setAccessMode(on){
   accessMode=!!on && !!Server.user && Server.isSuperAdmin();
   document.body.classList.toggle('access-mode', accessMode);
@@ -10098,18 +10131,19 @@ function setAccessMode(on){
   let bar=document.getElementById('accessBar');
   if(accessMode){
     if(!bar){ bar=document.createElement('div'); bar.id='accessBar'; document.body.appendChild(bar); }
-    bar.innerHTML=`<span>🔒 <b>Access mode</b> — click a lock to choose who sees it</span><button type="button" class="btn btn-secondary btn-sm" id="accPage">Page access…</button><button type="button" class="btn btn-primary btn-sm" id="accDone">Done</button>`;
+    bar.innerHTML=`<span>🔒 <b>All locks shown</b> — click one to choose who sees it</span><button type="button" class="btn btn-secondary btn-sm" id="accPage">Page access…</button><button type="button" class="btn btn-primary btn-sm" id="accDone">Done</button>`;
     bar.querySelector('#accDone').onclick=()=>setAccessMode(false);
     bar.querySelector('#accPage').onclick=()=>openAccessEditor({page:currentView});
     decorateAccess();
     if(!accessObs){ let t; accessObs=new MutationObserver(()=>{ clearTimeout(t); t=setTimeout(decorateAccess,120); }); }
     accessObs.observe(document.getElementById('dashboardViews')||document.body,{childList:true,subtree:true});
   } else {
-    bar?.remove(); accessObs?.disconnect(); document.querySelectorAll('.acc-chip').forEach(x=>x.remove()); document.querySelectorAll('.acc-host').forEach(x=>x.classList.remove('acc-host'));
+    bar?.remove();
+    if(!(Server.user&&Server.isSuperAdmin())){ accessObs?.disconnect(); document.querySelectorAll('.acc-chip').forEach(x=>x.remove()); document.querySelectorAll('.acc-host').forEach(x=>x.classList.remove('acc-host')); }
   }
 }
 function decorateAccess(){
-  if(!accessMode) return;
+  if(!(Server.user&&Server.isSuperAdmin())) return;
   document.querySelectorAll('#dashboardViews [data-section]').forEach(el=>{
     const key=el.dataset.section, label=sectionLabel(key); if(!label||el.offsetParent===null) return;
     if(el.querySelector(':scope > .acc-chip')) return;
@@ -10166,6 +10200,9 @@ async function openAccessEditor({section,label,page}){
   });
 }
 document.addEventListener('click',e=>{ if(e.target.closest('#accessModeBtn')) setAccessMode(!accessMode); });
+// only the innermost section under the mouse shows its lock
+let accHot=null;
+document.addEventListener('mouseover',e=>{ if(!document.body.classList.contains('access-ready')) return; const h=e.target.closest('.acc-host'); if(h===accHot) return; accHot?.classList.remove('acc-hot'); accHot=h; h?.classList.add('acc-hot'); });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&accessMode&&!document.querySelector('.modal-overlay')) setAccessMode(false); });
 // Menu groups: hide a heading when none of its items is available. On phones the bottom bar keeps
 // four items (always including the open page) and the rest go into a "More" sheet.
