@@ -6154,6 +6154,29 @@ async function scheduledRowsOn(date){
   if(!lists) lists=candCompute(await loadCandidateWeek(week),week).lists;
   return (lists.schedules||[]).filter(c=>c.date===date);
 }
+// Team-only candidate names: admins/uploaders publish each week's schedule rows (EID, name, recruiter,
+// branch, day) to dash_team_cand_rows; dash_team_candidates then returns only the caller's own team.
+let teamCandTimer=null, teamCandBusy=false, teamCandMissing=false;
+function syncTeamCandidatesSoon(){ clearTimeout(teamCandTimer); teamCandTimer=setTimeout(()=>syncTeamCandidates().catch(()=>{}),2500); }
+async function syncTeamCandidates(){
+  if(teamCandBusy || teamCandMissing || !Server.user || Server.teamNamesOnly()) return;
+  if(!(Server.isAdmin() || (Server.can('upload') && Server.can('candidates')))) return;
+  teamCandBusy=true;
+  try{
+    let have;
+    try{ have=await Server.rpc('dash_team_cand_weeks')||{}; }
+    catch(e){ if(/Could not find|does not exist|schema cache/i.test(e.message||'')) teamCandMissing=true; return; }
+    const weeks=weeksData.map(w=>w.weekEndDate).sort().reverse().slice(0,16);
+    for(const week of weeks){
+      const v=KV.get('weekly:'+week); if(!v) continue;
+      const sig=String(v.savedAt||'')+'|'+(dedupeByEmployeeNumber?'d':'r');
+      if(have[week]===sig) continue;
+      const got=await candFromWeekLists(week).catch(()=>null); if(!got) continue;
+      const rows=(got.lists.schedules||[]).filter(c=>c.date&&c.recruiter).map(c=>({d:c.date, r:c.recruiter, b:c.branch||'', e:c.eid&&c.eid!=='\u2013'?String(c.eid):'', n:c.name||''}));
+      await Server.rpc('dash_team_cand_put',{p_week:week, p_saved_at:sig, p_rows:rows});
+    }
+  }finally{ teamCandBusy=false; }
+}
 async function scheduledTodayRows(){ return scheduledRowsOn(ltToday()); }
 // Candidate-level lists are only sent by the server to accounts with the candidate-names right.
 function canSeeTeamNames(){ return !!Server.user && (Server.user.role!=='user' || (Server.user.hidden_sections||[]).includes('grant.team_names')); }
@@ -7460,20 +7483,18 @@ const Server = {
     return data;
   },
   rpc(fn, args){
-    // "See their team's candidate names" (team-only): the server only sends candidate lists to the
-    // candidates module, so team-only accounts carry it with a scope marker; the UI hides every
-    // all-candidate view and filters names to the lead's own team.
+    // "See their team's candidate names" is enforced by the database (dash_team_candidates returns only
+    // the lead's own team), so it never needs the all-candidates module. Older interim saves carried
+    // the module plus a scope marker; those are cleaned up here.
     if(fn==='dash_user_save' && args && args.p && Array.isArray(args.p.hidden_sections)){
-      const p={...args.p}; let mods=[...(p.modules||[])], hs=p.hidden_sections.filter(k=>k!==TEAM_SCOPE);
-      if(hs.includes('grant.team_names') && !mods.includes('candidates')){ mods.push('candidates'); hs.push(TEAM_SCOPE); }
-      p.modules=mods; p.hidden_sections=hs; args={...args, p};
+      args={...args, p:{...args.p, hidden_sections:args.p.hidden_sections.filter(k=>k!==TEAM_SCOPE)}};
     }
     const r=this.call(fn, {p_token:this.token, ...(args||{})});
     if(fn==='dash_users_list') return r.then(list=>Array.isArray(list)?list.map(u=>{ const hs=u&&u.hidden_sections||[];
-      // accounts given the team-names right before this fix: upgrade them once, quietly
-      if(u&&u.role==='user'&&hs.includes('grant.team_names')&&!hs.includes(TEAM_SCOPE)&&!(u.modules||[]).includes('candidates')&&this.isAdmin()&&!(this._fixed||(this._fixed=new Set())).has(u.id)){
-        this._fixed.add(u.id); this.rpc('dash_user_save',{p:{id:u.id,name:u.name,modules:u.modules||[],hidden_sections:hs,active:u.active}}).catch(()=>{}); }
       if(!hs.includes(TEAM_SCOPE)) return u;
+      // interim team-only accounts: drop the all-candidates module they were given, once, quietly
+      if(this.isAdmin()&&!(this._fixed||(this._fixed=new Set())).has(u.id)){ this._fixed.add(u.id);
+        this.rpc('dash_user_save',{p:{id:u.id,name:u.name,modules:(u.modules||[]).filter(m=>m!=='candidates'),hidden_sections:hs.filter(k=>k!==TEAM_SCOPE),active:u.active}}).catch(()=>{}); }
       return {...u, modules:(u.modules||[]).filter(m=>m!=='candidates'), hidden_sections:hs.filter(k=>k!==TEAM_SCOPE)}; }):list);
     return r;
   },
@@ -7518,6 +7539,7 @@ const Server = {
       }
       if(pending.length){ await loadAllWeeks(); LiveReload.schedule([]); }
       setTimeout(()=>backfillBranchDaily().catch(()=>{}),2000);
+      setTimeout(()=>syncTeamCandidates().catch(()=>{}),3500);
       // one-time conversion of weeks saved in the older all-in-one format
       if(Server.can('upload') || Server.can('master_edit')){
         const old = [...KV.entries()].filter(([k,v])=>k.startsWith('weekly:') && hasInlineLists(v)).map(([k])=>k);
@@ -7536,7 +7558,7 @@ const Server = {
       await this.rpc('dash_kv_set', {p_key:key+LISTS_SUFFIX, p_value:{v:4, gz: await gzipB64(JSON.stringify(lists))}});
       await this.rpc('dash_kv_set', {p_key:key, p_value: await encodeKvValue(key, summary)});
       val.listsSplit = true; val.listsLoaded = true;
-      KV.set(key, val); return;
+      KV.set(key, val); syncTeamCandidatesSoon(); return;
     }
     await this.rpc('dash_kv_set', {p_key:key, p_value: await encodeKvValue(key, val)});
     KV.set(key, val);
@@ -10178,7 +10200,7 @@ async function ltRenderScheduledCandidates(g){
   host.querySelector('#ltCandDate').onchange=e=>{ if(tgDate(e.target.value)&&e.target.value<=today){ ltState.candDate=e.target.value===today?null:e.target.value; ltRenderScheduledCandidates(g);} };
   host.querySelector('#ltCandToday')?.addEventListener('click',()=>{ltState.candDate=null;ltRenderScheduledCandidates(g);});
   draw();
- }catch(e){ if(!host.isConnected) return; host.innerHTML=teamOnly&&/Could not find|does not exist|schema cache/i.test(e.message||'')?`<div class="lt-empty"><strong>Your team-names right needs one more step.</strong><span>${Server.isAdmin()?'Open Settings → Users once (this upgrades the right), then the lead reloads.':'Your admin just needs to re-save your rights — then reload this page.'}</span></div>`:'<p role="alert">Candidate data could not be loaded. Refresh the team to retry.</p>'; }
+ }catch(e){ if(!host.isConnected) return; host.innerHTML=teamOnly&&/Could not find|does not exist|schema cache/i.test(e.message||'')?`<div class="lt-empty"><strong>Team candidate names need a one-time database update.</strong><span>${Server.isAdmin()?'Run team_candidates.sql in the Supabase SQL Editor, then reload the dashboard once as an admin.':'Your admin needs to finish setting this up.'}</span></div>`:'<p role="alert">Candidate data could not be loaded. Refresh the team to retry.</p>'; }
 }
 // ---------- One team per recruiter per day ----------
 // Every team's ranges (the lead's own recruiter name counts as a member for all dates).
