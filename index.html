@@ -1609,6 +1609,110 @@ h1,h2,h3,h4,.topbar h2{font-family:var(--font-display)!important}
 .ep-table tbody tr:hover,.dr-table tbody tr:hover{background:#f5f8ff!important}
 .pill.good{background:#e7f0ff;color:#1e3a8a}
 :focus-visible{outline-color:#1d4ed8!important}
+
+/* ================= Settings & user access — clean corporate layout ================= */
+.settings-tab-content select{min-width:200px}
+.settings-tab-content input[type=text],.settings-tab-content input[type=password],.settings-tab-content input:not([type]),.settings-tab-content select{border-color:#d3dbe7}
+
+.settings-page{grid-template-columns:232px minmax(0,1fr)!important;gap:24px!important}
+.settings-tabs{background:#fff!important;border:1px solid var(--line)!important;border-radius:10px!important;padding:8px!important;box-shadow:0 1px 2px #0a1f440d!important}
+.settings-group{font-size:11px!important;letter-spacing:0!important;text-transform:none!important;font-weight:700!important;color:#5b6b82!important;padding:14px 12px 6px!important}
+.settings-group:first-child{padding-top:6px!important}
+.settings-tab{color:#13264a!important;font-weight:500!important;border-radius:7px!important;position:relative}
+.settings-tab:hover{background:#f3f6fb!important}
+.settings-tab.active{background:#0a1f44!important;color:#fff!important;font-weight:600!important}
+.settings-tab.active .st-ico{color:#fff!important}
+.settings-tab-content .panel{border-radius:10px!important}
+.settings-tab-content h3{font-size:17px;font-weight:800;color:#0a1f44;letter-spacing:-.01em}
+/* users list */
+.ua-panel{padding:0!important;overflow:hidden}
+.ua-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:20px 22px 14px}
+.ua-head h3{margin:0 0 3px}
+.ua-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:0 22px 14px;border-bottom:1px solid var(--line)}
+.ua-bar input[type=search]{flex:0 1 280px;padding:9px 12px;border:1px solid #d3dbe7;border-radius:8px;font:inherit;font-size:13px}
+.ua-filter{display:inline-flex;gap:2px;padding:3px;border-radius:9px;background:#eef2f8}
+.ua-filter button{border:0;background:transparent;border-radius:7px;padding:6px 12px;font:inherit;font-size:12.5px;font-weight:600;color:#3f5170;cursor:pointer}
+.ua-filter button b{font-weight:600;color:#7b8aa3;margin-left:3px}
+.ua-filter button.on{background:#fff;color:#0a1f44;box-shadow:0 1px 3px #0a1f441f}
+.ua-table{width:100%;border-collapse:collapse}
+.ua-table th{background:#f6f8fc;color:#3f5170;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;text-align:left;padding:10px 16px;border-bottom:1px solid var(--line)}
+.ua-table td{padding:13px 16px;border-bottom:1px solid #edf1f7;vertical-align:middle}
+.ua-table tbody tr:hover{background:#f8faff}
+.ua-person{display:flex;align-items:center;gap:11px}
+.ua-person strong{display:block;font-size:14px;color:#0a1f44}
+.ua-role{display:block;font-size:11.5px;color:#5b6b82;margin-top:1px;white-space:nowrap}
+.ua-av{display:grid;place-items:center;width:34px;height:34px;flex:0 0 34px;border-radius:50%;background:#e7eefc;color:#1e3a8a;font-size:12.5px;font-weight:700}
+.ua-av.adm{background:#0a1f44;color:#fff}
+.ua-all{font-size:12.5px;font-weight:600;color:#1e3a8a}
+.ua-more{display:block;margin-top:5px;font-size:11.5px;color:#5b6b82}
+.ua-table .mod-chip{background:#eef2f8!important;color:#13264a!important;border:0!important;border-radius:5px!important;font-size:11.5px!important;padding:3px 7px!important;margin:2px 4px 2px 0;display:inline-block}
+.ua-status{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:#6b7a90}
+.ua-status:before{content:'';width:7px;height:7px;border-radius:50%;background:#a3adbd}
+.ua-status.on{color:#166534}.ua-status.on:before{background:#16a34a}
+.ua-when{font-size:12.5px;color:#3f5170;white-space:nowrap}
+.ua-actions{white-space:nowrap;text-align:right}
+.ua-actions .btn{margin-left:4px}
+.btn-link-danger{background:transparent!important;border:1px solid transparent!important;color:#b91c1c!important}
+.btn-link-danger:hover{background:#fef2f2!important;border-color:#fecaca!important}
+.ua-empty{padding:18px 22px;margin:0}
+/* user editor drawer */
+#userForm.uf-open{position:fixed;inset:0;z-index:600;background:#0a1f4466;display:flex;justify-content:flex-end;animation:ufFade .15s ease-out}
+@keyframes ufFade{from{opacity:0}to{opacity:1}}
+body.uf-lock{overflow:hidden}
+.uf-drawer{width:min(720px,100vw);height:100%;margin:0!important;border:0!important;border-radius:0!important;background:#fff!important;padding:0!important;display:flex;flex-direction:column;box-shadow:-16px 0 40px #0a1f4433;animation:ufIn .18s ease-out}
+@keyframes ufIn{from{transform:translateX(24px)}to{transform:none}}
+@media(prefers-reduced-motion:reduce){#userForm.uf-open,.uf-drawer{animation:none}}
+.uf-head{display:flex;align-items:center;gap:12px;padding:18px 24px;border-bottom:1px solid var(--line);background:#0a1f44;color:#fff}
+.uf-head h4{margin:0;font-size:18px;font-weight:800;color:#fff}
+.uf-head .hint{color:#b8c6de!important;font-size:12.5px}
+.uf-av{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:#fff;color:#0a1f44;font-weight:800}
+.uf-x{margin-left:auto;border:0;background:#ffffff1a;color:#fff;width:34px;height:34px;border-radius:8px;font-size:22px;line-height:1;cursor:pointer}
+.uf-x:hover{background:#ffffff33}
+.uf-body{flex:1;overflow-y:auto;padding:6px 24px 24px;background:#f6f8fc}
+.uf-sec{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-top:16px}
+.uf-sec h5{margin:0 0 12px;font-size:14px;font-weight:800;color:#0a1f44}
+.uf-sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}.uf-sec-head h5{margin:0}
+.uf-sec .field label{font-size:12px;font-weight:600;color:#3f5170}
+.uf-sec .field input,.uf-sec .field select{border:1px solid #d3dbe7!important;border-radius:8px!important;padding:9px 11px!important;font-size:13.5px!important;background:#fff;width:100%}
+.uf-note{background:#fff7e6;border:1px solid #fde3a7;color:#7a5200;border-radius:8px;padding:10px 12px;margin:16px 0 0}
+.uf-sa{margin:16px 0 0}
+.uf-access.dimmed{opacity:.5;pointer-events:none}
+.uf-presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.uf-preset{display:flex;flex-direction:column;gap:3px;text-align:left;border:1px solid #d3dbe7;background:#fff;border-radius:9px;padding:11px 12px;cursor:pointer;font:inherit}
+.uf-preset strong{font-size:13.5px;color:#0a1f44}.uf-preset span{font-size:11.5px;color:#5b6b82;line-height:1.35}
+.uf-preset:hover{border-color:#1d4ed8;background:#f5f8ff}.uf-preset.on{border-color:#1d4ed8;box-shadow:0 0 0 1px #1d4ed8 inset;background:#f5f8ff}
+.uf-sec .rights-bar{border:0!important;background:transparent!important;padding:12px 0 0!important;margin:0!important}
+.uf-pages{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.uf-page,.uf-tool{padding:12px 14px;border-top:1px solid #edf1f7;background:#fff}
+.uf-page:first-child,.uf-tool:first-child{border-top:0}
+.uf-tool{display:flex;align-items:center;gap:12px}
+.uf-page-main{display:flex;align-items:center;gap:12px}
+.uf-page-txt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.uf-page-txt strong{font-size:13.5px;color:#0a1f44}.uf-page-txt span{font-size:12px;color:#5b6b82}
+.uf-always{flex:0 0 40px;font-size:10.5px;font-weight:700;color:#166534;text-align:center}
+.uf-switch{position:relative;flex:0 0 40px;width:40px;height:22px;cursor:pointer}
+.uf-switch input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.uf-switch i{position:absolute;inset:0;border-radius:999px;background:#c5cedc;transition:background .15s}
+.uf-switch i:after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px #0003;transition:transform .15s}
+.uf-switch input:checked+i{background:#1d4ed8}.uf-switch input:checked+i:after{transform:translateX(18px)}
+.uf-switch input:focus-visible+i{outline:2px solid #1d4ed8;outline-offset:2px}
+.uf-active{margin-top:12px;border:1px solid var(--line);border-radius:9px;cursor:pointer}
+.uf-extras{display:flex;flex-wrap:wrap;gap:6px 14px;margin:10px 0 0 52px}
+.uf-chk{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:#13264a;cursor:pointer}
+.uf-chk input{accent-color:#1d4ed8;width:15px;height:15px}
+.uf-page .sec-page{margin:10px 0 0 52px;border:0!important;padding:0!important}
+.uf-page .sec-page summary{font-size:12.5px!important;font-weight:600;color:#1d4ed8;padding:2px 0!important}
+.uf-page .sec-page .sec-count{color:#5b6b82;font-weight:500;margin-left:4px}
+.uf-page .sec-list{margin-top:8px;padding:10px 12px;background:#f6f8fc;border-radius:8px;display:grid;gap:5px}
+.uf-page.off:not(.keep-extras) .uf-extras,.uf-page.off .sec-page{display:none}
+.uf-page.off .uf-page-txt strong{color:#5b6b82}
+.uf-foot{display:flex;align-items:center;gap:10px;justify-content:flex-end;padding:14px 24px;border-top:1px solid var(--line);background:#fff}
+.uf-foot .auth-msg{margin:0 auto 0 0;color:#b91c1c;font-size:12.5px}
+.uf-sec .role-pick{margin:0!important}
+.uf-sec .role-opt{flex:1;border:1px solid #d3dbe7;border-radius:9px;padding:11px 12px;background:#fff}
+.uf-sec .role-opt:has(input:checked){border-color:#1d4ed8;background:#f5f8ff;box-shadow:0 0 0 1px #1d4ed8 inset}
+.uf-sec .role-lbl{display:none}
+@media(max-width:760px){.uf-presets{grid-template-columns:1fr}.uf-body{padding:4px 14px 18px}.uf-head,.uf-foot{padding:14px 16px}.uf-extras,.uf-page .sec-page{margin-left:0}.ua-table th:nth-child(4),.ua-table td:nth-child(4){display:none}.settings-page{grid-template-columns:1fr!important}}
 </style>
 </head>
 <body class="locked">
@@ -9506,17 +9610,35 @@ async function renderUsersAdmin(){
   const host = document.getElementById('usersAdmin'); if(!host || !Server.isAdmin()) return;
   try{ usersCache = await Server.rpc('dash_users_list'); }catch(e){ host.innerHTML='<p class="hint">Could not load users: '+escapeHtml(cleanErr(e))+'</p>'; return; }
   const modLabel = k=> (MODULES.find(m=>m.key===k)||{label:k}).label;
-  host.innerHTML = `<div class="panel">
-    <div class="panel-head"><div><h3>Users &amp; access</h3><span class="hint">Only you (super admin) can add people, set their passwords and choose which modules they can open.</span></div><button class="btn btn-primary btn-sm" id="addUserBtn">+ Add user</button></div>
+  const pageName=k=>{ const pg=UF_PAGES.find(x=>x.mod===k); return pg?pg.label:null; };
+  const summary=u=>{ if(u.role!=='user') return '<span class="ua-all">Full access'+(u.role==='admin'?' · manages users':'')+'</span>';
+    const pages=(u.modules||[]).map(pageName).filter(Boolean), extras=(u.modules||[]).filter(k=>!pageName(k)).map(k=>UF_EXTRA_LABEL[k]||modLabel(k)), hid=(u.hidden_sections||[]).filter(k=>!k.startsWith('grant.')&&k!=='copy.tables').length;
+    return (pages.length?pages.map(x=>`<span class="mod-chip">${escapeHtml(x)}</span>`).join(''):'<span class="hint">No pages yet</span>')
+      +((extras.length||hid)?`<span class="ua-more">${extras.length?escapeHtml(extras.length+' extra right'+(extras.length===1?'':'s')):''}${extras.length&&hid?' · ':''}${hid?hid+' section'+(hid===1?'':'s')+' hidden':''}</span>`:''); };
+  const when=t=>{ if(!t) return 'Never'; const d=new Date(t), m=(Date.now()-d)/60000; return m<2?'Just now':m<60?Math.round(m)+' min ago':m<1440?Math.round(m/60)+' h ago':m<10080?Math.round(m/1440)+' d ago':d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}); };
+  const ini=nm=>String(nm||'?').trim().split(/\s+/).map(x=>x[0]).slice(0,2).join('').toUpperCase();
+  const counts={all:usersCache.length, admin:usersCache.filter(u=>u.role!=='user').length, user:usersCache.filter(u=>u.role==='user').length, off:usersCache.filter(u=>!u.active).length};
+  host.innerHTML = `<div class="panel ua-panel">
+    <div class="ua-head"><div><h3>Users &amp; access</h3><span class="hint">Add people, set their passwords and choose what they can open.</span></div><button class="btn btn-primary" id="addUserBtn">+ Add user</button></div>
+    <div class="ua-bar"><input type="search" id="uaSearch" placeholder="Search people" aria-label="Search people"><div class="ua-filter" role="tablist">${[['all','Everyone'],['admin','Admins'],['user','Users'],['off','Disabled']].map(([k,l])=>`<button type="button" data-ua-f="${k}" class="${(window.__uaF||'all')===k?'on':''}">${l} <b>${counts[k]}</b></button>`).join('')}</div></div>
     <div id="userForm"></div>
-    <div style="overflow-x:auto"><table class="users-table"><thead><tr><th>Name</th><th>Access</th><th>Status</th><th>Last sign-in</th><th></th></tr></thead><tbody>
-    ${usersCache.map(u=>`<tr>
-      <td><strong>${escapeHtml(u.name)}</strong>${u.role==='super_admin'?' <span class="pill good">Super admin</span>':u.role==='admin'?' <span class="pill role-admin">Admin</span>':''}${u.online?' <span class="online-dot" title="Online now"></span>':''}</td>
-      <td class="mod-chips">${u.role!=='user'?'<span class="hint">Everything'+(u.role==='admin'?' · manages users':'')+'</span>':(u.modules.length?u.modules.map(m=>`<span class="mod-chip">${escapeHtml(modLabel(m))}</span>`).join(''):'<span class="hint">No modules</span>')}${u.role==='user' && (u.hidden_sections||[]).length?`<span class="hint" style="display:block;margin-top:4px;">${u.hidden_sections.length} section${u.hidden_sections.length===1?'':'s'} hidden</span>`:''}</td>
-      <td>${u.active?'Active':'<span class="pill bad">Disabled</span>'}</td>
-      <td>${u.last_login_at?new Date(u.last_login_at).toLocaleString():'Never'}</td>
-      <td style="white-space:nowrap;text-align:right;"><button class="btn btn-primary btn-sm" data-team-user="${u.id}">Team assignments</button> ${u.role==='user'?`<button class="btn btn-secondary btn-sm" data-dup-user="${u.id}" title="New user with the same rights">Duplicate</button> `:''}${Server.isSuperAdmin() || u.role==='user' || u.id===Server.user.id ? `<button class="btn btn-secondary btn-sm" data-edit-user="${u.id}">Edit</button>` : '<span class="hint">Super admin only</span>'}${u.role==='super_admin' || u.id===Server.user.id || (!Server.isSuperAdmin() && u.role!=='user')?'':` <button class="btn btn-danger btn-sm" data-del-user="${u.id}">Delete</button>`}</td>
-    </tr>`).join('')}</tbody></table></div></div>`;
+    <div style="overflow-x:auto"><table class="users-table ua-table"><thead><tr><th>Person</th><th>Can open</th><th>Status</th><th>Last sign-in</th><th></th></tr></thead><tbody>
+    ${usersCache.map(u=>`<tr data-ua-name="${escapeHtml(String(u.name||'').toLowerCase())}" data-ua-role="${u.role==='user'?'user':'admin'}" data-ua-off="${u.active?0:1}">
+      <td><div class="ua-person"><span class="ua-av ${u.role!=='user'?'adm':''}">${escapeHtml(ini(u.name))}</span><div><strong>${escapeHtml(u.name)}</strong>${u.online?' <span class="online-dot" title="Online now"></span>':''}<span class="ua-role">${u.role==='super_admin'?'Super admin':u.role==='admin'?'Admin':'User'}</span></div></div></td>
+      <td class="mod-chips">${summary(u)}</td>
+      <td>${u.active?'<span class="ua-status on">Active</span>':'<span class="ua-status">Disabled</span>'}</td>
+      <td class="ua-when" title="${u.last_login_at?escapeHtml(new Date(u.last_login_at).toLocaleString()):''}">${when(u.last_login_at)}</td>
+      <td class="ua-actions">${Server.isSuperAdmin() || u.role==='user' || u.id===Server.user.id ? `<button class="btn btn-primary btn-sm" data-edit-user="${u.id}">Edit access</button>` : '<span class="hint">Super admin only</span>'}
+        <button class="btn btn-secondary btn-sm" data-team-user="${u.id}" title="Choose which recruiters are on this person’s team">Team</button>
+        ${u.role==='user'?`<button class="btn btn-secondary btn-sm" data-dup-user="${u.id}" title="New user with the same rights">Duplicate</button>`:''}
+        ${u.role==='super_admin' || u.id===Server.user.id || (!Server.isSuperAdmin() && u.role!=='user')?'':`<button class="btn btn-link-danger btn-sm" data-del-user="${u.id}" title="Delete ${escapeHtml(u.name)}">Delete</button>`}</td>
+    </tr>`).join('')}</tbody></table></div><p class="hint ua-empty" hidden>No one matches.</p></div>`;
+  const applyUa=()=>{ const q=(host.querySelector('#uaSearch').value||'').trim().toLowerCase(), f=window.__uaF||'all'; let shown=0;
+    host.querySelectorAll('tr[data-ua-name]').forEach(tr=>{ const ok=(!q||tr.dataset.uaName.includes(q))&&(f==='all'||(f==='off'?tr.dataset.uaOff==='1':tr.dataset.uaRole===f)); tr.hidden=!ok; if(ok) shown++; });
+    host.querySelector('.ua-empty').hidden=!!shown; };
+  host.querySelector('#uaSearch').oninput=applyUa;
+  host.querySelectorAll('[data-ua-f]').forEach(b=>b.onclick=()=>{ window.__uaF=b.dataset.uaF; host.querySelectorAll('[data-ua-f]').forEach(x=>x.classList.toggle('on',x===b)); applyUa(); });
+  applyUa();
   host.querySelectorAll('[data-team-user]').forEach(b=>b.onclick=()=>ltAdminOpen(usersCache.find(u=>String(u.id)===b.dataset.teamUser)));
   host.querySelector('#addUserBtn').onclick=()=>{ userFormPreset=null; editingUserId='new'; drawUserForm(); };
   host.querySelectorAll('[data-dup-user]').forEach(b=>b.onclick=()=>{ const src=usersCache.find(x=>String(x.id)===b.dataset.dupUser); if(!src) return; userFormPreset={...rightsOf(src), from:src.name}; editingUserId='new'; drawUserForm(); document.getElementById('userForm')?.scrollIntoView({block:'start'}); });
@@ -9530,14 +9652,33 @@ async function renderUsersAdmin(){
 }
 // Rights = modules + page sections + granted extras + default page. Never name, password, role or active.
 let userFormPreset = null;
+// The user editor groups rights by page: switch the page on, then its extras and visible sections.
+const UF_PAGES = [
+  {mod:'performance', label:'Overview', desc:'Weekly, monthly and quarterly results', sec:'performance'},
+  {mod:null, label:'My Team', desc:'Team leads always see their own team', sec:'teams', extras:['grant.team_names','grant.break_image']},
+  {mod:'recruiters', label:'Recruiters', desc:'Recruiter table, trends and history', sec:'recruiters', extras:['remarks']},
+  {mod:'branches', label:'Branches', desc:'Branch table, trends and history', sec:'branches'},
+  {mod:'alerts', label:'Action Center', desc:'Who is below goal and other signals', sec:'alerts', extras:['remarks_approve']},
+  {mod:'divreport', label:'Division Report', desc:'Pipeline by client and location, per division'},
+  {mod:'pivot', label:'Report Builder', desc:'Build their own tables and charts', sec:'pivot'},
+  {mod:'candidates', label:'Candidates', desc:'Candidate names and Employee Numbers everywhere', sec:'candidates', extras:['master','master_edit']},
+];
+const UF_TOOLS = ['upload','export','settings'];
+const UF_EXTRA_LABEL = {remarks:'Can add remarks', remarks_approve:'Can approve and edit remarks', 'grant.team_names':'See their team’s candidate names', 'grant.break_image':'Copy third-break lists as images',
+  master:'Browse all candidate records', master_edit:'Exclude or include candidates', upload:'Upload spreadsheets', export:'Download and share', settings:'Settings — divisions, branches, goals'};
+const UF_PRESETS = [
+  {name:'Viewer', desc:'Overview, recruiters and branches', modules:['performance','recruiters','branches']},
+  {name:'Team lead', desc:'Viewer + Action Center, remarks, team names', modules:['performance','recruiters','branches','alerts','remarks'], grants:['grant.team_names','grant.break_image']},
+  {name:'Manager', desc:'Every page, approves remarks, downloads', modules:['performance','recruiters','branches','alerts','remarks','remarks_approve','divreport','pivot','candidates','master','export'], grants:['grant.team_names','grant.break_image']},
+];
 function readFormRights(host){
-  return { modules:[...host.querySelectorAll('.mod-grid input:checked')].map(i=>i.value),
+  return { modules:[...host.querySelectorAll('input[data-mod]:checked')].map(i=>i.value),
     hidden_sections:[...host.querySelectorAll('[data-sec]:not(:checked)')].map(i=>i.dataset.sec).concat([...host.querySelectorAll('[data-grant]:checked')].map(i=>i.dataset.grant)),
     defaultView: host.querySelector('#ufDefaultView')?.value||'' };
 }
 function rightsOf(u){ return {modules:[...(u.modules||[])], hidden_sections:[...(u.hidden_sections||[])], defaultView:adminDefaultViews()[u.id]||''}; }
 function applyFormRights(host, r){
-  host.querySelectorAll('.mod-grid input').forEach(i=>{ i.checked=r.modules.includes(i.value); i.dispatchEvent(new Event('change')); });
+  host.querySelectorAll('input[data-mod]').forEach(i=>{ i.checked=r.modules.includes(i.value); i.dispatchEvent(new Event('change')); });
   host.querySelectorAll('[data-sec]').forEach(i=>{ i.disabled=false; i.checked=!r.hidden_sections.includes(i.dataset.sec); });
   host.querySelectorAll('[data-grant]').forEach(i=>{ i.checked=r.hidden_sections.includes(i.dataset.grant); });
   const dv=host.querySelector('#ufDefaultView'); if(dv) dv.value=[...dv.options].some(o=>o.value===r.defaultView)?r.defaultView:'';
@@ -9581,31 +9722,64 @@ function drawUserForm(){
   const elevated = u.role!=='user';                  // super admin / admin: every module
   const meSuper = Server.isSuperAdmin();
   const pwLocked = sa || (!meSuper && !isNew);       // only the super admin sets passwords for existing accounts
-  host.innerHTML = `<div class="user-form">
-    <h4>${isNew?(preset?'New user · rights copied from '+escapeHtml(preset.from):'New user'):'Edit '+escapeHtml(u.name)}</h4>
-    ${sa?'':`<div class="rights-bar"><label>Copy rights from<select id="ufCopyFrom"><option value="">Choose a person…</option>${(usersCache||[]).filter(x=>x.role==='user'&&x.id!==u.id).map(x=>`<option value="${escapeHtml(String(x.id))}">${escapeHtml(x.name)} — ${escapeHtml(rightsSummary(rightsOf(x)))}</option>`).join('')}</select></label>${isNew?'':`<button type="button" class="btn btn-secondary btn-sm" id="ufApplyOthers" title="Give other people exactly these rights">Apply these rights to others…</button>`}<span class="hint" id="ufCopyNote" role="status"></span></div>`}
-    <div class="field-row">
-      <div class="field"><label for="ufName">Name (used to sign in)</label><input id="ufName" value="${escapeHtml(u.name)}" autocomplete="off"></div>
-      <div class="field"><label for="ufPw">${isNew?'Password':'New password (leave blank to keep)'}</label><div class="pw-wrap"><input id="ufPw" type="text" autocomplete="new-password" placeholder="${isNew?'At least 8 characters, letters and numbers':''}" ${pwLocked?'disabled':''}><button type="button" class="pw-toggle" id="ufGen" ${pwLocked?'disabled':''}>Generate</button></div>${sa?'<span class="hint">Change your own password under My account.</span>':pwLocked?'<span class="hint">Only the super admin can change passwords.</span>':''}</div>
+  const has=k=>(u.modules||[]).includes(k), hidden=k=>(u.hidden_sections||[]).includes(k);
+  const used=new Set(), modLbl=k=>(MODULES.find(m=>m.key===k)||{label:k}).label;
+  const extra=k=>{ used.add(k); const lbl=UF_EXTRA_LABEL[k]||modLbl(k);
+    return k.startsWith('grant.')?`<label class="uf-chk"><input type="checkbox" data-grant="${k}" ${hidden(k)?'checked':''}><span>${escapeHtml(lbl)}</span></label>`
+      :`<label class="uf-chk"><input type="checkbox" data-mod value="${k}" ${has(k)?'checked':''}><span>${escapeHtml(lbl)}</span></label>`; };
+  const secBox=key=>PAGE_SECTIONS[key]?`<details class="sec-page" data-sec-mod="${key}"><summary>Choose what they see on this page <span class="sec-count"></span></summary><div class="sec-list">${PAGE_SECTIONS[key].map(([k,l])=>`<label class="sec-opt${l.startsWith('··')?' sub sub2':l.startsWith('·')?' sub':''}"><input type="checkbox" data-sec="${k}" ${hidden(k)?'':'checked'}> ${escapeHtml(l.replace(/^·+ /,''))}</label>`).join('')}</div></details>`:'';
+  const pageRow=pg=>{ if(pg.mod) used.add(pg.mod);
+    return `<div class="uf-page${pg.mod==='candidates'?' keep-extras':''}">
+      <div class="uf-page-main">${pg.mod?`<label class="uf-switch"><input type="checkbox" data-mod value="${pg.mod}" ${has(pg.mod)?'checked':''}><i aria-hidden="true"></i></label>`:'<span class="uf-always">Always</span>'}
+        <div class="uf-page-txt"><strong>${escapeHtml(pg.label)}</strong><span>${escapeHtml(pg.desc)}</span></div></div>
+      ${(pg.extras||[]).length?`<div class="uf-extras">${pg.extras.map(extra).join('')}</div>`:''}
+      ${secBox(pg.sec)}</div>`; };
+  const pagesHtml=UF_PAGES.map(pageRow).join('');
+  const tools=[...UF_TOOLS, ...MODULES.map(m=>m.key).filter(k=>!used.has(k)&&!UF_TOOLS.includes(k)&&!UF_PAGES.some(p=>p.mod===k||(p.extras||[]).includes(k)))];
+  const toolsHtml=tools.map(k=>`<div class="uf-tool"><label class="uf-switch"><input type="checkbox" data-mod value="${k}" ${has(k)?'checked':''}><i aria-hidden="true"></i></label><div class="uf-page-txt"><strong>${escapeHtml(UF_EXTRA_LABEL[k]||modLbl(k))}</strong><span>${escapeHtml((MODULES.find(m=>m.key===k)||{}).hint||'')}</span></div></div>`).join('')
+    +`<div class="uf-tool"><label class="uf-switch"><input type="checkbox" data-sec="copy.tables" ${hidden('copy.tables')?'':'checked'}><i aria-hidden="true"></i></label><div class="uf-page-txt"><strong>Copy tables</strong><span>Copy tables and lists to the clipboard</span></div></div>`;
+  const initials=(u.name||'?').trim().split(/\s+/).map(x=>x[0]).slice(0,2).join('').toUpperCase()||'+';
+  host.innerHTML = `<div class="user-form uf-drawer" role="dialog" aria-modal="true" aria-labelledby="ufTitle">
+    <header class="uf-head"><span class="uf-av">${escapeHtml(initials)}</span><div><h4 id="ufTitle">${isNew?(preset?'New user':'New user'):escapeHtml(u.name)}</h4><span class="hint">${isNew?(preset?'Rights copied from '+escapeHtml(preset.from)+' — review and create':'Set their sign-in, then choose what they can use'):sa?'Super admin · has every right':u.role==='admin'?'Admin':'User'}</span></div><button type="button" class="uf-x" id="ufClose" aria-label="Close">&times;</button></header>
+    <div class="uf-body">
+     <section class="uf-sec"><h5>Sign-in</h5>
+      <div class="field-row">
+       <div class="field"><label for="ufName">Name (used to sign in)</label><input id="ufName" value="${escapeHtml(u.name)}" autocomplete="off"></div>
+       <div class="field"><label for="ufPw">${isNew?'Password':'New password'}</label><div class="pw-wrap"><input id="ufPw" type="text" autocomplete="new-password" placeholder="${isNew?'8+ characters, letters and numbers':'Leave blank to keep the current one'}" ${pwLocked?'disabled':''}><button type="button" class="pw-toggle" id="ufGen" ${pwLocked?'disabled':''}>Generate</button></div>${sa?'<span class="hint">Change your own password under My account.</span>':pwLocked?'<span class="hint">Only the super admin can change passwords.</span>':''}</div>
+      </div>
+      ${sa?'':`<label class="uf-tool uf-active"><span class="uf-switch"><input type="checkbox" id="ufActive" ${u.active?'checked':''}><i aria-hidden="true"></i></span><span class="uf-page-txt"><strong>Account active</strong><span>Turn off to block sign-in without deleting the account</span></span></label>`}
+     </section>
+     ${!sa && meSuper ? `<section class="uf-sec"><h5>Role</h5><div class="role-pick" role="radiogroup" aria-label="Role">
+      <label class="role-opt"><input type="radio" name="ufRole" value="user" ${u.role!=='admin'?'checked':''}><span><strong>User</strong><em>Sees only the pages you turn on below</em></span></label>
+      <label class="role-opt"><input type="radio" name="ufRole" value="admin" ${u.role==='admin'?'checked':''}><span><strong>Admin</strong><em>Every page; approves remarks and manages users (not passwords)</em></span></label></div></section>` : ''}
+     ${sa?'<p class="hint uf-sa">The super admin always has every right.</p>':`
+     <p class="hint admin-note uf-note" ${u.role==='admin'?'':'hidden'}>Admins can use everything — the choices below only apply if you switch them back to User.</p>
+     <div class="uf-access">
+      <section class="uf-sec"><div class="uf-sec-head"><h5>Start from</h5><span class="hint">One click fills the page access below — adjust anything after.</span></div>
+       <div class="uf-presets">${UF_PRESETS.map((p,i)=>`<button type="button" class="uf-preset" data-preset="${i}"><strong>${escapeHtml(p.name)}</strong><span>${escapeHtml(p.desc)}</span></button>`).join('')}</div>
+       <div class="rights-bar"><label>Copy from a person<select id="ufCopyFrom"><option value="">Choose a person…</option>${(usersCache||[]).filter(x=>x.role==='user'&&x.id!==u.id).map(x=>`<option value="${escapeHtml(String(x.id))}">${escapeHtml(x.name)} — ${escapeHtml(rightsSummary(rightsOf(x)))}</option>`).join('')}</select></label>${isNew?'':`<button type="button" class="btn btn-secondary btn-sm" id="ufApplyOthers" title="Give other people exactly these rights">Give these rights to others…</button>`}<span class="hint" id="ufCopyNote" role="status"></span></div>
+      </section>
+      <section class="uf-sec"><div class="uf-sec-head"><h5>Pages they can open</h5><span class="hint" id="ufPageCount"></span></div><div class="uf-pages">${pagesHtml}</div></section>
+      <section class="uf-sec"><h5>Tools</h5><div class="uf-pages">${toolsHtml}</div></section>
+     </div>
+     <section class="uf-sec"><h5>Home page</h5><div class="field"><label for="ufDefaultView">Page they see when they sign in</label><select id="ufDefaultView"><option value="">First page they can open</option>${defaultViewOptions(u).map(([v,l])=>`<option value="${v}" ${adminDefaultViews()[u.id]===v?'selected':''}>${escapeHtml(l)}</option>`).join('')}</select><span class="hint">They can still change it in Settings → My account.</span></div></section>`}
     </div>
-    ${!sa && meSuper ? `<div class="role-pick" role="radiogroup" aria-label="Role"><span class="role-lbl">Role</span>
-      <label class="role-opt"><input type="radio" name="ufRole" value="user" ${u.role!=='admin'?'checked':''}><span><strong>User</strong><em>Only the modules and sections you tick below</em></span></label>
-      <label class="role-opt"><input type="radio" name="ufRole" value="admin" ${u.role==='admin'?'checked':''}><span><strong>Admin</strong><em>Every module, approves remarks, manages users (can’t change passwords, admins or the super admin)</em></span></label></div>` : ''}
-    ${sa?'<p class="hint">The super admin always has every right.</p>':`<p class="hint admin-note" ${u.role==='admin'?'':'hidden'}>Admins see every module and section — the ticks below only apply if you change them back to User.</p><fieldset class="mod-grid"><legend>Modules this person can open</legend>${MODULES.map(m=>`<label class="mod-opt"><input type="checkbox" value="${m.key}" ${u.modules.includes(m.key)?'checked':''}><span><strong>${escapeHtml(m.label)}</strong><em>${escapeHtml(m.hint)}</em></span></label>`).join('')}</fieldset>
-    <label class="mod-opt"><input type="checkbox" data-grant="grant.team_names" ${(u.hidden_sections||[]).includes("grant.team_names")?"checked":""}><span><strong>See their team’s candidate names</strong><em>My Team → Candidates: EID and name for their own team only</em></span></label>
-    <label class="mod-opt"><input type="checkbox" data-grant="grant.break_image" ${(u.hidden_sections||[]).includes("grant.break_image")?"checked":""}><span><strong>Copy third-break lists as images</strong><em>My Team: one click copies the eligible and not-yet-eligible recruiters as a picture</em></span></label>
-    <label class="mod-opt"><input type="checkbox" data-sec="copy.tables" ${(u.hidden_sections||[]).includes("copy.tables")?"":"checked"}><span><strong>Copy tables</strong><em>Allow copying tables and candidate lists to the clipboard</em></span></label>
-    <fieldset class="sec-grid"><legend>What this person sees on each page <span class="hint">(untick to hide a card or section)</span></legend>${Object.entries(PAGE_SECTIONS).map(([mod,secs])=>`<details class="sec-page" data-sec-mod="${mod}" ${mod==='teams'||u.modules.includes(mod)?'':'hidden'}><summary>${escapeHtml((MODULES.find(m=>m.key===mod)||{label:mod==='teams'?'My Team':mod}).label)} <span class="sec-count"></span></summary><div class="sec-list">${secs.map(([k,l])=>`<label class="sec-opt${l.startsWith('··')?' sub sub2':l.startsWith('·')?' sub':''}"><input type="checkbox" data-sec="${k}" ${(u.hidden_sections||[]).includes(k)?'':'checked'}> ${escapeHtml(l.replace(/^·+ /,''))}</label>`).join('')}</div></details>`).join('')}</fieldset>
-    <div class="field" style="margin-top:8px;max-width:340px"><label for="ufDefaultView">Default page when they sign in</label><select id="ufDefaultView"><option value="">Their own choice (first page they can open)</option>${defaultViewOptions(u).map(([v,l])=>`<option value="${v}" ${adminDefaultViews()[u.id]===v?'selected':''}>${escapeHtml(l)}</option>`).join('')}</select><span class="hint">They can still change it themselves in Settings → My account.</span></div>
-    <label class="mod-opt" style="margin-top:6px;"><input type="checkbox" id="ufActive" ${u.active?'checked':''}><span><strong>Account active</strong><em>Untick to block sign-in without deleting the account</em></span></label>`}
-    <p class="auth-msg" id="ufMsg" role="alert"></p>
-    <div class="user-form-actions"><button class="btn btn-secondary btn-sm" id="ufCancel">Cancel</button><button class="btn btn-primary btn-sm" id="ufSave">${isNew?'Create user':'Save changes'}</button></div>
+    <footer class="uf-foot"><p class="auth-msg" id="ufMsg" role="alert"></p><button class="btn btn-secondary" id="ufCancel">Cancel</button><button class="btn btn-primary" id="ufSave">${isNew?'Create user':'Save changes'}</button></footer>
   </div>`;
+  host.classList.add('uf-open'); document.body.classList.add('uf-lock');
+  const countPages=()=>{ const el=host.querySelector('#ufPageCount'); if(!el) return; const on=[...host.querySelectorAll('.uf-page input[data-mod]')].filter(i=>i.closest('.uf-page-main')&&i.checked).length, all=host.querySelectorAll('.uf-page-main input[data-mod]').length; el.textContent=on+' of '+all+' pages on'; };
+  host.querySelectorAll('.uf-page-main input[data-mod]').forEach(i=>i.addEventListener('change',()=>{ i.closest('.uf-page').classList.toggle('off',!i.checked); countPages(); }));
+  host.querySelectorAll('.uf-page-main input[data-mod]').forEach(i=>i.closest('.uf-page').classList.toggle('off',!i.checked)); countPages();
+  host.querySelectorAll('[data-preset]').forEach(b=>b.onclick=()=>{ const pr=UF_PRESETS[+b.dataset.preset]; const keepHidden=[...host.querySelectorAll('[data-sec]:not(:checked)')].map(i=>i.dataset.sec); applyFormRights(host,{modules:pr.modules,hidden_sections:[...keepHidden,...(pr.grants||[])],defaultView:host.querySelector('#ufDefaultView')?.value||''});
+    host.querySelectorAll('[data-preset]').forEach(x=>x.classList.toggle('on',x===b)); const n=host.querySelector('#ufCopyNote'); if(n) n.textContent=pr.name+' rights filled in — review, then '+(isNew?'create the user.':'save.'); });
+  const closeForm=()=>{ editingUserId=null; host.innerHTML=''; host.classList.remove('uf-open'); document.body.classList.remove('uf-lock'); };
+  host.querySelector('#ufClose').onclick=closeForm;
+  host.onkeydown=e=>{ if(e.key==='Escape') closeForm(); };
   host.querySelector('#ufGen')?.addEventListener('click', ()=>{ host.querySelector('#ufPw').value = genPassword(); });
-  host.querySelectorAll('input[name="ufRole"]').forEach(r=>r.addEventListener('change', ()=>{ const adm = host.querySelector('input[name="ufRole"]:checked').value==='admin'; host.querySelector('.admin-note')?.toggleAttribute('hidden', !adm); host.querySelectorAll('.mod-grid,.sec-grid').forEach(f=>f.classList.toggle('dimmed', adm)); }));
-  if(u.role==='admin') host.querySelectorAll('.mod-grid,.sec-grid').forEach(f=>f.classList.add('dimmed'));
+  host.querySelectorAll('input[name="ufRole"]').forEach(r=>r.addEventListener('change', ()=>{ const adm = host.querySelector('input[name="ufRole"]:checked').value==='admin'; host.querySelector('.admin-note')?.toggleAttribute('hidden', !adm); host.querySelectorAll('.uf-access').forEach(f=>f.classList.toggle('dimmed', adm)); }));
+  if(u.role==='admin') host.querySelectorAll('.uf-access').forEach(f=>f.classList.add('dimmed'));
   const secCount = ()=>host.querySelectorAll('.sec-page').forEach(d=>{ const all=d.querySelectorAll('[data-sec]').length, on=d.querySelectorAll('[data-sec]:checked').length; d.querySelector('.sec-count').textContent = on===all ? 'everything' : on+' of '+all+' shown'; });
-  host.querySelectorAll('.mod-grid input').forEach(cb=>cb.addEventListener('change', ()=>{ const d=host.querySelector('.sec-page[data-sec-mod="'+cb.value+'"]'); if(d) d.hidden=!cb.checked; }));
+  host.querySelectorAll('input[data-mod]').forEach(cb=>cb.addEventListener('change', ()=>{ const d=host.querySelector('.sec-page[data-sec-mod="'+cb.value+'"]'); if(d) d.hidden=!cb.checked; }));
   const LINE_PARENT={goal_reach:'schedules',shows:'interviews',no_shows:'interviews',hire_rate:'hires'};
   const syncDetail = ()=>{
     ['perf','team'].forEach(pf=>Object.entries(LINE_PARENT).forEach(([l,c])=>{ const cb=host.querySelector('[data-sec="'+pf+'.kpi.'+l+'"]'), par=host.querySelector('[data-sec="'+pf+'.kpi.'+c+'"]'); if(cb&&par){ cb.disabled=!par.checked; if(!par.checked) cb.checked=false; } }));
@@ -9617,13 +9791,13 @@ function drawUserForm(){
   host.querySelector('#ufCopyFrom')?.addEventListener('change',e=>{ const src=usersCache.find(x=>String(x.id)===e.target.value); if(!src) return;
     applyFormRights(host, rightsOf(src)); host.querySelector('#ufCopyNote').textContent=`Copied from ${src.name} — review, then ${isNew?'create the user':'save'}.`; e.target.value=''; });
   host.querySelector('#ufApplyOthers')?.addEventListener('click',()=>{ applyRightsToOthers(host.querySelector('#ufName').value.trim()||u.name, readFormRights(host), u.id); });
-  host.querySelector('#ufCancel').onclick=()=>{ editingUserId=null; host.innerHTML=''; };
+  host.querySelector('#ufCancel').onclick=closeForm;
   host.querySelector('#ufSave').onclick=async ()=>{
     const p = {name:host.querySelector('#ufName').value.trim()};
     if(!isNew) p.id = u.id;
     const pw = host.querySelector('#ufPw').value; if(pw) p.password = pw;
     const roleIn = host.querySelector('input[name="ufRole"]:checked'); if(roleIn) p.role = roleIn.value;
-    if(!sa){ p.modules = [...host.querySelectorAll('.mod-grid input:checked')].map(i=>i.value); p.active = host.querySelector('#ufActive').checked; p.hidden_sections = [...host.querySelectorAll('[data-sec]:not(:checked)')].map(i=>i.dataset.sec).concat([...host.querySelectorAll('[data-grant]:checked')].map(i=>i.dataset.grant)); }
+    if(!sa){ p.modules = [...host.querySelectorAll('input[data-mod]:checked')].map(i=>i.value); p.active = host.querySelector('#ufActive').checked; p.hidden_sections = [...host.querySelectorAll('[data-sec]:not(:checked)')].map(i=>i.dataset.sec).concat([...host.querySelectorAll('[data-grant]:checked')].map(i=>i.dataset.grant)); }
     if(isNew && !pw){ host.querySelector('#ufMsg').textContent='Set a password (or click Generate).'; return; }
     try{
       const saved = await Server.rpc('dash_user_save', {p});
@@ -9642,11 +9816,10 @@ function drawUserForm(){
       }
       showToast(isNew ? 'User created. Share the name and password with '+p.name+' privately.' : 'Saved.'+(dropped.length||grantLost.length?' Some rights were not accepted — see the message.':' '+p.name+' sees the change within a few seconds.'));
       if(isNew && pw) host.insertAdjacentHTML('afterend','');
-      editingUserId=null; renderUsersAdmin();
+      closeForm(); renderUsersAdmin();
       if(!isNew && u.id===Server.user.id){ Server.user = await Server.rpc('dash_me'); applyPermissions(); }
     }catch(e){ host.querySelector('#ufMsg').textContent = cleanErr(e); }
   };
-  host.scrollIntoView({block:'nearest'});
   host.querySelector('#ufName').focus();
 }
 async function renderActivityLog(){
