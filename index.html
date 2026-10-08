@@ -1222,7 +1222,7 @@ body.team-workspace .content{padding-top:10px!important}
 .mb-table tr.mb-first td{border-top:2px solid #e1eaed}.mb-tot td{background:#f3f8f8;font-weight:600}
 .mb-table td.mb-num small{display:inline;margin-left:3px;font-size:10.5px;color:#7a8f99;font-weight:500}.mb-g b{color:#15633f}.mb-a b{color:#8a6a1f}.mb-r b{color:#a12d36}
 .mb-tag{display:inline-block;margin-top:5px;font-size:10px;font-weight:700;padding:1px 6px;border-radius:5px;background:#eef3f5;color:#5c7480}.mb-tag.man{background:#efe8fb;color:#5b3fa0}.mb-edit{display:block;margin-top:6px}
-.bm-groups{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}.bm-group{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid #e1eaed;border-radius:10px}.bm-group>div{flex:1;min-width:0}.bm-group strong{display:block;color:#10303c}.bm-group span{display:block;font-size:12px;color:#6a808b}
+.bm-groups{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}.bm-groups-title{margin:18px 0 8px;font-size:13px;color:#4a6370}.bm-group{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid #e1eaed;border-radius:10px}.bm-group>div{flex:1;min-width:0}.bm-group strong{display:block;color:#10303c}.bm-group span{display:block;font-size:12px;color:#6a808b}
 .bm-name{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:#3f5863;margin-bottom:8px}.bm-name input,#bmSearch{padding:8px 10px;border:1px solid #d6e2e6;border-radius:8px;font:inherit;width:100%}
 .bm-list{max-height:300px;overflow:auto;border:1px solid #e1eaed;border-radius:10px;margin-top:8px}.bm-opt{display:flex;gap:10px;align-items:center;padding:8px 12px;border-top:1px solid #eef3f5;cursor:pointer;font-size:13px}.bm-opt:first-child{border-top:0}.bm-opt.off{opacity:.55;cursor:not-allowed}.bm-opt em{font-style:normal;font-size:11px;color:#7a8f99}
 .bm-msg{color:#a12d36;font-size:12.5px;min-height:1em;margin:8px 0 0}.bm-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
@@ -1421,6 +1421,81 @@ body.on-history .top-back{display:none!important}
 @media(max-width:1100px){.kpi-grid.mk-team{flex-wrap:nowrap!important}.kpi-grid.mk-team>*{flex:0 0 200px!important}}
 @media(max-width:900px){.al-tiles>*{flex:1 1 calc(50% - 12px)!important}}
 @media(max-width:760px){.kpi-grid.mk-grid:not(.mk-team)>*{flex:1 1 100%!important;min-width:0}.hp-sticky #histTiles{flex-wrap:nowrap}}
+
+/* ================= v4.22 — calmer, clearer chrome ================= */
+:root{--ink:#0f2c36;--ink-2:#163a46;--mint:#5fd0bf;--mint-ink:#1c8c84;--paper:#f3f6f7;--line:#e2eaed;--muted:#6b8590}
+body{background:var(--paper)!important}
+@media (min-width:761px){
+  :root{--side-w:232px}
+  body.side-collapsed{--side-w:72px}
+  .sidebar{background:var(--ink)!important;border-right:0!important;box-shadow:none!important;padding:18px 12px 12px!important}
+  /* brand: one line, version moves to the tooltip */
+  .sidebar .brand{padding:0 6px 16px!important;margin-bottom:4px;border-bottom:0!important;gap:10px!important}
+  .brand-mark{width:32px;height:32px;flex-basis:32px;border-radius:9px;background:var(--mint);color:var(--ink);box-shadow:none}
+  .brand-mark svg{width:17px;height:17px}
+  .sidebar .brand h1{font-size:14px!important;font-weight:700;letter-spacing:-.01em;color:#fff}
+  .sidebar .brand p{display:none!important}
+  .side-collapse{top:21px;right:8px;width:24px;height:24px;border-color:transparent;background:transparent;color:#86a3ad}
+  .side-collapse:hover{background:#ffffff14}
+  /* groups: quiet sentence-case headings */
+  .nav-group-label{font-size:11px!important;font-weight:600!important;letter-spacing:0!important;text-transform:none!important;color:#7f9ca6!important;padding:16px 12px 6px!important}
+  .nav-group-label:first-child{padding-top:4px!important}
+  .nav{gap:2px!important}
+  .nav button{height:38px;padding:0 12px!important;border-radius:8px!important;font-size:13.5px!important;font-weight:500!important;color:#c3d6dc!important;gap:11px!important}
+  .nav button:hover{background:#ffffff0d!important;color:#fff!important}
+  .nav button.active{background:#ffffff17!important;color:#fff!important;font-weight:600!important;box-shadow:none!important}
+  .nav button.active::before{left:-12px;top:9px;bottom:9px;width:3px;background:var(--mint)}
+  .nav button.active .nav-ico{color:var(--mint)!important}
+  .nav-ico{width:18px;height:18px;flex-basis:18px;opacity:.9}
+  /* tools: one tidy row of three, above the account */
+  .side-label-tools{display:none!important}
+  .ribbon-actions{margin-top:auto!important;display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;gap:6px!important;padding-top:12px;border-top:1px solid #ffffff12}
+  .ribbon-actions>.ribbon-btn,.ribbon-actions>.download-dropdown-wrap{flex:1 1 0!important;min-width:0;width:auto!important}
+  .ribbon-actions>.ribbon-btn.hidden,.ribbon-actions>.download-dropdown-wrap.hidden{display:none!important}
+  .ribbon-actions .download-dropdown-wrap>.ribbon-btn{width:100%!important}
+  .rb-l{display:none}
+  .ribbon-actions>.ribbon-btn,.ribbon-actions .download-dropdown-wrap>.ribbon-btn{flex-direction:column!important;gap:4px!important;justify-content:center!important;align-items:center!important;height:54px;padding:6px 2px!important;
+    font-size:11px!important;font-weight:500;border-radius:9px!important;background:#ffffff08!important;border:1px solid #ffffff10!important;color:#c3d6dc!important}
+  .ribbon-actions>.ribbon-btn:hover,.ribbon-actions .download-dropdown-wrap>.ribbon-btn:hover{background:#ffffff14!important;color:#fff!important}
+  #accessModeBtn.active{background:#5fd0bf26!important;border-color:#5fd0bf55!important;color:#fff!important}
+  .ribbon-actions .rb-ico{width:18px;height:18px;flex-basis:auto}
+  .download-dropdown-wrap .download-dropdown-menu{position:absolute!important;left:0;right:auto;top:auto!important;bottom:calc(100% + 8px);min-width:220px;margin:0!important;border-radius:12px;box-shadow:0 12px 32px #1834422e!important;z-index:400}
+  .user-chip-wrap{flex:1 1 100%!important;margin-top:6px!important;padding-top:0!important;border-top:0!important}
+  .ribbon-actions .user-chip{display:flex!important;align-items:center;gap:10px;height:auto;padding:8px 10px!important;border-radius:10px!important;background:transparent!important;border:1px solid transparent!important;flex-direction:row!important}
+  .ribbon-actions .user-chip:hover,.ribbon-actions .user-chip[aria-expanded="true"]{background:#ffffff10!important}
+  .user-dot{width:30px;height:30px;background:var(--mint);color:var(--ink);font-size:12.5px}
+  .ribbon-actions .user-chip .user-name{display:flex!important;flex-direction:column;align-items:flex-start;min-width:0;line-height:1.2;text-align:left}
+  .user-name b{font-size:13px;font-weight:600;color:#fff;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .user-name small{font-size:11px;color:#86a3ad;font-weight:500}
+  .user-caret{width:14px;height:14px;margin-left:auto;color:#86a3ad}
+  /* collapsed rail */
+  body.side-collapsed .sidebar{padding-left:8px!important;padding-right:8px!important}
+  body.side-collapsed .sidebar .brand{padding-bottom:44px!important}
+  body.side-collapsed .side-collapse{top:58px}
+  body.side-collapsed .nav-group-label{border-top-color:#ffffff12!important;margin:6px 10px!important}
+  body.side-collapsed .nav button{padding:0!important;justify-content:center}
+  body.side-collapsed .ribbon-actions{flex-direction:column!important;flex-wrap:nowrap!important;align-items:stretch!important}
+  body.side-collapsed .ribbon-actions>.ribbon-btn,body.side-collapsed .ribbon-actions>.download-dropdown-wrap,body.side-collapsed .user-chip-wrap{flex:0 0 auto!important;width:100%!important}
+  body.side-collapsed .nav-group-label{font-size:0!important;padding:0!important;height:0;border-top:1px solid #ffffff14!important;margin:8px 12px!important}
+  body.side-collapsed .ribbon-actions>.ribbon-btn,body.side-collapsed .ribbon-actions .download-dropdown-wrap>.ribbon-btn{height:40px}
+  body.side-collapsed .rb-label,body.side-collapsed .user-caret{display:none!important}
+  body.side-collapsed .ribbon-actions .user-chip .user-name{display:none!important}
+  body.side-collapsed .ribbon-actions .user-chip{justify-content:center;padding:6px 0!important}
+  /* page header: lighter and shorter */
+  .topbar{padding-top:18px!important;padding-bottom:16px!important;background:color-mix(in srgb,var(--paper) 92%,transparent)!important;backdrop-filter:blur(8px);border-bottom:1px solid var(--line)!important;box-shadow:none!important}
+  .topbar h2{font-size:24px!important;letter-spacing:-.02em!important;font-weight:750!important;color:var(--ink)}
+  .topbar .sub{font-size:12.5px!important;margin-top:3px!important;color:var(--muted)}
+}
+/* surfaces: one border, one radius, no heavy shadows */
+.panel{border-color:var(--line)!important;border-radius:14px!important;box-shadow:0 1px 2px #0f2c360a!important}
+.btn{border-radius:9px}
+.btn-secondary{border-color:#d6e1e5}
+.btn-secondary:hover{background:#eef4f6}
+:focus-visible{outline:2px solid var(--mint-ink);outline-offset:2px}
+@media (max-width:760px){
+  .rb-s{display:none}.user-caret{display:none!important}
+  .user-name b{font-weight:600}.user-name small{margin-left:6px;opacity:.7;font-size:11px}
+}
 </style>
 </head>
 <body class="locked">
@@ -1439,7 +1514,6 @@ body.on-history .top-back{display:none!important}
     <button type="button" class="side-collapse" id="sideCollapseBtn" aria-label="Collapse menu" title="Collapse menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
     <div class="side-label">Views</div>
     <nav class="nav" id="navList">
-      <div class="nav-group-label">Overview</div>
       <button data-view="performance" class="active"><span class="dot"></span>Performance Overview</button>
       <div class="nav-group-label">Teams</div>
       <button data-view="teams"><span class="dot"></span>My Team</button>
@@ -1454,10 +1528,10 @@ body.on-history .top-back{display:none!important}
     </nav>
     <div class="side-label side-label-tools">Tools</div>
     <div class="ribbon-actions">
-      <button class="ribbon-btn hidden" id="accessModeBtn" title="Super admin: choose who can see or edit each part of this page, right here"><svg class="rb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span class="rb-label">Manage access</span></button>
-      <button class="ribbon-btn" id="clearAllFiltersBtn" title="Reset every dashboard filter and selection to the latest available week"><svg class="rb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8z"/><path d="M17 3l4 4M21 3l-4 4"/></svg><span class="rb-label">Clear all filters</span></button>
+      <button class="ribbon-btn hidden" id="accessModeBtn" title="Super admin: choose who can see or edit each part of this page, right here"><svg class="rb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span class="rb-label"><span class="rb-s">Access</span><span class="rb-l">Manage access</span></span></button>
+      <button class="ribbon-btn" id="clearAllFiltersBtn" title="Reset filters — clear every filter and selection and go back to the latest week"><svg class="rb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8z"/><path d="M17 3l4 4M21 3l-4 4"/></svg><span class="rb-label"><span class="rb-s">Reset</span><span class="rb-l">Reset filters</span></span></button>
       <div class="download-dropdown-wrap hidden" id="downloadDropdownWrap">
-        <button class="ribbon-btn" id="downloadDropdownBtn"><svg class="rb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg><span class="rb-label">Download</span></button>
+        <button class="ribbon-btn" id="downloadDropdownBtn"><svg class="rb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg><span class="rb-label"><span class="rb-s">Export</span><span class="rb-l">Download</span></span></button>
       </div>
       <div class="user-chip-wrap hidden" id="userChipWrap"><button type="button" class="ribbon-btn user-chip" id="userChip" title="Account menu" aria-expanded="false" aria-controls="accountMenu"></button><div id="accountMenu" hidden><button data-view="uploads" class="ribbon-btn" id="settingsNavBtn"><svg class="rb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span class="rb-label">Settings</span></button><button type="button" class="ribbon-btn" id="myAccountBtn">My account</button><button type="button" class="ribbon-btn" id="signOutBtn" title="Sign out"><svg class="rb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg><span class="rb-label">Sign out</span></button></div></div>
     </div>
@@ -1823,7 +1897,6 @@ function openBranchMergeDialog(pre){
     const shown=raw.filter(b=>!q||b.toLowerCase().includes(q));
     wrap.innerHTML=`<div class="modal bm-modal" role="dialog" aria-modal="true" aria-labelledby="bmTitle"><div class="modal-header"><h3 id="bmTitle">Merge branches</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div>
      <div class="modal-body">
-      ${list.length?`<div class="bm-groups">${list.map((g,i)=>`<div class="bm-group${i===editing?' on':''}"><div><strong>${escapeHtml(g.name)}</strong><span>${g.members.map(escapeHtml).join(' + ')}</span></div><button class="btn btn-secondary btn-sm" data-bm-edit="${i}">Edit</button><button class="btn btn-secondary btn-sm" data-bm-split="${i}">Split</button></div>`).join('')}</div>`:''}
       <div class="bm-form">
        <h4>${editing==null?'New merged branch':'Edit “'+escapeHtml(list[editing]?.name||'')+'”'}</h4>
        <label class="bm-name">Name<input id="bmName" maxlength="80" value="${escapeHtml(name)}" placeholder="e.g. Memphis area"></label>
@@ -1832,13 +1905,14 @@ function openBranchMergeDialog(pre){
        <p class="bm-msg" id="bmMsg" role="alert"></p>
        <div class="bm-actions">${editing!=null?'<button class="btn btn-secondary btn-sm" id="bmCancelEdit">Cancel edit</button>':''}<button class="btn btn-primary" id="bmDone" ${busy?'disabled':''}>${busy?'Saving…':editing==null?`Merge ${picked.size||''} branches`:'Save changes'}</button></div>
       </div>
+      ${list.length?`<h4 class="bm-groups-title">Already merged · ${list.length}</h4><div class="bm-groups">${list.map((g,i)=>`<div class="bm-group${i===editing?' on':''}"><div><strong>${escapeHtml(g.name)}</strong><span>${g.members.map(escapeHtml).join(' + ')}</span></div><button class="btn btn-secondary btn-sm" data-bm-edit="${i}">Edit</button><button class="btn btn-secondary btn-sm" data-bm-split="${i}">Split</button></div>`).join('')}</div>`:''}
       <p class="hint bm-note">Merged branches count as one everywhere, for everyone. The uploaded data isn’t changed — Split brings the branches back.</p>
      </div></div>`;
     const keepFocus=sel=>{ const el=wrap.querySelector(sel); if(el){ el.focus(); const v=el.value; el.setSelectionRange?.(v.length,v.length); } };
     wrap.querySelector('#bmName').oninput=e=>{ name=e.target.value; };
     wrap.querySelector('#bmSearch').oninput=e=>{ q=e.target.value.trim().toLowerCase(); draw(); keepFocus('#bmSearch'); };
     wrap.querySelectorAll('.bm-list input').forEach(i=>i.onchange=()=>{ i.checked?picked.add(i.value):picked.delete(i.value); wrap.querySelector('.bm-search span').textContent=picked.size+' selected'; const d=wrap.querySelector('#bmDone'); if(editing==null) d.textContent=`Merge ${picked.size||''} branches`; });
-    wrap.querySelectorAll('[data-bm-edit]').forEach(b=>b.onclick=()=>{ editing=Number(b.dataset.bmEdit); const g=list[editing]; name=g.name; picked=new Set(g.members); q=''; draw(); });
+    wrap.querySelectorAll('[data-bm-edit]').forEach(b=>b.onclick=()=>{ editing=Number(b.dataset.bmEdit); const g=list[editing]; name=g.name; picked=new Set(g.members); q=''; draw(); const mb=wrap.querySelector('.modal-body'); if(mb) mb.scrollTop=0; wrap.querySelector('.modal')?.scrollTo?.(0,0); wrap.querySelector('#bmName')?.focus(); });
     wrap.querySelector('#bmCancelEdit')?.addEventListener('click',()=>{ editing=null; name=''; picked=new Set(); draw(); });
     wrap.querySelectorAll('[data-bm-split]').forEach(b=>b.onclick=async()=>{ const g=list[Number(b.dataset.bmSplit)]; if(!confirm(`Split “${g.name}” back into ${g.members.length} branches?`)) return;
       if(await saveBranchMerges(list.filter(x=>x!==g))){ showToast(`“${g.name}” split back into its branches.`); editing=null; name=''; picked=new Set(); draw(); } });
@@ -4385,7 +4459,14 @@ async function renderWeeklyView(){
   const trendWeeks=isMultiWeekMode ? weeksForAggregate : [week];
   const trendGoals=await Promise.all(trendWeeks.map(w=>computeGoalsForWeeks([w],universalDivision,w.weekEndDate).then(g=>g.total)));
   if(revision!==weeklyRenderRevision || currentView!=='performance') return;
-  renderTrendExplorer(weeksData.slice(-6).map(w=>scopeWeekToDivision(w,universalDivision)));
+  // trends follow the chosen period: every week for All weeks, the picked weeks for a multi-week selection,
+  // otherwise the 6 weeks up to the selected week
+  { const sorted=[...weeksData].sort((a,b)=>a.weekEndDate.localeCompare(b.weekEndDate));
+    const tw=isMultiWeekMode ? [...weeksForAggregate].sort((a,b)=>a.weekEndDate.localeCompare(b.weekEndDate))
+      : sorted.filter(w=>w.weekEndDate<=week.weekEndDate).slice(-6);
+    trendScope = isAllWeeks ? `All ${tw.length} weeks` : isMultiWeekMode ? `${tw.length} selected week${tw.length===1?'':'s'}` : `${tw.length} weeks up to Week ${week.weekNumber}`;
+    const n=document.getElementById('trendScopeNote'); if(n) n.textContent=trendScope;
+    renderTrendExplorer(tw.map(w=>scopeWeekToDivision(w,universalDivision))); }
 
 }
 
@@ -5005,9 +5086,9 @@ function drawDivisionBreakdown(weeksList, chartId, onDivisionClick, selectedDivi
 }
 
 /* ============================= ALL-CATEGORIES TREND ============================= */
-let trendGranularity='weeks';
+let trendGranularity='weeks', trendScope='Latest 6 available weeks';
 function trendExplorerHtml(){
- return '<div class="trend-explorer" data-export-exclude><div class="trend-controls"><label for="trendScale">Time scale</label><input id="trendScale" aria-label="Time scale: days, weeks, months, quarters" type="range" min="0" max="3" step="1" value="'+['days','weeks','months','quarters'].indexOf(trendGranularity)+'"><strong id="trendScaleLabel">'+trendGranularity+'</strong><span>Latest 6 available weeks · division filter applied. Scroll horizontally to explore. Hiring target: 15 per recruiter per week, scaled to the period.</span></div><div class="row-2col">'+explorerPanel('Show Rate','explorerShowRate')+explorerPanel('Hires per Recruiter','explorerHires')+'</div>'+explorerPanel('Performance Trend','explorerActivity')+'</div>';
+ return '<div class="trend-explorer" data-export-exclude><div class="trend-controls"><label for="trendScale">Time scale</label><input id="trendScale" aria-label="Time scale: days, weeks, months, quarters" type="range" min="0" max="3" step="1" value="'+['days','weeks','months','quarters'].indexOf(trendGranularity)+'"><strong id="trendScaleLabel">'+trendGranularity+'</strong><span><b id="trendScopeNote">'+escapeHtml(trendScope)+'</b> · division filter applied. Scroll sideways to see every week. Hiring target: 15 per recruiter per week, scaled to the period.</span></div><div class="row-2col">'+explorerPanel('Show Rate','explorerShowRate')+explorerPanel('Hires per Recruiter','explorerHires')+'</div>'+explorerPanel('Performance Trend','explorerActivity')+'</div>';
 }
 function explorerPanel(title,id){return '<div class="panel"><div class="panel-head"><h3>'+title+'</h3></div><div class="explorer-scroll"><div class="explorer-canvas"><canvas id="'+id+'"></canvas></div></div></div>';}
 function trendBuckets(weeks,unit){
@@ -7855,7 +7936,7 @@ function applyPermissions(){
   document.querySelectorAll('#settingsTabs .settings-tab').forEach(t=>t.classList.toggle('hidden', tabs[t.dataset.tab]===false));
   document.querySelectorAll('#settingsTabs .settings-group').forEach(g=>{ let n=g.nextElementSibling, any=false; while(n && !n.classList.contains('settings-group')){ if(!n.classList.contains('hidden')) any=true; n=n.nextElementSibling; } g.classList.toggle('hidden', !any); });
   const chip = document.getElementById('userChip');
-  if(chip) chip.innerHTML = `<span class="user-dot" aria-hidden="true">${escapeHtml((u.name||'?').trim().charAt(0).toUpperCase())}</span><span class="user-name">${escapeHtml(u.name)}</span>`;
+  if(chip) chip.innerHTML = `<span class="user-dot" aria-hidden="true">${escapeHtml((u.name||'?').trim().charAt(0).toUpperCase())}</span><span class="user-name"><b>${escapeHtml(u.name)}</b><small>${u.role==='super_admin'?'Super admin':u.role==='admin'?'Admin':'Member'}</small></span><svg class="user-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>`;
   document.getElementById('userChipWrap')?.classList.remove('hidden');
 }
 
@@ -10378,6 +10459,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 const APP_VERSION = 'Version 4.21.0';
 async function init(){
   document.getElementById('versionLabelInline').textContent = APP_VERSION;
+  { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page · '+APP_VERSION; }
   document.getElementById('footerVersionLabel').textContent = APP_VERSION;
   document.getElementById('footerCopyrightYear').textContent = new Date().getFullYear();
   if(EMBEDDED_WEEKS && Array.isArray(EMBEDDED_WEEKS) && EMBEDDED_WEEKS.length){
@@ -10526,7 +10608,7 @@ function openAccessMenu(btn){
   menu.hidden=false;
   const r=btn.getBoundingClientRect(), mobile=window.innerWidth<=760;
   if(mobile){ Object.assign(menu.style,{left:'12px',right:'12px',top:'auto',bottom:'calc(80px + env(safe-area-inset-bottom))',width:'auto'}); }
-  else { const h=menu.offsetHeight||200; Object.assign(menu.style,{left:Math.round(r.right+10)+'px',right:'auto',bottom:'auto',top:Math.max(12,Math.min(r.top,window.innerHeight-h-12))+'px',width:'280px'}); }
+  else { const h=menu.offsetHeight||200, side=document.querySelector('.sidebar')?.getBoundingClientRect(); Object.assign(menu.style,{left:Math.round((side?side.right:r.right)+10)+'px',right:'auto',bottom:'auto',top:Math.max(12,Math.min(r.top,window.innerHeight-h-12))+'px',width:'280px'}); }
   menu.querySelector('[data-a="page"]').onclick=()=>{ close(); openAccessEditor({page:currentView==='history'?historyState.from:currentView}); };
   menu.querySelector('[data-a="locks"]').onclick=()=>{ close(); setAccessMode(!accessMode); };
   menu.querySelector('[data-a="hover"]').onclick=()=>{ close(); const o=!document.body.classList.contains('acc-hover-off'); document.body.classList.toggle('acc-hover-off',o); try{ localStorage.setItem('ipd_acc_hover_off',o?'1':'0'); }catch(e){} showToast(o?'Hover locks turned off.':'Hover locks turned on.'); };
