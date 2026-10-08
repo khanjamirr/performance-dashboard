@@ -928,7 +928,10 @@ button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #183442
 .al-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
 .al-grid.compact{margin-top:12px}
 .al-card{border:1px solid #e1eaed;border-left:4px solid #d64545;border-radius:12px;padding:12px 14px;background:#fff;display:flex;flex-direction:column;gap:6px}
-.al-card.warn{border-left-color:#e0a020}
+.al-card.warn{border-left-color:#e0a020}.al-card.good{border-left-color:#16a34a}.al-card.good .al-pct{color:#15803d}.al-card.good .al-bar i{background:#16a34a}
+.al-tiles .al-tile{cursor:pointer;text-align:left;font:inherit;transition:box-shadow .15s,opacity .15s}.al-tiles .al-tile:not(.sel){opacity:.72}.al-tiles .al-tile.sel{opacity:1;box-shadow:0 0 0 2px currentColor inset}.al-tile.bad.sel{color:#b91c1c}.al-tile.warn.sel{color:#a16207}.al-tile.good.sel{color:#15803d}.al-tile.info{background:#f5f8ff;border:1px solid #dbe5fd}.al-tile.info.sel{color:#1d4ed8}.al-tile.info strong{color:#1d4ed8}
+.al-basis-pick .ua-filter{margin-top:4px}.al-basis-pick .ua-filter button:disabled{opacity:.45;cursor:not-allowed}.al-dot.good{background:#16a34a}
+.pc-log{margin-top:12px;padding:10px 12px;border-radius:8px;background:#f3f6fb;font-size:12.5px;color:#13264a}.pc-log.bad{background:#fff7e6}.pc-log ul{margin:6px 0 0;padding-left:18px}.pc-log li.bad{color:#b45309}
 .al-section .panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.al-section summary{display:flex;align-items:center;gap:10px}.al-copy{margin-left:auto;white-space:nowrap}
 .al-card[data-al-card]{cursor:pointer;transition:box-shadow .15s,transform .15s}.al-card[data-al-card]:hover{box-shadow:0 8px 20px #18344218;transform:translateY(-1px)}.al-card[data-al-card]:focus-visible{outline:2px solid #1d4ed8;outline-offset:2px}
 .al-card.bad{background:linear-gradient(90deg,#fff5f5,#fff 40%)}
@@ -2318,10 +2321,12 @@ const NamePolicy={
   label(raw,eid){
     if(this.show()){ if(this.isTok(raw)) return this.cache.get(raw)||'Unlocking…'; if(this.isHash(raw)) return this.code(raw)+' (name not saved)'; return raw||'—'; }
     return this.code(raw); },
-  async getKey(){ if(this.key) return this.key; if(this.keyTried) return null; this.keyTried=true;
-    try{ const hex=await Server.rpc('dash_name_key'); if(!hex||typeof hex!=='string') return null; const raw=new Uint8Array(hex.match(/../g).map(h=>parseInt(h,16)));
+  // a failed lookup is retried after 15 s (or at once with force) — e.g. right after privacy.sql is run
+  keyErr:'', keyAt:0,
+  async getKey(force){ if(this.key) return this.key; if(!force&&this.keyAt&&Date.now()-this.keyAt<15000) return null; this.keyAt=Date.now(); this.keyErr='';
+    try{ const hex=await Server.rpc('dash_name_key'); if(!hex||typeof hex!=='string'||!/^[0-9a-f]{64}$/i.test(hex.trim())){ this.keyErr='The server returned no key.'; return null; } const raw=new Uint8Array(hex.trim().match(/../g).map(h=>parseInt(h,16)));
       this.key={aes:await crypto.subtle.importKey('raw',raw,'AES-GCM',false,['encrypt','decrypt']), mac:await crypto.subtle.importKey('raw',raw,{name:'HMAC',hash:'SHA-256'},false,['sign'])}; return this.key; }
-    catch(e){ return null; } },
+    catch(e){ const m=e.message||''; this.keyErr=/Could not find|does not exist|schema cache/i.test(m)?'privacy.sql hasn’t been run in Supabase yet.':/FORBIDDEN/.test(m)?'Your account can’t read the key — it needs admin or the upload right.':cleanErr(e); return null; } },
   // deterministic: the same name always gives the same token, so repeat-candidate checks still work
   async enc(name){ const k=await this.getKey(); if(!k||!name) return null; const data=new TextEncoder().encode(name);
     const iv=new Uint8Array(await crypto.subtle.sign('HMAC',k.mac,data)).slice(0,12);
@@ -4002,6 +4007,7 @@ document.getElementById('navList').addEventListener('click', (e)=>{
   const btn = e.target.closest('button[data-view]');
   if(!btn) return;
   if(btn.dataset.view==='pivot' && currentView!=='pivot') pivotOpened=false;
+  if(btn.dataset.view==='alerts' && currentView!=='alerts') alertsState.band='below';
   currentView = btn.dataset.view;
   document.querySelectorAll('#navList button').forEach(b=> b.classList.toggle('active', b===btn));
   document.getElementById('settingsNavBtn').classList.remove('active');
@@ -8183,7 +8189,7 @@ const PAGE_SECTIONS = {
   branches:[['br.table','Branch table'],['hist.team','History page — recruiters in the branch']],
   candidates:[['cand.list','Category boxes and candidate list'],['cand.explain','“How are these counted?” breakdown']],
   pivot:[['pivot.chart','Chart'],['pivot.table','Pivot table']],
-  alerts:[['alerts.summary','Summary tiles'],['alerts.below','Below 50% of goal'],['alerts.watch','50–79% of goal'],['alerts.signals','Other signals & wins'],['alerts.approvals','Remarks awaiting approval (approvers only)']],
+  alerts:[['alerts.summary','Summary tiles'],['alerts.below','Below 50% of goal'],['alerts.watch','50–79% of goal'],['alerts.approvals','Remarks awaiting approval (approvers only)']],
 };
 function applySectionAccess(){
   let st = document.getElementById('sectionAccessStyle');
@@ -8435,66 +8441,81 @@ function chooseSourceDialog(fileName){
 // ---------- One-off clean-up: encrypt names already saved + drop unused columns ----------
 // Re-saves every week through the normal upload path, so the database ends up exactly as if the
 // files had been uploaded today: only the needed columns, candidate names encrypted.
+let privacyLog=null;   // {running, lines:[], result}
 function renderPrivacyCleanup(){
   const host=document.getElementById('privacyCleanup'); if(!host) return;
   if(!(Server.user&&(Server.isAdmin()||Server.can('upload')))){ host.innerHTML=''; return; }
-  const done=KV.get('privacyCleanupAt');
+  const done=KV.get('privacyCleanupAt'), run=privacyLog&&privacyLog.running;
   host.innerHTML=`<div class="panel set-card"><h3 class="set-title">Encrypt saved names &amp; slim the data</h3>
-    <div class="set-row"><div><strong>${done?'Last run '+escapeHtml(new Date(done.at).toLocaleString())+(done.by?' by '+escapeHtml(done.by):''):'Weeks uploaded before encryption still hold plain names and extra columns'}</strong>
-    <span>Re-saves every week with only the columns the dashboard uses and candidate names encrypted — smaller data, faster loading. Counts don’t change. Takes a few minutes; keep this tab open.</span></div>
-    <button type="button" class="btn btn-primary btn-sm" id="privacyRun">${done?'Run again':'Encrypt & slim now'}</button></div></div>`;
+    <div class="set-row"><div><strong>${done?'Last run '+escapeHtml(new Date(done.at).toLocaleString())+(done.by?' by '+escapeHtml(done.by):'')+(done.weeks!=null?' · '+done.weeks+' week'+(done.weeks===1?'':'s')+' re-saved':''):'Weeks uploaded before encryption still hold plain names and extra columns'}</strong>
+    <span>Re-saves every week with only the columns the dashboard uses and candidate names encrypted — smaller data, faster loading. Counts don’t change. Keep this tab open while it runs.</span></div>
+    <button type="button" class="btn btn-primary btn-sm" id="privacyRun" ${run?'disabled':''}>${run?'Running…':done?'Run again':'Encrypt & slim now'}</button></div>
+    ${privacyLog?`<div class="pc-log ${privacyLog.error?'bad':''}" role="status" aria-live="polite">${privacyLog.result?`<strong>${escapeHtml(privacyLog.result)}</strong>`:''}<ul>${privacyLog.lines.slice(-8).map(l=>`<li class="${l.bad?'bad':''}">${escapeHtml(l.t)}</li>`).join('')}</ul></div>`:''}</div>`;
   host.querySelector('#privacyRun').onclick=encryptSavedNames;
 }
+function pcLog(t,bad){ if(!privacyLog) return; privacyLog.lines.push({t,bad:!!bad}); renderPrivacyCleanup(); }
 async function encryptSavedNames(){
-  if(!(await NamePolicy.getKey())){ alert('The name-protection key isn’t available.\n\nRun privacy.sql in the Supabase SQL Editor first, then try again.'); return; }
+  privacyLog={running:true,lines:[],result:'',error:false}; renderPrivacyCleanup();
+  pcLog('Getting the name-protection key…');
+  if(!(await NamePolicy.getKey(true))){ privacyLog.running=false; privacyLog.error=true; privacyLog.result='Couldn’t start: '+(NamePolicy.keyErr||'the key isn’t available.'); renderPrivacyCleanup(); return; }
   const weeks=[...weeksData].map(w=>w.weekEndDate).sort();
-  if(!weeks.length){ showToast('No saved weeks yet.'); return; }
-  if(!confirm(`Encrypt candidate names and remove unused columns for all ${weeks.length} saved weeks?\n\nCounts stay the same. Rows you excluded in Candidates that have no Employee Number may need excluding again. Keep this tab open until it finishes.`)) return;
-  const keep=new Set(Object.values(CANON)), tokCache=new Map(), touched=new Set(), localRows=new Map();
+  if(!weeks.length){ privacyLog.running=false; privacyLog.result='No saved weeks yet.'; renderPrivacyCleanup(); return; }
+  if(!confirm(`Encrypt candidate names and remove unused columns for all ${weeks.length} saved weeks?\n\nCounts stay the same. Rows you excluded in Candidates that have no Employee Number may need excluding again. Keep this tab open until it finishes.`)){ privacyLog=null; renderPrivacyCleanup(); return; }
+  const keep=new Set(Object.values(CANON)), tokCache=new Map(), touched=new Set(), localRows=new Map(), failed=[];
   const toTok=async n=>{ if(tokCache.has(n)) return tokCache.get(n); const t=await NamePolicy.enc(n)||await NamePolicy.hash(n); tokCache.set(n,t); return t; };
-  let changedWeeks=0, rowsDone=0;
+  let changedWeeks=0, skippedWeeks=0, rowsDone=0;
   Server.ownMasterUntil=Date.now()+30*60*1000;
-  try{
-    for(let wi=0; wi<weeks.length; wi++){
-      const week=weeks[wi], weekStart=tgShift(week,-6), tag='Week '+(wi+1)+' of '+weeks.length;
-      importProgress(tag+' · reading…');
+  for(let wi=0; wi<weeks.length; wi++){
+    const week=weeks[wi], weekStart=tgShift(week,-6), label='Wk '+weekOfDate(week).number;
+    try{
+      setLoading('Encrypt & slim · week '+(wi+1)+' of '+weeks.length+'…');
       const index=[]; let after='';
       for(;;){ const page=await Server.rpc('dash_week_index',{p_weeks:[week],p_after:after,p_limit:1000}); if(!page||!page.length) break; index.push(...page); after=page[page.length-1].id; }
-      const mine=index.filter(r=>(r.s&&r.sw===week)||(r.v&&r.vw===week)); if(!mine.length) continue;
+      const inS=r=>r.s&&(r.sw===undefined||r.sw===week), inV=r=>r.v&&(r.vw===undefined||r.vw===week);
+      const mine=index.filter(r=>inS(r)||inV(r)); if(!mine.length){ skippedWeeks++; continue; }
       const data=new Map(), ids=mine.map(r=>r.id), chunks=[]; for(let i=0;i<ids.length;i+=500) chunks.push(ids.slice(i,i+500));
       await runPool(chunks.map(c=>async()=>{ ((await Server.rpc('dash_rows_by_ids',{p_ids:c}))||[]).forEach(r=>data.set(r.id,r.data)); }), NET_PARALLEL);
-      // anything to do in this week?
-      const needs=[...data.values()].some(d=>Object.keys(d).some(k=>!keep.has(k)) || (d['Candidate Name']!=null && !NamePolicy.isTok(d['Candidate Name']) && !NamePolicy.isHash(d['Candidate Name']) && !isBlankIdent(d['Candidate Name'])));
-      if(!needs) continue;
+      if(data.size<ids.length){ failed.push(label); pcLog(label+': only '+data.size+' of '+ids.length+' rows could be read — left unchanged.',true); continue; }
+      const plainName=v=>v!=null&&String(v).trim()!==''&&!NamePolicy.isTok(String(v).trim())&&!NamePolicy.isHash(String(v).trim())&&!isBlankIdent(v);
+      const needs=[...data.values()].some(d=>d&&(Object.keys(d).some(k=>!keep.has(k))||plainName(d['Candidate Name'])));
+      if(!needs){ skippedWeeks++; continue; }
+      // safety: never re-save a week whose rows don't carry the core columns (unexpected format)
+      const broken=[...data.values()].filter(d=>!d||!(d['Created On']||d['Date Of'])||!('Created By' in d)).length;
+      if(broken){ failed.push(label); pcLog(label+': '+broken+' row(s) lack Created On / Date Of / Created By — left unchanged.',true); continue; }
+      let rowsWeek=0;
       for(const source of ['schedules','shows']){
-        const rows=mine.filter(r=>source==='schedules'?(r.s&&r.sw===week):(r.v&&r.vw===week)).sort((a,b)=>(Number(source==='schedules'?a.so:a.vo)||0)-(Number(source==='schedules'?b.so:b.vo)||0));
+        const rows=mine.filter(r=>source==='schedules'?inS(r):inV(r)).sort((a,b)=>(Number(source==='schedules'?a.so:a.vo)||0)-(Number(source==='schedules'?b.so:b.vo)||0));
         if(!rows.length) continue;
-        importProgress(tag+' · protecting '+(source==='schedules'?'Created On':'Date Of')+' rows…');
         const occ=new Map(), batch=[], dropped=new Set();
         for(const [idx,r] of rows.entries()){
-          const d=data.get(r.id); if(!d) continue; const out={};
+          const d=data.get(r.id), out={};
           for(const k of Object.keys(d)){ if(keep.has(k)) out[k]=d[k]; else dropped.add(k); }
-          const nm=out['Candidate Name']!=null?String(out['Candidate Name']).trim():''; if(nm && !NamePolicy.isTok(nm) && !NamePolicy.isHash(nm) && !isBlankIdent(nm)) out['Candidate Name']=await toTok(nm);
+          if(plainName(out['Candidate Name'])) out['Candidate Name']=await toTok(String(out['Candidate Name']).trim());
           const created=out['Created On']||null, dateOf=out['Date Of']||null, eid=normalizeEmployeeNumber(out['Employee Number']||'');
           const base=[created||'', String(out['Created By']||'').trim().toLowerCase(), eid || ('n:'+String(out['Candidate Name']||'').trim().toLowerCase()), dateOf||''].join('|');
           const n=occ.get(base)||0; occ.set(base,n+1); const id=base+'#'+n;
           batch.push({id, created_on:created, date_of:dateOf, recruiter:String(out['Created By']||'').trim()||'Unassigned', branch:String(out['Branch']||'').trim()||'Unassigned', employee_number:eid||null, candidate_name:String(out['Candidate Name']||'').trim()||null, ord:idx, data:out});
           localRows.set(id,out);
         }
-        const importId=await Server.rpc('dash_import_begin',{p_source:source,p_file_name:'Privacy clean-up · Wk '+weekOfDate(week).number});
+        const importId=await Server.rpc('dash_import_begin',{p_source:source,p_file_name:'Privacy clean-up · '+label});
         const parts=[]; for(let i=0;i<batch.length;i+=IMPORT_BATCH) parts.push(batch.slice(i,i+IMPORT_BATCH));
-        await runPool(parts.map(rowsPart=>()=>Server.rpc('dash_import_rows',{p_import_id:importId,p_source:source,p_rows:rowsPart})), NET_PARALLEL);
+        const counts=await runPool(parts.map(rowsPart=>()=>Server.rpc('dash_import_rows',{p_import_id:importId,p_source:source,p_rows:rowsPart})), NET_PARALLEL);
         await Server.rpc('dash_import_finish',{p_import_id:importId,p_source:source,p_from:weekStart,p_to:week,p_rows_read:batch.length,p_removed_columns:[...dropped]});
-        rowsDone+=batch.length;
+        const saved=counts.reduce((a,c)=>a+(Number(c)||0),0); rowsWeek+=batch.length; rowsDone+=batch.length;
+        if(saved&&saved<batch.length) pcLog(label+' '+(source==='schedules'?'Created On':'Date Of')+': the server kept '+saved+' of '+batch.length+' rows.',true);
       }
-      touched.add(week); changedWeeks++;
-    }
-    if(touched.size) await rebuildWeeks([...touched], localRows, importProgress);
-    await storageSet('privacyCleanupAt',{at:new Date().toISOString(),by:Server.user.name});
+      touched.add(week); changedWeeks++; pcLog(label+': '+fmtNum(rowsWeek)+' rows encrypted and slimmed.');
+    }catch(e){ failed.push(label); pcLog(label+': '+cleanErr(e),true); }
+  }
+  try{
+    if(touched.size){ pcLog('Recalculating '+touched.size+' week'+(touched.size===1?'':'s')+'…'); await rebuildWeeks([...touched], localRows, t=>setLoading(t)); }
+    await storageSet('privacyCleanupAt',{at:new Date().toISOString(),by:Server.user.name,weeks:changedWeeks});
     candState.cache?.clear?.(); await loadAllWeeks(); refreshUI();
-    showToast(changedWeeks?`Done — ${changedWeeks} week${changedWeeks===1?'':'s'} re-saved (${fmtNum(rowsDone)} rows): names encrypted, unused columns removed.`:'Everything was already encrypted and slim — nothing to change.');
-  }catch(e){ alert('The clean-up stopped: '+cleanErr(e)+'\n\nWeeks already done are saved. Run it again to finish the rest.'); }
-  finally{ setLoading(null); const u=document.getElementById('uploadFilesBtn'); if(u) u.textContent='Upload Excel files'; renderPrivacyCleanup(); }
+  }catch(e){ failed.push('recalculation'); pcLog('Recalculating: '+cleanErr(e),true); }
+  setLoading(null); const u=document.getElementById('uploadFilesBtn'); if(u) u.textContent='Upload Excel files';
+  privacyLog.running=false; privacyLog.error=failed.length>0;
+  privacyLog.result=failed.length?`Finished with problems in ${failed.join(', ')} — run it again to retry those.`:changedWeeks?`Done — ${changedWeeks} week${changedWeeks===1?'':'s'} re-saved (${fmtNum(rowsDone)} rows). ${skippedWeeks} already clean.`:`Everything was already encrypted and slim — nothing to change.`;
+  renderPrivacyCleanup();
 }
 // ---------- Admins: download exactly what the server holds ----------
 // Rows come back as stored — encrypted names stay encrypted, columns as saved — so you can check
@@ -9586,7 +9607,7 @@ function drawPivot(){
 // Who needs attention in a week. Main list: recruiters below 50% of their schedule goal (for the
 // week in progress: below 50% of where they should be by today). Then 50–79%, other signals
 // (show rate drops, no-shows, inactivity, wins), and remarks waiting for approval.
-const alertsState = {week:null, signals:'attention', search:'', group:lsGet('ipd_alerts_group')||'division'};
+const alertsState = {week:null, signals:'attention', search:'', group:lsGet('ipd_alerts_group2')||'none', band:'below', basis:lsGet('ipd_alerts_basis')||'week'};
 // Groups alert items as Division › Branch (or Branch only, or none). Biggest groups first.
 function alertsGroupHtml(items, info, renderItem, wrapClass){
   const st = alertsState;
@@ -9634,15 +9655,15 @@ function alertsGoalRows(weekEnd){
 })();
 // One click: recruiter, week-end, pipelines, goal, schedules, % achieved and remarks — as a formatted
 // table for email/Teams (HTML) and tab-separated text for Excel.
-async function copyRemarksTable(rows, week, band){
+async function copyRemarksTable(rows, week, band, soFar){
   if(!rows.length){ showToast('Nobody to copy.'); return; }
   const d=new Date(week+'T12:00:00'), we=String(d.getDate()).padStart(2,'0')+'-'+d.toLocaleString('en-US',{month:'short'})+'-'+String(d.getFullYear()).slice(2);
   const remarkOf=n=>{ const all=Remarks.forWeek(n,week), ap=all.filter(r=>(r.status||'approved')==='approved'); return (ap.length?ap:all).map(r=>r.remark).join(' | '); };
-  const H=['Recruiter Name','Week-End Date','# of Pipelines','GOALS of Schedules','# of Schedules','% Achieved vs Goals','Remarks'];
-  const data=rows.map(r=>{ const pct=r.goal?Math.round(r.sched/r.goal*100):null; return [r.name,we,r.interviews||0,r.goal||'NA',r.sched==null?'NA':r.sched,pct==null?'NA':pct+'%',remarkOf(r.name)]; });
+  const H=['Recruiter Name','Week-End Date','# of Pipelines',soFar?'GOALS of Schedules (so far)':'GOALS of Schedules','# of Schedules','% Achieved vs Goals','Remarks'];
+  const data=rows.map(r=>{ const g=soFar?Math.round(r.expected):r.goal, pct=g?Math.round(r.sched/g*100):null; return [r.name,we,r.interviews||0,g||'NA',r.sched==null?'NA':r.sched,pct==null?'NA':pct+'%',remarkOf(r.name)]; });
   const th='background:#1f5f8b;color:#ffffff;font-weight:700;text-transform:none;letter-spacing:0;font-family:Calibri,Arial,sans-serif;font-size:11pt;border:1px solid #000;padding:4px 8px;text-align:left;vertical-align:middle';
   const td='font-family:Calibri,Arial,sans-serif;font-size:11pt;border:1px solid #000;padding:3px 8px;vertical-align:top';
-  const pctBg=band==='below'?'#ffff00':'#ffeb9c';
+  const pctBg=band==='below'?'#ffff00':band==='good'?'#c6efce':'#ffeb9c';
   const html='<table style="border-collapse:collapse"><thead><tr>'+H.map(h=>`<th style="${th}">${escapeHtml(h)}</th>`).join('')+'</tr></thead><tbody>'
     +data.map(r=>'<tr>'+r.map((v,i)=>`<td style="${td};${i>=1&&i<=5?'text-align:center;':''}${i===5?'background:'+pctBg+';':''}${i===6?'min-width:320px;':''}">${escapeHtml(String(v))}</td>`).join('')+'</tr>').join('')+'</tbody></table>';
   const tsv=[H,...data].map(r=>r.map(v=>String(v).replace(/[\t\r\n]+/g,' ')).join('\t')).join('\n');
@@ -9677,6 +9698,9 @@ async function renderAlertsView(){
     let t; sIn.addEventListener('input', ()=>{ clearTimeout(t); t=setTimeout(()=>{ st.search=sIn.value; renderAlertsView(); }, 200); });
   }
   const {rows, inProgress, elapsed} = alertsGoalRows(st.week);
+  // compare with the full weekly goal, or with the goal so far (working days elapsed × daily goal)
+  const today = st.basis==='today' && inProgress;
+  rows.forEach(r=>{ r.score = today ? (r.pace??0) : (r.pct??0); r.target = today ? Math.round(r.expected) : r.goal; });
   const q = st.search.trim().toLowerCase();
   const match = r=>!q || r.name.toLowerCase().includes(q) || String(r.branch).toLowerCase().includes(q);
   const rowByName = new Map(rows.map(r=>[r.name, r]));
@@ -9689,49 +9713,53 @@ async function renderAlertsView(){
   const pending = Remarks.canApprove() ? Remarks.pending().sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at))) : [];
   const noRemark = below.filter(r=>!Remarks.forWeek(r.name, st.week).some(x=>(x.status||'approved')==='approved')).length;
   const w = weekOfDate(st.week);
-  const bar = r=>{ const v=Math.min(100, r.pct||0); return `<div class="al-bar" title="${fmtNum(r.sched)} of ${fmtNum(r.goal)} schedules"><i style="width:${v}%"></i>${inProgress?`<u style="left:${Math.min(100, elapsed/5*100)}%" title="Where they should be by today"></u>`:''}<b style="left:50%"></b></div>`; };
+  const bar = r=>{ const v=Math.min(100, today?(r.pace||0):(r.pct||0)); return `<div class="al-bar" title="${fmtNum(r.sched)} of ${fmtNum(r.goal)} schedules"><i style="width:${v}%"></i>${inProgress&&!today?`<u style="left:${Math.min(100, elapsed/5*100)}%" title="Where they should be by today"></u>`:''}<b style="left:50%"></b></div>`; };
   const card = (r, sev)=>`<div class="al-card ${sev}" data-al-card="${escapeHtml(r.name)}" tabindex="0" role="button" aria-label="Open remarks for ${escapeHtml(r.name)}">
-      <div class="al-head"><button type="button" class="al-name" data-al-remarks="${escapeHtml(r.name)}">${escapeHtml(r.name)}</button><span class="al-pct" title="Schedules vs weekly goal">${Math.round(r.score)}%<small>of weekly goal</small></span></div>
+      <div class="al-head"><button type="button" class="al-name" data-al-remarks="${escapeHtml(r.name)}">${escapeHtml(r.name)}</button><span class="al-pct" title="${today?'Schedules vs goal so far':'Schedules vs weekly goal'}">${Math.round(r.score)}%<small>${today?'of goal so far':'of weekly goal'}</small></span></div>
       <div class="al-sub">${escapeHtml(r.division)}${r.branch?' · '+escapeHtml(r.branch):''}</div>
       ${bar(r)}
-      <div class="al-facts"><span><strong>${fmtNum(r.sched)}</strong> / ${fmtNum(r.goal)} schedules</span>${inProgress?`<span>on track for ~${fmtNum(r.projected)} · ${fmtNum(Math.round(r.expected))} due by today</span>`:`<span>${fmtNum(r.shows)} shows · ${fmtNum(r.hires)} hires</span>`}</div>
+      <div class="al-facts"><span><strong>${fmtNum(r.sched)}</strong> / ${fmtNum(r.target)} schedules${today?' so far':''}</span>${inProgress?(today?`<span>weekly goal ${fmtNum(r.goal)} · on track for ~${fmtNum(r.projected)}</span>`:`<span>on track for ~${fmtNum(r.projected)} · ${fmtNum(Math.round(r.expected))} due by today</span>`):`<span>${fmtNum(r.shows)} shows · ${fmtNum(r.hires)} hires</span>`}</div>
       ${alertsRemarkLine(r.name, st.week)}
       <div class="al-actions">${Remarks.canAdd()?`<button class="btn btn-secondary btn-sm" data-al-add="${escapeHtml(r.name)}">Add remark</button>`:''}<button class="link-btn" data-al-remarks="${escapeHtml(r.name)}">${Remarks.forRecruiter(r.name).length?'Remarks ('+Remarks.forRecruiter(r.name).length+')':'History'}</button></div>
     </div>`;
-  const belowShown = below.filter(match), watchShown = watch.filter(match);
+  const belowShown = below.filter(match), watchShown = watch.filter(match), goodShown = onTrack.filter(match).sort((a,b)=>b.score-a.score);
+  if(!['below','watch','good'].includes(st.band)) st.band='below';
   const sigList = (st.signals==='wins'?wins:attention).filter(a=>!q || a.name.toLowerCase().includes(q));
   host.innerHTML = `
     <div class="al-toolbar">
       <label class="cand-field"><span>Week ending</span><select id="alWeek">${weeks.map(d=>`<option value="${d}" ${d===st.week?'selected':''}>Wk ${weekOfDate(d).number} · ending ${fmtDate(d)}${d===toIsoDateOnly(saturdayOnOrAfter(new Date()))?' (this week)':''}</option>`).join('')}</select></label>
       <label class="cand-field"><span>Group by</span><select id="alGroup"><option value="division" ${st.group==='division'?'selected':''}>Division › Branch</option><option value="branch" ${st.group==='branch'?'selected':''}>Branch</option><option value="none" ${st.group==='none'?'selected':''}>No grouping</option></select></label>
-      <p class="hint al-basis">${inProgress?`Week in progress — ${elapsed} of 5 working days so far. Groups compare schedules with each recruiter’s full weekly goal; each card also shows where they should be by today. Recruiters with no schedules yet are included.`:`Completed week — schedules compared with each recruiter’s weekly goal (default ${DEFAULT_WEEKLY_GOAL}).`}</p>
+      <div class="cand-field al-basis-pick"><span>Compare with</span><div class="ua-filter" role="tablist"><button type="button" data-al-basis="week" class="${st.basis!=='today'?'on':''}">Weekly goal</button><button type="button" data-al-basis="today" class="${st.basis==='today'?'on':''}" ${inProgress?'':'disabled title="Only for the week in progress"'}>Goal so far (today)</button></div></div>
+      <p class="hint al-basis">${today?`Week in progress — ${elapsed} of 5 working days so far. Each recruiter’s schedules are compared with their goal so far (daily goal × ${elapsed} day${elapsed===1?'':'s'}).`:inProgress?`Week in progress — ${elapsed} of 5 working days so far. Groups compare schedules with each recruiter’s full weekly goal; each card also shows where they should be by today. Recruiters with no schedules yet are included.`:`Completed week — schedules compared with each recruiter’s weekly goal (default ${DEFAULT_WEEKLY_GOAL}).`}</p>
     </div>
     <div class="al-tiles" data-section="alerts.summary">
-      <button type="button" class="al-tile bad" data-jump="alBelow"><span>Below 50% of goal</span><strong>${below.length}</strong><em>${noRemark?noRemark+' without a remark':'all have remarks'}</em></button>
-      <button type="button" class="al-tile warn" data-jump="alWatch"><span>50–79% of goal</span><strong>${watch.length}</strong><em>keep an eye on</em></button>
-      <div class="al-tile good"><span>On track (80%+)</span><strong>${onTrack.length}</strong><em>of ${rows.length} recruiters</em></div>
+      <button type="button" class="al-tile bad ${st.band==='below'?'sel':''}" data-band="below" aria-pressed="${st.band==='below'}"><span>Below 50% of goal</span><strong>${below.length}</strong><em>${noRemark?noRemark+' without a remark':'all have remarks'}</em></button>
+      <button type="button" class="al-tile warn ${st.band==='watch'?'sel':''}" data-band="watch" aria-pressed="${st.band==='watch'}"><span>50–79% of goal</span><strong>${watch.length}</strong><em>keep an eye on</em></button>
+      <button type="button" class="al-tile good ${st.band==='good'?'sel':''}" data-band="good" aria-pressed="${st.band==='good'}"><span>On track (80%+)</span><strong>${onTrack.length}</strong><em>of ${rows.length} recruiters</em></button>
       
     </div>
     ${pending.length?`<section class="panel al-section" id="alApprovals" data-section="alerts.approvals"><div class="panel-head"><div><h3>Remarks awaiting approval</h3><span class="hint">Only you and the author can see these until they’re approved.</span></div></div>
       <div class="al-approvals">${pending.map(r=>`<div class="al-appr" data-id="${escapeHtml(r.id)}"><div class="al-appr-meta"><strong>${escapeHtml(r.recruiter)}</strong> · Wk ${weekOfDate(r.week_end_date).number} · by ${escapeHtml(r.author||'')} · ${new Date(r.created_at).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</div><div class="al-appr-text">${escapeHtml(r.remark)}</div><div class="al-actions"><button class="btn btn-primary btn-sm" data-appr="1">Approve</button><button class="btn btn-secondary btn-sm" data-appr="0">Reject</button><button class="link-btn" data-appr-edit="${escapeHtml(r.recruiter)}" data-week="${r.week_end_date}">Edit…</button></div></div>`).join('')}</div></section>`:''}
-    <section class="panel al-section" id="alBelow" data-section="alerts.below">
+    <section class="panel al-section" id="alBelow" data-section="alerts.below" ${st.band==='below'?'':'hidden'}>
       <div class="panel-head"><div><h3><span class="al-dot bad"></span>Below 50% of goal <span class="al-count">${belowShown.length}</span></h3><span class="hint">Lowest first. Click a card for the remark history.</span></div>${belowShown.length?'<button type="button" class="btn btn-secondary btn-sm al-copy" data-al-copy="below" title="Copy a table of these recruiters and their remarks — paste into email or Excel">📋 Copy remarks</button>':''}</div>
       ${belowShown.length?alertsGroupHtml(belowShown, x=>x, r=>card(r,'bad'), 'al-grid'):`<p class="hint" style="margin:0;">${q?'No match.':'Nobody is below 50% of goal this week. 🎉'}</p>`}
     </section>
-    <section class="panel al-section" id="alWatch" data-section="alerts.watch">
+    <section class="panel al-section" id="alWatch" data-section="alerts.watch" ${st.band==='watch'?'':'hidden'}>
       <details open><summary><h3><span class="al-dot warn"></span>50–79% of goal <span class="al-count">${watchShown.length}</span></h3>${watchShown.length?'<button type="button" class="btn btn-secondary btn-sm al-copy" data-al-copy="watch" title="Copy a table of these recruiters and their remarks">📋 Copy remarks</button>':''}</summary>
       ${watchShown.length?`<div class="al-watch-body">${alertsGroupHtml(watchShown, x=>x, r=>card(r,'warn'), 'al-grid')}</div>`:'<p class="hint" style="margin:8px 0 0;">Nobody in this range.</p>'}</details>
     </section>
-    <section class="panel al-section" data-section="alerts.signals">
-      <div class="panel-head"><div><h3>Other signals</h3><span class="hint">Compared with each recruiter’s previous 4 weeks</span></div><div class="seg"><button type="button" data-sig="attention" aria-pressed="${st.signals==='attention'}">Needs attention (${attention.length})</button><button type="button" data-sig="wins" aria-pressed="${st.signals==='wins'}">Wins (${wins.length})</button></div></div>
-      ${sigList.length?alertsGroupHtml(sigList, a=>rowByName.get(a.name), a=>`<div class="al-sig ${a.sev}"><span class="alert-kind">${escapeHtml(a.kind)}</span><button type="button" class="al-name" data-al-remarks="${escapeHtml(a.name)}">${escapeHtml(a.name)}</button><span class="al-sig-text">${escapeHtml(a.text)}</span>${a.remark && Remarks.canAdd()?`<button class="link-btn" data-al-add="${escapeHtml(a.name)}" data-suggest="${escapeHtml(a.remark)}">Add remark →</button>`:''}</div>`, 'al-signals'):`<p class="hint" style="margin:0;">${st.signals==='wins'?'No standout wins yet.':'Nothing else needs attention.'}</p>`}
-    </section>`;
+    <section class="panel al-section" id="alGood" ${st.band==='good'?'':'hidden'}>
+      <div class="panel-head"><div><h3><span class="al-dot good"></span>On track (80%+) <span class="al-count">${goodShown.length}</span></h3><span class="hint">Highest first.</span></div>${goodShown.length?'<button type="button" class="btn btn-secondary btn-sm al-copy" data-al-copy="good" title="Copy a table of these recruiters and their remarks">📋 Copy remarks</button>':''}</div>
+      ${goodShown.length?alertsGroupHtml(goodShown, x=>x, r=>card(r,'good'), 'al-grid'):`<p class="hint" style="margin:0;">${q?'No match.':'Nobody is at 80% or more yet.'}</p>`}
+    </section>
+`;
   host.querySelector('#alWeek').onchange = e=>{ st.week=e.target.value; renderAlertsView(); };
-  host.querySelector('#alGroup').onchange = e=>{ st.group=e.target.value; lsSet('ipd_alerts_group', st.group); renderAlertsView(); };
-  host.querySelectorAll('[data-jump]').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.jump)?.scrollIntoView({behavior:'smooth', block:'start'}));
+  host.querySelector('#alGroup').onchange = e=>{ st.group=e.target.value; lsSet('ipd_alerts_group2', st.group); renderAlertsView(); };
+  host.querySelectorAll('[data-band]').forEach(b=>b.onclick=()=>{ st.band=b.dataset.band; renderAlertsView(); });
+  host.querySelectorAll('[data-al-basis]').forEach(b=>b.onclick=()=>{ if(b.disabled) return; st.basis=b.dataset.alBasis; lsSet('ipd_alerts_basis', st.basis); renderAlertsView(); });
   host.querySelectorAll('[data-sig]').forEach(b=>b.onclick=()=>{ st.signals=b.dataset.sig; renderAlertsView(); });
   host.querySelectorAll('[data-al-remarks]').forEach(b=>b.onclick=()=>openRemarksModal(b.dataset.alRemarks, st.week));
-  host.querySelectorAll('[data-al-copy]').forEach(b=>b.onclick=e=>{ e.preventDefault(); e.stopPropagation(); copyRemarksTable(b.dataset.alCopy==='below'?belowShown:watchShown, st.week, b.dataset.alCopy); });
+  host.querySelectorAll('[data-al-copy]').forEach(b=>b.onclick=e=>{ e.preventDefault(); e.stopPropagation(); copyRemarksTable(b.dataset.alCopy==='below'?belowShown:b.dataset.alCopy==='good'?goodShown:watchShown, st.week, b.dataset.alCopy, today); });
   // the whole card opens the remarks (buttons inside keep their own action)
   host.querySelectorAll('[data-al-card]').forEach(c=>{ const open=()=>openRemarksModal(c.dataset.alCard, st.week);
     c.addEventListener('click',e=>{ if(e.target.closest('button,a,input,select,textarea,.acc-chip')) return; if(String(window.getSelection?.()||'').length) return; open(); });
