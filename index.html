@@ -1789,6 +1789,7 @@ body.uf-lock{overflow:hidden}
           <div id="numberCheck"></div>
           <div id="uploadHistory"></div>
           <div id="privacyCleanup"></div>
+          <div id="serverDownload"></div>
           <div class="panel set-card settings-only">
             <h3 class="set-title">Preferences</h3>
             <div class="set-row"><div><strong>Performer highlights</strong><span>Badges for top and star performers in the recruiter and branch tables</span></div><button type="button" class="switch" role="switch" id="settingsPerformerHighlightBtn" aria-checked="false"><i></i></button></div>
@@ -4176,7 +4177,7 @@ function renderSettingsModalContent(){
   if(stale) stale.remove();
   if(databaseSchemaStale) document.getElementById('settingsPane-sync')?.insertAdjacentHTML('afterbegin', '<div class="panel warn-note" id="schemaStaleNote" style="margin-bottom:16px;"><strong>Database setup is out of date.</strong> This page (v'+APP_VERSION.replace('Version ','')+') needs the matching <code>supabase_setup.sql</code>. Open Supabase → SQL Editor → New query, paste the whole file, click <em>Run</em>, and check it finishes with “Success”. Until then, newer features (for example the Candidates right for users) won’t work.</div>');
   renderFolderUploadExplainer();
-  renderUploadHistory(); renderPrivacyCleanup();
+  renderUploadHistory(); renderPrivacyCleanup(); renderServerDownload();
   renderNumberCheck();
   renderMyAccount();
   if(Server.can('settings')) renderManageView();
@@ -8494,6 +8495,44 @@ async function encryptSavedNames(){
     showToast(changedWeeks?`Done — ${changedWeeks} week${changedWeeks===1?'':'s'} re-saved (${fmtNum(rowsDone)} rows): names encrypted, unused columns removed.`:'Everything was already encrypted and slim — nothing to change.');
   }catch(e){ alert('The clean-up stopped: '+cleanErr(e)+'\n\nWeeks already done are saved. Run it again to finish the rest.'); }
   finally{ setLoading(null); const u=document.getElementById('uploadFilesBtn'); if(u) u.textContent='Upload Excel files'; renderPrivacyCleanup(); }
+}
+// ---------- Admins: download exactly what the server holds ----------
+// Rows come back as stored — encrypted names stay encrypted, columns as saved — so you can check
+// what's really in the database.
+function renderServerDownload(){
+  const host=document.getElementById('serverDownload'); if(!host) return;
+  if(!(Server.user&&Server.isAdmin())){ host.innerHTML=''; return; }
+  const weeks=[...weeksData].map(w=>w.weekEndDate).sort().reverse();
+  host.innerHTML=`<div class="panel set-card"><h3 class="set-title">Download what’s saved on the server</h3>
+    <div class="set-row"><div><strong>The stored rows, exactly as saved</strong><span>Every column the database holds, names still encrypted, plus which file each row came from. A second sheet lists each week’s row counts and columns.</span></div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><select id="srvWeek" aria-label="Weeks to download"><option value="">All ${weeks.length} weeks</option>${weeks.map(w=>`<option value="${w}">Wk ${weekOfDate(w).number} · ending ${fmtDate(w)}</option>`).join('')}</select>
+    <button type="button" class="btn btn-primary btn-sm" id="srvDl">Download Excel</button></div></div></div>`;
+  host.querySelector('#srvDl').onclick=()=>downloadServerRows(host.querySelector('#srvWeek').value);
+}
+async function downloadServerRows(onlyWeek){
+  if(typeof XLSX==='undefined'){ showToast('The Excel writer didn’t load — check your connection and reload.'); return; }
+  const weeks=onlyWeek?[onlyWeek]:[...weeksData].map(w=>w.weekEndDate).sort();
+  if(!weeks.length){ showToast('No saved weeks yet.'); return; }
+  try{
+    const index=[]; let after='';
+    for(;;){ setLoading('Listing saved rows… '+fmtNum(index.length)); const page=await Server.rpc('dash_week_index',{p_weeks:weeks,p_after:after,p_limit:1000}); if(!page||!page.length) break; index.push(...page); after=page[page.length-1].id; }
+    const data=new Map(), ids=index.map(r=>r.id), chunks=[]; for(let i=0;i<ids.length;i+=500) chunks.push(ids.slice(i,i+500));
+    await runPool(chunks.map(c=>async()=>{ ((await Server.rpc('dash_rows_by_ids',{p_ids:c}))||[]).forEach(r=>data.set(r.id,r.data)); }), NET_PARALLEL,
+      d=>setLoading('Downloading rows… '+fmtNum(Math.min(d*500,ids.length))+' / '+fmtNum(ids.length)));
+    setLoading('Building the file…');
+    const metaKeys=[...new Set(index.flatMap(r=>Object.keys(r)))].filter(k=>k!=='id'&&k!=='data');
+    const dataKeys=[...new Set([...data.values()].flatMap(d=>Object.keys(d||{})))];
+    const nice={s:'In Created On file',v:'In Date Of file',sw:'Created On week',vw:'Date Of week',so:'Created On order',vo:'Date Of order',excluded:'Excluded'};
+    const aoa=[['Row ID',...metaKeys.map(k=>nice[k]||k),...dataKeys],
+      ...index.map(r=>{ const d=data.get(r.id)||{}; return [r.id,...metaKeys.map(k=>typeof r[k]==='boolean'?(r[k]?'Yes':'No'):r[k]??''),...dataKeys.map(k=>d[k]??'')]; })];
+    const per=new Map(); index.forEach(r=>{ const d=data.get(r.id)||{}; [['s','sw'],['v','vw']].forEach(([f,wk])=>{ if(!r[f]) return; const w=r[wk]||'?'; const x=per.get(w)||{rows:0,s:0,v:0,cols:new Set()}; x.rows++; x[f]++; Object.keys(d).forEach(c=>x.cols.add(c)); per.set(w,x); }); });
+    const sum=[['Week ending','Created On rows','Date Of rows','Columns saved'],...[...per.entries()].sort().map(([w,x])=>[w,x.s,x.v,[...x.cols].sort().join(', ')])];
+    const wb=XLSX.utils.book_new(), sh=XLSX.utils.aoa_to_sheet(aoa); sh['!cols']=aoa[0].map((h,i)=>({wch:i===0?42:Math.min(40,Math.max(12,String(h).length+2))}));
+    XLSX.utils.book_append_sheet(wb,sh,'Saved rows'); const s2=XLSX.utils.aoa_to_sheet(sum); s2['!cols']=[{wch:14},{wch:16},{wch:14},{wch:120}]; XLSX.utils.book_append_sheet(wb,s2,'Per week');
+    XLSX.writeFile(wb,'server-data-'+(onlyWeek?'wk-'+weekOfDate(onlyWeek).number:'all-weeks')+'-'+toIsoDateOnly(new Date())+'.xlsx');
+    showToast(`Downloaded ${fmtNum(index.length)} saved rows (${dataKeys.length} columns).`);
+  }catch(e){ showToast('Couldn’t download: '+cleanErr(e)); }
+  finally{ setLoading(null); }
 }
 function importProgress(text){
   ['folderSyncNowBtn','uploadFilesBtn'].forEach(id=>{ const b=document.getElementById(id); if(b && text) b.textContent=text; });
