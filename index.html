@@ -1329,8 +1329,13 @@ body.team-workspace .content{padding-top:10px!important}
 
 /* ---------- access mode ---------- */
 body.access-ready .acc-host{position:relative}
-body.access-ready:not(.access-mode) .acc-chip{opacity:0;pointer-events:none;transition:opacity .12s}
-body.access-ready:not(.access-mode) .acc-host.acc-hot>.acc-chip,body.access-ready:not(.access-mode) .acc-chip:focus-visible{opacity:1;pointer-events:auto}
+body.access-ready:not(.access-mode) .acc-chip{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .12s,visibility 0s .12s}
+/* hover locks appear only after a short pause, so quick clicks reach the card or tab underneath */
+body.access-ready:not(.access-mode):not(.acc-hover-off) .acc-host.acc-hot>.acc-chip,body.access-ready:not(.access-mode) .acc-chip:focus-visible{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .15s .7s,visibility 0s .7s}
+body.acc-hover-off:not(.access-mode) .acc-host.acc-hot{outline:0!important}
+/* small hosts (tabs, chips, buttons): a tiny badge on the corner instead of a label over the text */
+.acc-chip.acc-mini{top:-9px;right:-9px;width:20px;height:20px;padding:0;justify-content:center;font-size:10px;border-radius:50%}
+.acc-chip.acc-mini span{display:none}
 body.access-ready:not(.access-mode) .acc-host.acc-hot{outline:2px dashed #7a5fb855;outline-offset:2px;border-radius:10px}
 body.access-mode .acc-host{outline:2px dashed #7a5fb855;outline-offset:2px;border-radius:10px}
 #accessFab{position:fixed;right:18px;bottom:18px;z-index:290;display:inline-flex;align-items:center;gap:6px;padding:10px 14px;border-radius:999px;border:1px solid #c9b8ef;background:#5b3fa0;color:#fff;font:inherit;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 10px 24px #2b1f4d55}
@@ -6181,8 +6186,8 @@ async function syncTeamCandidates(){
     }
   }finally{ teamCandBusy=false; }
 }
-// Schedule rows created between two dates (inclusive). Team-only accounts get just their team from the server.
-async function scheduleRowsBetween(from,to){
+// Candidate (EID + name) rows created between two dates. Team-only accounts get just their team from the server.
+async function candidateRowsBetween(from,to){
   if(!canSeeCandidates() && !Server.teamNamesOnly())
     return (await Server.rpc('dash_team_candidates',{p_from:from,p_to:to})||[]).map(c=>({...c, date:String(c.date||'').slice(0,10), eid:c.eid||'–', branch:branchAlias(c.branch||'Unassigned')}));
   const weeks=new Set(); for(let d=from; d<=to; d=tgShift(d,1)) weeks.add(weekOfDate(d).weekEnd);
@@ -6383,7 +6388,7 @@ async function renderHistoryToday(name){
   };
   host.innerHTML=head()+'<p class="hint">Loading…</p>'; bind();
   try{
-    const all=await scheduleRowsBetween(from,to);
+    const all=await candidateRowsBetween(from,to);
     if(!host.isConnected || historyState.name!==name || historyState.schedFor!==name) return;
     const rows=all.filter(c=>c.recruiter===name).sort((a,b)=>String(b.date).localeCompare(a.date)||String(a.name).localeCompare(b.name));
     const branches=[...new Set(rows.map(c=>c.branch))].sort();
@@ -10384,11 +10389,13 @@ function setupAccessHelpers(){
     fab=document.createElement('button'); fab.type='button'; fab.id='accessFab'; fab.title='Choose who can see or edit this page and its sections';
     fab.innerHTML='🔒 <span>Access</span>'; document.body.appendChild(fab);
     const menu=document.createElement('div'); menu.id='accessFabMenu'; menu.hidden=true; document.body.appendChild(menu);
+    try{ document.body.classList.toggle('acc-hover-off', localStorage.getItem('ipd_acc_hover_off')==='1'); }catch(e){}
     const close=()=>{ menu.hidden=true; };
-    fab.onclick=e=>{ e.stopPropagation(); menu.innerHTML=`<button type="button" data-a="page">Who can open / edit this page…</button><button type="button" data-a="locks">${accessMode?'Hide':'Show'} all section locks</button><p>Tip: hover any card or section and click its 🔒 lock.</p>`;
+    fab.onclick=e=>{ e.stopPropagation(); menu.innerHTML=`<button type="button" data-a="page">Who can open / edit this page…</button><button type="button" data-a="locks">${accessMode?'Hide':'Show'} all section locks</button><button type="button" data-a="hover">${document.body.classList.contains('acc-hover-off')?'Turn on':'Turn off'} locks on hover</button><p>${document.body.classList.contains('acc-hover-off')?'Hover locks are off — use “Show all section locks” when you want to change access.':'Tip: rest the pointer on any card or section for a moment, then click its 🔒 lock.'}</p>`;
       menu.hidden=!menu.hidden;
       menu.querySelector('[data-a="page"]').onclick=()=>{ close(); openAccessEditor({page:currentView==='history'?historyState.from:currentView}); };
-      menu.querySelector('[data-a="locks"]').onclick=()=>{ close(); setAccessMode(!accessMode); }; };
+      menu.querySelector('[data-a="locks"]').onclick=()=>{ close(); setAccessMode(!accessMode); };
+      menu.querySelector('[data-a="hover"]').onclick=()=>{ close(); const off=!document.body.classList.contains('acc-hover-off'); document.body.classList.toggle('acc-hover-off',off); try{ localStorage.setItem('ipd_acc_hover_off',off?'1':'0'); }catch(e){} showToast(off?'Hover locks turned off.':'Hover locks turned on.'); }; };
     document.addEventListener('click',e=>{ if(!e.target.closest('#accessFabMenu,#accessFab')) close(); });
   }
   if(!accessObs){ let t; accessObs=new MutationObserver(()=>{ clearTimeout(t); t=setTimeout(decorateAccess,150); }); }
@@ -10421,6 +10428,7 @@ function decorateAccess(){
     el.classList.add('acc-host');
     const chip=document.createElement('button'); chip.type='button'; chip.className='acc-chip'; chip.title='Who can see: '+label;
     chip.innerHTML='🔒<span>Access</span>';
+    if(el.matches('button,a,label,.tab,[role=tab]') || el.offsetHeight<64 || el.offsetWidth<150) chip.classList.add('acc-mini');
     chip.addEventListener('click',e=>{ e.preventDefault(); e.stopPropagation(); openAccessEditor({section:key,label}); });
     el.appendChild(chip);
   });
