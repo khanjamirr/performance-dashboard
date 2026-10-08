@@ -1368,7 +1368,48 @@ body.access-mode #accessFab{display:none}
 @media(max-width:760px){.top-back{position:fixed;top:calc(60px + env(safe-area-inset-top));left:12px;z-index:126;margin:0}body.on-history .hp-sticky{top:calc(104px + env(safe-area-inset-top))!important}}
 .hp-sticky .mk-team{margin:0}.hp-sticky #histTiles{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px}
 .hp-sel-meta{margin-left:auto;font-size:12px;color:#5c7480}.hp-sel-meta b{color:#10303c}
+/* recruiter history: one frozen header (back, name, week, cards) + table/charts toggle */
+body.on-history .main>.topbar{display:none!important}
+body.on-history .top-back{display:none!important}
+#view-history .hp-back{display:inline-flex!important;align-items:center;gap:6px;flex:0 0 auto;padding:8px 14px 8px 10px;border-radius:999px;border:1px solid #2f8f8a;background:#2f8f8a;color:#fff;font-weight:700;font-size:13px}
+#view-history .hp-back:hover{background:#25756f}
+#view-history .hp-head{position:sticky;top:var(--menu-height,0px);z-index:70;background:#f2f6f7;margin:0 0 14px;padding:14px 0 10px;border-bottom:1px solid #dde7ea;box-shadow:0 8px 14px -12px #18344233}
+#view-history .hp-head .hp-top{align-items:center;gap:8px 16px;margin-bottom:8px}
+#view-history .hp-head .hp-id h2{font-size:22px;margin:2px 0 0}
+#view-history .hp-head .hp-id .hint{font-size:11.5px}
+#view-history .hp-head .hp-sticky{position:static!important;top:auto!important;margin:0;padding:6px 0 0;border:0;background:transparent}
+.hp-ctl{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-left:auto}
+.hp-toggle{display:inline-flex;border:1px solid #cfdde2;border-radius:999px;background:#fff;padding:3px}
+.hp-toggle button{border:0;background:transparent;font:inherit;font-size:12.5px;font-weight:700;color:#4a6370;padding:6px 16px;border-radius:999px;cursor:pointer}
+.hp-toggle button.on{background:#183442;color:#fff}
+#view-history.hp-mode-table .hp-chartsec{display:none!important}
+#view-history.hp-mode-charts>section:not(.hp-chartsec){display:none!important}
+.hp-chart-note{margin:-4px 0 14px;font-size:12px}
+@media(max-width:760px){
+  #view-history .hp-head{padding:10px 0 8px;margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px}
+  #view-history .hp-head .hp-top{flex-wrap:wrap}
+  #view-history .hp-head .hp-id{min-width:0;flex:1 1 60%}
+  #view-history .hp-head .hp-id .hint,#view-history .hp-head .ep-eyebrow .hp-more{display:none}
+  #view-history .hp-head .hp-id h2{font-size:18px}
+  #view-history .hp-back{padding:6px 10px 6px 8px;font-size:12px}
+  .hp-ctl{margin-left:0;flex-basis:100%;justify-content:space-between}
+  .hp-range{font-size:11px}.hp-range select{padding:5px 7px}
+  .hp-sticky #histTiles{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px}
+  .hp-sticky #histTiles>[data-section="hist.kpi.interviews"]{grid-column:auto!important;order:0!important}
+  #view-history .hp-sel{margin-bottom:6px;gap:6px}
+  .hp-sticky #histTiles .mk-row,.hp-sticky #histTiles .mk-bar{display:none!important}
+  .hp-sticky #histTiles .mk-card{padding:7px 9px!important}
+  .hp-sticky #histTiles .label,.hp-sticky #histTiles .mk-top span{font-size:9.5px!important;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hp-sticky #histTiles .value{font-size:19px!important}
+}
 @media(max-width:760px){.hp-sticky #histTiles{grid-template-columns:1fr 1fr!important}.hp-sticky #histTiles>[data-section="hist.kpi.interviews"]{grid-column:1/-1;order:3}.hp-sel-meta{margin-left:0;flex-basis:100%}}
+/* card rows reflow when a card is hidden by rights — no empty slots */
+.kpi-grid.mk-grid,.al-tiles,.hp-sticky #histTiles,.ki-tiles{display:flex!important;flex-wrap:wrap}
+.kpi-grid.mk-grid>*,.al-tiles>*,.hp-sticky #histTiles>*,.ki-tiles>*{flex:1 1 0!important;min-width:0;width:auto!important;max-width:none!important}
+@media(max-width:1250px){.kpi-grid.mk-grid:not(.mk-team)>*{flex:1 1 calc(50% - 14px)!important;min-width:260px}}
+@media(max-width:1100px){.kpi-grid.mk-team{flex-wrap:nowrap!important}.kpi-grid.mk-team>*{flex:0 0 200px!important}}
+@media(max-width:900px){.al-tiles>*{flex:1 1 calc(50% - 12px)!important}}
+@media(max-width:760px){.kpi-grid.mk-grid:not(.mk-team)>*{flex:1 1 100%!important;min-width:0}.hp-sticky #histTiles{flex-wrap:nowrap}}
 </style>
 </head>
 <body class="locked">
@@ -2179,6 +2220,7 @@ document.addEventListener('mouseout', (e)=>{
   if(leavingCand){ scheduleHideRecruiterTooltip(); }
 });
 // Candidate names / Employee Numbers are only shown to people with the Candidates right.
+const TEAM_SCOPE='scope.team_names_only';
 function canSeeCandidates(){ return Server.can('candidates'); }
 // v4.21: the hover lists moved to Report Builder — tables show plain numbers everywhere.
 function candidateCellHtml(value, list, metricKey, entityName){
@@ -3661,6 +3703,7 @@ function renderUploadStamp(){
  }
 }
 async function refreshUI(){
+ saveNavSoon();
  document.body.classList.toggle('team-workspace',currentView==='teams'||currentView==='leads');
  if(currentView!=='history'){ document.getElementById('topBack')?.classList.add('hidden'); document.body.classList.remove('on-history'); }
  renderUploadStamp();
@@ -6282,7 +6325,7 @@ async function renderHistoryToday(name){
   if(teamOnly && !canSeeTeamNames()){ host.innerHTML=head+noNamesRightHtml('Candidate names (EID and employee name)'); return; }
   host.innerHTML=head+'<p class="hint">Loading…</p>';
   try{
-    const all=teamOnly?(await Server.rpc('dash_team_candidates',{p_from:today,p_to:today})||[]):await scheduledTodayRows();
+    const all=teamOnly&&!Server.teamNamesOnly()?(await Server.rpc('dash_team_candidates',{p_from:today,p_to:today})||[]):await scheduledTodayRows();
     const rows=all.filter(c=>c.recruiter===name);
     if(!host.isConnected || historyState.name!==name) return;
     const branches=[...new Set(rows.map(c=>c.branch))].sort();
@@ -6319,17 +6362,20 @@ function renderHistoryView(){
   }
   const weekRows = rows.slice().reverse().map(({w,x})=>{ const gp=x.goal?Math.round(x.schedules/x.goal*100):null; const pend=weekIsFullyPending(w.weekEndDate);
     return `<tr data-hist-week="${w.weekEndDate}"><td>Wk ${w.weekNumber}<small>${fmtDate(weekOfDate(w.weekEndDate).weekStart).replace(/, \d{4}$/,'')} – ${fmtDate(w.weekEndDate)}</small></td>${mode==='recruiters'?`<td>${escapeHtml(x.branch||'–')}</td>`:''}<td>${fmtNum(x.goal)}</td><td class="rc-${recruiterSignal(x.schedules,x.shows,x.scheduledDateOf,x.goal).schedule}">${mode==='recruiters'?recruiterSignalHtml(recruiterSignal(x.schedules,x.shows,x.scheduledDateOf,x.goal))+' ':''}${fmtNum(x.schedules)}${gp!=null?` <span class="ep-pct ${gp<50?'bad':gp<80?'warn':'good'}">${gp}%</span>`:''}</td><td>${fmtNum(x.scheduledDateOf)}</td><td>${fmtNum(x.shows)}</td><td>${fmtNum(x.noShows)}</td><td>${pend?'pending':fmtPct(x.shows,x.scheduledDateOf)}</td><td>${fmtNum(x.i9)}</td><td>${fmtNum(x.placed)}</td>${mode==='recruiters'?`<td class="hp-rem" data-copy-value="${escapeHtml(remarks.filter(r=>r.week_end_date===w.weekEndDate).map(r=>r.remark).join(" | "))}">${(()=>{ const rs=remarks.filter(r=>r.week_end_date===w.weekEndDate); return rs.length?escapeHtml(rs[0].remark).slice(0,80)+(rs.length>1?` <b>+${rs.length-1}</b>`:''):''; })()}</td>`:''}</tr>`; }).join('');
-  el.innerHTML = `<div class="hp-top">
+  const hv = historyState.view==='charts' ? 'charts' : 'table'; historyState.view=hv;
+  el.classList.toggle('hp-mode-charts', hv==='charts'); el.classList.toggle('hp-mode-table', hv!=='charts');
+  el.innerHTML = `<div class="hp-head"><div class="hp-top">
       <button type="button" class="btn btn-secondary hp-back" id="historyBack"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg> Back to ${escapeHtml((VIEW_META[historyState.from]||VIEW_META.performance).title)}</button>
       <div class="hp-id"><div class="ep-eyebrow">${mode==='recruiters'?'Recruiter':'Branch'} · ${escapeHtml(div)}${branchesSeen.length?' · '+escapeHtml(last.x.branch||branchesSeen[branchesSeen.length-1])+(branchesSeen.length>1?` <span class="hp-more" title="${escapeHtml(branchesSeen.join(', '))}">+${branchesSeen.length-1} earlier branch${branchesSeen.length>2?'es':''}</span>`:''):''}</div><h2>${escapeHtml(name)}</h2><p class="hint">${all.length?`Active in ${all.length} week${all.length===1?'':'s'} · first Wk ${all[0].w.weekNumber} (${fmtDate(all[0].w.weekEndDate)}) · latest Wk ${last.w.weekNumber} (${fmtDate(last.w.weekEndDate)})`:'No activity recorded.'}</p></div>
-      <label class="hp-range">Show <select id="historyRange">${Object.entries(ranges).map(([k,l])=>`<option value="${k}" ${String(historyState.range)===k?'selected':''}>${l}</option>`).join('')}</select></label>
+      <div class="hp-ctl">${rows.length?`<div class="hp-toggle" role="tablist" aria-label="Table or charts"><button type="button" data-hview="table" class="${hv==='table'?'on':''}" aria-selected="${hv==='table'}">Table</button><button type="button" data-hview="charts" class="${hv==='charts'?'on':''}" aria-selected="${hv==='charts'}">Charts</button></div>`:''}<label class="hp-range">Show <select id="historyRange">${Object.entries(ranges).map(([k,l])=>`<option value="${k}" ${String(historyState.range)===k?'selected':''}>${l}</option>`).join('')}</select></label></div>
     </div>
-    ${rows.length ? `<div class="hp-sticky" data-section="hist.kpis"><div class="hp-sel" id="histSel"></div><div class="hp-tiles" id="histTiles"></div></div>
-    <div class="hp-charts">
+    ${rows.length ? `<div class="hp-sticky" data-section="hist.kpis"><div class="hp-sel" id="histSel"></div><div class="hp-tiles" id="histTiles"></div></div>`:''}</div>
+    ${rows.length ? `<div class="hp-charts hp-chartsec">
       <section class="panel hp-panel" data-section="hist.trend"><div class="hp-panel-head"><h3>Weekly line trend</h3></div><div class="hp-chart"><canvas id="historyTrend"></canvas></div></section>
       <section class="panel hp-panel" data-section="hist.goal"><div class="hp-panel-head"><h3>Schedules vs goal</h3><span class="hint">red under 50%, amber under 80%</span></div><div class="hp-chart"><canvas id="historyGoal"></canvas></div></section>
     </div>
-    <section class="panel hp-panel" data-section="hist.trend"><div class="hp-panel-head"><h3>Weekly bar trend</h3></div><div class="hp-chart"><canvas id="historyTrendBar"></canvas></div></section>
+    <p class="hint hp-chart-note hp-chartsec">Charts cover ${ranges[historyState.range].toLowerCase()}. Switch to <b>Table</b> above for week-by-week numbers, today's schedules and remarks.</p>
+    <section class="panel hp-panel hp-chartsec" data-section="hist.trend"><div class="hp-panel-head"><h3>Weekly bar trend</h3></div><div class="hp-chart"><canvas id="historyTrendBar"></canvas></div></section>
     ${team}
     <section class="panel hp-panel" data-section="hist.weeks"><div class="hp-panel-head"><h3>Every week</h3><span class="hint">${rows.length} week${rows.length===1?'':'s'}</span><button class="btn btn-secondary btn-sm" id="historyCopy" style="margin-left:auto">Copy table</button></div>
       <div class="hp-table-wrap"><table class="ep-table" id="historyTable"><thead><tr><th>Week</th>${mode==='recruiters'?'<th>Branch</th>':''}<th>Goal</th><th>Schedules</th><th>Interviews</th><th>Shows</th><th>No shows</th><th>Show %</th><th>Hires</th><th>Placed</th>${mode==='recruiters'?'<th>Remark</th>':''}</tr></thead><tbody>${weekRows}</tbody>
@@ -6337,7 +6383,7 @@ function renderHistoryView(){
     ${mode==='recruiters' ? `<section class="panel hp-panel" data-section="hist.remarks"><div class="hp-panel-head"><h3>Remarks</h3><span class="hint">${remarks.length}</span>${Remarks.canAdd()||remarks.length?`<button class="btn btn-secondary btn-sm" id="historyRemarks" style="margin-left:auto">${Remarks.canAdd()?'Add or review remarks':'Open remarks'}</button>`:''}</div>
       ${remarks.length?`<div class="ep-remarks">${remarks.map(r=>`<div class="ep-remark"><div class="ep-remark-meta"><strong>Wk ${weekOfDate(r.week_end_date).number}</strong> · ${fmtDate(r.remark_date)} · ${escapeHtml(r.author||'')} ${remarkStatusHtml(r)}</div><div class="ep-remark-text">${escapeHtml(r.remark)}</div></div>`).join('')}</div>`:'<p class="hint">No remarks yet.</p>'}</section>` : ''}`
     : `<div class="panel"><p class="hint">No activity for ${escapeHtml(name)} in ${ranges[historyState.range].toLowerCase()}.</p></div>`}`;
-  if(mode==='recruiters'){ (el.querySelector('.hp-sticky')||el.querySelector('.hp-top')).insertAdjacentHTML('afterend', '<section class="panel hp-panel" data-section="hist.today" id="historyToday"></section>'); renderHistoryToday(name); }
+  if(mode==='recruiters'){ el.querySelector('.hp-head').insertAdjacentHTML('afterend', '<section class="panel hp-panel" data-section="hist.today" id="historyToday"></section>'); renderHistoryToday(name); }
   if(rows.length){
     if(!historyState.selWeek || historyState.selFor!==mode+'|'+name || !rows.some(r=>r.w.weekEndDate===historyState.selWeek)){ historyState.selWeek=rows[rows.length-1].w.weekEndDate; historyState.selFor=mode+'|'+name; }
     const drawSel=()=>{
@@ -6359,6 +6405,12 @@ function renderHistoryView(){
   el.querySelector('#historyBack').onclick=()=>leaveHistoryPage(false);
   { const tb=document.getElementById('topBack'); tb.querySelector('span').textContent='Back to '+(VIEW_META[historyState.from]||VIEW_META.performance).title; tb.classList.remove('hidden'); tb.onclick=()=>leaveHistoryPage(false); document.body.classList.add('on-history'); }
   el.querySelector('#historyRange').onchange=e=>{ historyState.range=e.target.value; renderHistoryView(); };
+  el.querySelectorAll('[data-hview]').forEach(b=>b.onclick=()=>{ historyState.view=b.dataset.hview; const c=historyState.view==='charts';
+    el.classList.toggle('hp-mode-charts', c); el.classList.toggle('hp-mode-table', !c);
+    el.querySelectorAll('[data-hview]').forEach(x=>{ x.classList.toggle('on', x===b); x.setAttribute('aria-selected', String(x===b)); });
+    if(c) requestAnimationFrame(()=>['historyTrend','historyTrendBar','historyGoal'].forEach(k=>{ try{ charts[k]&&charts[k].resize(); }catch(e){} }));
+    const head=el.querySelector('.hp-head'); if(head && window.scrollY>head.offsetTop) window.scrollTo({top:Math.max(0,head.offsetTop-8)});
+    if(typeof saveNavSoon==='function') saveNavSoon(); });
   el.querySelector('#historyRemarks')?.addEventListener('click', ()=>openRemarksModal(name, last?last.w.weekEndDate:defaultWeekEnd()));
   el.querySelectorAll('[data-history-open]').forEach(b=>b.onclick=()=>{ historyState.from='branches'; Object.assign(historyState,{mode:b.dataset.historyOpen, name:b.dataset.name}); try{ history.pushState({ipdView:'history', mode:historyState.mode, name:historyState.name}, '', '#history'); }catch(e){} renderHistoryView(); window.scrollTo(0,0); });
   el.querySelector('#historyCopy')?.addEventListener('click', ()=>copyTableToClipboard(el.querySelector('#historyTable')));
@@ -7248,6 +7300,41 @@ const MODULES = [
 const VIEW_MODULE = {teams:'teams',leads:'teams',performance:'performance', recruiters:'recruiters', branches:'branches', master:'master', candidates:'candidate_hub', alerts:'alerts', pivot:'pivot'};
 
 function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+// ---------- Reload keeps you on the same page (this tab) ----------
+const NAV_KEY=()=> 'ipd_nav:'+(Server.user?.id||'');
+let _navT=null;
+function saveNavSoon(){ clearTimeout(_navT); _navT=setTimeout(saveNav,0); }
+function saveNav(){
+  if(!Server.user) return;
+  const nav={view:currentView,
+    hist:currentView==='history'?{mode:historyState.mode,name:historyState.name,from:historyState.from,selWeek:historyState.selWeek,range:historyState.range,view:historyState.view}:null,
+    lt:{viewingId:ltState.viewingId,rangeMode:ltState.rangeMode,anchor:ltState.anchor,division:ltState.division,tab:ltState.tab,brTab:ltState.brTab},
+    leads:{mode:leadsState.mode,anchor:leadsState.anchor,division:leadsState.division},
+    perf:{week:currentWeekEndDate,sel:selectedWeekEndDates,div:universalDivision}};
+  try{ sessionStorage.setItem(NAV_KEY(), JSON.stringify(nav)); }catch(e){}
+}
+async function restoreNav(){
+  let nav=null; try{ nav=JSON.parse(sessionStorage.getItem(NAV_KEY())||'null'); }catch(e){}
+  if(!nav||!nav.view) return false;
+  const ok=v=>v==='settings'?false:v==='history'?true:v==='leads'?Server.isAdmin():VIEW_MODULE[v]&&Server.can(VIEW_MODULE[v]);
+  if(!ok(nav.view)) return false;
+  if(nav.perf){ if(nav.perf.week) currentWeekEndDate=nav.perf.week; if(Array.isArray(nav.perf.sel)) selectedWeekEndDates=nav.perf.sel.filter(d=>weeksData.some(w=>w.weekEndDate===d)); if(typeof nav.perf.div==='string') universalDivision=nav.perf.div; }
+  if(nav.lt){ Object.assign(ltState,{owner:String(Server.user.id),viewingId:Server.isAdmin()?(nav.lt.viewingId||String(Server.user.id)):String(Server.user.id),rangeMode:nav.lt.rangeMode||null,anchor:nav.lt.anchor||null,division:nav.lt.division||'',tab:nav.lt.tab,brTab:nav.lt.brTab}); }
+  if(nav.leads) Object.assign(leadsState,nav.leads);
+  let view=nav.view;
+  if(view==='history'){
+    const h=nav.hist||{};
+    const allowed=h.name&&(h.mode==='recruiters'?await verifyRecruiterHistory(h.name):Server.can(h.mode));
+    if(allowed){ Object.assign(historyState,{mode:h.mode,name:h.name,from:h.from||'performance',selWeek:h.selWeek,range:h.range||'all',view:h.view,pushed:false}); try{ history.replaceState({ipdView:'history',mode:h.mode,name:h.name},'','#history'); }catch(e){} }
+    else view=h.from&&ok(h.from)?h.from:null;
+  }
+  if(!view) return false;
+  currentView=view;
+  const navBtn=view==='history'?historyState.from:view;
+  document.querySelectorAll('#navList button[data-view]').forEach(b=>b.classList.toggle('active', b.dataset.view===(navBtn==='teams'&&Server.isAdmin()?'leads':navBtn)));
+  return true;
+}
+window.addEventListener('beforeunload',()=>saveNav());
 // Default page: the person's own choice (this browser) → the one an admin set for them → first page they can open.
 const DEFAULT_VIEW_LABELS = {performance:'Performance Overview', teams:'My Team', leads:'Team Leads (admins)', recruiters:'Recruiter Scorecards', branches:'Branch Results', alerts:'Action Center', candidates:'Candidate Hub', master:'Candidate Hub — master sheet', pivot:'Report Builder'};
 function adminDefaultViews(){ return KV.get('userDefaultViews')||{}; }
@@ -7372,8 +7459,26 @@ const Server = {
     }
     return data;
   },
-  rpc(fn, args){ return this.call(fn, {p_token:this.token, ...(args||{})}); },
-  can(m){ if(m==='candidate_hub')return this.can('candidates')||this.can('master'); return !!this.user && (m==='teams' || this.user.role==='super_admin' || this.user.role==='admin' || (this.user.modules||[]).includes(m)); },
+  rpc(fn, args){
+    // "See their team's candidate names" (team-only): the server only sends candidate lists to the
+    // candidates module, so team-only accounts carry it with a scope marker; the UI hides every
+    // all-candidate view and filters names to the lead's own team.
+    if(fn==='dash_user_save' && args && args.p && Array.isArray(args.p.hidden_sections)){
+      const p={...args.p}; let mods=[...(p.modules||[])], hs=p.hidden_sections.filter(k=>k!==TEAM_SCOPE);
+      if(hs.includes('grant.team_names') && !mods.includes('candidates')){ mods.push('candidates'); hs.push(TEAM_SCOPE); }
+      p.modules=mods; p.hidden_sections=hs; args={...args, p};
+    }
+    const r=this.call(fn, {p_token:this.token, ...(args||{})});
+    if(fn==='dash_users_list') return r.then(list=>Array.isArray(list)?list.map(u=>{ const hs=u&&u.hidden_sections||[];
+      // accounts given the team-names right before this fix: upgrade them once, quietly
+      if(u&&u.role==='user'&&hs.includes('grant.team_names')&&!hs.includes(TEAM_SCOPE)&&!(u.modules||[]).includes('candidates')&&this.isAdmin()&&!(this._fixed||(this._fixed=new Set())).has(u.id)){
+        this._fixed.add(u.id); this.rpc('dash_user_save',{p:{id:u.id,name:u.name,modules:u.modules||[],hidden_sections:hs,active:u.active}}).catch(()=>{}); }
+      if(!hs.includes(TEAM_SCOPE)) return u;
+      return {...u, modules:(u.modules||[]).filter(m=>m!=='candidates'), hidden_sections:hs.filter(k=>k!==TEAM_SCOPE)}; }):list);
+    return r;
+  },
+  teamNamesOnly(){ return !!this.user && this.user.role==='user' && (this.user.hidden_sections||[]).includes(TEAM_SCOPE); },
+  can(m){ if(m==='candidate_hub')return this.can('candidates')||this.can('master'); if(m==='candidates'&&this.teamNamesOnly()) return false; return !!this.user && (m==='teams' || this.user.role==='super_admin' || this.user.role==='admin' || (this.user.modules||[]).includes(m)); },
   isAdmin(){ return !!this.user && (this.user.role==='super_admin' || this.user.role==='admin'); },
   isSuperAdmin(){ return !!this.user && this.user.role==='super_admin'; },
   expired(){
@@ -7402,7 +7507,7 @@ const Server = {
   // Fetches the candidate lists for weeks loaded without them, then refreshes quietly.
   listsLoading:false,
   async loadListsInBackground(){
-    if(this.listsLoading || !this.can('candidates')) return; this.listsLoading = true;
+    if(this.listsLoading || !(this.can('candidates')||this.teamNamesOnly())) return; this.listsLoading = true;
     try{
       const pending = [...KV.entries()].filter(([k,v])=>k.startsWith('weekly:') && v && v.listsSplit && !v.listsLoaded).map(([k])=>k).sort().reverse();
       for(let i=0;i<pending.length;i+=4){
@@ -7742,7 +7847,7 @@ async function afterLogin(boot){
     await loadDivisionNames(); await loadDedupeSetting(); await loadAllWeeks(); await loadExcludedRecruiters(); await loadExcludedBranches();
     await loadRecruiterDivisions(); await loadBranchDivisions(); await loadDedupeSetting(); await loadPerformerHighlightSetting();
     deleteSourceFilesAfterImport = lsGet('ipd_delete_sources')!=='0';
-    if(!location.hash || location.hash==='#') applyDefaultView();
+    if(!(await restoreNav())) applyDefaultView();
     applyPermissions(); renderDefaultViewPref();
     document.getElementById('storageModeNote').textContent = 'Signed in as '+Server.user.name+' · data is stored securely on the server.';
     refreshUI();
@@ -8966,7 +9071,7 @@ async function renderAlertsView(){
       <button type="button" class="al-tile bad" data-jump="alBelow"><span>Below 50% of goal</span><strong>${below.length}</strong><em>${noRemark?noRemark+' without a remark':'all have remarks'}</em></button>
       <button type="button" class="al-tile warn" data-jump="alWatch"><span>50–79% of goal</span><strong>${watch.length}</strong><em>keep an eye on</em></button>
       <div class="al-tile good"><span>On track (80%+)</span><strong>${onTrack.length}</strong><em>of ${rows.length} recruiters</em></div>
-      ${Remarks.canApprove()?`<button type="button" class="al-tile ${pending.length?'warn':''}" data-jump="alApprovals" data-section="alerts.approvals"><span>Remarks to approve</span><strong>${pending.length}</strong><em>${pending.length?'waiting for you':'all caught up'}</em></button>`:`<div class="al-tile"><span>Other signals</span><strong>${attention.length}</strong><em>show rate, no-shows, activity</em></div>`}
+      ${`<div class="al-tile"><span>Other signals</span><strong>${attention.length}</strong><em>show rate, no-shows, activity</em></div>`}
     </div>
     ${pending.length?`<section class="panel al-section" id="alApprovals" data-section="alerts.approvals"><div class="panel-head"><div><h3>Remarks awaiting approval</h3><span class="hint">Only you and the author can see these until they’re approved.</span></div></div>
       <div class="al-approvals">${pending.map(r=>`<div class="al-appr" data-id="${escapeHtml(r.id)}"><div class="al-appr-meta"><strong>${escapeHtml(r.recruiter)}</strong> · Wk ${weekOfDate(r.week_end_date).number} · by ${escapeHtml(r.author||'')} · ${new Date(r.created_at).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</div><div class="al-appr-text">${escapeHtml(r.remark)}</div><div class="al-actions"><button class="btn btn-primary btn-sm" data-appr="1">Approve</button><button class="btn btn-secondary btn-sm" data-appr="0">Reject</button><button class="link-btn" data-appr-edit="${escapeHtml(r.recruiter)}" data-week="${r.week_end_date}">Edit…</button></div></div>`).join('')}</div></section>`:''}
@@ -10053,7 +10158,7 @@ async function ltRenderScheduledCandidates(g){
  host.innerHTML='<p class="hint">Loading candidates…</p>';
  const mine=(list,d)=>list.filter(c=>tgActive(g,c.recruiter,d)&&(!g.division||(branchDivisions[c.branch]||'Unassigned')===g.division));
  // team-only: the server returns just this lead's team (needs the dash_team_candidates function)
- const rowsOn=async d=>teamOnly?(await Server.rpc('dash_team_candidates',{p_from:d,p_to:d})||[]).map(c=>({...c,branch:branchAlias(c.branch||'Unassigned')})):await scheduledRowsOn(d);
+ const rowsOn=async d=>teamOnly&&!Server.teamNamesOnly()?(await Server.rpc('dash_team_candidates',{p_from:d,p_to:d})||[]).map(c=>({...c,branch:branchAlias(c.branch||'Unassigned')})):await scheduledRowsOn(d);
  try{
   const rows=mine(await rowsOn(day),day);
   if(!host.isConnected||String(Server.user?.id)!==owner)return;
@@ -10073,7 +10178,7 @@ async function ltRenderScheduledCandidates(g){
   host.querySelector('#ltCandDate').onchange=e=>{ if(tgDate(e.target.value)&&e.target.value<=today){ ltState.candDate=e.target.value===today?null:e.target.value; ltRenderScheduledCandidates(g);} };
   host.querySelector('#ltCandToday')?.addEventListener('click',()=>{ltState.candDate=null;ltRenderScheduledCandidates(g);});
   draw();
- }catch(e){ if(!host.isConnected) return; host.innerHTML=teamOnly&&/Could not find|does not exist|schema cache/i.test(e.message||'')?`<div class="lt-empty"><strong>Team-only candidate names need a database update.</strong><span>${Server.isAdmin()?'The dash_team_candidates function isn’t installed yet — run the team-names SQL in Supabase.':'Your admin needs to finish setting this up.'}</span></div>`:'<p role="alert">Candidate data could not be loaded. Refresh the team to retry.</p>'; }
+ }catch(e){ if(!host.isConnected) return; host.innerHTML=teamOnly&&/Could not find|does not exist|schema cache/i.test(e.message||'')?`<div class="lt-empty"><strong>Your team-names right needs one more step.</strong><span>${Server.isAdmin()?'Open Settings → Users once (this upgrades the right), then the lead reloads.':'Your admin just needs to re-save your rights — then reload this page.'}</span></div>`:'<p role="alert">Candidate data could not be loaded. Refresh the team to retry.</p>'; }
 }
 // ---------- One team per recruiter per day ----------
 // Every team's ranges (the lead's own recruiter name counts as a member for all dates).
