@@ -1788,6 +1788,7 @@ body.uf-lock{overflow:hidden}
           <div id="view-folderUploads"></div>
           <div id="numberCheck"></div>
           <div id="uploadHistory"></div>
+          <div id="privacyCleanup"></div>
           <div class="panel set-card settings-only">
             <h3 class="set-title">Preferences</h3>
             <div class="set-row"><div><strong>Performer highlights</strong><span>Badges for top and star performers in the recruiter and branch tables</span></div><button type="button" class="switch" role="switch" id="settingsPerformerHighlightBtn" aria-checked="false"><i></i></button></div>
@@ -2309,9 +2310,13 @@ const NamePolicy={
   async hash(name){ const d=new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(String(name).trim().toLowerCase()))); return 'h1:'+[...d.slice(0,12)].map(b=>b.toString(16).padStart(2,'0')).join(''); },
   show(){ if(typeof Server==='undefined'||!Server.user||!Server.isAdmin()) return false; try{ return localStorage.getItem('ipd_show_names:'+Server.user.id)==='1'; }catch(e){ return false; } },
   setShow(on){ try{ localStorage.setItem('ipd_show_names:'+Server.user.id,on?'1':'0'); }catch(e){} applyNamesEverywhere(); if(on) this.decryptPending(); },
-  label(raw,eid){ const e=eid&&eid!=='\u2013'&&eid!=='–'?String(eid):'';
-    if(this.show()){ if(this.isTok(raw)) return this.cache.get(raw)||(e?e+' (unlocking…)':'Unlocking…'); if(this.isHash(raw)) return (e||'No EID')+' (name not saved)'; return raw||e||'—'; }
-    return e||'No EID'; },
+  // short encrypted code shown in place of a name, e.g. "#7C1E09A4"
+  code(raw){ const s=String(raw||'').trim(); if(!s) return '—';
+    if(this.isTok(s)||this.isHash(s)) return '#'+s.slice(s.indexOf(':')+1, s.indexOf(':')+9).toUpperCase();
+    let h=0x811c9dc5; for(let i=0;i<s.length;i++){ h^=s.toLowerCase().charCodeAt(i); h=Math.imul(h,0x01000193)>>>0; } return '#'+h.toString(16).toUpperCase().padStart(8,'0'); },
+  label(raw,eid){
+    if(this.show()){ if(this.isTok(raw)) return this.cache.get(raw)||'Unlocking…'; if(this.isHash(raw)) return this.code(raw)+' (name not saved)'; return raw||'—'; }
+    return this.code(raw); },
   async getKey(){ if(this.key) return this.key; if(this.keyTried) return null; this.keyTried=true;
     try{ const hex=await Server.rpc('dash_name_key'); if(!hex||typeof hex!=='string') return null; const raw=new Uint8Array(hex.match(/../g).map(h=>parseInt(h,16)));
       this.key={aes:await crypto.subtle.importKey('raw',raw,'AES-GCM',false,['encrypt','decrypt']), mac:await crypto.subtle.importKey('raw',raw,{name:'HMAC',hash:'SHA-256'},false,['sign'])}; return this.key; }
@@ -4171,7 +4176,7 @@ function renderSettingsModalContent(){
   if(stale) stale.remove();
   if(databaseSchemaStale) document.getElementById('settingsPane-sync')?.insertAdjacentHTML('afterbegin', '<div class="panel warn-note" id="schemaStaleNote" style="margin-bottom:16px;"><strong>Database setup is out of date.</strong> This page (v'+APP_VERSION.replace('Version ','')+') needs the matching <code>supabase_setup.sql</code>. Open Supabase → SQL Editor → New query, paste the whole file, click <em>Run</em>, and check it finishes with “Success”. Until then, newer features (for example the Candidates right for users) won’t work.</div>');
   renderFolderUploadExplainer();
-  renderUploadHistory();
+  renderUploadHistory(); renderPrivacyCleanup();
   renderNumberCheck();
   renderMyAccount();
   if(Server.can('settings')) renderManageView();
@@ -8426,6 +8431,70 @@ function chooseSourceDialog(fileName){
     wrap.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{ wrap.remove(); resolve(b.dataset.v||null); });
   });
 }
+// ---------- One-off clean-up: encrypt names already saved + drop unused columns ----------
+// Re-saves every week through the normal upload path, so the database ends up exactly as if the
+// files had been uploaded today: only the needed columns, candidate names encrypted.
+function renderPrivacyCleanup(){
+  const host=document.getElementById('privacyCleanup'); if(!host) return;
+  if(!(Server.user&&(Server.isAdmin()||Server.can('upload')))){ host.innerHTML=''; return; }
+  const done=KV.get('privacyCleanupAt');
+  host.innerHTML=`<div class="panel set-card"><h3 class="set-title">Encrypt saved names &amp; slim the data</h3>
+    <div class="set-row"><div><strong>${done?'Last run '+escapeHtml(new Date(done.at).toLocaleString())+(done.by?' by '+escapeHtml(done.by):''):'Weeks uploaded before encryption still hold plain names and extra columns'}</strong>
+    <span>Re-saves every week with only the columns the dashboard uses and candidate names encrypted — smaller data, faster loading. Counts don’t change. Takes a few minutes; keep this tab open.</span></div>
+    <button type="button" class="btn btn-primary btn-sm" id="privacyRun">${done?'Run again':'Encrypt & slim now'}</button></div></div>`;
+  host.querySelector('#privacyRun').onclick=encryptSavedNames;
+}
+async function encryptSavedNames(){
+  if(!(await NamePolicy.getKey())){ alert('The name-protection key isn’t available.\n\nRun privacy.sql in the Supabase SQL Editor first, then try again.'); return; }
+  const weeks=[...weeksData].map(w=>w.weekEndDate).sort();
+  if(!weeks.length){ showToast('No saved weeks yet.'); return; }
+  if(!confirm(`Encrypt candidate names and remove unused columns for all ${weeks.length} saved weeks?\n\nCounts stay the same. Rows you excluded in Candidates that have no Employee Number may need excluding again. Keep this tab open until it finishes.`)) return;
+  const keep=new Set(Object.values(CANON)), tokCache=new Map(), touched=new Set(), localRows=new Map();
+  const toTok=async n=>{ if(tokCache.has(n)) return tokCache.get(n); const t=await NamePolicy.enc(n)||await NamePolicy.hash(n); tokCache.set(n,t); return t; };
+  let changedWeeks=0, rowsDone=0;
+  Server.ownMasterUntil=Date.now()+30*60*1000;
+  try{
+    for(let wi=0; wi<weeks.length; wi++){
+      const week=weeks[wi], weekStart=tgShift(week,-6), tag='Week '+(wi+1)+' of '+weeks.length;
+      importProgress(tag+' · reading…');
+      const index=[]; let after='';
+      for(;;){ const page=await Server.rpc('dash_week_index',{p_weeks:[week],p_after:after,p_limit:1000}); if(!page||!page.length) break; index.push(...page); after=page[page.length-1].id; }
+      const mine=index.filter(r=>(r.s&&r.sw===week)||(r.v&&r.vw===week)); if(!mine.length) continue;
+      const data=new Map(), ids=mine.map(r=>r.id), chunks=[]; for(let i=0;i<ids.length;i+=500) chunks.push(ids.slice(i,i+500));
+      await runPool(chunks.map(c=>async()=>{ ((await Server.rpc('dash_rows_by_ids',{p_ids:c}))||[]).forEach(r=>data.set(r.id,r.data)); }), NET_PARALLEL);
+      // anything to do in this week?
+      const needs=[...data.values()].some(d=>Object.keys(d).some(k=>!keep.has(k)) || (d['Candidate Name']!=null && !NamePolicy.isTok(d['Candidate Name']) && !NamePolicy.isHash(d['Candidate Name']) && !isBlankIdent(d['Candidate Name'])));
+      if(!needs) continue;
+      for(const source of ['schedules','shows']){
+        const rows=mine.filter(r=>source==='schedules'?(r.s&&r.sw===week):(r.v&&r.vw===week)).sort((a,b)=>(Number(source==='schedules'?a.so:a.vo)||0)-(Number(source==='schedules'?b.so:b.vo)||0));
+        if(!rows.length) continue;
+        importProgress(tag+' · protecting '+(source==='schedules'?'Created On':'Date Of')+' rows…');
+        const occ=new Map(), batch=[], dropped=new Set();
+        for(const [idx,r] of rows.entries()){
+          const d=data.get(r.id); if(!d) continue; const out={};
+          for(const k of Object.keys(d)){ if(keep.has(k)) out[k]=d[k]; else dropped.add(k); }
+          const nm=out['Candidate Name']!=null?String(out['Candidate Name']).trim():''; if(nm && !NamePolicy.isTok(nm) && !NamePolicy.isHash(nm) && !isBlankIdent(nm)) out['Candidate Name']=await toTok(nm);
+          const created=out['Created On']||null, dateOf=out['Date Of']||null, eid=normalizeEmployeeNumber(out['Employee Number']||'');
+          const base=[created||'', String(out['Created By']||'').trim().toLowerCase(), eid || ('n:'+String(out['Candidate Name']||'').trim().toLowerCase()), dateOf||''].join('|');
+          const n=occ.get(base)||0; occ.set(base,n+1); const id=base+'#'+n;
+          batch.push({id, created_on:created, date_of:dateOf, recruiter:String(out['Created By']||'').trim()||'Unassigned', branch:String(out['Branch']||'').trim()||'Unassigned', employee_number:eid||null, candidate_name:String(out['Candidate Name']||'').trim()||null, ord:idx, data:out});
+          localRows.set(id,out);
+        }
+        const importId=await Server.rpc('dash_import_begin',{p_source:source,p_file_name:'Privacy clean-up · Wk '+weekOfDate(week).number});
+        const parts=[]; for(let i=0;i<batch.length;i+=IMPORT_BATCH) parts.push(batch.slice(i,i+IMPORT_BATCH));
+        await runPool(parts.map(rowsPart=>()=>Server.rpc('dash_import_rows',{p_import_id:importId,p_source:source,p_rows:rowsPart})), NET_PARALLEL);
+        await Server.rpc('dash_import_finish',{p_import_id:importId,p_source:source,p_from:weekStart,p_to:week,p_rows_read:batch.length,p_removed_columns:[...dropped]});
+        rowsDone+=batch.length;
+      }
+      touched.add(week); changedWeeks++;
+    }
+    if(touched.size) await rebuildWeeks([...touched], localRows, importProgress);
+    await storageSet('privacyCleanupAt',{at:new Date().toISOString(),by:Server.user.name});
+    candState.cache?.clear?.(); await loadAllWeeks(); refreshUI();
+    showToast(changedWeeks?`Done — ${changedWeeks} week${changedWeeks===1?'':'s'} re-saved (${fmtNum(rowsDone)} rows): names encrypted, unused columns removed.`:'Everything was already encrypted and slim — nothing to change.');
+  }catch(e){ alert('The clean-up stopped: '+cleanErr(e)+'\n\nWeeks already done are saved. Run it again to finish the rest.'); }
+  finally{ setLoading(null); const u=document.getElementById('uploadFilesBtn'); if(u) u.textContent='Upload Excel files'; renderPrivacyCleanup(); }
+}
 function importProgress(text){
   ['folderSyncNowBtn','uploadFilesBtn'].forEach(id=>{ const b=document.getElementById(id); if(b && text) b.textContent=text; });
   setLoading(text);
@@ -9934,7 +10003,7 @@ function renderMyAccount(){
     <button class="btn btn-secondary btn-sm" id="acctSignOut">Sign out</button>
   </div>
   ${u.role!=='user' ? `<div class="panel"><h3 style="margin:0 0 4px;">Candidate names</h3>
-    <p class="hint" style="margin:0 0 10px;">Everyone sees Employee Numbers (EID) instead of candidate names. As an admin you can show the real names on this device only — they’re unlocked here and never shared.</p>
+    <p class="hint" style="margin:0 0 10px;">Candidate names are stored encrypted, and everyone sees a short code such as #7C1E09A4 instead. As an admin you can show the real names on this device only — they’re unlocked here and never shared.</p>
     <label class="uf-tool uf-active" style="margin:0"><span class="uf-switch"><input type="checkbox" id="acctShowNames" ${NamePolicy.show()?'checked':''}><i aria-hidden="true"></i></span><span class="uf-page-txt"><strong>Show candidate names</strong><span>Admins only · this browser only</span></span></label>
     <p class="auth-msg" id="acctNamesMsg" role="status"></p></div>` : ''}
   ${u.role==='super_admin' ? `<div class="panel">
@@ -9949,7 +10018,7 @@ function renderMyAccount(){
   host.querySelector('#acctSignOut').onclick = signOut;
   host.querySelector('#acctShowNames')?.addEventListener('change', async e=>{ const on=e.target.checked; NamePolicy.setShow(on);
     if(on){ const k=await NamePolicy.getKey(); host.querySelector('#acctNamesMsg').textContent=k?'Names will show across the dashboard.':'Older uploads show names; newer ones need the name-protection key (run privacy.sql).'; }
-    else host.querySelector('#acctNamesMsg').textContent='Names hidden — Employee Numbers show instead.';
+    else host.querySelector('#acctNamesMsg').textContent='Names hidden — encrypted codes show instead.';
     refreshUI(); });
   const save = host.querySelector('#pwSave');
   if(save) save.onclick = async ()=>{
