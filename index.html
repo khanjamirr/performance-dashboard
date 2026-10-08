@@ -1213,7 +1213,7 @@ body.team-workspace .content{padding-top:10px!important}
 #ltScheduledCandidates .lt-pane-head{align-items:center;margin:8px 0 0}#ltScheduledCandidates .lt-pane-head .hint{font-size:12px}.bc-intro{margin:0 0 10px;font-size:12.5px!important}.bc-table td{vertical-align:middle;font-variant-numeric:tabular-nums}.bc-table td small{display:block;font-size:10.5px;font-weight:600}
 .bc-branch{font-weight:700;color:#10303c;border-right:1px solid #e4ecef;background:#fbfdfd}.bc-mine td{border-bottom:0!important}.bc-other td{color:#5c7480;border-bottom:2px solid #e1eaed!important}
 .bc-up b{color:#15633f}.bc-up small{color:#1f9a6c!important}.bc-down b{color:#a12d36}.bc-down small{color:#c4565f!important}
-.lt-back{flex:0 0 auto;align-self:center}.mb-controls{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;margin-bottom:12px}.mb-controls .lt-field input{min-height:36px}
+.lt-back{flex:0 0 auto;align-self:center}.mb-missing{background:#fdf4df;border:1px solid #f0d9a4;color:#6b4f12!important;padding:8px 12px;border-radius:9px;margin:0 0 10px!important}.mb-controls{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;margin-bottom:12px}.mb-controls .lt-field input{min-height:36px}
 .mb-seg{display:inline-flex;border:1px solid #d6e2e6;border-radius:9px;overflow:hidden}.mb-seg button{font:inherit;font-size:12.5px;font-weight:600;padding:8px 14px;border:0;background:#fff;color:#3f5863;cursor:pointer}.mb-seg button+button{border-left:1px solid #d6e2e6}.mb-seg button.on{background:#2f8f8a;color:#fff}.mb-seg button:disabled{opacity:.45;cursor:not-allowed}
 .mb-all{display:flex;align-items:center;gap:6px;font-size:12.5px;color:#3f5863;padding-bottom:8px}.mb-sum{margin-left:auto;padding-bottom:8px;font-size:12.5px!important}#ltMultiBranch>p.hint{font-size:12px!important;margin-top:8px}
 .mb-table th small{display:block;font-weight:500;text-transform:none;letter-spacing:0;color:#7a8f99;font-size:10.5px}.mb-num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -1356,6 +1356,19 @@ body.access-mode #accessFab{display:none}
 .acc-tg input:checked+i{background:#2f8f8a}.acc-tg input:checked+i:after{transform:translateX(16px)}.acc-tg input:focus-visible+i{outline:2px solid #5b3fa0;outline-offset:2px}
 #accMsg{margin-right:auto}
 .al-pct small{display:block;font-size:10px;font-weight:600;color:#8a9ca5;text-align:right;letter-spacing:0}
+.pv-empty{text-align:center;padding:48px 24px!important}.pv-empty-ico{font-size:34px;margin-bottom:6px}.pv-empty h3{margin:0 0 6px;color:#10303c}.pv-empty p{margin:0 auto;max-width:460px;color:#5c7480;font-size:13.5px;line-height:1.55}
+.top-back{display:inline-flex;align-items:center;gap:6px;margin:0 0 8px;padding:7px 14px 7px 10px;border-radius:999px;border:1px solid #2f8f8a;background:#2f8f8a;color:#fff;font:inherit;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px #2f8f8a33}
+.top-back:hover{background:#25756f}.top-back.hidden{display:none}
+#view-history .hp-back{display:none!important}
+@media(min-width:761px){
+  body.on-history .top-back:not(.hidden){position:fixed;top:14px;left:calc(var(--side-w,256px) + 24px);z-index:210;margin:0;padding:9px 16px 9px 12px;font-size:13.5px;box-shadow:0 8px 22px #18344233}
+  body.on-history .main>.topbar{padding-top:62px!important}
+  body.on-history .hp-sticky{top:56px!important}
+}
+@media(max-width:760px){.top-back{position:fixed;top:calc(60px + env(safe-area-inset-top));left:12px;z-index:126;margin:0}body.on-history .hp-sticky{top:calc(104px + env(safe-area-inset-top))!important}}
+.hp-sticky .mk-team{margin:0}.hp-sticky #histTiles{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px}
+.hp-sel-meta{margin-left:auto;font-size:12px;color:#5c7480}.hp-sel-meta b{color:#10303c}
+@media(max-width:760px){.hp-sticky #histTiles{grid-template-columns:1fr 1fr!important}.hp-sticky #histTiles>[data-section="hist.kpi.interviews"]{grid-column:1/-1;order:3}.hp-sel-meta{margin-left:0;flex-basis:100%}}
 </style>
 </head>
 <body class="locked">
@@ -1401,6 +1414,7 @@ body.access-mode #accessFab{display:none}
   <main class="main">
     <div class="topbar">
       <div>
+        <button type="button" class="top-back hidden" id="topBack"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg><span></span></button>
         <h2 id="viewTitle">Weekly Overview</h2>
         <div class="sub" id="viewSub">No data uploaded yet</div>
       </div>
@@ -3327,6 +3341,7 @@ function processFile1(rows, mapping, weekEndDate, dedupeFlag, rangeCheckFn){
     const day = daily[toIsoDateOnly(d)] ||= emptyTotals();
     day.schedules++;
     byRecruiter[recruiter].branch = branch;
+    { const bd=byRecruiter[recruiter].branchDays ||= {}, bb=bd[branch] ||= {}, dk=toIsoDateOnly(d); bb[dk]=(bb[dk]||0)+1; }   // counts only, no names
     const candName = mapping.candidateName ? (row[mapping.candidateName]||'').toString().trim() : '';
     const eid = mapping.employeeNumber ? (row[mapping.employeeNumber]||'').toString().trim() : '';
     if(candName || eid) byRecruiter[recruiter].schedulesList.push({name: candName || 'Unknown', eid: eid || '\u2013', date: toIsoDateOnly(d), branch});
@@ -3494,6 +3509,7 @@ function buildWeekRecord(weekEndDate, weekNumber, agg1, agg2Result){
       shows: b.shows||0,
       noShows: b.noShows||0,
       daily: mergeDailyMetrics(a.daily,b.daily),
+      branchDays: a.branchDays||undefined,
       schedulesList: a.schedulesList||[],
       interviewsList: b.interviewsList||[],
       showsList: b.showsList||[],
@@ -3549,6 +3565,7 @@ function branchCandidateList(week, branchName, listKey){
 document.getElementById('navList').addEventListener('click', (e)=>{
   const btn = e.target.closest('button[data-view]');
   if(!btn) return;
+  if(btn.dataset.view==='pivot' && currentView!=='pivot') pivotOpened=false;
   currentView = btn.dataset.view;
   document.querySelectorAll('#navList button').forEach(b=> b.classList.toggle('active', b===btn));
   document.getElementById('settingsNavBtn').classList.remove('active');
@@ -3645,6 +3662,7 @@ function renderUploadStamp(){
 }
 async function refreshUI(){
  document.body.classList.toggle('team-workspace',currentView==='teams'||currentView==='leads');
+ if(currentView!=='history'){ document.getElementById('topBack')?.classList.add('hidden'); document.body.classList.remove('on-history'); }
  renderUploadStamp();
  if(currentView==='candidates'&&!Server.can('candidates')&&Server.can('master'))currentView='master';
   closeEntityPopover();
@@ -4496,7 +4514,7 @@ function mergedKpiCards(o){
   const sSt='info', iSt='info', hSt='info';
   // weekly averages when the selection spans more than one week
   // …and per recruiter (per recruiter per week across several weeks: active recruiter-weeks, as for hires per recruiter)
-  const W=o.weeks>1?o.weeks:0, R=hpr.recruiters||0;
+  const W=o.weeks>1?o.weeks:0, R=o.plainHires?0:(hpr.recruiters||0);   // no per-recruiter box on a single recruiter's page
   const fmtA=(v,n)=>{ if(v==null||!n) return '–'; const x=v/n; return x>=100?fmtNum(Math.round(x)):(Math.round(x*10)/10).toLocaleString(); };
   const block=(title,n,items)=>!n?'':`<div class="mk-avg"><span>${title}</span>${items.filter(Boolean).map(([v,l])=>`<i class="mk-pair"><b>${fmtA(v,n)}</b><em>${l}</em></i>`).join('')}</div>`;
   const both=items=>block('Per week (avg)',W,items)+block(W?'Per recruiter per week':'Per recruiter',R,items);
@@ -4516,6 +4534,10 @@ function mergedKpiCards(o){
       ringHtml:ring(sr==null?null:sr/100,sr==null?'–':Math.round(sr)+'%','',iSt==='pending'?'pending':band(sr,70,60)),
       body:stack+row('shows','<i class="mk-dot" style="background:#2fa57a"></i>Shows',pend?'Pending':num(t.shows),sr,70,false,'show_rate')+row('no_shows','<i class="mk-dot" style="background:#b9c7cd"></i>No shows',pend?'Pending':num(t.noShows),nr,20,true,'no_show_rate'),
       insight:iIns, foot:d.interviews, spark:sp.interviews, avg:avgI}),
+    o.plainHires ? card({key:'hires',label:'Hires',accent:'#7a5fb8',status:'info',
+      value:num(t.i9), sub:'hired',
+      body:row('hire_rate','of shows',pend?'Pending':num(t.shows),hr,null,false),
+      insight:'', foot:'', spark:'', avg:''}) :
     card({key:'hires',label:'Hires per recruiter',accent:'#7a5fb8',status:hSt,kd:'hires_per_recruiter',
       value:hpr.value==null?'–':hpr.value.toFixed(1), sub:`${num(hpr.hires)} hires · ${num(hpr.recruiters)} recruiters`,
       ringHtml:ring(hpr.value==null?null:hpr.value/15,hpr.value==null?'–':hpr.value.toFixed(1),'of 15',hSt),
@@ -4526,7 +4548,7 @@ function mergedKpiCards(o){
       ringHtml:ring(ph==null?null:ph/100,ph==null?'–':ph.toFixed(0)+'%','','info'),
       body:row('','of hires',num(t.i9),ph,null,false)+row('','of shows',pend?'Pending':num(t.shows),ps,null,false),
       insight:pIns, foot:d.placed, spark:sp.placed, avg:avgP}),
-  ].join('');
+  ].filter((html,i)=>!o.only||o.only.includes(['schedules','interviews','hires','placed'][i])).join('');
 }
 const KPI_DETAIL = {
   schedules:{label:'Schedules', n:'schedules', good:'up', accent:'#2f8f8a'},
@@ -6091,11 +6113,38 @@ async function scheduledRowsOn(date){
 }
 async function scheduledTodayRows(){ return scheduledRowsOn(ltToday()); }
 // Candidate-level lists are only sent by the server to accounts with the candidate-names right.
+function canSeeTeamNames(){ return !!Server.user && (Server.user.role!=='user' || (Server.user.hidden_sections||[]).includes('grant.team_names')); }
 function noNamesRightHtml(what){
-  return `<div class="lt-empty"><strong>${escapeHtml(what)} need the “Candidate Hub — pipeline and names” right.</strong><span>${Server.isSuperAdmin()?'Use the 🔒 Access button (bottom right) → “Who can open / edit this page…” to turn on “See candidate names” for the people who need it.':'Your account doesn’t have it yet — ask your admin to turn it on.'}</span></div>`;
+  return `<div class="lt-empty"><strong>${escapeHtml(what)} need the “See their team’s candidate names” right.</strong><span>${Server.isSuperAdmin()?'Use the 🔒 Access button (bottom right) → “Who can open / edit this page…” and turn on “See their team’s candidate names”.':'Your account doesn’t have it yet — ask your admin to turn it on.'}</span></div>`;
 }
 // Every schedule row (with its own branch and date) between two dates.
+// Name-free summary for people without the candidate-names right:
+// branchDaily:<week> = {deduped:{recruiter:{date:{branch:count}}}, raw:{…}}
+function branchDailyFromRecord(rec){
+  const out={};
+  for(const mode of ['deduped','raw']){
+    const part=rec&&rec[mode]; if(!part||!part.byRecruiter) continue; const m=out[mode]={};
+    Object.entries(part.byRecruiter).forEach(([n,o])=>(o.schedulesList||[]).forEach(c=>{ if(!c||!c.date) return; const b=c.branch||o.branch||'Unassigned'; const r=m[n]||(m[n]={}), d=r[c.date]||(r[c.date]={}); d[b]=(d[b]||0)+1; }));
+  }
+  return out;
+}
+const hasLists=rec=>!!(rec&&rec.deduped&&rec.deduped.byRecruiter&&Object.values(rec.deduped.byRecruiter).some(o=>Array.isArray(o.schedulesList)&&o.schedulesList.length));
+async function backfillBranchDaily(){
+  if(!(Server.can('upload')||Server.isAdmin())||!Server.can('candidates')) return;
+  const weeks=[...KV.keys()].filter(k=>k.startsWith('weekly:')&&!k.endsWith(LISTS_SUFFIX)).map(k=>k.slice(7)).sort().reverse().slice(0,16);
+  for(const w of weeks){ if(KV.get('branchDaily:'+w)) continue; const rec=KV.get('weekly:'+w); if(!hasLists(rec)) continue;
+    try{ await Server.kvSet('branchDaily:'+w, branchDailyFromRecord(rec)); }catch(e){ return; } await new Promise(r=>setTimeout(r,50)); }
+}
+function scheduleRowsFromSummary(from,to){
+  const out=[], mode=dedupeByEmployeeNumber?'deduped':'raw'; let missing=0;
+  [...new Set(tgDays(from,to).map(d=>weekOfDate(d).weekEnd))].filter(w=>weeksData.some(x=>x.weekEndDate===w)).forEach(w=>{
+    const v=KV.get('branchDaily:'+w); if(!v){ missing++; return; }
+    Object.entries(v[mode]||v.deduped||{}).forEach(([rec,days])=>Object.entries(days).forEach(([d,brs])=>{ if(d<from||d>to) return; Object.entries(brs).forEach(([b,n])=>{ for(let i=0;i<n;i++) out.push({recruiter:rec,branch:branchAlias(b),date:d}); }); }));
+  });
+  out.missingWeeks=missing; return out;
+}
 async function scheduleRowsBetween(from,to){
+  if(!canSeeCandidates()) return scheduleRowsFromSummary(from,to);
   const weeks=[...new Set(tgDays(from,to).map(d=>weekOfDate(d).weekEnd))].filter(w=>weeksData.some(x=>x.weekEndDate===w));
   const out=[];
   for(const week of weeks){
@@ -6119,6 +6168,15 @@ function branchTargets(name,weekEnd,activeBranches){
   return {goal,targets:out,manual:fixed.length>0,sum:Object.values(out).reduce((a,v)=>a+v,0)};
 }
 const wdIn=(from,to)=>from>to?0:ltWorkdays(from,to).length;
+// Schedule counts per recruiter / branch / day from the week summaries — no names needed.
+function scheduleCountsBetween(from,to){
+  const out=[]; let have=false;
+  weeksData.filter(w=>w.weekEndDate>=from&&tgShift(w.weekEndDate,-6)<=to).forEach(w=>Object.entries(w.byRecruiter||{}).forEach(([rec,r])=>{
+    if(!r.branchDays) return; have=true;
+    Object.entries(r.branchDays).forEach(([b,days])=>Object.entries(days).forEach(([d,n])=>{ if(d>=from&&d<=to&&n) out.push({recruiter:rec,branch:branchAlias(b),date:d,n}); }));
+  }));
+  return {rows:out,have};
+}
 // Multi-branch tab: schedules per recruiter per branch, by day or by week, for any dates, against branch targets.
 async function ltRenderMultiBranch(g,p,cutoff){
   const host=document.getElementById('ltMultiBranch'); if(!host) return;
@@ -6126,19 +6184,22 @@ async function ltRenderMultiBranch(g,p,cutoff){
   if(!st.from||st.key!==p.from+'|'+p.to){ st.from=p.from; st.to=cutoff; st.key=p.from+'|'+p.to; }
   let from=st.from, to=st.to>today?today:st.to; if(to<from) to=from;
   const span=tgDays(from,to).length, group=st.group==='week'||span>31?'week':'day';
-  if(!canSeeCandidates()){ host.innerHTML=noNamesRightHtml('Schedules per branch'); return; }
   host.innerHTML='<p class="hint">Loading schedules…</p>';
   try{
     const owner=String(Server.user?.id), wFrom=weekOfDate(from).weekStart, wTo=weekOfDate(to).weekEnd<today?weekOfDate(to).weekEnd:today;
     const mine=c=>tgActive(g,c.recruiter,c.date)&&(!g.division||(getEffectiveRecruiterDivision(c.recruiter,weekOfDate(c.date).weekEnd)||'Unassigned')===g.division);
-    const full=(await scheduleRowsBetween(wFrom,wTo)).filter(mine);      // whole weeks: which branches each person works at
+    let src;
+    { const c=scheduleCountsBetween(wFrom,wTo);   // counts (everyone); fall back to candidate lists for weeks saved before counts existed
+      src = c.have ? c.rows : canSeeCandidates() ? await scheduleRowsBetween(wFrom,wTo) : null; }
+    if(!src){ host.innerHTML=`<div class="lt-empty"><strong>Branch counts for these weeks aren’t ready yet.</strong><span>They’re added automatically the next time an admin or uploader opens the dashboard (or after the next upload).</span></div>`; return; }
+    const full=src.filter(mine);      // whole weeks: which branches each person works at
     if(!host.isConnected||String(Server.user?.id)!==owner) return;
-    const rows=full.filter(c=>c.date>=from&&c.date<=to);
+    const rows=full.filter(c=>c.date>=from&&c.date<=to), missingNote=full.missingWeeks?`<p class="hint mb-missing">Branch counts for ${full.missingWeeks} week${full.missingWeeks===1?'':'s'} in these dates aren’t ready yet — they appear after the next upload.</p>`:'';
     const weeks=[...new Set(tgDays(from,to).map(d=>weekOfDate(d).weekEnd))];
     const cols=group==='day'?tgDays(from,to):weeks, colOf=d=>group==='day'?d:weekOfDate(d).weekEnd;
     // activity per person/week → branches
     const act={}; full.forEach(c=>{ const k=c.recruiter+'|'+weekOfDate(c.date).weekEnd; (act[k]||(act[k]=new Set())).add(c.branch||'Unassigned'); });
-    const by={}; rows.forEach(c=>{ const r=by[c.recruiter]||(by[c.recruiter]={}), b=r[c.branch||'Unassigned']||(r[c.branch||'Unassigned']={}); const k=colOf(c.date); b[k]=(b[k]||0)+1; });
+    const by={}; rows.forEach(c=>{ const r=by[c.recruiter]||(by[c.recruiter]={}), b=r[c.branch||'Unassigned']||(r[c.branch||'Unassigned']={}); const k=colOf(c.date); b[k]=(b[k]||0)+(c.n||1); });
     // admins' overrides can add a branch with no schedules yet
     const names=new Set([...Object.keys(by),...full.map(c=>c.recruiter)]);
     weeks.forEach(w=>names.forEach(n=>{ const ov=branchSplitOverride(n,w); if(ov){ const r=by[n]||(by[n]={}); Object.keys(ov).forEach(b=>{ r[b]=r[b]||{}; }); } }));
@@ -6156,7 +6217,7 @@ async function ltRenderMultiBranch(g,p,cutoff){
     const cell=(v,t)=>{ if(t==null||t===0) return `<td class="mb-num">${v?fmtNum(v):'<span class="ta-n">·</span>'}</td>`; const r=(v||0)/t;
       return `<td class="mb-num mb-${r>=1?'g':r>=.5?'a':'r'}"><b>${fmtNum(v||0)}</b><small>/ ${one(t)}</small></td>`; };
     const weekNote=x=>{ const ws=weeks.filter(w=>tgt[x.name]?.[w]); if(!ws.length) return ''; const man=ws.some(w=>tgt[x.name][w].manual); return man?'<span class="mb-tag man">targets set by admin</span>':'<span class="mb-tag">targets split automatically</span>'; };
-    host.innerHTML=`<div class="mb-controls">
+    host.innerHTML=missingNote+`<div class="mb-controls">
       <label class="lt-field">From<input type="date" id="mbFrom" value="${from}" max="${today}"></label>
       <label class="lt-field">To<input type="date" id="mbTo" value="${to}" max="${today}"></label>
       <div class="mb-seg" role="group" aria-label="Group by"><button type="button" data-mb-group="day" class="${group==='day'?'on':''}" ${span>31?'disabled title="Daily view covers up to 31 days"':''}>Daily</button><button type="button" data-mb-group="week" class="${group==='week'?'on':''}">Weekly</button></div>
@@ -6216,9 +6277,13 @@ function openBranchTargetEditor(name, weekList, done){
 async function renderHistoryToday(name){
   const host=document.getElementById('historyToday'); if(!host || !hasRecruiterHistoryAccess(name)) return;
   const today=ltToday();
-  host.innerHTML='<div class="hp-panel-head"><h3>Scheduled today</h3><span class="hint">'+fmtDate(today)+'</span></div><p class="hint">Loading…</p>';
+  const head='<div class="hp-panel-head"><h3>Scheduled today</h3><span class="hint">'+fmtDate(today)+'</span></div>';
+  const teamOnly=!canSeeCandidates();
+  if(teamOnly && !canSeeTeamNames()){ host.innerHTML=head+noNamesRightHtml('Candidate names (EID and employee name)'); return; }
+  host.innerHTML=head+'<p class="hint">Loading…</p>';
   try{
-    const rows=(await scheduledTodayRows()).filter(c=>c.recruiter===name);
+    const all=teamOnly?(await Server.rpc('dash_team_candidates',{p_from:today,p_to:today})||[]):await scheduledTodayRows();
+    const rows=all.filter(c=>c.recruiter===name);
     if(!host.isConnected || historyState.name!==name) return;
     const branches=[...new Set(rows.map(c=>c.branch))].sort();
     host.innerHTML=`<div class="hp-panel-head"><h3>Scheduled today</h3><span class="hint">${fmtDate(today)} · ${escapeHtml(branches.join(', ')||'no branch yet')} · ${fmtNum(rows.length)} candidate${rows.length===1?'':'s'}</span>${branches.length>1?`<select id="histTodayBranch" style="margin-left:auto"><option value="">All branches</option>${branches.map(b=>`<option>${escapeHtml(b)}</option>`).join('')}</select>`:''}</div><div id="histTodayRows"></div>`;
@@ -6279,16 +6344,11 @@ function renderHistoryView(){
       const i=rows.findIndex(r=>r.w.weekEndDate===historyState.selWeek), {w,x}=rows[i], wk=weekOfDate(w.weekEndDate), pend=weekIsFullyPending(w.weekEndDate);
       const gp=x.goal?x.schedules/x.goal*100:null, pc=(v,ok)=>v==null?'':`<b class="lt-pct ${ok?'ok':'low'}">${v.toFixed(0)}%</b>`;
       el.querySelector('#histSel').innerHTML=`<button type="button" class="btn btn-secondary btn-sm" data-sel="-1" ${i<=0?'disabled':''} aria-label="Previous week">←</button><strong>Wk ${w.weekNumber} · ${fmtDate(wk.weekStart).replace(/, \d{4}$/,'')} – ${fmtDate(w.weekEndDate)}</strong>${i===rows.length-1?' <span class="pill good">Most recent</span>':''}<button type="button" class="btn btn-secondary btn-sm" data-sel="1" ${i>=rows.length-1?'disabled':''} aria-label="Next week">→</button><span class="hint">Click any week in the table below to see it here.</span>`;
-      el.querySelector('#histTiles').innerHTML=[
-        tile('Schedules', fmtNum(x.schedules)+'<small> / '+fmtNum(x.goal)+'</small>'+pc(gp,gp!=null&&gp>=90), 'goal reach · min 90%'),
-        tile('Interviews', fmtNum(x.scheduledDateOf), ''),
-        tile('Shows', fmtNum(x.shows)+(pend?'':pc(x.scheduledDateOf?x.shows/x.scheduledDateOf*100:null, x.shows/x.scheduledDateOf>=.7)), pend?'pending':'show rate · min 70%'),
-        tile('No shows', fmtNum(x.noShows)+(pend?'':pc(x.scheduledDateOf?x.noShows/x.scheduledDateOf*100:null, x.noShows/x.scheduledDateOf<.2)), 'under 20%'),
-        tile('Hires', fmtNum(x.i9)+pc(x.shows?x.i9/x.shows*100:null,true), 'of shows'),
-        tile('Placed', fmtNum(x.placed), ''),
-        tile(mode==='recruiters'?'Branch':'Goal', mode==='recruiters'?`<span style="font-size:14px">${escapeHtml(x.branch||'–')}</span>`:fmtNum(x.goal), ''),
-        tile('Goal hit', `${hit}<small>/${rows.length}</small>`, `weeks in range · ${low} below 50%`)
-      ].join('');
+      // same compact cards as the team pages; branch and goal-hit sit in the week line above
+      const recs = mode==='recruiters' ? 1 : Object.values(w.byRecruiter||{}).filter(r=>r.branch===name&&((r.schedules||0)+(r.scheduledDateOf||0)+(r.i9||0))>0).length;
+      el.querySelector('#histTiles').innerHTML = mergedKpiCards({prefix:'hist', t:{schedules:x.schedules||0, scheduledDateOf:x.scheduledDateOf||0, shows:x.shows||0, noShows:x.noShows||0, i9:x.i9||0, placed:x.placed||0},
+        goal:x.goal, pending:pend, hpr:{value:recs?(x.i9||0)/recs:null, hires:x.i9||0, recruiters:recs}, compact:true, only:['schedules','interviews','hires'], plainHires:true});
+      el.querySelector('#histSel').insertAdjacentHTML('beforeend', `<span class="hp-sel-meta">${mode==='recruiters'?`<b>${escapeHtml(x.branch||'–')}</b> · `:''}Goal hit <b>${hit}</b> of ${rows.length} weeks${low?` · ${low} below 50%`:''}</span>`);
       el.querySelectorAll('#historyTable tr[data-hist-week]').forEach(tr=>tr.classList.toggle('on', tr.dataset.histWeek===historyState.selWeek));
       el.querySelectorAll('#histSel [data-sel]').forEach(b=>b.onclick=()=>{ historyState.selWeek=rows[i+Number(b.dataset.sel)].w.weekEndDate; drawSel(); });
     };
@@ -6297,6 +6357,7 @@ function renderHistoryView(){
   }
   if(mode==='recruiters' && canSeeCandidates()){ el.insertAdjacentHTML('beforeend', '<section class="panel hp-panel" data-section="hist.candidates" id="historyCandidates"></section>'); renderHistoryCandidates(); }
   el.querySelector('#historyBack').onclick=()=>leaveHistoryPage(false);
+  { const tb=document.getElementById('topBack'); tb.querySelector('span').textContent='Back to '+(VIEW_META[historyState.from]||VIEW_META.performance).title; tb.classList.remove('hidden'); tb.onclick=()=>leaveHistoryPage(false); document.body.classList.add('on-history'); }
   el.querySelector('#historyRange').onchange=e=>{ historyState.range=e.target.value; renderHistoryView(); };
   el.querySelector('#historyRemarks')?.addEventListener('click', ()=>openRemarksModal(name, last?last.w.weekEndDate:defaultWeekEnd()));
   el.querySelectorAll('[data-history-open]').forEach(b=>b.onclick=()=>{ historyState.from='branches'; Object.assign(historyState,{mode:b.dataset.historyOpen, name:b.dataset.name}); try{ history.pushState({ipdView:'history', mode:historyState.mode, name:historyState.name}, '', '#history'); }catch(e){} renderHistoryView(); window.scrollTo(0,0); });
@@ -7351,6 +7412,7 @@ const Server = {
         chunk.forEach(k=>{ const v=KV.get(k); if(v) v.listsLoaded=true; });
       }
       if(pending.length){ await loadAllWeeks(); LiveReload.schedule([]); }
+      setTimeout(()=>backfillBranchDaily().catch(()=>{}),2000);
       // one-time conversion of weeks saved in the older all-in-one format
       if(Server.can('upload') || Server.can('master_edit')){
         const old = [...KV.entries()].filter(([k,v])=>k.startsWith('weekly:') && hasInlineLists(v)).map(([k])=>k);
@@ -7942,7 +8004,7 @@ async function importGoalSheets(goalSheets){
 //  6 = "Final visited" procedure (see finalVisitFlags)
 //  7 = No Shows no longer wait for the interview date to pass
 //  8 = No Show attendance matched ignoring spacing/punctuation; blanks never count
-const COUNT_RULES = 8;
+const COUNT_RULES = 9;   // 9: per-branch daily schedule counts (branchDays) for multi-branch recruiters
 // Recalculates the stored weekly summaries for the given weeks from the server's master sheet.
 async function rebuildWeeks(weeks, localRows, progress){
   const list = [...new Set(weeks)].filter(Boolean).sort();
@@ -7976,9 +8038,14 @@ async function rebuildWeeks(weeks, localRows, progress){
     const raw = buildWeekRecord(wed, wn, processFile1(rows1, MAP1, wed, false), processFile2(rows2, MAP2, wed, false));
     const empty = !ded.totals.schedules && !ded.totals.scheduledDateOf && !raw.totals.schedules && !raw.totals.scheduledDateOf;
     if(empty){ if(KV.has('weekly:'+wed)) await storageDelete('weekly:'+wed); }
-    else await storageSet('weekly:'+wed, {weekEndDate:wed, weekNumber:wn, savedAt:new Date().toISOString(), source:'master', rules:COUNT_RULES,
-      deduped:{totals:ded.totals, byRecruiter:ded.byRecruiter, byBranch:ded.byBranch, diagnostics:ded.diagnostics},
-      raw:{totals:raw.totals, byRecruiter:raw.byRecruiter, byBranch:raw.byBranch, diagnostics:raw.diagnostics}});
+    else {
+      const rec={weekEndDate:wed, weekNumber:wn, savedAt:new Date().toISOString(), source:'master', rules:COUNT_RULES,
+        deduped:{totals:ded.totals, byRecruiter:ded.byRecruiter, byBranch:ded.byBranch, diagnostics:ded.diagnostics},
+        raw:{totals:raw.totals, byRecruiter:raw.byRecruiter, byBranch:raw.byBranch, diagnostics:raw.diagnostics}};
+      const bd=branchDailyFromRecord(rec);
+      await storageSet('weekly:'+wed, rec);
+      try{ await Server.kvSet('branchDaily:'+wed, bd); }catch(e){ console.warn('branch summary not saved', e); }
+    }
     await new Promise(r=>setTimeout(r,0));
   }
 }
@@ -8452,7 +8519,7 @@ const PIVOT_PALETTES = {
   mono:['#0f4c5c','#1f6f78','#2f8f8a','#4fa9a0','#77c2b6','#a3d9cd','#c9ebe3','#5e7d86','#8aa3aa','#b7c9ce','#123c46','#376f73'],
 };
 const PIVOT_COLORS = PIVOT_PALETTES.default;
-const pivotDefault = ()=>({rows:['branch'], cols:[], values:['schedules'], filters:{}, chart:'bar', weeks:'8', from:'', to:'', top:'15', sort:'auto',
+const pivotDefault = ()=>({rows:[], cols:[], values:[], filters:{}, chart:'bar', weeks:'8', from:'', to:'', top:'15', sort:'auto',
   stack:false, labels:'auto', legend:'bottom', palette:'default', showAs:'value', totals:true, heat:false, height:'380'});
 function pivotMigrate(o){
   const st = {...pivotDefault(), ...(o||{})};
@@ -8463,14 +8530,15 @@ function pivotMigrate(o){
   if(st.chart==='stacked'){ st.chart='bar'; st.stack=true; }
   if(!PIVOT_CHARTS[st.chart]) st.chart='bar';
   st.rows = st.rows.filter(d=>PIVOT_DIMS[d]); st.cols = st.cols.filter(d=>PIVOT_DIMS[d] && !st.rows.includes(d)); st.values = st.values.filter(m=>PIVOT_MEASURES[m]);
-  if(!st.values.length) st.values=['schedules'];
   st.filters = Object.fromEntries(Object.entries(st.filters||{}).filter(([d,v])=>PIVOT_DIMS[d] && Array.isArray(v)));
   delete st.measure; delete st.division;
   return st;
 }
 let pivotState = (()=>{ try{ return pivotMigrate(JSON.parse(lsGet('ipd_pivot')||'{}')); }catch(e){ return pivotDefault(); } })();
+let pivotOpened = false;   // first visit this session: start empty unless the person has saved views
 function pivotSave(){ lsSet('ipd_pivot', JSON.stringify(pivotState)); }
 function pivotSavedKey(){ return 'pivot:'+(Server.user ? Server.user.id : 'me'); }
+function pivotLastKey(){ return 'ipd_pivot_last:'+(Server.user?Server.user.id:'me'); }
 function pivotSavedViews(){ const v = KV.get(pivotSavedKey()); return Array.isArray(v) ? v : []; }
 function pivotDimValue(dim, f){ return dim==='week' ? 'Wk '+isoWeekNumber(new Date(f.week+'T00:00:00'))+' · '+fmtDate(f.week).replace(/, \d{4}$/,'') : dim==='month' ? monthLabel(f.week) : dim==='quarter' ? quarterLabel(f.week) : f[dim]; }
 function pivotDimSort(dim, f){ return dim==='week' ? f.week : dim==='month' ? String(monthSortKey(f.week)).padStart(8,'0') : dim==='quarter' ? String(quarterSortKey(f.week)).padStart(8,'0') : String(f[dim]).toLowerCase(); }
@@ -8602,7 +8670,7 @@ function pivotPlace(field, well, index){
   else { st.rows=st.rows.filter(x=>x!==key); st.cols=st.cols.filter(x=>x!==key); const arr=st[well]; arr.splice(index==null?arr.length:Math.min(index,arr.length), 0, key); if(arr.length>3){ arr.length=3; showToast('Up to 3 fields per box.'); } }
   return true;
 }
-function pivotRemove(well, key){ const st=pivotState; if(well==='filters') delete st.filters[key]; else { st[well]=st[well].filter(x=>x!==key); if(well==='values' && !st.values.length) st.values=['schedules']; } }
+function pivotRemove(well, key){ const st=pivotState; if(well==='filters') delete st.filters[key]; else { st[well]=st[well].filter(x=>x!==key); } }
 function pivotChipHtml(well, key){
   const st=pivotState, isM=well==='values', label=isM?PIVOT_MEASURES[key].label:PIVOT_DIMS[key];
   let extra='';
@@ -8610,6 +8678,9 @@ function pivotChipHtml(well, key){
   return `<span class="pv-pill ${isM?'m':'d'}" draggable="true" data-pv-drag="${isM?'m':'d'}:${key}" data-from="${well}"><span class="pv-grip" aria-hidden="true">⋮⋮</span>${escapeHtml(label)}${extra}<button type="button" class="pv-rm" data-pv-rm="${well}:${key}" aria-label="Remove ${escapeHtml(label)}">×</button></span>`;
 }
 function renderPivotView(){
+  // Each visit starts empty — or with the view used last, once the person has saved views.
+  if(!pivotOpened){ pivotOpened=true; const views=pivotSavedViews(), last=lsGet(pivotLastKey()), v=views.find(x=>x.name===last);
+    pivotState = v ? pivotMigrate(v.cfg) : pivotDefault(); pivotSave(); }
   const host = document.getElementById('view-pivot'); if(!host) return;
   if(!weeksData.length){ host.innerHTML='<div class="panel"><p class="hint" style="margin:0;">No weeks yet — upload data first.</p></div>'; return; }
   const st = pivotState;
@@ -8651,9 +8722,10 @@ function renderPivotView(){
           <button class="btn btn-secondary btn-sm" id="pvSave">Save this view</button><button class="btn btn-secondary btn-sm" id="pvReset">Reset</button>
         </div>
       </div>
-      <div class="panel" data-section="pivot.chart"><div class="panel-head"><div><h3 id="pvTitle"></h3><span class="hint" id="pvSub"></span></div><div style="display:flex;gap:8px;"><button class="btn btn-secondary btn-sm export-only" id="pvPng">⬇ PNG</button></div></div><div class="pv-chart-wrap" id="pvChartWrap"><canvas id="pvChart"></canvas></div></div>
+      ${pivotState.values.length?'':`<div class="panel pv-empty"><div class="pv-empty-ico">📊</div><h3>Start a report</h3><p>Click a <b>Number</b> (e.g. Schedules) and a <b>Group by</b> field (e.g. Branch) on the left — or drag them into the boxes above. ${pivotSavedViews().length?'Or open one of <b>My views</b>.':'Save it as a view to open it again later.'}</p></div>`}
+      <div class="panel${pivotState.values.length?'':' hidden'}" data-section="pivot.chart"><div class="panel-head"><div><h3 id="pvTitle"></h3><span class="hint" id="pvSub"></span></div><div style="display:flex;gap:8px;"><button class="btn btn-secondary btn-sm export-only" id="pvPng">⬇ PNG</button></div></div><div class="pv-chart-wrap" id="pvChartWrap"><canvas id="pvChart"></canvas></div></div>
       <div class="panel hidden pv-drill" id="pvDrill"></div>
-      <div class="panel" data-section="pivot.table"><div class="panel-head"><h3>Pivot table</h3><div style="display:flex;gap:8px;"><button class="btn btn-secondary btn-sm" id="pvCopy">📋 Copy</button><button class="btn btn-secondary btn-sm export-only" id="pvXlsx">⬇ Excel</button></div></div><div class="pv-table-wrap"><table class="users-table pv-table" id="pvTable"></table></div></div>
+      <div class="panel${pivotState.values.length?'':' hidden'}" data-section="pivot.table"><div class="panel-head"><h3>Pivot table</h3><div style="display:flex;gap:8px;"><button class="btn btn-secondary btn-sm" id="pvCopy">📋 Copy</button><button class="btn btn-secondary btn-sm export-only" id="pvXlsx">⬇ Excel</button></div></div><div class="pv-table-wrap"><table class="users-table pv-table" id="pvTable"></table></div></div>
     </div></div>`;
   const changed=()=>{ pivotSave(); renderPivotView(); };
   host.querySelectorAll('[data-pv]').forEach(s=>s.onchange=()=>{ st[s.dataset.pv]=s.value; if(s.dataset.pv==='weeks' && s.value==='custom' && !st.from){ st.from=allWeeks[Math.max(0,allWeeks.length-8)]; st.to=allWeeks[allWeeks.length-1]; } if(st.from && st.to && st.from>st.to){ const t=st.from; st.from=st.to; st.to=t; } changed(); });
@@ -8661,14 +8733,14 @@ function renderPivotView(){
   host.querySelectorAll('[data-pv-chart]').forEach(b=>b.onclick=()=>{ st.chart=b.dataset.pvChart; changed(); });
   host.querySelector('.pv-more').addEventListener('toggle', e=>lsSet('ipd_pivot_more', e.target.open?'1':'0'));
   host.querySelector('#pvSwap').onclick=()=>{ const r=st.rows; st.rows=st.cols; st.cols=r; changed(); };
-  host.querySelector('#pvReset').onclick = ()=>{ pivotState = pivotDefault(); changed(); };
+  host.querySelector('#pvReset').onclick = ()=>{ pivotState = pivotDefault(); try{ localStorage.removeItem(pivotLastKey()); }catch(e){} Object.keys(charts).filter(k=>/^pv|^pivot/i.test(k)).forEach(destroyChart); pivotLast=null; changed(); };
   host.querySelector('#pvSave').onclick = async ()=>{
     const def = st.values.map(k=>PIVOT_MEASURES[k].label).join(' & ')+(st.rows.length?' by '+st.rows.map(d=>PIVOT_DIMS[d].toLowerCase()).join(' & '):'');
     const name = (prompt('Name for this view:', def)||'').trim(); if(!name) return;
-    const list = pivotSavedViews().filter(v=>v.name!==name); list.push({name:name.slice(0,60), cfg:JSON.parse(JSON.stringify(st))});
+    const list = pivotSavedViews().filter(v=>v.name!==name); list.push({name:name.slice(0,60), cfg:JSON.parse(JSON.stringify(st))}); lsSet(pivotLastKey(), name.slice(0,60));
     if(await storageSet(pivotSavedKey(), list.slice(-20))){ showToast('View saved.'); renderPivotView(); }
   };
-  host.querySelectorAll('[data-pv-load]').forEach(b=>b.onclick=()=>{ const v=pivotSavedViews()[+b.dataset.pvLoad]; if(v){ pivotState=pivotMigrate(v.cfg); changed(); } });
+  host.querySelectorAll('[data-pv-load]').forEach(b=>b.onclick=()=>{ const v=pivotSavedViews()[+b.dataset.pvLoad]; if(v){ pivotState=pivotMigrate(v.cfg); lsSet(pivotLastKey(), v.name); changed(); } });
   host.querySelectorAll('[data-pv-del]').forEach(b=>b.onclick=async ()=>{ const list=pivotSavedViews(); list.splice(+b.dataset.pvDel,1); if(await storageSet(pivotSavedKey(), list)) renderPivotView(); });
   host.querySelectorAll('[data-pv-rm]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const [w,k]=b.dataset.pvRm.split(':'); pivotRemove(w,k); changed(); });
   host.querySelectorAll('[data-pv-fopen]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); pivotFilterPopover(b, b.dataset.pvFopen); });
@@ -8697,7 +8769,7 @@ function renderPivotView(){
   // dropping a pill back on the field list removes it
   host.querySelector('.pv-fields').addEventListener('dragover', e=>{ if(dragFrom) e.preventDefault(); });
   host.querySelector('.pv-fields').addEventListener('drop', e=>{ if(!dragFrom) return; e.preventDefault(); pivotRemove(dragFrom, dragField.split(':')[1]); dragField=null; changed(); });
-  drawPivot();
+  if(pivotState.values.length) drawPivot(); else pivotLast=null;
 }
 function pivotClosePops(){ document.querySelectorAll('.pv-pop').forEach(p=>p.remove()); }
 document.addEventListener('click', e=>{ if(!e.target.closest || !e.target.closest('.pv-pop')) pivotClosePops(); });
@@ -9074,6 +9146,7 @@ function drawUserForm(){
       <label class="role-opt"><input type="radio" name="ufRole" value="user" ${u.role!=='admin'?'checked':''}><span><strong>User</strong><em>Only the modules and sections you tick below</em></span></label>
       <label class="role-opt"><input type="radio" name="ufRole" value="admin" ${u.role==='admin'?'checked':''}><span><strong>Admin</strong><em>Every module, approves remarks, manages users (can’t change passwords, admins or the super admin)</em></span></label></div>` : ''}
     ${sa?'<p class="hint">The super admin always has every right.</p>':`<p class="hint admin-note" ${u.role==='admin'?'':'hidden'}>Admins see every module and section — the ticks below only apply if you change them back to User.</p><fieldset class="mod-grid"><legend>Modules this person can open</legend>${MODULES.map(m=>`<label class="mod-opt"><input type="checkbox" value="${m.key}" ${u.modules.includes(m.key)?'checked':''}><span><strong>${escapeHtml(m.label)}</strong><em>${escapeHtml(m.hint)}</em></span></label>`).join('')}</fieldset>
+    <label class="mod-opt"><input type="checkbox" data-grant="grant.team_names" ${(u.hidden_sections||[]).includes("grant.team_names")?"checked":""}><span><strong>See their team’s candidate names</strong><em>My Team → Candidates: EID and name for their own team only</em></span></label>
     <label class="mod-opt"><input type="checkbox" data-grant="grant.break_image" ${(u.hidden_sections||[]).includes("grant.break_image")?"checked":""}><span><strong>Copy third-break lists as images</strong><em>My Team: one click copies the eligible and not-yet-eligible recruiters as a picture</em></span></label>
     <label class="mod-opt"><input type="checkbox" data-sec="copy.tables" ${(u.hidden_sections||[]).includes("copy.tables")?"":"checked"}><span><strong>Copy tables</strong><em>Allow copying tables and candidate lists to the clipboard</em></span></label>
     <fieldset class="sec-grid"><legend>What this person sees on each page <span class="hint">(untick to hide a card or section)</span></legend>${Object.entries(PAGE_SECTIONS).map(([mod,secs])=>`<details class="sec-page" data-sec-mod="${mod}" ${mod==='teams'||u.modules.includes(mod)?'':'hidden'}><summary>${escapeHtml((MODULES.find(m=>m.key===mod)||{label:mod==='teams'?'My Team':mod}).label)} <span class="sec-count"></span></summary><div class="sec-list">${secs.map(([k,l])=>`<label class="sec-opt${l.startsWith('··')?' sub sub2':l.startsWith('·')?' sub':''}"><input type="checkbox" data-sec="${k}" ${(u.hidden_sections||[]).includes(k)?'':'checked'}> ${escapeHtml(l.replace(/^·+ /,''))}</label>`).join('')}</div></details>`).join('')}</fieldset>
@@ -9180,7 +9253,7 @@ const CAND_CATEGORIES = [
 const candState = {week:null, cat:'schedules', recruiter:'', search:'', limit:500, cache:new Map(), rev:0};
 async function loadCandidateWeek(week){
   if(candState.cache.has(week)) return candState.cache.get(week);
-  const rows = await Server.rpc('dash_week_rows', {p_week:week});
+  const rows = (await Server.rpc('dash_week_rows', {p_week:week})) || [];
   const s = rows.filter(r=>r.s).sort((a,b)=>(Number(a.so)||0)-(Number(b.so)||0)).map(r=>r.data);
   const v = rows.filter(r=>r.v).sort((a,b)=>(Number(a.vo)||0)-(Number(b.vo)||0)).map(r=>r.data);
   const data = {s, v};
@@ -9975,15 +10048,18 @@ async function ltCopyBreakImage(lists, meta){
 async function ltRenderScheduledCandidates(g){
  const host=document.getElementById('ltScheduledCandidates');if(!host)return;
  const owner=String(Server.user.id),today=ltToday(),day=ltState.candDate&&ltState.candDate<=today?ltState.candDate:today;
- if(!canSeeCandidates()){ host.innerHTML=noNamesRightHtml('Candidate names (EID and employee name)'); return; }
+ const teamOnly=!canSeeCandidates();
+ if(teamOnly && !canSeeTeamNames()){ host.innerHTML=noNamesRightHtml('Candidate names (EID and employee name)'); return; }
  host.innerHTML='<p class="hint">Loading candidates…</p>';
  const mine=(list,d)=>list.filter(c=>tgActive(g,c.recruiter,d)&&(!g.division||(branchDivisions[c.branch]||'Unassigned')===g.division));
+ // team-only: the server returns just this lead's team (needs the dash_team_candidates function)
+ const rowsOn=async d=>teamOnly?(await Server.rpc('dash_team_candidates',{p_from:d,p_to:d})||[]).map(c=>({...c,branch:branchAlias(c.branch||'Unassigned')})):await scheduledRowsOn(d);
  try{
-  const rows=mine(await scheduledRowsOn(day),day);
+  const rows=mine(await rowsOn(day),day);
   if(!host.isConnected||String(Server.user?.id)!==owner)return;
   // nothing yet? find the latest earlier day that has candidates, so the tab isn't a dead end
   let fallback=null;
-  if(!rows.length&&day===today){ for(let i=1;i<=7&&!fallback;i++){ const d=tgShift(today,-i), r=mine(await scheduledRowsOn(d),d); if(r.length) fallback={d,n:r.length}; } }
+  if(!rows.length&&day===today){ for(let i=1;i<=7&&!fallback;i++){ const d=tgShift(today,-i), r=mine(await rowsOn(d),d); if(r.length) fallback={d,n:r.length}; } }
   if(!host.isConnected||String(Server.user?.id)!==owner)return;
   const up=(KV.get('lastUploads')||{}).schedules, upDay=up&&up.at?ltToday(new Date(up.at)):null;
   const why=day!==today?'':!up?'':upDay<today?`Today’s Created On file hasn’t been uploaded yet${Server.isAdmin()?` (latest: ${new Date(up.at).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})})`:''}, so today’s schedules aren’t in the dashboard yet.`:'Today’s file is uploaded, but nobody on your team has a schedule created today yet.';
@@ -9997,7 +10073,7 @@ async function ltRenderScheduledCandidates(g){
   host.querySelector('#ltCandDate').onchange=e=>{ if(tgDate(e.target.value)&&e.target.value<=today){ ltState.candDate=e.target.value===today?null:e.target.value; ltRenderScheduledCandidates(g);} };
   host.querySelector('#ltCandToday')?.addEventListener('click',()=>{ltState.candDate=null;ltRenderScheduledCandidates(g);});
   draw();
- }catch(e){if(host.isConnected)host.innerHTML='<p role="alert">Candidate data could not be loaded. Refresh the team to retry.</p>';}
+ }catch(e){ if(!host.isConnected) return; host.innerHTML=teamOnly&&/Could not find|does not exist|schema cache/i.test(e.message||'')?`<div class="lt-empty"><strong>Team-only candidate names need a database update.</strong><span>${Server.isAdmin()?'The dash_team_candidates function isn’t installed yet — run the team-names SQL in Supabase.':'Your admin needs to finish setting this up.'}</span></div>`:'<p role="alert">Candidate data could not be loaded. Refresh the team to retry.</p>'; }
 }
 // ---------- One team per recruiter per day ----------
 // Every team's ranges (the lead's own recruiter name counts as a member for all dates).
@@ -10105,8 +10181,8 @@ document.addEventListener('keydown', e=>{
 });
 // ---------- Manage access in place (super admin) ----------
 const PAGE_MODULE = {performance:'performance', recruiters:'recruiters', branches:'branches', candidates:'candidates', master:'master', alerts:'alerts', pivot:'pivot'};
-const PAGE_EDIT = {performance:['upload','export'], recruiters:['remarks','export'], branches:['export'], candidates:['master_edit','export'], master:['master_edit','export'], alerts:['remarks','remarks_approve'], pivot:['export'], teams:['candidates','grant.break_image'], leads:[]};
-const EDIT_LABEL = {'grant.break_image':'Copy third-break list as image', candidates:'See candidate names'};
+const PAGE_EDIT = {performance:['upload','export'], recruiters:['remarks','export'], branches:['export'], candidates:['master_edit','export'], master:['master_edit','export'], alerts:['remarks','remarks_approve'], pivot:['export'], teams:['grant.team_names','grant.break_image'], leads:[]};
+const EDIT_LABEL = {'grant.break_image':'Copy third-break list as image', 'grant.team_names':'See their team’s candidate names', candidates:'See all candidate names'};
 let accessMode=false, accessObs=null;
 function sectionLabel(key){ for(const secs of Object.values(PAGE_SECTIONS)) for(const [k,l] of secs) if(k===key) return l.replace(/^·+ /,''); return null; }
 // Super admin: locks appear on hover everywhere (no mode needed); "Show all locks" pins them all on.
