@@ -6090,6 +6090,10 @@ async function scheduledRowsOn(date){
   return (lists.schedules||[]).filter(c=>c.date===date);
 }
 async function scheduledTodayRows(){ return scheduledRowsOn(ltToday()); }
+// Candidate-level lists are only sent by the server to accounts with the candidate-names right.
+function noNamesRightHtml(what){
+  return `<div class="lt-empty"><strong>${escapeHtml(what)} need the “Candidate Hub — pipeline and names” right.</strong><span>${Server.isSuperAdmin()?'Use the 🔒 Access button (bottom right) → “Who can open / edit this page…” to turn on “See candidate names” for the people who need it.':'Your account doesn’t have it yet — ask your admin to turn it on.'}</span></div>`;
+}
 // Every schedule row (with its own branch and date) between two dates.
 async function scheduleRowsBetween(from,to){
   const weeks=[...new Set(tgDays(from,to).map(d=>weekOfDate(d).weekEnd))].filter(w=>weeksData.some(x=>x.weekEndDate===w));
@@ -6122,6 +6126,7 @@ async function ltRenderMultiBranch(g,p,cutoff){
   if(!st.from||st.key!==p.from+'|'+p.to){ st.from=p.from; st.to=cutoff; st.key=p.from+'|'+p.to; }
   let from=st.from, to=st.to>today?today:st.to; if(to<from) to=from;
   const span=tgDays(from,to).length, group=st.group==='week'||span>31?'week':'day';
+  if(!canSeeCandidates()){ host.innerHTML=noNamesRightHtml('Schedules per branch'); return; }
   host.innerHTML='<p class="hint">Loading schedules…</p>';
   try{
     const owner=String(Server.user?.id), wFrom=weekOfDate(from).weekStart, wTo=weekOfDate(to).weekEnd<today?weekOfDate(to).weekEnd:today;
@@ -9970,6 +9975,7 @@ async function ltCopyBreakImage(lists, meta){
 async function ltRenderScheduledCandidates(g){
  const host=document.getElementById('ltScheduledCandidates');if(!host)return;
  const owner=String(Server.user.id),today=ltToday(),day=ltState.candDate&&ltState.candDate<=today?ltState.candDate:today;
+ if(!canSeeCandidates()){ host.innerHTML=noNamesRightHtml('Candidate names (EID and employee name)'); return; }
  host.innerHTML='<p class="hint">Loading candidates…</p>';
  const mine=(list,d)=>list.filter(c=>tgActive(g,c.recruiter,d)&&(!g.division||(branchDivisions[c.branch]||'Unassigned')===g.division));
  try{
@@ -10099,8 +10105,8 @@ document.addEventListener('keydown', e=>{
 });
 // ---------- Manage access in place (super admin) ----------
 const PAGE_MODULE = {performance:'performance', recruiters:'recruiters', branches:'branches', candidates:'candidates', master:'master', alerts:'alerts', pivot:'pivot'};
-const PAGE_EDIT = {performance:['upload','export'], recruiters:['remarks','export'], branches:['export'], candidates:['master_edit','export'], master:['master_edit','export'], alerts:['remarks','remarks_approve'], pivot:['export'], teams:['grant.break_image'], leads:[]};
-const EDIT_LABEL = {'grant.break_image':'Copy third-break list as image'};
+const PAGE_EDIT = {performance:['upload','export'], recruiters:['remarks','export'], branches:['export'], candidates:['master_edit','export'], master:['master_edit','export'], alerts:['remarks','remarks_approve'], pivot:['export'], teams:['candidates','grant.break_image'], leads:[]};
+const EDIT_LABEL = {'grant.break_image':'Copy third-break list as image', candidates:'See candidate names'};
 let accessMode=false, accessObs=null;
 function sectionLabel(key){ for(const secs of Object.values(PAGE_SECTIONS)) for(const [k,l] of secs) if(k===key) return l.replace(/^·+ /,''); return null; }
 // Super admin: locks appear on hover everywhere (no mode needed); "Show all locks" pins them all on.
