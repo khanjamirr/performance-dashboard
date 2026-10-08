@@ -1536,7 +1536,7 @@ body{background:var(--paper)!important}
 .dr-dim-client>summary{background:#eef3fb}.dr-dim-location>summary{background:#ecf6f3}
 .dr-dim-count{margin-left:auto;font-size:11px;font-weight:500;color:#6b8590}
 .dr-dim-in{padding:8px}.dr-dim-in input[type=search]{width:100%;padding:6px 8px;border:1px solid #d3dfe3;border-radius:7px;font:inherit;font-size:12px}
-.dr-mini{display:flex;gap:6px;margin:6px 0}.dr-mini button{border:1px solid #d3dfe3;background:#f5f7fa;border-radius:6px;padding:3px 9px;font:inherit;font-size:11px;cursor:pointer;color:#1e3a8a}
+.dr-mini{display:flex;gap:6px;margin:6px 0;align-items:center}.dr-mini .hint{margin-left:auto;font-size:12px}.dr-mini button{border:1px solid #d3dfe3;background:#f5f7fa;border-radius:6px;padding:3px 9px;font:inherit;font-size:11px;cursor:pointer;color:#1e3a8a}
 .dr-checks{max-height:200px;overflow:auto}
 .dr-check{display:flex;gap:8px;align-items:flex-start;padding:5px 2px;font-size:12.5px;cursor:pointer;border-radius:5px}.dr-check:hover{background:#f1f6f7}
 .dr-check input{margin-top:2px;accent-color:#1d4ed8}.dr-check em{font-style:normal;font-size:10.5px;color:#1d4ed8;margin-left:4px}.dr-check.off{opacity:.5}
@@ -2297,6 +2297,49 @@ function resolveWeekRecord(stored){
   return stored;
 }
 
+// ---------- Candidate-name privacy ----------
+// Uploads keep only the columns the dashboard calculates with, and candidate names are stored as
+// encrypted tokens ("enc1:…"). Everyone sees the Employee Number (EID) wherever a name used to be.
+// Admins can turn on "Show candidate names" (Settings → My account) to see decrypted names.
+const NamePolicy={
+  key:null, keyTried:false, cache:new Map(), pending:false,
+  isTok(s){ return typeof s==='string' && s.startsWith('enc1:'); },
+  isHash(s){ return typeof s==='string' && s.startsWith('h1:'); },
+  // one-way code used when no key is available: still unique per name (so counting works), never readable
+  async hash(name){ const d=new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(String(name).trim().toLowerCase()))); return 'h1:'+[...d.slice(0,12)].map(b=>b.toString(16).padStart(2,'0')).join(''); },
+  show(){ if(typeof Server==='undefined'||!Server.user||!Server.isAdmin()) return false; try{ return localStorage.getItem('ipd_show_names:'+Server.user.id)==='1'; }catch(e){ return false; } },
+  setShow(on){ try{ localStorage.setItem('ipd_show_names:'+Server.user.id,on?'1':'0'); }catch(e){} applyNamesEverywhere(); if(on) this.decryptPending(); },
+  label(raw,eid){ const e=eid&&eid!=='\u2013'&&eid!=='–'?String(eid):'';
+    if(this.show()){ if(this.isTok(raw)) return this.cache.get(raw)||(e?e+' (unlocking…)':'Unlocking…'); if(this.isHash(raw)) return (e||'No EID')+' (name not saved)'; return raw||e||'—'; }
+    return e||'No EID'; },
+  async getKey(){ if(this.key) return this.key; if(this.keyTried) return null; this.keyTried=true;
+    try{ const hex=await Server.rpc('dash_name_key'); if(!hex||typeof hex!=='string') return null; const raw=new Uint8Array(hex.match(/../g).map(h=>parseInt(h,16)));
+      this.key={aes:await crypto.subtle.importKey('raw',raw,'AES-GCM',false,['encrypt','decrypt']), mac:await crypto.subtle.importKey('raw',raw,{name:'HMAC',hash:'SHA-256'},false,['sign'])}; return this.key; }
+    catch(e){ return null; } },
+  // deterministic: the same name always gives the same token, so repeat-candidate checks still work
+  async enc(name){ const k=await this.getKey(); if(!k||!name) return null; const data=new TextEncoder().encode(name);
+    const iv=new Uint8Array(await crypto.subtle.sign('HMAC',k.mac,data)).slice(0,12);
+    const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},k.aes,data));
+    const all=new Uint8Array(12+ct.length); all.set(iv,0); all.set(ct,12); return 'enc1:'+[...all].map(b=>b.toString(16).padStart(2,'0')).join(''); },
+  async dec(tok){ const k=await this.getKey(); if(!k) return null; const b=new Uint8Array(tok.slice(5).match(/../g).map(h=>parseInt(h,16)));
+    try{ return new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:b.slice(0,12)},k.aes,b.slice(12))); }catch(e){ return null; } },
+  toks:new Set(),
+  async decryptPending(){ if(this.pending||!this.show()) return; this.pending=true;
+    try{ const todo=[...this.toks].filter(t=>!this.cache.has(t)); if(!todo.length) return; if(!(await this.getKey())) return;
+      for(let i=0;i<todo.length;i+=200){ await Promise.all(todo.slice(i,i+200).map(async t=>{ const v=await this.dec(t); this.cache.set(t,v||'(can’t unlock)'); })); }
+      applyNamesEverywhere(); refreshUI(); }
+    finally{ this.pending=false; } },
+};
+// Rewrites the display name on candidate list items (the original stays in c._n).
+function applyNamesTo(list){ if(!Array.isArray(list)) return list; const show=NamePolicy.show(); let need=false;
+  list.forEach(c=>{ if(!c||typeof c!=='object') return; if(c._n===undefined) c._n=c.name; if(NamePolicy.isTok(c._n)){ NamePolicy.toks.add(c._n); if(show&&!NamePolicy.cache.has(c._n)) need=true; } c.name=NamePolicy.label(c._n,c.eid); });
+  if(need) setTimeout(()=>NamePolicy.decryptPending(),0); return list; }
+function applyNamesEverywhere(){
+  const LK=['schedulesList','interviewsList','showsList','noShowsList','i9List','placedList'];
+  const doRec=rec=>{ if(!rec) return; [rec,rec.deduped,rec.raw].forEach(part=>{ if(!part) return; ['byRecruiter','byBranch'].forEach(b=>Object.values(part[b]||{}).forEach(o=>LK.forEach(k=>applyNamesTo(o&&o[k])))); }); };
+  [...KV.entries()].forEach(([k,v])=>{ if(k.startsWith('weekly:')&&!k.endsWith('|lists')) doRec(v); });
+  (weeksData||[]).forEach(doRec);
+}
 // Shows / no shows for an interview day are only final once that day ends, so (except for admins)
 // today's — and any later day's — shows and no shows stay hidden until tomorrow, everywhere.
 const HELD_KEYS=[['shows','showsList'],['noShows','noShowsList']];
@@ -2338,6 +2381,7 @@ async function loadAllWeeks(){
   }
   out.sort((a,b)=> a.weekEndDate.localeCompare(b.weekEndDate));
   weeksData = out;
+  applyNamesEverywhere();
 }
 
 /* ============================= UTIL ============================= */
@@ -6526,7 +6570,7 @@ async function syncTeamCandidates(){
       const sig=String(v.savedAt||'')+'|'+(dedupeByEmployeeNumber?'d':'r');
       if(have[week]===sig) continue;
       const got=await candFromWeekLists(week).catch(()=>null); if(!got) continue;
-      const rows=(got.lists.schedules||[]).filter(c=>c.date&&c.recruiter).map(c=>({d:c.date, r:c.recruiter, b:c.branch||'', e:c.eid&&c.eid!=='\u2013'?String(c.eid):'', n:c.name||''}));
+      const rows=(got.lists.schedules||[]).filter(c=>c.date&&c.recruiter).map(c=>({d:c.date, r:c.recruiter, b:c.branch||'', e:c.eid&&c.eid!=='\u2013'?String(c.eid):'', n:(c._n!==undefined?c._n:c.name)||''}));
       await Server.rpc('dash_team_cand_put',{p_week:week, p_saved_at:sig, p_rows:rows});
     }
   }finally{ teamCandBusy=false; }
@@ -6534,7 +6578,7 @@ async function syncTeamCandidates(){
 // Candidate (EID + name) rows created between two dates. Team-only accounts get just their team from the server.
 async function candidateRowsBetween(from,to){
   if(!canSeeCandidates() && !Server.teamNamesOnly())
-    return (await Server.rpc('dash_team_candidates',{p_from:from,p_to:to})||[]).map(c=>({...c, date:String(c.date||'').slice(0,10), eid:c.eid||'–', branch:branchAlias(c.branch||'Unassigned')}));
+    return applyNamesTo((await Server.rpc('dash_team_candidates',{p_from:from,p_to:to})||[]).map(c=>({...c, date:String(c.date||'').slice(0,10), eid:c.eid||'–', branch:branchAlias(c.branch||'Unassigned')})));
   const weeks=new Set(); for(let d=from; d<=to; d=tgShift(d,1)) weeks.add(weekOfDate(d).weekEnd);
   const out=[];
   for(const week of weeks){
@@ -7821,6 +7865,7 @@ function mergeWeeklyLists(summary, lists){
     if(by) Object.entries(byName).forEach(([name,l])=>{ if(by[name]) Object.assign(by[name], l); });
   });
   summary.listsLoaded = true;
+  applyNamesEverywhere();
   return summary;
 }
 function hasInlineLists(val){ return !!val && !val.listsSplit && JSON.stringify(val).indexOf('List":[')>-1; }
@@ -8432,10 +8477,16 @@ async function ingestFiles(entries, {interactive=true, week=null}={}){
         let minD=null, maxD=null, skipped=0;
         importProgress('Preparing '+entry.name+' ('+fmtNum(sh.rows.length)+' rows)…');
         await new Promise(r=>setTimeout(r,30));
+        // candidate names never leave this browser as plain text: deterministic encrypted tokens
+        const nameCol=full.candidateName, plainNames=nameCol?[...new Set(sh.rows.map(r=>String(r[nameCol]??'').trim()).filter(v=>v&&!isBlankIdent(v)))]:[];   // placeholders like “N/A” stay as they are (they mean “no candidate”)
+        const tok=new Map(); let encOk=true;
+        if(plainNames.length){ importProgress('Protecting candidate names…'); for(const nmv of plainNames){ let t=encOk?await NamePolicy.enc(nmv):null; if(!t){ encOk=false; t=await NamePolicy.hash(nmv); } tok.set(nmv,t); } }
+        if(plainNames.length&&!encOk&&!window.__namesDropNote){ window.__namesDropNote=true; showToast('Candidate names were replaced with a one-way code — the name-protection key isn’t set up (run privacy.sql), so admins can’t unlock these names. Employee Numbers are kept.'); }
         sh.rows.forEach((row, idx)=>{
           const out = {};
           for(const [k,col] of Object.entries(CANON)){ const raw=full[k]; if(raw && row[raw]!=='' && row[raw]!=null) out[col]=row[raw]; }
-          for(const h in row){ const v=row[h]; if(v===''||v==null || mappedRaw.has(h) || removedSet.has(h) || SYSTEM_COL_RE.test(h) || h in out) continue; out[h]=v; }
+          // only the columns the dashboard calculates with are kept — everything else in the file is dropped
+          if(out['Candidate Name']!==undefined){ const nmv=String(out['Candidate Name']).trim(); if(nmv&&tok.has(nmv)) out['Candidate Name']=tok.get(nmv); }
           const created = toTs(out['Created On']), dateOf = toTs(out['Date Of']);
           if(created) out['Created On']=created; if(dateOf) out['Date Of']=dateOf;
           const ev = source==='schedules' ? created : dateOf;
@@ -8976,7 +9027,7 @@ async function drawMasterTable(freshCount){
   <tbody>${rows.map(r=>{ const sel = st.allMatching || st.selected.has(r.id); return `<tr class="${r.excluded?'excluded':''}${sel?' selected':''}" data-key="${escapeHtml(r.id)}">${canEdit?`<td class="sel-col"><input type="checkbox" ${sel?'checked':''} ${st.allMatching?'disabled':''} aria-label="Select row"></td>`:''}${cols.map(c=>{
       if(c.key==='__status') return `<td><span class="pill ${r.excluded?'bad':'good'}">${r.excluded?'Excluded':'Included'}</span></td>`;
       if(c.key==='__files') return `<td>${r.s&&r.v?'Both':r.s?'Created On':'Date Of'}</td>`;
-      return `<td>${escapeHtml(fmtMasterCell(r.data[c.key]))}</td>`; }).join('')}</tr>`; }).join('') || `<tr><td colspan="${cols.length+1}" class="muted-note" style="padding:18px;">No rows match these filters.</td></tr>`}</tbody>`;
+      return `<td>${escapeHtml(c.key==='Candidate Name'?NamePolicy.label(r.data[c.key],r.data['Employee Number']):fmtMasterCell(r.data[c.key]))}</td>`; }).join('')}</tr>`; }).join('') || `<tr><td colspan="${cols.length+1}" class="muted-note" style="padding:18px;">No rows match these filters.</td></tr>`}</tbody>`;
   drawMasterCounts();
   const sa = table.querySelector('#masterSelAll');
   if(sa) sa.onchange=e=>{ if(st.allMatching){ st.allMatching=false; st.selected.clear(); } else rows.forEach(r=> e.target.checked ? st.selected.add(r.id) : st.selected.delete(r.id)); drawMasterTable(); };
@@ -9033,7 +9084,7 @@ async function downloadMasterSheet(){
     for(;;){ setLoading('Preparing the master sheet… '+fmtNum(rows.length)+' rows'); const page = await Server.rpc('dash_master_export', {p_after:after, p_limit:1000}); if(!page.length) break; rows.push(...page); after=page[page.length-1].id; }
     setLoading('Building the Excel file…'); await new Promise(r=>setTimeout(r,30));
     const cols = masterColumnsList().filter(c=>!c.key.startsWith('__'));
-    const aoa = [['Status','In files',...cols.map(c=>c.label)], ...rows.map(r=>[r.excluded?'Excluded':'Included', r.s&&r.v?'Both':r.s?'Created On':'Date Of', ...cols.map(c=>fmtMasterCell(r.data[c.key]))])];
+    const aoa = [['Status','In files',...cols.map(c=>c.label)], ...rows.map(r=>[r.excluded?'Excluded':'Included', r.s&&r.v?'Both':r.s?'Created On':'Date Of', ...cols.map(c=>c.key==='Candidate Name'?NamePolicy.label(r.data[c.key],r.data['Employee Number']):fmtMasterCell(r.data[c.key]))])];
     const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), 'Master');
     XLSX.writeFile(wb, 'master-sheet-'+toIsoDateOnly(new Date())+'.xlsx');
   }catch(e){ showToast('Download failed: '+cleanErr(e)); }
@@ -9882,6 +9933,10 @@ function renderMyAccount(){
     <h3 style="margin:0 0 4px;">${escapeHtml(u.name)}</h3><p class="hint" style="margin:0 0 12px;">${u.role==='super_admin'?'Super admin':u.role==='admin'?'Admin':'User'} · access: ${escapeHtml(mods.join(', ')||'none')}</p>
     <button class="btn btn-secondary btn-sm" id="acctSignOut">Sign out</button>
   </div>
+  ${u.role!=='user' ? `<div class="panel"><h3 style="margin:0 0 4px;">Candidate names</h3>
+    <p class="hint" style="margin:0 0 10px;">Everyone sees Employee Numbers (EID) instead of candidate names. As an admin you can show the real names on this device only — they’re unlocked here and never shared.</p>
+    <label class="uf-tool uf-active" style="margin:0"><span class="uf-switch"><input type="checkbox" id="acctShowNames" ${NamePolicy.show()?'checked':''}><i aria-hidden="true"></i></span><span class="uf-page-txt"><strong>Show candidate names</strong><span>Admins only · this browser only</span></span></label>
+    <p class="auth-msg" id="acctNamesMsg" role="status"></p></div>` : ''}
   ${u.role==='super_admin' ? `<div class="panel">
     <h3 style="margin:0 0 4px;">Change my password</h3>
     ${u.default_password?'<p class="warn-note">You are still using the setup password <strong>India@5618</strong>. Change it now — anyone who knows it could sign in as you.</p>':'<p class="hint">Only you can change the super-admin password. Other users’ passwords are set in Users &amp; Access.</p>'}
@@ -9892,6 +9947,10 @@ function renderMyAccount(){
     <button class="btn btn-primary btn-sm" id="pwSave">Change password</button>
   </div>` : `<div class="panel"><p class="hint" style="margin:0;">Your password is managed by the super admin. Ask them if you need it reset.</p></div>`}`;
   host.querySelector('#acctSignOut').onclick = signOut;
+  host.querySelector('#acctShowNames')?.addEventListener('change', async e=>{ const on=e.target.checked; NamePolicy.setShow(on);
+    if(on){ const k=await NamePolicy.getKey(); host.querySelector('#acctNamesMsg').textContent=k?'Names will show across the dashboard.':'Older uploads show names; newer ones need the name-protection key (run privacy.sql).'; }
+    else host.querySelector('#acctNamesMsg').textContent='Names hidden — Employee Numbers show instead.';
+    refreshUI(); });
   const save = host.querySelector('#pwSave');
   if(save) save.onclick = async ()=>{
     const o=host.querySelector('#pwOld').value, n=host.querySelector('#pwNew').value, n2=host.querySelector('#pwNew2').value, msg=host.querySelector('#pwMsg');
@@ -9939,17 +9998,19 @@ async function candFromWeekLists(week){
   const mode = dedupeByEmployeeNumber ? 'deduped' : 'raw', T = v[mode].totals || {};
   const totals = {schedules:T.schedules||0, interviews:T.scheduledDateOf||0, shows:T.shows||0, noShows:T.noShows||0, i9:T.i9||0, placed:T.placed||0};
   const lists = {}, counted = {};
-  const idKey = c=>{ const e = c.eid && c.eid!=='\u2013' ? normalizeEmployeeNumber(c.eid) : ''; return e ? 'eid:'+e : 'name:'+String(c.name||'').toLowerCase()+'|'+c.date; };
+  const nm = c=>String(c._n!==undefined?c._n:c.name||'');
+  const idKey = c=>{ const e = c.eid && c.eid!=='\u2013' ? normalizeEmployeeNumber(c.eid) : ''; return e ? 'eid:'+e : 'name:'+nm(c).toLowerCase()+'|'+c.date; };
   const dupsOf = list=>{
     const kept = flat('deduped', list), left = new Map(), byId = new Map();
-    kept.forEach(c=>{ const t=c.recruiter+'|'+c.name+'|'+c.eid+'|'+c.date; left.set(t,(left.get(t)||0)+1); if(!byId.has(idKey(c))) byId.set(idKey(c), c); });
-    return flat('raw', list).filter(c=>{ const t=c.recruiter+'|'+c.name+'|'+c.eid+'|'+c.date; const n=left.get(t)||0; if(n>0){ left.set(t,n-1); return false; } return true; })
+    kept.forEach(c=>{ const t=c.recruiter+'|'+nm(c)+'|'+c.eid+'|'+c.date; left.set(t,(left.get(t)||0)+1); if(!byId.has(idKey(c))) byId.set(idKey(c), c); });
+    return flat('raw', list).filter(c=>{ const t=c.recruiter+'|'+nm(c)+'|'+c.eid+'|'+c.date; const n=left.get(t)||0; if(n>0){ left.set(t,n-1); return false; } return true; })
       .map(c=>({...c, keptWith: byId.get(idKey(c)) || {recruiter:'–', date:''}}));
   };
   CAND_CATEGORIES.forEach(c=>{
     if(c.dup){ lists[c.key] = dupsOf(c.src==='s' ? 'schedulesList' : 'interviewsList'); counted[c.key] = lists[c.key].length; }
     else { lists[c.key] = flat(mode, c.list); counted[c.key] = totals[c.key]; }
   });
+  Object.values(lists).forEach(applyNamesTo);
   return {lists, counted};
 }
 function candDuplicates(rows, week, dateCol){
@@ -9977,6 +10038,7 @@ function candCompute(data, week){
     if(c.dup){ out[c.key] = candDuplicates(c.src==='s'?data.s:data.v, week, c.dateCol); counted[c.key] = out[c.key].length; }
     else { out[c.key] = flat(c.src==='s'?p1:p2, c.list); counted[c.key] = totals[c.key]; }
   });
+  Object.values(out).forEach(applyNamesTo);
   return {lists:out, counted};
 }
 async function renderCandidatesView(){
@@ -10716,7 +10778,7 @@ async function ltRenderScheduledCandidates(g){
  host.innerHTML='<p class="hint">Loading candidates…</p>';
  const mine=(list,d)=>list.filter(c=>tgActive(g,c.recruiter,d)&&(!g.division||(branchDivisions[c.branch]||'Unassigned')===g.division));
  // team-only: the server returns just this lead's team (needs the dash_team_candidates function)
- const rowsOn=async d=>teamOnly&&!Server.teamNamesOnly()?(await Server.rpc('dash_team_candidates',{p_from:d,p_to:d})||[]).map(c=>({...c,branch:branchAlias(c.branch||'Unassigned')})):await scheduledRowsOn(d);
+ const rowsOn=async d=>teamOnly&&!Server.teamNamesOnly()?applyNamesTo((await Server.rpc('dash_team_candidates',{p_from:d,p_to:d})||[]).map(c=>({...c,branch:branchAlias(c.branch||'Unassigned')}))):await scheduledRowsOn(d);
  try{
   const rows=mine(await rowsOn(day),day);
   if(!host.isConnected||String(Server.user?.id)!==owner)return;
@@ -11216,7 +11278,7 @@ const DivReport=(()=>{
    for(const name of book.SheetNames){ const recs=XLSX.utils.sheet_to_json(book.Sheets[name],{defval:null}); if(recs.length&&'Client List Selector' in recs[0]&&'Job Site' in recs[0]){ imported=recs; break; } }
    if(!imported) throw new Error('This file has no “Client List Selector” and “Job Site” columns.');
    const str=v=>v==null?'':String(v).trim();
-   const rows=imported.filter(r=>str(r['Client List Selector'])||str(r['Job Site'])).map(r=>({client:str(r['Client List Selector'])||'(No client)',location:normalizeLocation(r['Job Site'])||'(No location)',candidate:str(r['Candidate Name']),recruiter:str(r['Recruiter Name']),eid:str(r.EID),dateAdded:parseDay(r['Date Added']),apptDate:parseDay(r['Branch Appointment Date']??r['Branch Schedule Date']),branchSchedule:str(r['Branch Schedule?']),onboardingStage:str(r['Onboarding Stage']),ebStatusReason:str(r['EB Status Reason'])}));
+   const rows=imported.filter(r=>str(r['Client List Selector'])||str(r['Job Site'])).map(r=>({client:str(r['Client List Selector'])||'(No client)',location:normalizeLocation(r['Job Site'])||'(No location)',candidate:'',recruiter:str(r['Recruiter Name']),eid:str(r.EID),dateAdded:parseDay(r['Date Added']),apptDate:parseDay(r['Branch Appointment Date']??r['Branch Schedule Date']),branchSchedule:str(r['Branch Schedule?']),onboardingStage:str(r['Onboarding Stage']),ebStatusReason:str(r['EB Status Reason'])}));
    if(!rows.length) throw new Error('No usable rows found in this file.');
    uploaded={rows,fileName:file.name,at:new Date().toISOString()}; state.source='upload';
    await loadData(); selectAll();
@@ -11450,12 +11512,16 @@ const DivReport=(()=>{
  function addRows(){
   const pairs=[...new Map(scoped().map(r=>[pairKey(r.client,r.location),[r.client,r.location]])).entries()].sort((a,b)=>a[1][0].localeCompare(b[1][0])||a[1][1].localeCompare(b[1][1]));
   const picked=new Set();
-  const d=dialog(`<div class="modal-header"><h3>Add rows to the report</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div><div class="modal-body"><p class="hint">Added rows always show, whatever the filters.</p><input type="search" class="dr-search dr-pair-search" placeholder="Search client or location" aria-label="Search"><div class="dr-checks dr-pair-list"></div><div class="dr-foot"><button type="button" class="btn btn-secondary" data-close>Cancel</button><button type="button" class="btn btn-primary dr-apply" disabled>Add to report</button></div></div>`);
+  const d=dialog(`<div class="modal-header"><h3>Add rows to the report</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div><div class="modal-body"><p class="hint">Added rows always show, whatever the filters.</p><input type="search" class="dr-search dr-pair-search" placeholder="Search client or location" aria-label="Search"><div class="dr-mini"><button type="button" class="dr-pair-all">Select all shown</button><button type="button" class="dr-pair-none">Clear</button><span class="hint dr-pair-n"></span></div><div class="dr-checks dr-pair-list"></div><div class="dr-foot"><button type="button" class="btn btn-secondary" data-close>Cancel</button><button type="button" class="btn btn-primary dr-apply" disabled>Add to report</button></div></div>`);
   const q=s=>d.querySelector(s);
-  const paint=()=>{ const term=q('.dr-pair-search').value.toLowerCase(), list=q('.dr-pair-list'); list.innerHTML='';
-   pairs.filter(([,p])=>p.join(' ').toLowerCase().includes(term)).slice(0,400).forEach(([k,p])=>{ const lab=document.createElement('label'); lab.className='dr-check'; const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=picked.has(k); const sp=document.createElement('span'); sp.textContent=p.join(' · '); lab.append(cb,sp); list.append(lab);
-    cb.onchange=()=>{ cb.checked?picked.add(k):picked.delete(k); q('.dr-apply').disabled=!picked.size; q('.dr-apply').textContent='Add to report'+(picked.size?' ('+picked.size+')':''); }; }); };
-  q('.dr-pair-search').oninput=paint; q('.dr-apply').onclick=()=>{ lockPairs([...picked]); d.remove(); }; paint(); q('.dr-pair-search').focus();
+  const shownPairs=()=>{ const term=q('.dr-pair-search').value.toLowerCase(); return pairs.filter(([,p])=>p.join(' ').toLowerCase().includes(term)); };
+  const sync=()=>{ q('.dr-apply').disabled=!picked.size; q('.dr-apply').textContent='Add to report'+(picked.size?' ('+picked.size+')':''); q('.dr-pair-n').textContent=picked.size?picked.size+' selected':''; };
+  const paint=()=>{ const list=q('.dr-pair-list'); list.innerHTML='';
+   shownPairs().slice(0,400).forEach(([k,p])=>{ const lab=document.createElement('label'); lab.className='dr-check'; const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=picked.has(k); const sp=document.createElement('span'); sp.textContent=p.join(' · '); lab.append(cb,sp); list.append(lab);
+    cb.onchange=()=>{ cb.checked?picked.add(k):picked.delete(k); sync(); }; }); sync(); };
+  q('.dr-pair-search').oninput=paint;
+  q('.dr-pair-all').onclick=()=>{ shownPairs().forEach(([k])=>picked.add(k)); paint(); };
+  q('.dr-pair-none').onclick=()=>{ picked.clear(); paint(); }; q('.dr-apply').onclick=()=>{ lockPairs([...picked]); d.remove(); }; paint(); q('.dr-pair-search').focus();
  }
  function mergeRows(){
   const t=$('dr-table'), sel=[...t.querySelectorAll('[data-sel]:checked')].map(cb=>report.rows[+cb.dataset.sel]); if(sel.length<2) return;
