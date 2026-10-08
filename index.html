@@ -1717,6 +1717,18 @@ body.uf-lock{overflow:hidden}
 .uf-sec .role-opt:has(input:checked){border-color:#1d4ed8;background:#f5f8ff;box-shadow:0 0 0 1px #1d4ed8 inset}
 .uf-sec .role-lbl{display:none}
 @media(max-width:760px){.uf-presets{grid-template-columns:1fr}.uf-body{padding:4px 14px 18px}.uf-head,.uf-foot{padding:14px 16px}.uf-extras,.uf-page .sec-page{margin-left:0}.ua-table th:nth-child(4),.ua-table td:nth-child(4){display:none}.settings-page{grid-template-columns:1fr!important}}
+
+/* smart grouping */
+.al-branches{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:10px}
+.al-branch{flex:0 1 auto;margin:0!important;border:1px solid #e3e8ef;border-radius:10px;background:#f8fafd;padding:10px 12px 12px;max-width:100%}
+.al-branch.wide{flex:1 1 100%}
+.al-bhead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.al-bhead h5{margin:0;font-size:13px;color:#0a1f44}
+.al-bgrid{display:grid;grid-template-columns:repeat(var(--n),minmax(250px,270px));gap:10px}
+.al-branch.wide .al-bgrid{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.al-gstat{font-size:12px;color:#5b6b82;font-weight:500}.al-gstat b{font-weight:700}.al-gstat b.bad{color:#b91c1c}.al-gstat b.warn{color:#a16207}.al-gstat b.good{color:#15803d}
+.al-group>summary{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+@media(max-width:760px){.al-bgrid{grid-template-columns:1fr!important}.al-branch{flex:1 1 100%}}
 </style>
 </head>
 <body class="locked">
@@ -9609,13 +9621,24 @@ function drawPivot(){
 // (show rate drops, no-shows, inactivity, wins), and remarks waiting for approval.
 const alertsState = {week:null, signals:'attention', search:'', group:lsGet('ipd_alerts_group2')||'none', band:'below', basis:lsGet('ipd_alerts_basis')||'week'};
 // Groups alert items as Division › Branch (or Branch only, or none). Biggest groups first.
+// Smart grouping: small branches sit side by side, single-recruiter branches share one box, and each
+// group header carries its own summary (average %, schedules vs goal) so you can scan without opening cards.
 function alertsGroupHtml(items, info, renderItem, wrapClass){
   const st = alertsState;
   if(st.group==='none' || !items.length) return `<div class="${wrapClass}">${items.map(renderItem).join('')}</div>`;
   const bucket = (arr, keyFn)=>{ const m=new Map(); arr.forEach(x=>{ const k=keyFn(x)||'Unassigned'; if(!m.has(k)) m.set(k,[]); m.get(k).push(x); }); return [...m.entries()].sort((a,b)=>b[1].length-a[1].length || a[0].localeCompare(b[0])); };
-  const branchBlocks = arr=>bucket(arr, x=>(info(x)||{}).branch).map(([br,list])=>`<div class="al-branch"><h5>${escapeHtml(br)} <span class="al-count">${list.length}</span></h5><div class="${wrapClass}">${list.map(renderItem).join('')}</div></div>`).join('');
+  const stats = list=>{ const rs=list.map(info).filter(r=>r&&r.score!=null); if(!rs.length) return ''; const avg=rs.reduce((a,r)=>a+r.score,0)/rs.length, sc=rs.reduce((a,r)=>a+(r.sched||0),0), gl=rs.reduce((a,r)=>a+(r.target||r.goal||0),0);
+    return `<span class="al-gstat"><b class="${avg<50?'bad':avg<80?'warn':'good'}">${Math.round(avg)}%</b> avg · ${fmtNum(sc)} / ${fmtNum(gl)} schedules</span>`; };
+  const box = (title, list, extra)=>{ const n=list.length;
+    return `<div class="al-branch ${n>=3?'wide':''}" style="--n:${Math.min(n,3)}"><div class="al-bhead"><h5>${title} <span class="al-count">${n}</span></h5>${extra||stats(list)}</div><div class="al-bgrid">${list.map(renderItem).join('')}</div></div>`; };
+  const branchBlocks = arr=>{
+    const groups=bucket(arr, x=>(info(x)||{}).branch), singles=groups.filter(([,l])=>l.length===1), multi=groups.filter(([,l])=>l.length>1);
+    const blocks=multi.map(([br,list])=>box(escapeHtml(br), list));
+    if(singles.length>=2) blocks.push(box('Other branches', singles.map(([,l])=>l[0]), `<span class="al-gstat">one recruiter each · ${stats(singles.map(([,l])=>l[0])).replace(/^<span class="al-gstat">|<\/span>$/g,'')}</span>`));
+    else singles.forEach(([br,list])=>blocks.push(box(escapeHtml(br), list)));
+    return `<div class="al-branches">${blocks.join('')}</div>`; };
   if(st.group==='branch') return branchBlocks(items);
-  return bucket(items, x=>(info(x)||{}).division).map(([div,list])=>`<details class="al-group" open><summary><h4>${escapeHtml(div)} <span class="al-count">${list.length}</span></h4></summary>${branchBlocks(list)}</details>`).join('');
+  return bucket(items, x=>(info(x)||{}).division).map(([div,list])=>`<details class="al-group" open><summary><h4>${escapeHtml(div)} <span class="al-count">${list.length}</span></h4>${stats(list)}</summary>${branchBlocks(list)}</details>`).join('');
 }
 function alertsGoalRows(weekEnd){
   const week = weeksData.find(w=>w.weekEndDate===weekEnd); if(!week) return {rows:[], inProgress:false, elapsed:5, workdays:5};
