@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard</title>
+<title>Performance Dashboard · v4.30.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -1740,7 +1740,7 @@ body.uf-lock{overflow:hidden}
       <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V12M10 20V5M16 20V9M22 20V3"/></svg></div>
       <div class="brand-text">
         <h1 id="dashboardTitle" title="Click to go home">Performance Dashboard</h1>
-        <p><span id="versionLabelInline">Version 4.21.0</span></p>
+        <p><span id="versionLabelInline"></span></p>
       </div>
       <div id="liveBadge" class="live-badge upload-stamp" title="Latest upload">No uploads yet</div>
     </div>
@@ -1848,7 +1848,7 @@ body.uf-lock{overflow:hidden}
       </div>
       <div class="muted-note" id="storageModeNote" style="text-align:center;margin-top:24px;">Data stored locally in this browser.</div>
       <div class="muted-note" style="text-align:center;margin-top:4px;opacity:.65;">
-        <span id="footerVersionLabel">Version 4.21.0</span> &middot; &copy; <span id="footerCopyrightYear"></span>
+        &copy; <span id="footerCopyrightYear"></span>
       </div>
     </div>
   </main>
@@ -8253,7 +8253,7 @@ function showAuthGate(mode, message){
     login:'This dashboard is private. Sign in with the name and password your administrator gave you.',
   };
   gate.innerHTML = `<form class="auth-card" novalidate>
-    <div class="auth-brand"><span class="auth-mark" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V11M10 19V5M16 19V9M22 19V2"/></svg></span><div><strong>Performance Dashboard</strong><span>${escapeHtml(APP_VERSION)}</span></div></div>
+    <div class="auth-brand"><span class="auth-mark" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V11M10 19V5M16 19V9M22 19V2"/></svg></span><div><strong>Performance Dashboard</strong><span>Sign in to continue</span></div></div>
     <h1>${titles[mode]}</h1>
     <p class="auth-intro">${intro[mode]}</p>
     ${mode==='connect' ? `
@@ -11020,11 +11020,10 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = 'Version 4.21.0';
+const APP_VERSION = '4.30.0';   // shown only in the browser tab title
 async function init(){
-  document.getElementById('versionLabelInline').textContent = APP_VERSION;
-  { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page · '+APP_VERSION; }
-  document.getElementById('footerVersionLabel').textContent = APP_VERSION;
+  document.title = 'Performance Dashboard · v'+APP_VERSION;
+  { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
   document.getElementById('footerCopyrightYear').textContent = new Date().getFullYear();
   if(EMBEDDED_WEEKS && Array.isArray(EMBEDDED_WEEKS) && EMBEDDED_WEEKS.length){
     isSnapshotMode = true; setLocked(false); setLoading(null);
