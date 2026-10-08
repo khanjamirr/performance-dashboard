@@ -929,6 +929,7 @@ button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #183442
 .al-grid.compact{margin-top:12px}
 .al-card{border:1px solid #e1eaed;border-left:4px solid #d64545;border-radius:12px;padding:12px 14px;background:#fff;display:flex;flex-direction:column;gap:6px}
 .al-card.warn{border-left-color:#e0a020}
+.al-section .panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.al-section summary{display:flex;align-items:center;gap:10px}.al-copy{margin-left:auto;white-space:nowrap}
 .al-card[data-al-card]{cursor:pointer;transition:box-shadow .15s,transform .15s}.al-card[data-al-card]:hover{box-shadow:0 8px 20px #18344218;transform:translateY(-1px)}.al-card[data-al-card]:focus-visible{outline:2px solid #1d4ed8;outline-offset:2px}
 .al-card.bad{background:linear-gradient(90deg,#fff5f5,#fff 40%)}
 .al-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
@@ -8061,7 +8062,7 @@ const LiveReload = {
   async run(){
     const ae=document.activeElement;
     const typing = ae && (ae.tagName==='TEXTAREA' || (ae.tagName==='INPUT' && ae.type!=='checkbox'));
-    if((typing || document.getElementById('remarksModal') || document.querySelector('.col-filter-pop')) && this.waits<15){ this.waits++; this.timer=setTimeout(()=>this.run(), 2000); return; }
+    if((typing || document.getElementById('remarksModal') || document.querySelector('.col-filter-pop, .modal-overlay, #userForm.uf-open')) && this.waits<15){ this.waits++; this.timer=setTimeout(()=>this.run(), 2000); return; }
     this.waits=0;
     await reloadAllFromStorage();
     if(this.authors.size) showToast('Live update from '+[...this.authors].join(', '));
@@ -9460,6 +9461,44 @@ function alertsGoalRows(weekEnd){
   }).filter(r=>r.goal>0);
   return {rows, inProgress, elapsed:workdays, workdays};
 }
+// Pop-ups close on a backdrop click only when the press also STARTED on the backdrop. Selecting text in a
+// field and releasing the mouse outside the box (or a touch that drifts) used to land a "click" on the
+// backdrop and close the pop-up mid-typing.
+(function guardBackdropClicks(){
+  let downOn=null, wasTyping=false;
+  document.addEventListener('pointerdown',e=>{ downOn=e.target; const ae=document.activeElement; wasTyping=!!(ae&&/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)&&ae.closest('.modal-overlay')&&!/^(checkbox|radio|button)$/.test(ae.type||'')); },true);
+  document.addEventListener('click',e=>{
+    const t=e.target; if(!(t instanceof Element)||!t.classList.contains('modal-overlay')) return;
+    const started=downOn; downOn=null;
+    if(started!==t || wasTyping){ e.stopImmediatePropagation(); e.stopPropagation(); }
+  },true);
+})();
+// One click: recruiter, week-end, pipelines, goal, schedules, % achieved and remarks — as a formatted
+// table for email/Teams (HTML) and tab-separated text for Excel.
+async function copyRemarksTable(rows, week, band){
+  if(!rows.length){ showToast('Nobody to copy.'); return; }
+  const d=new Date(week+'T12:00:00'), we=String(d.getDate()).padStart(2,'0')+'-'+d.toLocaleString('en-US',{month:'short'})+'-'+String(d.getFullYear()).slice(2);
+  const remarkOf=n=>{ const all=Remarks.forWeek(n,week), ap=all.filter(r=>(r.status||'approved')==='approved'); return (ap.length?ap:all).map(r=>r.remark).join(' | '); };
+  const H=['Recruiter Name','Week-End Date','# of Pipelines','GOALS of Schedules','# of Schedules','% Achieved vs Goals','Remarks'];
+  const data=rows.map(r=>{ const pct=r.goal?Math.round(r.sched/r.goal*100):null; return [r.name,we,r.interviews||0,r.goal||'NA',r.sched==null?'NA':r.sched,pct==null?'NA':pct+'%',remarkOf(r.name)]; });
+  const th='background:#1f5f8b;color:#ffffff;font-weight:700;text-transform:none;letter-spacing:0;font-family:Calibri,Arial,sans-serif;font-size:11pt;border:1px solid #000;padding:4px 8px;text-align:left;vertical-align:middle';
+  const td='font-family:Calibri,Arial,sans-serif;font-size:11pt;border:1px solid #000;padding:3px 8px;vertical-align:top';
+  const pctBg=band==='below'?'#ffff00':'#ffeb9c';
+  const html='<table style="border-collapse:collapse"><thead><tr>'+H.map(h=>`<th style="${th}">${escapeHtml(h)}</th>`).join('')+'</tr></thead><tbody>'
+    +data.map(r=>'<tr>'+r.map((v,i)=>`<td style="${td};${i>=1&&i<=5?'text-align:center;':''}${i===5?'background:'+pctBg+';':''}${i===6?'min-width:320px;':''}">${escapeHtml(String(v))}</td>`).join('')+'</tr>').join('')+'</tbody></table>';
+  const tsv=[H,...data].map(r=>r.map(v=>String(v).replace(/[\t\r\n]+/g,' ')).join('\t')).join('\n');
+  try{
+    if(window.ClipboardItem&&navigator.clipboard?.write){ await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([tsv],{type:'text/plain'})})]); }
+    else await navigator.clipboard.writeText(tsv);
+    showToast(`Copied ${rows.length} recruiter${rows.length===1?'':'s'} with remarks — paste into email, Teams or Excel.`);
+  }catch(e){
+    // fallback: select a hidden copy of the table
+    const box=document.createElement('div'); box.style.cssText='position:fixed;left:-9999px;top:0'; box.innerHTML=html; document.body.append(box);
+    const rg=document.createRange(); rg.selectNodeContents(box); const sel=getSelection(); sel.removeAllRanges(); sel.addRange(rg);
+    let ok=false; try{ ok=document.execCommand('copy'); }catch(_){} sel.removeAllRanges(); box.remove();
+    showToast(ok?'Copied — paste into email, Teams or Excel.':'Your browser blocked copying.');
+  }
+}
 function alertsRemarkLine(name, week){
   const all = Remarks.forWeek(name, week);
   const ap = all.filter(r=>(r.status||'approved')==='approved'), pend = all.filter(r=>r.status==='pending');
@@ -9517,11 +9556,11 @@ async function renderAlertsView(){
     ${pending.length?`<section class="panel al-section" id="alApprovals" data-section="alerts.approvals"><div class="panel-head"><div><h3>Remarks awaiting approval</h3><span class="hint">Only you and the author can see these until they’re approved.</span></div></div>
       <div class="al-approvals">${pending.map(r=>`<div class="al-appr" data-id="${escapeHtml(r.id)}"><div class="al-appr-meta"><strong>${escapeHtml(r.recruiter)}</strong> · Wk ${weekOfDate(r.week_end_date).number} · by ${escapeHtml(r.author||'')} · ${new Date(r.created_at).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</div><div class="al-appr-text">${escapeHtml(r.remark)}</div><div class="al-actions"><button class="btn btn-primary btn-sm" data-appr="1">Approve</button><button class="btn btn-secondary btn-sm" data-appr="0">Reject</button><button class="link-btn" data-appr-edit="${escapeHtml(r.recruiter)}" data-week="${r.week_end_date}">Edit…</button></div></div>`).join('')}</div></section>`:''}
     <section class="panel al-section" id="alBelow" data-section="alerts.below">
-      <div class="panel-head"><div><h3><span class="al-dot bad"></span>Below 50% of goal <span class="al-count">${belowShown.length}</span></h3><span class="hint">Lowest first. Click a name for the remark history.</span></div></div>
+      <div class="panel-head"><div><h3><span class="al-dot bad"></span>Below 50% of goal <span class="al-count">${belowShown.length}</span></h3><span class="hint">Lowest first. Click a card for the remark history.</span></div>${belowShown.length?'<button type="button" class="btn btn-secondary btn-sm al-copy" data-al-copy="below" title="Copy a table of these recruiters and their remarks — paste into email or Excel">📋 Copy remarks</button>':''}</div>
       ${belowShown.length?alertsGroupHtml(belowShown, x=>x, r=>card(r,'bad'), 'al-grid'):`<p class="hint" style="margin:0;">${q?'No match.':'Nobody is below 50% of goal this week. 🎉'}</p>`}
     </section>
     <section class="panel al-section" id="alWatch" data-section="alerts.watch">
-      <details open><summary><h3><span class="al-dot warn"></span>50–79% of goal <span class="al-count">${watchShown.length}</span></h3></summary>
+      <details open><summary><h3><span class="al-dot warn"></span>50–79% of goal <span class="al-count">${watchShown.length}</span></h3>${watchShown.length?'<button type="button" class="btn btn-secondary btn-sm al-copy" data-al-copy="watch" title="Copy a table of these recruiters and their remarks">📋 Copy remarks</button>':''}</summary>
       ${watchShown.length?`<div class="al-watch-body">${alertsGroupHtml(watchShown, x=>x, r=>card(r,'warn'), 'al-grid')}</div>`:'<p class="hint" style="margin:8px 0 0;">Nobody in this range.</p>'}</details>
     </section>
     <section class="panel al-section" data-section="alerts.signals">
@@ -9533,6 +9572,7 @@ async function renderAlertsView(){
   host.querySelectorAll('[data-jump]').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.jump)?.scrollIntoView({behavior:'smooth', block:'start'}));
   host.querySelectorAll('[data-sig]').forEach(b=>b.onclick=()=>{ st.signals=b.dataset.sig; renderAlertsView(); });
   host.querySelectorAll('[data-al-remarks]').forEach(b=>b.onclick=()=>openRemarksModal(b.dataset.alRemarks, st.week));
+  host.querySelectorAll('[data-al-copy]').forEach(b=>b.onclick=e=>{ e.preventDefault(); e.stopPropagation(); copyRemarksTable(b.dataset.alCopy==='below'?belowShown:watchShown, st.week, b.dataset.alCopy); });
   // the whole card opens the remarks (buttons inside keep their own action)
   host.querySelectorAll('[data-al-card]').forEach(c=>{ const open=()=>openRemarksModal(c.dataset.alCard, st.week);
     c.addEventListener('click',e=>{ if(e.target.closest('button,a,input,select,textarea,.acc-chip')) return; if(String(window.getSelection?.()||'').length) return; open(); });
@@ -11374,7 +11414,14 @@ const DivReport=(()=>{
  }
  function removePairs(keys){ const rm=new Set(state.removedPairs); keys.forEach(k=>rm.add(k)); state.removedPairs=[...rm]; state.addedPairs=state.addedPairs.filter(k=>!rm.has(k)); refresh(); status('Row removed — tick its client and location again, or use Add rows, to bring it back.'); }
  function lockPairs(keys){ state.addedPairs=[...new Set([...state.addedPairs,...keys])]; state.removedPairs=state.removedPairs.filter(k=>!keys.includes(k)); state.hiddenPairs=state.hiddenPairs.filter(k=>!keys.includes(k)); refresh(); status(keys.length+' row'+(keys.length===1?'':'s')+' added to the report.'); }
- function dialog(html){ const d=document.createElement('div'); d.className='modal-overlay dr-modal'; d.innerHTML=`<div class="modal" role="dialog" aria-modal="true">${html}</div>`; document.body.append(d); d.addEventListener('click',e=>{ if(e.target===d||e.target.closest('[data-close]')) d.remove(); }); return d; }
+ // Forms here only close from Cancel / × / Escape — a tap outside (or the phone keyboard opening and
+ // shifting the page) must never throw away what someone is typing.
+ function dialog(html){ const d=document.createElement('div'); d.className='modal-overlay dr-modal'; d.innerHTML=`<div class="modal" role="dialog" aria-modal="true">${html}</div>`; document.body.append(d);
+  const close=()=>{ d.remove(); document.removeEventListener('keydown',esc,true); };
+  const esc=e=>{ if(e.key==='Escape'&&d.isConnected){ e.stopPropagation(); close(); } };
+  d.addEventListener('click',e=>{ if(e.target.closest('[data-close]')) close(); }); document.addEventListener('keydown',esc,true);
+  d.remove=((orig)=>function(){ document.removeEventListener('keydown',esc,true); return orig.call(this); })(d.remove);
+  return d; }
  function editDimension(action){
   if(!data.length) return; let kind='location', picked=new Set();
   const d=dialog(`<div class="modal-header"><h3>${action==='merge'?'Merge clients or locations':'Hide clients or locations'}</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div><div class="modal-body">
