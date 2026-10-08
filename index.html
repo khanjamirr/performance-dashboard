@@ -6345,7 +6345,6 @@ async function renderHistoryToday(name){
   const today=ltToday();
   const head='<div class="hp-panel-head"><h3>Scheduled today</h3><span class="hint">'+fmtDate(today)+'</span></div>';
   const teamOnly=!canSeeCandidates();
-  if(teamOnly && !canSeeTeamNames()){ host.innerHTML=head+noNamesRightHtml('Candidate names (EID and employee name)'); return; }
   host.innerHTML=head+'<p class="hint">Loading…</p>';
   try{
     const all=teamOnly&&!Server.teamNamesOnly()?(await Server.rpc('dash_team_candidates',{p_from:today,p_to:today})||[]):await scheduledTodayRows();
@@ -6356,7 +6355,10 @@ async function renderHistoryToday(name){
     const draw=()=>{ const b=host.querySelector('#histTodayBranch')?.value||'', list=rows.filter(c=>!b||c.branch===b);
       host.querySelector('#histTodayRows').innerHTML=list.length?`<div class="hp-table-wrap"><table class="ep-table" id="histTodayTable"><thead><tr><th>EID</th><th>Employee name</th></tr></thead><tbody>${list.map(c=>`<tr><td class="mono">${escapeHtml(c.eid)}</td><td>${escapeHtml(c.name)}</td></tr>`).join('')}</tbody></table></div><div class="ep-foot"><span></span>${copyBtnHtml('histTodayTable')}</div>`:'<p class="hint">Nobody scheduled today yet.</p>'; };
     host.querySelector('#histTodayBranch')?.addEventListener('change',draw); draw();
-  }catch(e){ if(host.isConnected) host.innerHTML='<div class="hp-panel-head"><h3>Scheduled today</h3></div><p class="hint">Today’s candidates could not be loaded ('+escapeHtml(cleanErr(e))+').</p>'; }
+  }catch(e){ if(!host.isConnected) return; const m=e.message||'';
+    host.innerHTML=head+(teamOnly&&/FORBIDDEN/.test(m)?noNamesRightHtml('Candidate names (EID and employee name)')
+      :teamOnly&&/Could not find|does not exist|schema cache/i.test(m)?`<div class="lt-empty"><strong>Team candidate names need a one-time database update.</strong><span>${Server.isAdmin()?'Run team_candidates.sql in the Supabase SQL Editor, then reload once as an admin.':'Your admin needs to finish setting this up.'}</span></div>`
+      :'<p class="hint">Today’s candidates could not be loaded ('+escapeHtml(cleanErr(e))+').</p>'); }
 }
 function renderHistoryView(){
   const el=document.getElementById('view-history'); if(!el) return;
@@ -7489,7 +7491,17 @@ const Server = {
     if(fn==='dash_user_save' && args && args.p && Array.isArray(args.p.hidden_sections)){
       args={...args, p:{...args.p, hidden_sections:args.p.hidden_sections.filter(k=>k!==TEAM_SCOPE)}};
     }
-    const r=this.call(fn, {p_token:this.token, ...(args||{})});
+    let r=this.call(fn, {p_token:this.token, ...(args||{})});
+    // Opt-in rights (grant.*) are also kept in dash_user_grants, which the database checks itself —
+    // so they work even if the users table drops unknown section keys.
+    if(fn==='dash_me') return r.then(async me=>{ await this.mergeGrants(me); return me; });
+    if(fn==='dash_user_save' && args && args.p && args.p.id!=null){ const p=args.p;
+      r=r.then(async res=>{ try{ await this.call('dash_user_grants_set',{p_token:this.token, p_user_id:String(p.id), p_grants:(p.hidden_sections||[]).filter(k=>k.startsWith('grant.'))}); }
+        catch(e){ if(!/Could not find|does not exist|schema cache/i.test(e.message||'')) throw e; } return res; }); }
+    if(fn==='dash_users_list') r=r.then(async list=>{ if(!Array.isArray(list)) return list; let all=null;
+      try{ all=await this.call('dash_user_grants_all',{p_token:this.token}); }catch(e){}
+      if(all) list.forEach(u=>{ const g=all[String(u.id)]||[]; if(g.length) u.hidden_sections=[...new Set([...(u.hidden_sections||[]), ...g])]; });
+      return list; });
     if(fn==='dash_users_list') return r.then(list=>Array.isArray(list)?list.map(u=>{ const hs=u&&u.hidden_sections||[];
       if(!hs.includes(TEAM_SCOPE)) return u;
       // interim team-only accounts: drop the all-candidates module they were given, once, quietly
@@ -7498,6 +7510,9 @@ const Server = {
       return {...u, modules:(u.modules||[]).filter(m=>m!=='candidates'), hidden_sections:hs.filter(k=>k!==TEAM_SCOPE)}; }):list);
     return r;
   },
+  async mergeGrants(user){ user=user||this.user; if(!user||!this.token) return user;
+    try{ const g=await this.call('dash_my_grants',{p_token:this.token}); if(Array.isArray(g)&&g.length) user.hidden_sections=[...new Set([...(user.hidden_sections||[]), ...g])]; }catch(e){}
+    return user; },
   teamNamesOnly(){ return !!this.user && this.user.role==='user' && (this.user.hidden_sections||[]).includes(TEAM_SCOPE); },
   can(m){ if(m==='candidate_hub')return this.can('candidates')||this.can('master'); if(m==='candidates'&&this.teamNamesOnly()) return false; return !!this.user && (m==='teams' || this.user.role==='super_admin' || this.user.role==='admin' || (this.user.modules||[]).includes(m)); },
   isAdmin(){ return !!this.user && (this.user.role==='super_admin' || this.user.role==='admin'); },
@@ -7626,7 +7641,7 @@ const Server = {
     }
     if(remarks){ await Remarks.load().catch(()=>{}); if(currentView==='alerts') renderAlertsView(); if(currentView==='history') renderHistoryView(); }
     if(users){
-      try{ const me = await this.rpc('dash_me'); const changed = JSON.stringify(me.modules)!==JSON.stringify(this.user.modules) || me.name!==this.user.name; this.user=me; if(changed){ applyPermissions(); refreshUI(); showToast('Your access rights were updated.'); } }catch(e){}
+      try{ const me = await this.rpc('dash_me'); const changed = JSON.stringify(me.modules)!==JSON.stringify(this.user.modules) || JSON.stringify(me.hidden_sections||[])!==JSON.stringify(this.user.hidden_sections||[]) || me.name!==this.user.name; this.user=me; if(changed){ applyPermissions(); refreshUI(); showToast('Your access rights were updated.'); } }catch(e){}
       if(settingsModalOpen && !document.getElementById('settingsPane-users')?.classList.contains('hidden')) renderUsersAdmin();
     }
     if(master){ candState.cache.clear(); if(currentView==='candidates') renderCandidatesView(); }
@@ -7660,7 +7675,7 @@ async function reloadAllFromStorage(){
 /* ------------------------------------------ PERMISSIONS ------------------------------------------ */
 document.addEventListener('visibilitychange', async ()=>{
   if(document.visibilityState!=='visible' || !Server.token || !Server.user) return;
-  try{ const me = await Server.rpc('dash_me'); const changed = JSON.stringify(me.modules)!==JSON.stringify(Server.user.modules); Server.user = me; if(changed){ applyPermissions(); refreshUI(); showToast('Your access rights were updated.'); } }catch(e){}
+  try{ const me = await Server.rpc('dash_me'); const changed = JSON.stringify(me.modules)!==JSON.stringify(Server.user.modules) || JSON.stringify(me.hidden_sections||[])!==JSON.stringify(Server.user.hidden_sections||[]); Server.user = me; if(changed){ applyPermissions(); refreshUI(); showToast('Your access rights were updated.'); } }catch(e){}
 });
 // The page needs the database functions from the matching supabase_setup.sql. If the super
 // admin hasn't run the latest one (or the run failed), new features such as new user rights
@@ -7853,11 +7868,12 @@ function setLoading(text){
 }
 async function afterLogin(boot){
   setLocked(false);
+  if(!boot && Server.user) await Server.mergeGrants();
   setLoading('Loading dashboard…');
   try{
     if(!boot){ try{ boot = await Server.rpc('dash_bootstrap'); }catch(e){ if(!/Could not find|schema cache|does not exist/i.test(e.message+' '+(e.code||''))) throw e; } }
     if(boot){
-      Server.user = boot.me;
+      Server.user = boot.me; await Server.mergeGrants();
       KV.clear();
       await Promise.all((boot.kv||[]).map(async r=>{ KV.set(r.key, await decodeKvValue(r.key, r.value)); }));
       Remarks.list = boot.remarks || [];
@@ -10176,7 +10192,6 @@ async function ltRenderScheduledCandidates(g){
  const host=document.getElementById('ltScheduledCandidates');if(!host)return;
  const owner=String(Server.user.id),today=ltToday(),day=ltState.candDate&&ltState.candDate<=today?ltState.candDate:today;
  const teamOnly=!canSeeCandidates();
- if(teamOnly && !canSeeTeamNames()){ host.innerHTML=noNamesRightHtml('Candidate names (EID and employee name)'); return; }
  host.innerHTML='<p class="hint">Loading candidates…</p>';
  const mine=(list,d)=>list.filter(c=>tgActive(g,c.recruiter,d)&&(!g.division||(branchDivisions[c.branch]||'Unassigned')===g.division));
  // team-only: the server returns just this lead's team (needs the dash_team_candidates function)
@@ -10200,7 +10215,7 @@ async function ltRenderScheduledCandidates(g){
   host.querySelector('#ltCandDate').onchange=e=>{ if(tgDate(e.target.value)&&e.target.value<=today){ ltState.candDate=e.target.value===today?null:e.target.value; ltRenderScheduledCandidates(g);} };
   host.querySelector('#ltCandToday')?.addEventListener('click',()=>{ltState.candDate=null;ltRenderScheduledCandidates(g);});
   draw();
- }catch(e){ if(!host.isConnected) return; host.innerHTML=teamOnly&&/Could not find|does not exist|schema cache/i.test(e.message||'')?`<div class="lt-empty"><strong>Team candidate names need a one-time database update.</strong><span>${Server.isAdmin()?'Run team_candidates.sql in the Supabase SQL Editor, then reload the dashboard once as an admin.':'Your admin needs to finish setting this up.'}</span></div>`:'<p role="alert">Candidate data could not be loaded. Refresh the team to retry.</p>'; }
+ }catch(e){ if(!host.isConnected) return; host.innerHTML=teamOnly&&/FORBIDDEN/.test(e.message||'')?noNamesRightHtml('Candidate names (EID and employee name)'):teamOnly&&/Could not find|does not exist|schema cache/i.test(e.message||'')?`<div class="lt-empty"><strong>Team candidate names need a one-time database update.</strong><span>${Server.isAdmin()?'Run team_candidates.sql in the Supabase SQL Editor, then reload the dashboard once as an admin.':'Your admin needs to finish setting this up.'}</span></div>`:'<p role="alert">Candidate data could not be loaded. Refresh the team to retry.</p>'; }
 }
 // ---------- One team per recruiter per day ----------
 // Every team's ranges (the lead's own recruiter name counts as a member for all dates).
