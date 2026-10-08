@@ -1498,6 +1498,14 @@ body{background:var(--paper)!important}
 }
 
 /* ---------- Division Reporting ---------- */
+.dr-srcs{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin:14px 0}
+.dr-src{display:flex;gap:10px;align-items:flex-start;border:1px solid #d6e2e6;border-radius:12px;padding:14px;cursor:pointer;background:#fff}
+.dr-src.on{border-color:#1c8c84;background:#f3faf9;box-shadow:0 0 0 1px #1c8c84 inset}.dr-src.off{opacity:.6;cursor:not-allowed}
+.dr-src>input{margin-top:3px;accent-color:#1c8c84}
+.dr-src-body{display:flex;flex-direction:column;gap:6px;min-width:0;flex:1}.dr-src-body b{font-size:14px}.dr-src-body em{font-style:normal;font-size:12.5px;color:#58717c;line-height:1.45}
+.dr-src .dr-drop{display:block;margin-top:4px;padding:14px}
+.dr-map{margin-top:6px;font-size:12.5px}.dr-map summary{cursor:pointer;font-weight:600;color:#285866}.dr-map table{margin-top:8px}.dr-map td{white-space:normal!important}
+
 #view-divreport .dr-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
 .dr-tabs{display:inline-flex;gap:2px;padding:3px;border-radius:10px;background:#e5edf0}
 .dr-tabs button{border:0;background:transparent;border-radius:8px;padding:8px 14px;font:inherit;font-size:13px;font-weight:600;color:#4a6370;cursor:pointer}
@@ -1549,7 +1557,7 @@ body{background:var(--paper)!important}
 .dr-sort{border:0;background:none;font:inherit;color:inherit;cursor:pointer;padding:0}.dr-sort span{opacity:.6;margin-left:3px}
 .dr-reason{background:#fff0f2;color:#aa3547;font-size:11px;padding:2px 7px;border-radius:5px}
 .dr-count{background:#fde8eb;color:#a32d3d;border-radius:12px;padding:2px 8px;font-size:12px;font-weight:700}
-.dr-source{padding:22px!important}.dr-source h3{margin:0 0 6px}
+.dr-source{padding:22px!important}.dr-source>p.hint{font-size:13px;margin:0}.dr-source h3{margin:0 0 6px}
 .dr-drop{margin-top:12px;border:2px dashed #cfdde2;border-radius:12px;padding:26px;text-align:center;color:#6b8590;font-size:13px}.dr-drop.on{border-color:#1c8c84;background:#eef8f7;color:#1c6f69}
 .dr-filemeta{margin:12px 0 0;font-size:13px}
 .dr-modal .modal{max-width:520px}.dr-seg{display:flex;gap:8px;margin-bottom:10px}.dr-seg label{flex:1;border:1px solid #d3dfe3;border-radius:8px;padding:8px 10px;font-size:13px;cursor:pointer}
@@ -2413,6 +2421,7 @@ document.addEventListener('mouseout', (e)=>{
 });
 // Candidate names / Employee Numbers are only shown to people with the Candidates right.
 const TEAM_SCOPE='scope.team_names_only';
+const GRANT_MODULES=['divreport'];   // page rights stored as grant.<key> (see Server.rpc)
 function canSeeCandidates(){ return Server.can('candidates'); }
 // v4.21: the hover lists moved to Report Builder — tables show plain numbers everywhere.
 function candidateCellHtml(value, list, metricKey, entityName){
@@ -7734,6 +7743,11 @@ const Server = {
     if(fn==='dash_user_save' && args && args.p && Array.isArray(args.p.hidden_sections)){
       args={...args, p:{...args.p, hidden_sections:args.p.hidden_sections.filter(k=>k!==TEAM_SCOPE)}};
     }
+    // Newer page rights (Division Reporting) are saved as opt-in grants, because the users table only
+    // accepts the module names it already knows.
+    if(fn==='dash_user_save' && args && args.p){ const p={...args.p}, mods=[...(p.modules||[])], hs=[...(p.hidden_sections||[])];
+      GRANT_MODULES.forEach(m=>{ const g='grant.'+m, on=mods.includes(m)||hs.includes(g); p.modules=mods.filter(x=>!GRANT_MODULES.includes(x)); p.hidden_sections=hs.filter(x=>x!==g); if(on) p.hidden_sections.push(g); });
+      if(GRANT_MODULES.length) args={...args,p}; }
     let r=this.call(fn, {p_token:this.token, ...(args||{})});
     // Opt-in rights (grant.*) are also kept in dash_user_grants, which the database checks itself —
     // so they work even if the users table drops unknown section keys.
@@ -7744,6 +7758,8 @@ const Server = {
     if(fn==='dash_users_list') r=r.then(async list=>{ if(!Array.isArray(list)) return list; let all=null;
       try{ all=await this.call('dash_user_grants_all',{p_token:this.token}); }catch(e){}
       if(all) list.forEach(u=>{ const g=all[String(u.id)]||[]; if(g.length) u.hidden_sections=[...new Set([...(u.hidden_sections||[]), ...g])]; });
+      // show grant-backed page rights as normal ticks in the user editors
+      list.forEach(u=>{ const hs=u.hidden_sections||[]; GRANT_MODULES.forEach(m=>{ if(hs.includes('grant.'+m)&&!(u.modules||[]).includes(m)) u.modules=[...(u.modules||[]),m]; }); u.hidden_sections=hs.filter(k=>!GRANT_MODULES.some(m=>k==='grant.'+m)); });
       return list; });
     if(fn==='dash_users_list') return r.then(list=>Array.isArray(list)?list.map(u=>{ const hs=u&&u.hidden_sections||[];
       if(!hs.includes(TEAM_SCOPE)) return u;
@@ -7757,7 +7773,7 @@ const Server = {
     try{ const g=await this.call('dash_my_grants',{p_token:this.token}); if(Array.isArray(g)&&g.length) user.hidden_sections=[...new Set([...(user.hidden_sections||[]), ...g])]; }catch(e){}
     return user; },
   teamNamesOnly(){ return !!this.user && this.user.role==='user' && (this.user.hidden_sections||[]).includes(TEAM_SCOPE); },
-  can(m){ if(m==='candidate_hub')return this.can('candidates')||this.can('master'); if(m==='candidates'&&this.teamNamesOnly()) return false; return !!this.user && (m==='teams' || this.user.role==='super_admin' || this.user.role==='admin' || (this.user.modules||[]).includes(m)); },
+  can(m){ if(m==='candidate_hub')return this.can('candidates')||this.can('master'); if(m==='candidates'&&this.teamNamesOnly()) return false; return !!this.user && (m==='teams' || this.user.role==='super_admin' || this.user.role==='admin' || (this.user.modules||[]).includes(m) || (GRANT_MODULES.includes(m)&&(this.user.hidden_sections||[]).includes('grant.'+m))); },
   isAdmin(){ return !!this.user && (this.user.role==='super_admin' || this.user.role==='admin'); },
   isSuperAdmin(){ return !!this.user && this.user.role==='super_admin'; },
   expired(){
@@ -10769,17 +10785,21 @@ function toggleNavMore(force){ const on=force===undefined?!document.body.classLi
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init); else init();
 
 /* ============================= DIVISION REPORTING ============================= */
-// Client / location pipeline report from the daily candidate export ("Client List Selector" + "Job Site").
-// The uploaded file is shared with everyone who has the Division Reporting right; filters, groups and
-// hidden rows are each person's own view (saved in this browser). Candidate names and EIDs are kept in
-// a separate store and only loaded for people who may see candidate names (Red flags).
+// Client / location pipeline report. Two data sources, picked on the Data source tab:
+//  • Upload — a PowerApp export read in this tab only. Nothing is saved anywhere; it's gone when the
+//    person clears it, reloads or closes the tab.
+//  • Dashboard data — the Created On / Date Of rows already in Supabase for the chosen weeks
+//    (Created On = Date added, Date Of = branch appointment date).
+// Filters, groups and hidden rows are each person's own view (saved in this browser).
 const DivReport=(()=>{
  const NS_HEADERS=['Client','Location','Pending onboarding','Schedules for today','Interviews today','Total schedules','Total pipeline'];
  const WEST_HEADERS=['Client','Location','Pending onboarding','Schedule in branch','Pipeline (Available/OAE)','Pipeline (Unavailable/Inactive)'];
  const FLAG_HEADERS=['Recruiter','Candidate','EID','Client','Location','Branch schedule?','Appointment date','Why'];
- const DATA_KEY='divreport:data', NAMES_KEY='divreport:names';
- const FIELDS=['client','location','recruiter','dateAdded','apptDate','branchSchedule','onboardingStage','ebStatusReason'];
- let data=[], meta=null, loadedAt=0, loading=null, namesLoaded=false, state=null, stateFor='', report={rows:[],totals:[]}, flags=[], msg={text:'',error:false};
+ const OLD_KEYS=['divreport:data','divreport:names'];
+ let data=[], meta=null, loading=null, state=null, stateFor='', report={rows:[],totals:[]}, flags=[], msg={text:'',error:false};
+ let uploaded=null;              // {rows, fileName, at} — memory only
+ const sbWeeks=new Map();        // week-ending → mapped rows from Supabase (memory only)
+ let sbKey='';                   // which weeks `data` was built from
  const $=id=>document.getElementById(id);
  const esc=s=>escapeHtml(String(s??''));
  const localDay=d=>d instanceof Date&&!isNaN(d)?d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'):'';
@@ -10845,33 +10865,72 @@ const DivReport=(()=>{
  }
  // ---------- state (per person, this browser) ----------
  const stateKey=()=>'ipd_divreport:'+(Server.user?Server.user.id:'me');
- function fresh(){ const t=localDay(new Date()); return {module:'ns',addedPairs:[],removedPairs:[],hiddenPairs:[],rowGroups:[],clients:[],locations:[],hiddenClients:[],hiddenLocations:[],clientGroups:[],locationGroups:[],search:'',scheduleDate:t,interviewDate:t,weekEnd:t,flags:{recruiter:'',dateField:'dateAdded',from:'',to:'',sort:'recruiter'}}; }
+ function fresh(){ const t=localDay(new Date()); return {module:'ns',addedPairs:[],removedPairs:[],hiddenPairs:[],rowGroups:[],clients:[],locations:[],hiddenClients:[],hiddenLocations:[],clientGroups:[],locationGroups:[],search:'',scheduleDate:t,interviewDate:t,weekEnd:t,flags:{recruiter:'',dateField:'dateAdded',from:'',to:'',sort:'recruiter'},source:canSupabase()?'supabase':'upload',sbFrom:'',sbTo:''}; }
  function loadState(){ if(stateFor===stateKey()&&state) return; stateFor=stateKey(); state=fresh(); try{ const s=JSON.parse(localStorage.getItem(stateFor)||'null'); if(s&&typeof s==='object') state={...state,...s,flags:{...state.flags,...(s.flags||{})}}; }catch(e){} }
  function save(){ try{ localStorage.setItem(stateKey(),JSON.stringify(state)); }catch(e){} }
  // ---------- rights ----------
- const canUpload=()=>Server.isAdmin()||Server.can('upload');
- const canFlags=()=>Server.isAdmin()||canSeeCandidates();
- // ---------- shared data ----------
- async function fetchKey(key){
-  let v=KV.get(key);
-  if(v===undefined||v===null){ const got=await Server.rpc('dash_kv_get',{p_keys:[key]}); const r=(got||[]).find(x=>x.key===key); v=r?r.value:null; }
-  return v?await decodeKvValue(key,v):null;
+ const canSupabase=()=>!!Server.user&&(Server.isAdmin()||Server.can('master')||Server.can('candidates'));
+ const canFlags=()=>state&&state.source==='upload'?true:(Server.isAdmin()||canSeeCandidates());
+ // ---------- Supabase rows → report rows ----------
+ // Branch names carry both parts: "Louisville, KY - PLX", "Charlotte, NC (PLX)", "Gildan - Charleston, SC".
+ function splitBranch(b){
+  const s=String(b||'').trim(); if(!s) return {client:'(No client)',location:'(No location)'};
+  const paren=s.match(/^(.*?)\s*\(([^)]+)\)\s*$/); if(paren) return {location:normalizeLocation(paren[1]),client:paren[2].trim()};
+  const parts=s.split(/\s+-\s+/); if(parts.length>=2){ const isPlace=p=>/,\s*[A-Za-z]{2,}\.?$/.test(p)||/\s[A-Z]{2}$/.test(p);
+   const i=parts.findIndex(isPlace), li=i>=0?i:0; return {location:normalizeLocation(parts[li]),client:parts.filter((_,j)=>j!==li).join(' - ').trim()||'(No client)'}; }
+  return {location:normalizeLocation(s),client:'(No client)'};
  }
- async function loadData(force){
+ function mapSupabaseRow(d,inS){
+  const pick=(...ks)=>{ for(const k of ks){ const v=d[k]; if(v!=null&&String(v).trim()!=='') return String(v).trim(); } return ''; };
+  const day=v=>v?String(v).slice(0,10):'';
+  const branch=branchAlias(pick('Branch')||'');
+  let client=pick('Client List Selector','Client','Client Name'), location=pick('Job Site','Location');
+  // no Job Site in dashboard data: the full branch name is the location, client stays blank
+  location=location?normalizeLocation(location):(branch||'(No location)'); if(!client) client='—';
+  const dateAdded=day(d['Created On']), apptDate=day(d['Date Of']);
+  const i9=pick('I-9 Completed'), i9s=pick('I-9 Status');
+  return {client:client||'(No client)', location:location||'(No location)', recruiter:pick('Created By','Recruiter Name'),
+   candidate:pick('Candidate Name'), eid:pick('Employee Number','EID'), dateAdded, apptDate,
+   branchSchedule:pick('Branch Schedule?')||((inS||dateAdded)?'Yes':''),
+   onboardingStage:pick('Onboarding Stage')||(/^y/i.test(i9)||/complete/i.test(i9s)?'EB Complete/I9 Complete':'Pending'),
+   ebStatusReason:pick('EB Status Reason','Status Reason')};
+ }
+ const weekList=()=>[...weeksData].map(w=>w.weekEndDate).sort();
+ function weeksNeeded(){
+  const all=weekList(); if(!all.length) return [];
+  const cur=weekOfDate(localDay(new Date())).weekEnd, last=all.filter(w=>w<=cur).pop()||all[all.length-1];
+  let from=state.sbFrom&&all.includes(state.sbFrom)?state.sbFrom:last, to=state.sbTo&&all.includes(state.sbTo)?state.sbTo:last; if(from>to) [from,to]=[to,from];
+  const set=new Set(all.filter(w=>w>=from&&w<=to));
+  [state.scheduleDate,state.interviewDate,state.weekEnd].forEach(d=>{ const w=d&&weekOfDate(d).weekEnd; if(w&&all.includes(w)) set.add(w); });
+  return [...set].sort();
+ }
+ async function fetchSupabase(weeks){
+  const missing=weeks.filter(w=>!sbWeeks.has(w));
+  for(let i=0;i<missing.length;i+=3){
+   await Promise.all(missing.slice(i,i+3).map(async w=>{ const rows=(await Server.rpc('dash_week_rows',{p_week:w}))||[];
+    sbWeeks.set(w, rows.filter(r=>r&&r.data).map(r=>mapSupabaseRow(r.data,!!r.s))); }));
+  }
+  const seen=new Set(), out=[];
+  weeks.forEach(w=>(sbWeeks.get(w)||[]).forEach(r=>{ const k=[r.eid||r.candidate,r.recruiter,r.dateAdded,r.apptDate,r.location].join('|'); if(seen.has(k)) return; seen.add(k); out.push(r); }));
+  return out;
+ }
+ async function loadData(){
+  if(state.source==='upload'){
+   data=uploaded?uploaded.rows.map((r,i)=>({...r,id:i})):[];
+   meta=uploaded?{kind:'upload',label:uploaded.fileName,count:data.length,at:uploaded.at}:null; sbKey=''; return;
+  }
+  if(!canSupabase()){ data=[]; meta=null; return; }
+  const weeks=weeksNeeded(), key=weeks.join(',');
+  if(key===sbKey&&meta) return;
   if(loading) return loading;
-  if(loadedAt&&!force&&(!canFlags()||namesLoaded)) return;
-  loading=(async()=>{
-   const d=await fetchKey(DATA_KEY);
-   if(d&&Array.isArray(d.rows)){ meta={fileName:d.fileName||'Uploaded file',uploadedAt:d.uploadedAt||null,by:d.by||'',count:d.rows.length};
-    data=d.rows.map((a,i)=>{ const r={id:i}; FIELDS.forEach((k,j)=>r[k]=a[j]||''); r.client=r.client||'(No client)'; r.location=r.location||'(No location)'; return r; }); }
-   else { meta=null; data=[]; }
-   namesLoaded=false;
-   if(data.length&&canFlags()){ try{ const n=await fetchKey(NAMES_KEY); if(n&&Array.isArray(n.rows)&&n.rows.length===data.length){ n.rows.forEach((a,i)=>{ data[i].candidate=a[0]||''; data[i].eid=a[1]||''; }); namesLoaded=true; } }catch(e){} }
-   loadedAt=Date.now();
-  })();
+  loading=(async()=>{ const rows=await fetchSupabase(weeks); data=rows.map((r,i)=>({...r,id:i})); sbKey=key;
+   meta={kind:'supabase',label:weeks.length?(weeks.length===1?'Wk '+weekOfDate(weeks[0]).number+' · ending '+fmtDate(weeks[0]):'Wk '+weekOfDate(weeks[0]).number+' – Wk '+weekOfDate(weeks[weeks.length-1]).number):'no weeks',count:data.length,weeks}; })();
   try{ await loading; } finally{ loading=null; }
  }
- async function putKey(key,obj){ const val={v:1,gz:await gzipB64(JSON.stringify(obj))}; await Server.rpc('dash_kv_set',{p_key:key,p_value:val}); KV.set(key,obj); }
+ // earlier versions kept a shared copy of the upload — remove it, nothing is stored now
+ let oldCleaned=false;
+ function cleanOldCopies(){ if(oldCleaned||!(Server.isAdmin()||Server.can('upload'))) return; oldCleaned=true;
+  OLD_KEYS.forEach(k=>{ if(KV.get(k)!==undefined||true) Server.rpc('dash_kv_delete',{p_key:k}).then(()=>KV.delete(k)).catch(()=>{}); }); }
  async function uploadFile(file){
   if(!file) return;
   if(!/\.xlsx?$/i.test(file.name)){ status('Choose an Excel file (.xlsx or .xls).',true); return; }
@@ -10884,36 +10943,30 @@ const DivReport=(()=>{
    const str=v=>v==null?'':String(v).trim();
    const rows=imported.filter(r=>str(r['Client List Selector'])||str(r['Job Site'])).map(r=>({client:str(r['Client List Selector'])||'(No client)',location:normalizeLocation(r['Job Site'])||'(No location)',candidate:str(r['Candidate Name']),recruiter:str(r['Recruiter Name']),eid:str(r.EID),dateAdded:parseDay(r['Date Added']),apptDate:parseDay(r['Branch Appointment Date']??r['Branch Schedule Date']),branchSchedule:str(r['Branch Schedule?']),onboardingStage:str(r['Onboarding Stage']),ebStatusReason:str(r['EB Status Reason'])}));
    if(!rows.length) throw new Error('No usable rows found in this file.');
-   status('Saving '+rows.length.toLocaleString()+' rows for everyone…');
-   const info={fileName:file.name,uploadedAt:new Date().toISOString(),by:Server.user?.name||''};
-   await putKey(NAMES_KEY,{...info,rows:rows.map(r=>[r.candidate,r.eid])});
-   await putKey(DATA_KEY,{...info,rows:rows.map(r=>FIELDS.map(k=>r[k]))});
-   data=rows.map((r,i)=>({...r,id:i})); meta={...info,count:rows.length}; namesLoaded=true; loadedAt=Date.now();
-   // keep each person's picks where they still exist; new clients/locations start unticked
-   const cs=new Set(data.map(r=>r.client)), ls=new Set(data.map(r=>r.location));
-   state.clients=state.clients.filter(c=>cs.has(c)); state.locations=state.locations.filter(l=>ls.has(l));
-   if(!state.clients.length&&!state.locations.length){ state.clients=[...cs]; state.locations=[...ls]; }
-   status('Uploaded '+file.name+' · '+rows.length.toLocaleString()+' rows. Everyone with access now sees this file.');
+   uploaded={rows,fileName:file.name,at:new Date().toISOString()}; state.source='upload';
+   await loadData(); selectAll();
+   status('Loaded '+file.name+' · '+rows.length.toLocaleString()+' rows. It stays in this tab only — nothing is saved.');
    state.module='ns'; build();
   }catch(e){ status(cleanErr(e)||'This file couldn’t be read.',true); }
  }
- async function removeFile(){
-  if(!confirm('Remove the uploaded file for everyone?')) return;
-  try{ await Server.rpc('dash_kv_delete',{p_key:DATA_KEY}); await Server.rpc('dash_kv_delete',{p_key:NAMES_KEY}).catch(()=>{}); KV.delete(DATA_KEY); KV.delete(NAMES_KEY); data=[]; meta=null; status('File removed.'); build(); }
-  catch(e){ status('Couldn’t remove the file: '+cleanErr(e),true); }
- }
+ function clearUpload(){ uploaded=null; if(state.source==='upload'){ data=[]; meta=null; } status('Uploaded data cleared.'); build(); }
+ async function useSource(src){ state.source=src; status(src==='supabase'?'Loading dashboard data…':''); build(); try{ await loadData(); selectAll(); status(src==='supabase'&&meta?'Using dashboard data · '+meta.label+' · '+meta.count.toLocaleString()+' rows.':''); }catch(e){ status('Couldn’t load dashboard data: '+cleanErr(e),true); } build(); }
+ // a new source starts with every client and location ticked
+ function selectAll(){ if(!data.length) return; state.clients=[...new Set(data.map(r=>r.client))]; state.locations=[...new Set(data.map(r=>r.location))]; }
+ function tickAllIfEmpty(force){ if(!data.length) return; const cs=new Set(data.map(r=>r.client)), ls=new Set(data.map(r=>r.location));
+  state.clients=state.clients.filter(c=>cs.has(c)); state.locations=state.locations.filter(l=>ls.has(l));
+  if(force&&!state.clients.length) state.clients=[...cs]; if(force&&!state.locations.length) state.locations=[...ls]; }
  function status(text,error=false){ msg={text,error}; const el=$('dr-status'); if(el){ el.textContent=text; el.classList.toggle('error',!!error); } }
  // ---------- view ----------
  const allClients=()=>[...new Set(data.map(r=>r.client))].sort();
  const allLocations=()=>[...new Set(data.map(r=>r.location))].sort();
- function modules(){ return [['ns','North / SE / SC'],['west','West weekly'],...(canFlags()?[['flags','Red flags']]:[]),...(canUpload()?[['source','Data source']]:[])]; }
+ function modules(){ return [['ns','North / SE / SC'],['west','West weekly'],...(canFlags()?[['flags','Red flags']]:[]),['source','Data source']]; }
  function build(){
   const host=$('view-divreport'); if(!host) return;
   loadState();
   if(!modules().some(([k])=>k===state.module)) state.module='ns';
-  const up=meta&&meta.uploadedAt?new Date(meta.uploadedAt):null;
   host.innerHTML=`<div class="dr-top"><div class="dr-tabs" role="tablist" aria-label="Report">${modules().map(([k,l])=>`<button type="button" role="tab" data-dr-mod="${k}" aria-selected="${state.module===k}" class="${state.module===k?'on':''}">${l}</button>`).join('')}</div>
-    <span class="dr-file">${meta?`${esc(meta.fileName)} · ${meta.count.toLocaleString()} rows${up?' · uploaded '+esc(up.toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})):''}${meta.by?' by '+esc(meta.by):''}`:'No file uploaded yet'}</span></div>
+    <span class="dr-file">${meta?(meta.kind==='upload'?`Your upload · ${esc(meta.label)} · ${meta.count.toLocaleString()} rows · not saved`:`Dashboard data · ${esc(meta.label)} · ${meta.count.toLocaleString()} rows`):(state.source==='upload'?'No file loaded':'Dashboard data')}</span></div>
    <div class="dr-wrap">
     <aside class="dr-side panel" id="dr-side">
      <div class="dr-stats" id="dr-stats"></div>
@@ -10937,10 +10990,23 @@ const DivReport=(()=>{
       <button type="button" class="link-btn" id="dr-reset-flags">Reset red flag filters</button></section>
     </aside>
     <div class="dr-main">
-     <section class="panel dr-source" id="dr-source"><h3>Data source</h3><p class="hint">Upload the candidate export (.xlsx) with the <b>Client List Selector</b> and <b>Job Site</b> columns. It replaces the current file for everyone with access to Division Reporting. Each person’s filters and groups stay their own.</p>
-      <div class="dr-row"><button type="button" class="btn btn-primary" id="dr-upload">Upload Excel</button>${meta?'<button type="button" class="btn btn-secondary" id="dr-remove">Remove file</button>':''}</div><input type="file" id="dr-file" accept=".xlsx,.xls" hidden>
-      <div class="dr-drop" id="dr-drop">…or drop the file here</div>
-      <p class="dr-filemeta">${meta?`Current file: <b>${esc(meta.fileName)}</b> · ${meta.count.toLocaleString()} rows`:'No file uploaded yet.'}</p></section>
+     <section class="panel dr-source" id="dr-source"><h3>Data source</h3><p class="hint">Choose where the report gets its rows. Switch at any time — your groups and hidden items stay, and every client and location starts ticked.</p>
+      <div class="dr-srcs">
+       <label class="dr-src ${state.source==='upload'?'on':''}"><input type="radio" name="dr-src" value="upload" ${state.source==='upload'?'checked':''}>
+        <span class="dr-src-body"><b>Upload a PowerApp export</b><em>Read in this tab only. Nothing is saved — it’s gone when you clear it, reload or close the tab.</em>
+        <span class="dr-row"><button type="button" class="btn btn-primary btn-sm" id="dr-upload">${uploaded?'Replace file':'Choose Excel file'}</button>${uploaded?'<button type="button" class="btn btn-secondary btn-sm" id="dr-clear">Clear uploaded data</button>':''}</span>
+        <span class="dr-drop" id="dr-drop">${uploaded?`Loaded: <b>${esc(uploaded.fileName)}</b> · ${uploaded.rows.length.toLocaleString()} rows`:'…or drop the file here'}</span></span></label>
+       <label class="dr-src ${state.source==='supabase'?'on':''} ${canSupabase()?'':'off'}"><input type="radio" name="dr-src" value="supabase" ${state.source==='supabase'?'checked':''} ${canSupabase()?'':'disabled'}>
+        <span class="dr-src-body"><b>Dashboard data (Supabase)</b><em>${canSupabase()?'The Created On and Date Of rows already uploaded to the dashboard. Weeks holding your reporting dates are added automatically.':'Needs the Candidate Hub right — ask your admin.'}</em>
+        ${canSupabase()?`<span class="dr-row"><label class="dr-field">From week<select id="dr-sb-from">${weekList().slice().reverse().map(w=>`<option value="${w}">Wk ${weekOfDate(w).number} · ending ${fmtDate(w)}</option>`).join('')}</select></label><label class="dr-field">To week<select id="dr-sb-to">${weekList().slice().reverse().map(w=>`<option value="${w}">Wk ${weekOfDate(w).number} · ending ${fmtDate(w)}</option>`).join('')}</select></label></span>`:''}</span></label>
+      </div>
+      <input type="file" id="dr-file" accept=".xlsx,.xls" hidden>
+      <details class="dr-map"><summary>How dashboard data fills each column</summary><table class="dr-table"><thead><tr><th>Report uses</th><th>Taken from</th></tr></thead><tbody>
+       <tr><td>Date added</td><td>Created On</td></tr><tr><td>Branch appointment date</td><td>Date Of</td></tr>
+       <tr><td>Location</td><td>Branch (full name, merged branches included) — or Job Site when the export has it</td></tr><tr><td>Client</td><td>Left blank (—) — or Client List Selector when the export has it</td></tr>
+       <tr><td>Branch schedule?</td><td>“Yes” for every Created On row</td></tr><tr><td>Recruiter</td><td>Created By</td></tr><tr><td>Candidate / EID</td><td>Candidate Name / Employee Number</td></tr>
+       <tr><td>Onboarding stage</td><td>Onboarding Stage if present, otherwise complete when I-9 Completed = Yes</td></tr><tr><td>EB status reason (West pipeline)</td><td>Status Reason — Available / OAE and Unavailable / Inactive</td></tr><tr><td>Total schedules / pipeline</td><td>Every row in the weeks picked above</td></tr></tbody></table></details>
+     </section>
      <div class="dr-tools" id="dr-tools"><button type="button" class="btn btn-primary btn-sm" id="dr-merge-rows" disabled>Merge selected rows</button><span class="hint" id="dr-sel-count"></span><span class="dr-grow"></span><button type="button" class="btn btn-secondary btn-sm" id="dr-copy">📋 Copy</button><button type="button" class="btn btn-secondary btn-sm" id="dr-download">⬇ Excel</button></div>
      <section class="panel dr-panel" id="dr-report-panel"><div class="dr-head"><h3 id="dr-title"></h3><span class="hint" id="dr-meta"></span></div><div class="dr-scroll"><table class="dr-table" id="dr-table"><thead></thead><tbody></tbody><tfoot></tfoot></table></div></section>
      <section class="panel dr-panel" id="dr-flags-panel"><div class="dr-head"><h3>Red flags</h3><span class="dr-count" id="dr-flag-count">0</span><span class="hint">Branch schedule “Yes” with no appointment date, or an appointment date without “Yes”.</span></div><div class="dr-scroll"><table class="dr-table dr-flags" id="dr-flag-table"><thead></thead><tbody></tbody></table></div></section>
@@ -11017,7 +11083,7 @@ const DivReport=(()=>{
   // report table
   const H=headers(), t=$('dr-table');
   t.querySelector('thead').innerHTML='<tr><th class="dr-act" aria-label="Select, remove or hide rows"></th>'+H.map(h=>`<th scope="col">${esc(h)}</th>`).join('')+'</tr>';
-  const empty=!data.length?(canUpload()?'No file uploaded yet — open <b>Data source</b> to upload the candidate export.':'No file has been uploaded yet.'):(!state.clients.length||!state.locations.length)?'Pick at least one client and one location on the left (or use <b>Select all</b>).':'Nothing matches these filters.';
+  const empty=!data.length?(state.source==='upload'?'No file loaded — open <b>Data source</b> to upload a PowerApp export, or switch to dashboard data.':'No dashboard rows for these weeks — pick other weeks on <b>Data source</b>.'):(!state.clients.length||!state.locations.length)?'Pick at least one client and one location on the left (or use <b>Select all</b>).':'Nothing matches these filters.';
   t.querySelector('tbody').innerHTML=report.rows.length?report.rows.map((r,i)=>`<tr><td class="dr-act"><input type="checkbox" data-sel="${i}" aria-label="Select row ${i+1}"><button type="button" class="dr-x" data-rm="${i}" title="Remove row" aria-label="Remove row">×</button><button type="button" class="dr-hide-btn" data-hide="${i}" title="Hide row">Hide</button></td><td>${esc(r.client)}</td><td>${esc(r.location)}${r.pairs.size>1?'<span class="dr-badge">merged</span>':''}${[...r.pairs].some(p=>state.addedPairs.includes(p))?'<span class="dr-badge lock">added</span>':''}</td>${r.counts.map(n=>`<td class="num">${n.toLocaleString()}</td>`).join('')}</tr>`).join(''):`<tr><td class="dr-empty" colspan="${H.length+1}">${empty}</td></tr>`;
   t.querySelector('tfoot').innerHTML=report.rows.length?`<tr><td></td><td>Total</td><td></td>${report.totals.map(n=>`<td class="num">${n.toLocaleString()}</td>`).join('')}</tr>`:'';
   t.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>removePairs([...report.rows[+b.dataset.rm].pairs]));
@@ -11029,7 +11095,7 @@ const DivReport=(()=>{
   if(flagMode){
    const keys=['recruiter','candidate','eid','client','location','branchSchedule','apptDate','reason'], ft=$('dr-flag-table');
    ft.querySelector('thead').innerHTML='<tr>'+FLAG_HEADERS.map((h,i)=>{ const k=keys[i], on=state.flags.headerKey===k; return `<th scope="col" aria-sort="${on?(state.flags.direction==='desc'?'descending':'ascending'):'none'}"><button type="button" class="dr-sort" data-key="${k}">${esc(h)} <span>${on?(state.flags.direction==='desc'?'↓':'↑'):'↕'}</span></button></th>`; }).join('')+'</tr>';
-   ft.querySelector('tbody').innerHTML=flags.length?flagMatrix().slice(1).map(row=>'<tr>'+row.map((v,i)=>`<td>${i===7?`<span class="dr-reason">${esc(v)}</span>`:esc(v)}</td>`).join('')+'</tr>').join(''):`<tr><td colspan="8" class="dr-empty">${data.length?'No red flags for these filters.':'No file uploaded yet.'}</td></tr>`;
+   ft.querySelector('tbody').innerHTML=flags.length?flagMatrix().slice(1).map(row=>'<tr>'+row.map((v,i)=>`<td>${i===7?`<span class="dr-reason">${esc(v)}</span>`:esc(v)}</td>`).join('')+'</tr>').join(''):`<tr><td colspan="8" class="dr-empty">${data.length?'No red flags for these filters.':'No data loaded yet.'}</td></tr>`;
    ft.querySelectorAll('[data-key]').forEach(b=>b.onclick=()=>{ const k=b.dataset.key; state.flags.direction=state.flags.headerKey===k&&state.flags.direction!=='desc'?'desc':'asc'; state.flags.headerKey=k; render(); });
    $('dr-flag-count').textContent=flags.length.toLocaleString();
   }
@@ -11090,15 +11156,19 @@ const DivReport=(()=>{
  }
  function bind(){
   const host=$('view-divreport');
-  host.querySelectorAll('[data-dr-mod]').forEach(b=>b.onclick=async()=>{ state.module=b.dataset.drMod; if(state.module==='flags'&&!namesLoaded){ await loadData(true); } render(); });
+  host.querySelectorAll('[data-dr-mod]').forEach(b=>b.onclick=()=>{ state.module=b.dataset.drMod; render(); });
   $('dr-search').oninput=e=>{ state.search=e.target.value; render(); };
-  for(const [id,key] of [['dr-schedule-date','scheduleDate'],['dr-interview-date','interviewDate'],['dr-week-end','weekEnd']]) $(id).onchange=e=>{ if(!e.target.value){ e.target.value=state[key]; return; } state[key]=e.target.value; render(); };
+  for(const [id,key] of [['dr-schedule-date','scheduleDate'],['dr-interview-date','interviewDate'],['dr-week-end','weekEnd']]) $(id).onchange=async e=>{ if(!e.target.value){ e.target.value=state[key]; return; } state[key]=e.target.value;
+   if(state.source==='supabase'&&weeksNeeded().join(',')!==sbKey){ status('Loading the week for that date…'); try{ await loadData(); status(''); }catch(err){ status('Couldn’t load that week: '+cleanErr(err),true); } build(); return; } render(); };
   for(const [id,key] of [['dr-recruiter','recruiter'],['dr-flag-date-field','dateField'],['dr-flag-from','from'],['dr-flag-to','to'],['dr-flag-sort','sort']]) $(id).onchange=e=>{ state.flags[key]=e.target.value; if(key==='sort') delete state.flags.headerKey; render(); };
   $('dr-reset-flags').onclick=()=>{ state.flags=fresh().flags; syncControls(); render(); };
   $('dr-reset').onclick=()=>{ if(!confirm('Reset your filters, groups, added and hidden rows?')) return; const m=state.module; state=fresh(); state.module=m; syncControls(); refresh(); status('Your filters and groups were reset.'); };
   $('dr-merge').onclick=()=>editDimension('merge'); $('dr-hide').onclick=()=>editDimension('hide'); $('dr-add').onclick=addRows; $('dr-merge-rows').onclick=mergeRows;
-  $('dr-upload').onclick=()=>$('dr-file').click(); $('dr-file').onchange=e=>{ uploadFile(e.target.files[0]); e.target.value=''; };
-  $('dr-remove')?.addEventListener('click',removeFile);
+  $('dr-upload').onclick=e=>{ e.preventDefault(); $('dr-file').click(); }; $('dr-file').onchange=e=>{ uploadFile(e.target.files[0]); e.target.value=''; };
+  $('dr-clear')?.addEventListener('click',e=>{ e.preventDefault(); clearUpload(); });
+  host.querySelectorAll('[name=dr-src]').forEach(r=>r.onchange=()=>{ if(r.checked) useSource(r.value); });
+  const wf=$('dr-sb-from'), wt=$('dr-sb-to'); if(wf&&wt){ const need=weeksNeeded(); wf.value=state.sbFrom||need[0]||''; wt.value=state.sbTo||need[need.length-1]||'';
+   const ch=()=>{ state.sbFrom=wf.value; state.sbTo=wt.value; useSource('supabase'); }; wf.onchange=ch; wt.onchange=ch; }
   const drop=$('dr-drop'); ['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('on'); })); ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,()=>drop.classList.remove('on')));
   drop.addEventListener('drop',e=>{ e.preventDefault(); uploadFile(e.dataTransfer.files[0]); });
   $('dr-copy').onclick=async()=>{ const text=toTSV(state.module==='flags'?flagMatrix():reportMatrix()); try{ await navigator.clipboard.writeText(text); showToast('Copied — paste into Excel or an email.'); }catch(e){ showToast('Your browser blocked copying.'); } };
@@ -11108,12 +11178,12 @@ const DivReport=(()=>{
  }
  async function show(){
   const host=$('view-divreport'); if(!host) return;
-  loadState();
-  if(!loadedAt){ host.innerHTML='<div class="panel"><p class="hint">Loading division report…</p></div>'; }
-  try{ await loadData(Date.now()-loadedAt>60000); }catch(e){ if(!/Could not find|does not exist/i.test(e.message||'')) status('Couldn’t load the uploaded file: '+cleanErr(e),true); }
+  loadState(); cleanOldCopies();
+  if(state.source==='supabase'&&!canSupabase()) state.source='upload';
+  if(state.source==='supabase'&&!meta){ host.innerHTML='<div class="panel"><p class="hint">Loading dashboard data…</p></div>'; }
+  try{ await loadData(); }catch(e){ status('Couldn’t load dashboard data: '+cleanErr(e),true); }
   if(currentView!=='divreport') return;
-  // first visit: start with everything ticked so the report isn't empty
-  if(data.length&&!state.clients.length&&!state.locations.length&&!state._init){ state.clients=allClients(); state.locations=allLocations(); state._init=true; }
+  if(data.length&&!state._init){ tickAllIfEmpty(true); state._init=true; }
   build();
  }
  return {show};
