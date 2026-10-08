@@ -1496,6 +1496,70 @@ body{background:var(--paper)!important}
   .rb-s{display:none}.user-caret{display:none!important}
   .user-name b{font-weight:600}.user-name small{margin-left:6px;opacity:.7;font-size:11px}
 }
+
+/* ---------- Division Reporting ---------- */
+#view-divreport .dr-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.dr-tabs{display:inline-flex;gap:2px;padding:3px;border-radius:10px;background:#e5edf0}
+.dr-tabs button{border:0;background:transparent;border-radius:8px;padding:8px 14px;font:inherit;font-size:13px;font-weight:600;color:#4a6370;cursor:pointer}
+.dr-tabs button.on{background:#fff;color:var(--ink,#0f2c36);box-shadow:0 1px 3px #0f2c3621}
+.dr-file{font-size:12px;color:var(--muted,#6b8590);margin-left:auto}
+.dr-wrap{display:grid;grid-template-columns:280px minmax(0,1fr);min-width:0;gap:16px;align-items:start}
+.dr-side{position:sticky;top:calc(var(--frozen-header-height,96px) + 8px);max-height:calc(100vh - var(--frozen-header-height,96px) - 24px);overflow:auto;padding:14px!important}
+.dr-sec{border-top:1px solid var(--line,#e2eaed);padding-top:12px;margin-top:12px}
+.dr-sec h4{margin:0 0 8px;font-size:12.5px;color:#183b47}
+.dr-field{display:block;font-size:11.5px;color:#58717c;margin:8px 0}
+.dr-field input,.dr-field select{display:block;width:100%;margin-top:4px;padding:7px 8px;border:1px solid #d3dfe3;border-radius:8px;font:inherit;font-size:12.5px;background:#fff}
+.dr-search{width:100%;padding:8px 10px;border:1px solid #d3dfe3;border-radius:8px;font:inherit;font-size:12.5px}
+.dr-row{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.dr-row>.dr-field{flex:1;margin:0}
+.dr-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.dr-stat{background:#f3f7f8;border:1px solid #e6eef0;border-radius:9px;padding:8px 10px}
+.dr-stat strong{display:block;font-size:18px;color:#0f2c36;font-variant-numeric:tabular-nums}.dr-stat span{font-size:11px;color:#6b8590}
+.dr-stat.alert{background:#fff4f5;border-color:#f3d6db}.dr-stat.alert strong{color:#b33b4b}
+.dr-status{margin:8px 0 0;font-size:12px;color:#1c8c84}.dr-status:empty{display:none}.dr-status.error{color:#b33b4b}
+.dr-dim{border:1px solid #dbe6e9;border-radius:9px;margin-top:8px;overflow:hidden;background:#fff}
+.dr-dim>summary{display:flex;align-items:center;gap:8px;padding:9px 10px;font-size:12.5px;font-weight:600;cursor:pointer;list-style:none}
+.dr-dim>summary::-webkit-details-marker{display:none}.dr-dim>summary:after{content:'▾';margin-left:6px;color:#8aa1aa}
+.dr-dim-client>summary{background:#eef3fb}.dr-dim-location>summary{background:#ecf6f3}
+.dr-dim-count{margin-left:auto;font-size:11px;font-weight:500;color:#6b8590}
+.dr-dim-in{padding:8px}.dr-dim-in input[type=search]{width:100%;padding:6px 8px;border:1px solid #d3dfe3;border-radius:7px;font:inherit;font-size:12px}
+.dr-mini{display:flex;gap:6px;margin:6px 0}.dr-mini button{border:1px solid #d3dfe3;background:#f5f9fa;border-radius:6px;padding:3px 9px;font:inherit;font-size:11px;cursor:pointer;color:#285866}
+.dr-checks{max-height:200px;overflow:auto}
+.dr-check{display:flex;gap:8px;align-items:flex-start;padding:5px 2px;font-size:12.5px;cursor:pointer;border-radius:5px}.dr-check:hover{background:#f1f6f7}
+.dr-check input{margin-top:2px;accent-color:#1c8c84}.dr-check em{font-style:normal;font-size:10.5px;color:#1c8c84;margin-left:4px}.dr-check.off{opacity:.5}
+.dr-saved{margin-top:8px;font-size:12px}.dr-saved summary{cursor:pointer;color:#4a6370;font-weight:600}
+.dr-saved-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #eef3f5}
+.dr-saved-item span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dr-saved-item small{display:block;color:#7b929b;font-size:10.5px}
+.dr-x{border:1px solid #f0d3d8;background:#fff5f6;color:#a92f42;border-radius:6px;min-width:26px;height:24px;cursor:pointer;font-size:14px;line-height:1}
+.dr-reset{margin-top:10px;font-size:12px}
+.dr-tools{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}.dr-grow{flex:1}
+.dr-panel{padding:0!important;overflow:hidden}
+.dr-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--line,#e2eaed)}.dr-head h3{margin:0;font-size:15px}
+.dr-scroll{overflow:auto;max-height:calc(100vh - var(--frozen-header-height,96px) - 140px)}
+.dr-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.dr-table th{position:sticky;top:0;z-index:1;background:#f3f7f8;color:#58717c;font-size:11px;font-weight:650;text-align:left;padding:10px 12px;border-bottom:1px solid var(--line,#e2eaed);white-space:nowrap}
+.dr-table td{padding:9px 12px;border-bottom:1px solid #eef3f5;white-space:nowrap}
+.dr-table td.num,.dr-table th:nth-child(n+4){text-align:right;font-variant-numeric:tabular-nums}
+.dr-flags th:nth-child(n+4){text-align:left}
+.dr-table tbody tr:hover{background:#f4f9f9}
+.dr-table tfoot td{position:sticky;bottom:0;background:#eaf2f3;font-weight:700;border-top:1px solid #d6e3e6}
+.dr-act{width:118px}.dr-act input{vertical-align:middle;margin-right:6px;accent-color:#1c8c84}
+.dr-hide-btn{border:1px solid #d3dfe3;background:#fff;border-radius:6px;padding:2px 7px;font:inherit;font-size:11px;margin-left:4px;cursor:pointer}
+.dr-badge{font-size:10px;background:#e6f2f1;color:#1c6f69;padding:1px 6px;border-radius:5px;margin-left:6px}.dr-badge.lock{background:#eef1fb;color:#3f5aa3}
+.dr-empty{text-align:center!important;padding:40px!important;color:#6b8590;white-space:normal!important}
+.dr-sort{border:0;background:none;font:inherit;color:inherit;cursor:pointer;padding:0}.dr-sort span{opacity:.6;margin-left:3px}
+.dr-reason{background:#fff0f2;color:#aa3547;font-size:11px;padding:2px 7px;border-radius:5px}
+.dr-count{background:#fde8eb;color:#a32d3d;border-radius:12px;padding:2px 8px;font-size:12px;font-weight:700}
+.dr-source{padding:22px!important}.dr-source h3{margin:0 0 6px}
+.dr-drop{margin-top:12px;border:2px dashed #cfdde2;border-radius:12px;padding:26px;text-align:center;color:#6b8590;font-size:13px}.dr-drop.on{border-color:#1c8c84;background:#eef8f7;color:#1c6f69}
+.dr-filemeta{margin:12px 0 0;font-size:13px}
+.dr-modal .modal{max-width:520px}.dr-seg{display:flex;gap:8px;margin-bottom:10px}.dr-seg label{flex:1;border:1px solid #d3dfe3;border-radius:8px;padding:8px 10px;font-size:13px;cursor:pointer}
+.dr-seg label:has(input:checked){border-color:#1c8c84;background:#eef8f7}
+.dr-modal .dr-checks{max-height:260px;border:1px solid #e2eaed;border-radius:8px;padding:6px;margin:8px 0}
+.dr-preview{font-size:12.5px;background:#f3f7f8;border-radius:8px;padding:8px 10px;margin-top:8px}.dr-preview:empty{display:none}
+.dr-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+#view-divreport [hidden]{display:none!important}
+.dr-head .hint{font-size:12px;font-weight:400}
+@media(max-width:900px){.dr-wrap{grid-template-columns:minmax(0,1fr)}.dr-main{order:-1;min-width:0}.dr-side{min-width:0}.dr-side{position:static;max-height:none}.dr-file{margin-left:0;flex-basis:100%}.dr-tabs{overflow-x:auto;max-width:100%}}
 </style>
 </head>
 <body class="locked">
@@ -1523,6 +1587,7 @@ body{background:var(--paper)!important}
       <button data-view="branches"><span class="dot"></span>Branch Results</button>
       <div class="nav-group-label">Work</div>
       <button data-view="alerts"><span class="dot"></span>Action Center</button>
+      <button data-view="divreport"><span class="dot"></span>Division Reporting</button>
       <button data-view="candidates"><span class="dot"></span>Candidate Hub</button>
       <button data-view="pivot"><span class="dot"></span>Report Builder</button>
     </nav>
@@ -1611,6 +1676,7 @@ body{background:var(--paper)!important}
         <div id="view-alerts" class="hidden"></div>
         <div id="view-pivot" class="hidden"></div>
         <div id="view-history" class="hidden"></div>
+        <div id="view-divreport" class="hidden"></div>
       </div>
       <div class="muted-note" id="storageModeNote" style="text-align:center;margin-top:24px;">Data stored locally in this browser.</div>
       <div class="muted-note" style="text-align:center;margin-top:4px;opacity:.65;">
@@ -3794,6 +3860,7 @@ const VIEW_META = {
   candidates:{title:'Candidate Hub', sub:'Who is counted in each category, by week'},
   alerts:{title:'Action Center', sub:'Who needs attention this week — below 50% of goal first'},
   pivot:{title:'Report Builder', sub:'Drag fields into Rows, Columns, Values and Filters — the chart builds itself'},
+  divreport:{title:'Division Reporting', sub:'Pipeline by client and location from the daily candidate export'},
   history:{title:'History', sub:'Every week on record'},
   master:{title:'Candidate Hub', sub:'Every candidate row from every import, in one sheet — filter any column, exclude or include candidates'},
   settings:{title:'Settings', sub:'Uploads, saved weeks, divisions, users and your account'},
@@ -3855,7 +3922,7 @@ async function refreshUI(){
   // The Uploads page must stay reachable even with zero weeks saved — it's the page you use
   // to add the first one — so it's treated as always-showable, unlike Performance/Recruiter/
   // Branch which genuinely have nothing to render without data.
-  const showDashboardViews = hasData || currentView==='master' || currentView==='teams' || currentView==='leads';
+  const showDashboardViews = hasData || currentView==='master' || currentView==='teams' || currentView==='leads' || currentView==='divreport';
   document.getElementById('emptyState').classList.toggle('hidden', showDashboardViews);
   document.getElementById('dashboardViews').classList.toggle('hidden', !showDashboardViews);
   document.getElementById('downloadDropdownWrap').classList.toggle('hidden', !hasData);
@@ -3864,11 +3931,11 @@ async function refreshUI(){
   document.getElementById('viewTitle').textContent = meta.title;
   document.getElementById('viewSub').textContent = showDashboardViews ? meta.sub : 'No data uploaded yet';
 
-  ['teams','leads','performance','recruiters','branches','master','candidates','alerts','pivot','history'].forEach(v=>{
+  ['teams','leads','performance','recruiters','branches','master','candidates','alerts','pivot','history','divreport'].forEach(v=>{
     document.getElementById('view-'+v).classList.toggle('hidden', v!==currentView);
   });
 
-  document.getElementById('topbarCenter').classList.toggle('hidden', !showDashboardViews || ['teams','leads','candidates','alerts','pivot','history'].includes(currentView));
+  document.getElementById('topbarCenter').classList.toggle('hidden', !showDashboardViews || ['teams','leads','candidates','alerts','pivot','history','divreport'].includes(currentView));
 
   if(currentView!=='recruiters' && currentView!=='branches' && currentView!=='master' && currentView!=='candidates' && currentView!=='alerts' && currentView!=='pivot'){
     const extra = document.getElementById('topbarExtra');
@@ -3878,10 +3945,11 @@ async function refreshUI(){
   renderPeriodPickerButton();
   closePeriodPicker();
   syncDedupeControls();
-  document.getElementById('periodPicker')?.classList.toggle('hidden', currentView==='teams' || currentView==='leads' || currentView==='candidates' || currentView==='alerts' || currentView==='pivot' || currentView==='history');
+  document.getElementById('periodPicker')?.classList.toggle('hidden', currentView==='teams' || currentView==='leads' || currentView==='candidates' || currentView==='alerts' || currentView==='pivot' || currentView==='history' || currentView==='divreport');
   ['weeklyDivisionSelect','weeklyDivisionSelectLbl'].forEach(id=>document.getElementById(id).classList.toggle('hidden',currentView!=='performance'));
   if(currentView==='teams'){ renderTeamGroups(); return; }
   if(currentView==='leads'){ renderLeadsView(); return; }
+  if(currentView==='divreport'){ renderDivReportView(); return; }
   if(!hasData){ if(showDashboardViews) renderMasterView(); return; }
 
   if(!currentWeekEndDate || (currentWeekEndDate!=='all-weeks' && !weeksData.find(w=>w.weekEndDate===currentWeekEndDate))){
@@ -7488,6 +7556,7 @@ const MODULES = [
   {key:'candidates',  label:'Candidate Hub — pipeline and names', hint:'Candidate names & Employee Numbers anywhere: the Candidates page, hover lists in tables and the recruiter detail page'},
   {key:'alerts',      label:'Alerts', hint:'Recruiters below 50% of their goal, other signals and remarks'},
   {key:'pivot',       label:'Report Builder', hint:'Build their own pivot tables and charts, and save views'},
+  {key:'divreport',   label:'Division Reporting', hint:'Client / location pipeline (North / SE / SC and West weekly); red flags need the candidate-names right'},
   {key:'master',      label:'Candidate Hub — all records', hint:'Browse and filter every candidate row'},
   {key:'master_edit', label:'Candidate Hub — exclude / include', hint:'Remove candidates from the metrics or bring them back'},
   {key:'upload',      label:'Upload spreadsheets', hint:'Import Created On / Date Of / goals files, folder sync'},
@@ -7496,7 +7565,7 @@ const MODULES = [
   {key:'settings',    label:'Settings', hint:'Divisions, branch divisions, show/hide recruiters, saved weeks'},
   {key:'export',      label:'Download & share', hint:'Excel, PDF, Word, master sheet download, snapshots'},
 ];
-const VIEW_MODULE = {teams:'teams',leads:'teams',performance:'performance', recruiters:'recruiters', branches:'branches', master:'master', candidates:'candidate_hub', alerts:'alerts', pivot:'pivot'};
+const VIEW_MODULE = {teams:'teams',leads:'teams',performance:'performance', recruiters:'recruiters', branches:'branches', master:'master', candidates:'candidate_hub', alerts:'alerts', pivot:'pivot', divreport:'divreport'};
 
 function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
 // ---------- Reload keeps you on the same page (this tab) ----------
@@ -7535,7 +7604,7 @@ async function restoreNav(){
 }
 window.addEventListener('beforeunload',()=>saveNav());
 // Default page: the person's own choice (this browser) → the one an admin set for them → first page they can open.
-const DEFAULT_VIEW_LABELS = {performance:'Performance Overview', teams:'My Team', leads:'Team Leads (admins)', recruiters:'Recruiter Scorecards', branches:'Branch Results', alerts:'Action Center', candidates:'Candidate Hub', master:'Candidate Hub — master sheet', pivot:'Report Builder'};
+const DEFAULT_VIEW_LABELS = {performance:'Performance Overview', teams:'My Team', leads:'Team Leads (admins)', recruiters:'Recruiter Scorecards', branches:'Branch Results', alerts:'Action Center', candidates:'Candidate Hub', master:'Candidate Hub — master sheet', pivot:'Report Builder', divreport:'Division Reporting'};
 function adminDefaultViews(){ return KV.get('userDefaultViews')||{}; }
 function defaultViewOptions(u){ const can=v=>v==='teams'&&(u?u.role!=='user':Server.isAdmin())?false:v==='leads'?(u?u.role!=='user':Server.isAdmin()):(!u||u.role!=='user'||v==='teams'||(u.modules||[]).includes(VIEW_MODULE[v])); return Object.keys(DEFAULT_VIEW_LABELS).filter(v=>VIEW_MODULE[v]&&can(v)).map(v=>[v,DEFAULT_VIEW_LABELS[v]]); }
 function myDefaultViewKey(){ return 'ipd_default_view:'+(Server.user?.id||''); }
@@ -10505,8 +10574,8 @@ document.addEventListener('keydown', e=>{
   const search=document.querySelector('#topbarExtra input[type="search"]'); if(search){ e.preventDefault(); search.focus(); }
 });
 // ---------- Manage access in place (super admin) ----------
-const PAGE_MODULE = {performance:'performance', recruiters:'recruiters', branches:'branches', candidates:'candidates', master:'master', alerts:'alerts', pivot:'pivot'};
-const PAGE_EDIT = {performance:['upload','export'], recruiters:['remarks','export'], branches:['export'], candidates:['master_edit','export'], master:['master_edit','export'], alerts:['remarks','remarks_approve'], pivot:['export'], teams:['grant.team_names','grant.break_image'], leads:[]};
+const PAGE_MODULE = {performance:'performance', recruiters:'recruiters', branches:'branches', candidates:'candidates', master:'master', alerts:'alerts', pivot:'pivot', divreport:'divreport'};
+const PAGE_EDIT = {performance:['upload','export'], recruiters:['remarks','export'], branches:['export'], candidates:['master_edit','export'], master:['master_edit','export'], alerts:['remarks','remarks_approve'], pivot:['export'], teams:['grant.team_names','grant.break_image'], leads:[], divreport:['upload','candidates']};
 const EDIT_LABEL = {'grant.break_image':'Copy third-break list as image', 'grant.team_names':'See their team’s candidate names', candidates:'See all candidate names'};
 let accessMode=false, accessObs=null;
 function sectionLabel(key){ for(const secs of Object.values(PAGE_SECTIONS)) for(const [k,l] of secs) if(k===key) return l.replace(/^·+ /,''); return null; }
@@ -10668,8 +10737,9 @@ function toggleNavMore(force){ const on=force===undefined?!document.body.classLi
     master:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10"/>',
     alerts:'<path d="M12 3l9.5 16.5h-19z"/><path d="M12 10v4M12 17.5v.5"/>',
     pivot:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/><path d="M13 17v-3M16 17v-5M19 17v-2" stroke-width="1.6"/>',
+    divreport:'<path d="M4 4h16v4H4zM4 10h7v10H4zM13 10h7v4h-7zM13 16h7v4h-7z"/>',
     candidates:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2.2"/><path d="M5.8 16c.6-1.6 1.8-2.4 3.2-2.4s2.6.8 3.2 2.4M14.5 10h4M14.5 13.5h3"/>'};
-  const short = {teams:'My Team', leads:'Leads', performance:'Overview', recruiters:'Recruiters', branches:'Branches', master:'Master', candidates:'Names', alerts:'Alerts', pivot:'Pivot'};
+  const short = {teams:'My Team', leads:'Leads', performance:'Overview', recruiters:'Recruiters', branches:'Branches', master:'Master', candidates:'Names', alerts:'Alerts', pivot:'Pivot', divreport:'Divisions'};
   document.querySelectorAll('#navList button[data-view]').forEach(b=>{
     const v=b.dataset.view; if(!icons[v]) return;
     [...b.childNodes].forEach(n=>{ if(n.nodeType===3 && n.textContent.trim()){ const s=document.createElement('span'); s.className='nav-full'; s.textContent=n.textContent; b.replaceChild(s,n); } });
@@ -10697,6 +10767,359 @@ function toggleNavMore(force){ const on=force===undefined?!document.body.classLi
 })();
 // libraries load in parallel (defer); start as soon as they are ready
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init); else init();
+
+/* ============================= DIVISION REPORTING ============================= */
+// Client / location pipeline report from the daily candidate export ("Client List Selector" + "Job Site").
+// The uploaded file is shared with everyone who has the Division Reporting right; filters, groups and
+// hidden rows are each person's own view (saved in this browser). Candidate names and EIDs are kept in
+// a separate store and only loaded for people who may see candidate names (Red flags).
+const DivReport=(()=>{
+ const NS_HEADERS=['Client','Location','Pending onboarding','Schedules for today','Interviews today','Total schedules','Total pipeline'];
+ const WEST_HEADERS=['Client','Location','Pending onboarding','Schedule in branch','Pipeline (Available/OAE)','Pipeline (Unavailable/Inactive)'];
+ const FLAG_HEADERS=['Recruiter','Candidate','EID','Client','Location','Branch schedule?','Appointment date','Why'];
+ const DATA_KEY='divreport:data', NAMES_KEY='divreport:names';
+ const FIELDS=['client','location','recruiter','dateAdded','apptDate','branchSchedule','onboardingStage','ebStatusReason'];
+ let data=[], meta=null, loadedAt=0, loading=null, namesLoaded=false, state=null, stateFor='', report={rows:[],totals:[]}, flags=[], msg={text:'',error:false};
+ const $=id=>document.getElementById(id);
+ const esc=s=>escapeHtml(String(s??''));
+ const localDay=d=>d instanceof Date&&!isNaN(d)?d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'):'';
+ function parseDay(v){
+  if(v instanceof Date) return isNaN(v)?'':v.getUTCFullYear()+'-'+String(v.getUTCMonth()+1).padStart(2,'0')+'-'+String(v.getUTCDate()).padStart(2,'0');
+  if(typeof v==='number'){ const d=new Date(Date.UTC(1899,11,30)+Math.floor(v)*86400000); return d.toISOString().slice(0,10); }
+  if(typeof v!=='string'||!v.trim()) return '';
+  const s=v.trim(); if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  return localDay(new Date(s));
+ }
+ function normalizeLocation(v){ let s=String(v||'').trim().replace(/\s+/g,' ').replace(/\s*,\s*/g,', '); if(!s.includes(',')) s=s.replace(/^(.*\S)\s+([A-Za-z]{2})$/,(_,a,b)=>a+', '+b.toUpperCase()); else s=s.replace(/,\s*([A-Za-z]{2})$/,(_,b)=>', '+b.toUpperCase()); return s; }
+ const pairKey=(c,l)=>JSON.stringify([c,l]);
+ function visibleRecords(rows,st){
+  const clients=new Set(st.clients),locations=new Set(st.locations),hc=new Set(st.hiddenClients),hl=new Set(st.hiddenLocations),q=st.search.trim().toLowerCase();
+  const added=new Set(st.addedPairs||[]),removed=new Set([...(st.removedPairs||[]),...(st.hiddenPairs||[])]);
+  return rows.filter(r=>{ const k=pairKey(r.client,r.location); return !removed.has(k)&&(added.has(k)||(clients.has(r.client)&&locations.has(r.location)&&!hc.has(r.client)&&!hl.has(r.location)&&(!q||(r.client+' '+r.location).toLowerCase().includes(q)))); });
+ }
+ function groupMap(groups){ const m=new Map(); groups.forEach(g=>g.members.forEach(x=>m.set(x,g))); return m; }
+ function groupedReport(records,st){
+  const cm=groupMap(st.clientGroups),lm=groupMap(st.locationGroups),buckets=new Map(),rowMap=new Map(),west=st.module==='west',n=west?4:5;
+  (st.rowGroups||[]).forEach(g=>g.pairs.forEach(p=>rowMap.set(p,g)));
+  const end=new Date(st.weekEnd+'T12:00:00'),start=new Date(end); start.setDate(start.getDate()-6); const from=localDay(start);
+  const added=new Set(st.addedPairs||[]);
+  records.forEach(r=>{
+   const pk=pairKey(r.client,r.location), single=added.has(pk), rg=rowMap.get(pk);
+   const c=single?null:cm.get(r.client), l=single?null:lm.get(r.location);
+   const key=rg?JSON.stringify(['row',rg.id]):JSON.stringify([c?['g',c.id]:['v',r.client],l?['g',l.id]:['v',r.location]]);
+   if(!buckets.has(key)) buckets.set(key,{client:rg?rg.clientLabel:(c?c.name:r.client),location:rg?rg.locationLabel:(l?l.name:r.location),counts:Array(n).fill(0),pairs:new Set()});
+   const b=buckets.get(key); b.pairs.add(pk);
+   if(west){
+    if(!r.dateAdded||r.dateAdded<from||r.dateAdded>st.weekEnd) return;
+    if(r.onboardingStage!=='EB Complete/I9 Complete') b.counts[0]++;
+    if(r.branchSchedule==='Yes') b.counts[1]++;
+    if(['Available','OAE'].includes(r.ebStatusReason)) b.counts[2]++;
+    if(['Unavailable','Inactive'].includes(r.ebStatusReason)) b.counts[3]++;
+   } else {
+    if(r.onboardingStage!=='EB Complete/I9 Complete') b.counts[0]++;
+    if(r.branchSchedule==='Yes'&&r.dateAdded===st.scheduleDate) b.counts[1]++;
+    if(r.apptDate&&r.apptDate===st.interviewDate) b.counts[2]++;
+    if(r.branchSchedule==='Yes') b.counts[3]++;
+    b.counts[4]++;
+   }
+  });
+  const rows=[...buckets.values()].sort((a,b)=>a.location.localeCompare(b.location)||a.client.localeCompare(b.client));
+  return {rows, totals:rows.reduce((t,b)=>t.map((v,i)=>v+b.counts[i]),Array(n).fill(0))};
+ }
+ function redFlags(rows,f){
+  const out=rows.filter(r=>((r.branchSchedule==='Yes'&&!r.apptDate)||(r.apptDate&&(r.branchSchedule==='No'||!r.branchSchedule)))&&(!f.recruiter||r.recruiter===f.recruiter)&&(!f.from||(r[f.dateField]&&r[f.dateField]>=f.from))&&(!f.to||(r[f.dateField]&&r[f.dateField]<=f.to)));
+  const key=f.headerKey||(f.sort==='dateAsc'||f.sort==='dateDesc'?f.dateField:f.sort), desc=f.headerKey?f.direction==='desc':f.sort==='dateDesc';
+  const get=r=>key==='reason'?(r.branchSchedule==='Yes'?'Yes, no date':'Dated, not Yes'):String(r[key]||'');
+  out.sort((a,b)=>{ const av=get(a),bv=get(b); if(!av&&bv) return 1; if(av&&!bv) return -1; return av.localeCompare(bv,undefined,{numeric:key==='eid'})*(desc?-1:1)||String(a.candidate||'').localeCompare(String(b.candidate||'')); });
+  return out;
+ }
+ function replaceDimensionGroup(groups,members,name,id){
+  const picked=new Set(members); if(picked.size<2) return groups;
+  const kept=groups.map(g=>({...g,members:g.members.filter(m=>!picked.has(m))})).filter(g=>g.members.length>=2);
+  return [...kept,{id,name:name.trim()||[...picked].join(' / '),members:[...picked]}];
+ }
+ const toTSV=m=>m.map(row=>row.map(v=>{ const s=String(v??'').replace(/[\r\n\t]+/g,' '); return typeof v==='string'&&/^[=+@-]/.test(s)?"'"+s:s; }).join('\t')).join('\n');
+ function contextualValues(kind){
+  const opp=new Set(kind==='client'?state.locations:state.clients), hidden=new Set(kind==='client'?state.hiddenClients:state.hiddenLocations), otherHidden=new Set(kind==='client'?state.hiddenLocations:state.hiddenClients);
+  return [...new Set(data.filter(r=>opp.has(kind==='client'?r.location:r.client)&&!otherHidden.has(kind==='client'?r.location:r.client)&&!hidden.has(kind==='client'?r.client:r.location)).map(r=>kind==='client'?r.client:r.location))].sort();
+ }
+ // ---------- state (per person, this browser) ----------
+ const stateKey=()=>'ipd_divreport:'+(Server.user?Server.user.id:'me');
+ function fresh(){ const t=localDay(new Date()); return {module:'ns',addedPairs:[],removedPairs:[],hiddenPairs:[],rowGroups:[],clients:[],locations:[],hiddenClients:[],hiddenLocations:[],clientGroups:[],locationGroups:[],search:'',scheduleDate:t,interviewDate:t,weekEnd:t,flags:{recruiter:'',dateField:'dateAdded',from:'',to:'',sort:'recruiter'}}; }
+ function loadState(){ if(stateFor===stateKey()&&state) return; stateFor=stateKey(); state=fresh(); try{ const s=JSON.parse(localStorage.getItem(stateFor)||'null'); if(s&&typeof s==='object') state={...state,...s,flags:{...state.flags,...(s.flags||{})}}; }catch(e){} }
+ function save(){ try{ localStorage.setItem(stateKey(),JSON.stringify(state)); }catch(e){} }
+ // ---------- rights ----------
+ const canUpload=()=>Server.isAdmin()||Server.can('upload');
+ const canFlags=()=>Server.isAdmin()||canSeeCandidates();
+ // ---------- shared data ----------
+ async function fetchKey(key){
+  let v=KV.get(key);
+  if(v===undefined||v===null){ const got=await Server.rpc('dash_kv_get',{p_keys:[key]}); const r=(got||[]).find(x=>x.key===key); v=r?r.value:null; }
+  return v?await decodeKvValue(key,v):null;
+ }
+ async function loadData(force){
+  if(loading) return loading;
+  if(loadedAt&&!force&&(!canFlags()||namesLoaded)) return;
+  loading=(async()=>{
+   const d=await fetchKey(DATA_KEY);
+   if(d&&Array.isArray(d.rows)){ meta={fileName:d.fileName||'Uploaded file',uploadedAt:d.uploadedAt||null,by:d.by||'',count:d.rows.length};
+    data=d.rows.map((a,i)=>{ const r={id:i}; FIELDS.forEach((k,j)=>r[k]=a[j]||''); r.client=r.client||'(No client)'; r.location=r.location||'(No location)'; return r; }); }
+   else { meta=null; data=[]; }
+   namesLoaded=false;
+   if(data.length&&canFlags()){ try{ const n=await fetchKey(NAMES_KEY); if(n&&Array.isArray(n.rows)&&n.rows.length===data.length){ n.rows.forEach((a,i)=>{ data[i].candidate=a[0]||''; data[i].eid=a[1]||''; }); namesLoaded=true; } }catch(e){} }
+   loadedAt=Date.now();
+  })();
+  try{ await loading; } finally{ loading=null; }
+ }
+ async function putKey(key,obj){ const val={v:1,gz:await gzipB64(JSON.stringify(obj))}; await Server.rpc('dash_kv_set',{p_key:key,p_value:val}); KV.set(key,obj); }
+ async function uploadFile(file){
+  if(!file) return;
+  if(!/\.xlsx?$/i.test(file.name)){ status('Choose an Excel file (.xlsx or .xls).',true); return; }
+  if(typeof XLSX==='undefined'){ status('The Excel reader didn’t load. Check your connection and reload the page.',true); return; }
+  status('Reading '+file.name+'…');
+  try{
+   const book=XLSX.read(await file.arrayBuffer(),{type:'array',cellDates:true}); let imported=null;
+   for(const name of book.SheetNames){ const recs=XLSX.utils.sheet_to_json(book.Sheets[name],{defval:null}); if(recs.length&&'Client List Selector' in recs[0]&&'Job Site' in recs[0]){ imported=recs; break; } }
+   if(!imported) throw new Error('This file has no “Client List Selector” and “Job Site” columns.');
+   const str=v=>v==null?'':String(v).trim();
+   const rows=imported.filter(r=>str(r['Client List Selector'])||str(r['Job Site'])).map(r=>({client:str(r['Client List Selector'])||'(No client)',location:normalizeLocation(r['Job Site'])||'(No location)',candidate:str(r['Candidate Name']),recruiter:str(r['Recruiter Name']),eid:str(r.EID),dateAdded:parseDay(r['Date Added']),apptDate:parseDay(r['Branch Appointment Date']??r['Branch Schedule Date']),branchSchedule:str(r['Branch Schedule?']),onboardingStage:str(r['Onboarding Stage']),ebStatusReason:str(r['EB Status Reason'])}));
+   if(!rows.length) throw new Error('No usable rows found in this file.');
+   status('Saving '+rows.length.toLocaleString()+' rows for everyone…');
+   const info={fileName:file.name,uploadedAt:new Date().toISOString(),by:Server.user?.name||''};
+   await putKey(NAMES_KEY,{...info,rows:rows.map(r=>[r.candidate,r.eid])});
+   await putKey(DATA_KEY,{...info,rows:rows.map(r=>FIELDS.map(k=>r[k]))});
+   data=rows.map((r,i)=>({...r,id:i})); meta={...info,count:rows.length}; namesLoaded=true; loadedAt=Date.now();
+   // keep each person's picks where they still exist; new clients/locations start unticked
+   const cs=new Set(data.map(r=>r.client)), ls=new Set(data.map(r=>r.location));
+   state.clients=state.clients.filter(c=>cs.has(c)); state.locations=state.locations.filter(l=>ls.has(l));
+   if(!state.clients.length&&!state.locations.length){ state.clients=[...cs]; state.locations=[...ls]; }
+   status('Uploaded '+file.name+' · '+rows.length.toLocaleString()+' rows. Everyone with access now sees this file.');
+   state.module='ns'; build();
+  }catch(e){ status(cleanErr(e)||'This file couldn’t be read.',true); }
+ }
+ async function removeFile(){
+  if(!confirm('Remove the uploaded file for everyone?')) return;
+  try{ await Server.rpc('dash_kv_delete',{p_key:DATA_KEY}); await Server.rpc('dash_kv_delete',{p_key:NAMES_KEY}).catch(()=>{}); KV.delete(DATA_KEY); KV.delete(NAMES_KEY); data=[]; meta=null; status('File removed.'); build(); }
+  catch(e){ status('Couldn’t remove the file: '+cleanErr(e),true); }
+ }
+ function status(text,error=false){ msg={text,error}; const el=$('dr-status'); if(el){ el.textContent=text; el.classList.toggle('error',!!error); } }
+ // ---------- view ----------
+ const allClients=()=>[...new Set(data.map(r=>r.client))].sort();
+ const allLocations=()=>[...new Set(data.map(r=>r.location))].sort();
+ function modules(){ return [['ns','North / SE / SC'],['west','West weekly'],...(canFlags()?[['flags','Red flags']]:[]),...(canUpload()?[['source','Data source']]:[])]; }
+ function build(){
+  const host=$('view-divreport'); if(!host) return;
+  loadState();
+  if(!modules().some(([k])=>k===state.module)) state.module='ns';
+  const up=meta&&meta.uploadedAt?new Date(meta.uploadedAt):null;
+  host.innerHTML=`<div class="dr-top"><div class="dr-tabs" role="tablist" aria-label="Report">${modules().map(([k,l])=>`<button type="button" role="tab" data-dr-mod="${k}" aria-selected="${state.module===k}" class="${state.module===k?'on':''}">${l}</button>`).join('')}</div>
+    <span class="dr-file">${meta?`${esc(meta.fileName)} · ${meta.count.toLocaleString()} rows${up?' · uploaded '+esc(up.toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})):''}${meta.by?' by '+esc(meta.by):''}`:'No file uploaded yet'}</span></div>
+   <div class="dr-wrap">
+    <aside class="dr-side panel" id="dr-side">
+     <div class="dr-stats" id="dr-stats"></div>
+     <p id="dr-status" class="dr-status" role="status" aria-live="polite"></p>
+     <section class="dr-sec" id="dr-dates"><h4>Reporting dates</h4>
+      <div id="dr-ns-dates"><label class="dr-field">Schedules created on<input id="dr-schedule-date" type="date"></label><label class="dr-field">Interviews on<input id="dr-interview-date" type="date"></label></div>
+      <div id="dr-west-dates"><label class="dr-field">Week ending<input id="dr-week-end" type="date"></label></div></section>
+     <section class="dr-sec" id="dr-filters"><h4>Filters</h4>
+      <input type="search" id="dr-search" class="dr-search" placeholder="Search client or location" aria-label="Search report">
+      <div id="dr-dims"></div>
+      <div class="dr-row"><button type="button" class="btn btn-secondary btn-sm" id="dr-merge">Merge…</button><button type="button" class="btn btn-secondary btn-sm" id="dr-hide">Hide…</button><button type="button" class="btn btn-secondary btn-sm" id="dr-add">Add rows…</button></div>
+      <details class="dr-saved"><summary id="dr-groups-summary">Groups · 0</summary><div id="dr-groups-list"></div></details>
+      <details class="dr-saved"><summary id="dr-added-summary">Added rows · 0</summary><div id="dr-added-list"></div></details>
+      <details class="dr-saved"><summary id="dr-hidden-summary">Hidden · 0</summary><div id="dr-hidden-list"></div></details>
+      <button type="button" class="link-btn dr-reset" id="dr-reset">Reset my filters and groups</button></section>
+     <section class="dr-sec" id="dr-flag-controls"><h4>Red flags</h4>
+      <label class="dr-field">Recruiter<select id="dr-recruiter"></select></label>
+      <label class="dr-field">Date field<select id="dr-flag-date-field"><option value="dateAdded">Date added</option><option value="apptDate">Appointment date</option></select></label>
+      <div class="dr-row"><label class="dr-field">From<input id="dr-flag-from" type="date"></label><label class="dr-field">To<input id="dr-flag-to" type="date"></label></div>
+      <label class="dr-field">Sort by<select id="dr-flag-sort"><option value="recruiter">Recruiter A–Z</option><option value="candidate">Candidate A–Z</option><option value="client">Client A–Z</option><option value="location">Location A–Z</option><option value="dateDesc">Date · newest first</option><option value="dateAsc">Date · oldest first</option></select></label>
+      <button type="button" class="link-btn" id="dr-reset-flags">Reset red flag filters</button></section>
+    </aside>
+    <div class="dr-main">
+     <section class="panel dr-source" id="dr-source"><h3>Data source</h3><p class="hint">Upload the candidate export (.xlsx) with the <b>Client List Selector</b> and <b>Job Site</b> columns. It replaces the current file for everyone with access to Division Reporting. Each person’s filters and groups stay their own.</p>
+      <div class="dr-row"><button type="button" class="btn btn-primary" id="dr-upload">Upload Excel</button>${meta?'<button type="button" class="btn btn-secondary" id="dr-remove">Remove file</button>':''}</div><input type="file" id="dr-file" accept=".xlsx,.xls" hidden>
+      <div class="dr-drop" id="dr-drop">…or drop the file here</div>
+      <p class="dr-filemeta">${meta?`Current file: <b>${esc(meta.fileName)}</b> · ${meta.count.toLocaleString()} rows`:'No file uploaded yet.'}</p></section>
+     <div class="dr-tools" id="dr-tools"><button type="button" class="btn btn-primary btn-sm" id="dr-merge-rows" disabled>Merge selected rows</button><span class="hint" id="dr-sel-count"></span><span class="dr-grow"></span><button type="button" class="btn btn-secondary btn-sm" id="dr-copy">📋 Copy</button><button type="button" class="btn btn-secondary btn-sm" id="dr-download">⬇ Excel</button></div>
+     <section class="panel dr-panel" id="dr-report-panel"><div class="dr-head"><h3 id="dr-title"></h3><span class="hint" id="dr-meta"></span></div><div class="dr-scroll"><table class="dr-table" id="dr-table"><thead></thead><tbody></tbody><tfoot></tfoot></table></div></section>
+     <section class="panel dr-panel" id="dr-flags-panel"><div class="dr-head"><h3>Red flags</h3><span class="dr-count" id="dr-flag-count">0</span><span class="hint">Branch schedule “Yes” with no appointment date, or an appointment date without “Yes”.</span></div><div class="dr-scroll"><table class="dr-table dr-flags" id="dr-flag-table"><thead></thead><tbody></tbody></table></div></section>
+    </div></div>`;
+  status(msg.text,msg.error);
+  bind(); syncControls(); paintDims(); paintSaved(); render();
+ }
+ function syncControls(){
+  $('dr-search').value=state.search; $('dr-schedule-date').value=state.scheduleDate; $('dr-interview-date').value=state.interviewDate; $('dr-week-end').value=state.weekEnd;
+  const recs=[...new Set(data.map(r=>r.recruiter).filter(Boolean))].sort(); if(!recs.includes(state.flags.recruiter)) state.flags.recruiter='';
+  $('dr-recruiter').innerHTML='<option value="">All recruiters</option>'+recs.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
+  $('dr-recruiter').value=state.flags.recruiter; $('dr-flag-date-field').value=state.flags.dateField; $('dr-flag-from').value=state.flags.from; $('dr-flag-to').value=state.flags.to; $('dr-flag-sort').value=state.flags.sort;
+ }
+ function paintDims(){
+  const box=$('dr-dims'); if(!box) return; box.innerHTML='';
+  ['client','location'].forEach(kind=>{
+   const d=document.createElement('details'); d.className='dr-dim dr-dim-'+kind; d.id='dr-'+kind+'-filter';
+   d.innerHTML=`<summary>${kind==='client'?'Clients':'Locations'}<span class="dr-dim-count"></span></summary><div class="dr-dim-in"><input type="search" placeholder="Search ${kind}s" aria-label="Search ${kind}s"><div class="dr-mini"><button type="button" data-all>Select all</button><button type="button" data-none>Clear</button></div><div class="dr-checks"></div></div>`;
+   box.append(d);
+   d.querySelector('input').oninput=()=>paintFilter(kind);
+   d.querySelector('[data-all]').onclick=()=>{ state[kind+'s']=[...(kind==='client'?allClients():allLocations())]; paintFilter(kind); render(); };
+   d.querySelector('[data-none]').onclick=()=>{ state[kind+'s']=[]; d.querySelector('input').value=''; paintFilter(kind); render(); };
+   paintFilter(kind);
+  });
+ }
+ function paintFilter(kind){
+  const box=$('dr-'+kind+'-filter'); if(!box) return;
+  const values=kind==='client'?allClients():allLocations(), key=kind+'s', chosen=new Set(state[key]), hidden=new Set(state[kind==='client'?'hiddenClients':'hiddenLocations']), groups=state[kind+'Groups'];
+  box.querySelector('.dr-dim-count').textContent=values.filter(v=>chosen.has(v)&&!hidden.has(v)).length+' / '+values.length;
+  const term=box.querySelector('input').value.toLowerCase(), list=box.querySelector('.dr-checks'); list.innerHTML='';
+  const item=(name,members,isGroup)=>{
+   const avail=members.filter(m=>!hidden.has(m)), on=avail.filter(m=>chosen.has(m)).length;
+   const lab=document.createElement('label'); lab.className='dr-check'+(!avail.length?' off':'');
+   const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=!!avail.length&&on===avail.length; cb.indeterminate=on>0&&on<avail.length; cb.disabled=!avail.length;
+   const sp=document.createElement('span'); sp.textContent=name; if(isGroup){ const g=document.createElement('em'); g.textContent=' group'; sp.append(g); }
+   lab.append(cb,sp); list.append(lab);
+   cb.onchange=()=>{ const next=new Set(state[key]); avail.forEach(v=>cb.checked?next.add(v):next.delete(v)); state[key]=[...next]; paintFilter(kind); render(); };
+  };
+  groups.filter(g=>(g.name+' '+g.members.join(' ')).toLowerCase().includes(term)).forEach(g=>item(g.name,g.members,true));
+  values.filter(v=>v.toLowerCase().includes(term)).forEach(v=>item(v,[v],false));
+ }
+ function savedItem(list,text,btnText,label,onclick,sub){
+  const it=document.createElement('div'); it.className='dr-saved-item'; const sp=document.createElement('span'); sp.textContent=text; sp.title=text;
+  if(sub){ const s=document.createElement('small'); s.textContent=sub; sp.append(s); }
+  const b=document.createElement('button'); b.type='button'; b.className='dr-x'; b.textContent=btnText; b.setAttribute('aria-label',label); b.title=label; b.onclick=onclick; it.append(sp,b); list.append(it);
+ }
+ function paintSaved(){
+  const added=$('dr-added-list'); added.innerHTML=''; $('dr-added-summary').textContent='Added rows · '+state.addedPairs.length;
+  state.addedPairs.forEach(k=>savedItem(added,JSON.parse(k).join(' · '),'×','Remove added row',()=>removePairs([k])));
+  const gl=$('dr-groups-list'); gl.innerHTML=''; const total=state.clientGroups.length+state.locationGroups.length+state.rowGroups.length; $('dr-groups-summary').textContent='Groups · '+total;
+  ['client','location'].forEach(kind=>state[kind+'Groups'].forEach(g=>savedItem(gl,g.name,'×','Ungroup '+g.name,()=>{ state[kind+'Groups']=state[kind+'Groups'].filter(x=>x.id!==g.id); refresh(); },g.members.length+' '+kind+'s')));
+  state.rowGroups.forEach(g=>savedItem(gl,g.clientLabel+' · '+g.locationLabel,'×','Ungroup rows',()=>{ state.rowGroups=state.rowGroups.filter(x=>x.id!==g.id); refresh(); },g.pairs.length+' rows'));
+  if(total){ const b=document.createElement('button'); b.type='button'; b.className='link-btn'; b.textContent='Ungroup all'; b.onclick=()=>{ state.clientGroups=[]; state.locationGroups=[]; state.rowGroups=[]; refresh(); }; gl.append(b); }
+  const hl=$('dr-hidden-list'); hl.innerHTML=''; let count=0;
+  ['client','location'].forEach(kind=>{ const key=kind==='client'?'hiddenClients':'hiddenLocations'; state[key].forEach(v=>{ count++; savedItem(hl,v,'↶','Show '+v,()=>{ state[key]=state[key].filter(x=>x!==v); if(!state[kind+'s'].includes(v)) state[kind+'s'].push(v); refresh(); }); }); });
+  state.hiddenPairs.forEach(k=>{ count++; savedItem(hl,JSON.parse(k).join(' · '),'↶','Show row',()=>{ state.hiddenPairs=state.hiddenPairs.filter(p=>p!==k); lockPairs([k]); }); });
+  $('dr-hidden-summary').textContent='Hidden · '+count;
+  if(count){ const b=document.createElement('button'); b.type='button'; b.className='link-btn'; b.textContent='Show everything hidden'; b.onclick=()=>{ state.clients=[...new Set([...state.clients,...state.hiddenClients])]; state.locations=[...new Set([...state.locations,...state.hiddenLocations])]; state.hiddenClients=[]; state.hiddenLocations=[]; state.addedPairs=[...new Set([...state.addedPairs,...state.hiddenPairs])]; state.hiddenPairs=[]; refresh(); }; hl.append(b); }
+ }
+ function refresh(){ paintFilter('client'); paintFilter('location'); paintSaved(); render(); }
+ const headers=()=>state.module==='west'?WEST_HEADERS:NS_HEADERS;
+ const reportMatrix=()=>[headers(),...report.rows.map(r=>[r.client,r.location,...r.counts]),['Total','',...report.totals]];
+ const flagMatrix=()=>[FLAG_HEADERS,...flags.map(r=>[r.recruiter||'—',r.candidate||'—',r.eid||'—',r.client,r.location,r.branchSchedule||'Blank',r.apptDate||'—',r.branchSchedule==='Yes'?'Yes, no date':'Dated, not Yes'])];
+ function render(){
+  const host=$('view-divreport'); if(!host||!$('dr-table')) return;
+  const mod=state.module, flagMode=mod==='flags', src=mod==='source';
+  const records=visibleRecords(data,state); report=groupedReport(records,state); flags=flagMode?redFlags(data,state.flags):[];
+  host.querySelectorAll('[data-dr-mod]').forEach(b=>{ b.classList.toggle('on',b.dataset.drMod===mod); b.setAttribute('aria-selected',String(b.dataset.drMod===mod)); });
+  $('dr-source').hidden=!src; $('dr-tools').hidden=src; $('dr-report-panel').hidden=flagMode||src; $('dr-flags-panel').hidden=!flagMode;
+  $('dr-dates').hidden=flagMode||src; $('dr-filters').hidden=flagMode||src; $('dr-flag-controls').hidden=!flagMode; $('dr-stats').hidden=src;
+  $('dr-ns-dates').hidden=mod==='west'; $('dr-west-dates').hidden=mod!=='west';
+  $('dr-merge-rows').hidden=flagMode; $('dr-sel-count').hidden=flagMode; $('dr-merge-rows').disabled=true; $('dr-sel-count').textContent='';
+  ['dr-merge','dr-hide','dr-add'].forEach(id=>$(id).disabled=!data.length);
+  // report table
+  const H=headers(), t=$('dr-table');
+  t.querySelector('thead').innerHTML='<tr><th class="dr-act" aria-label="Select, remove or hide rows"></th>'+H.map(h=>`<th scope="col">${esc(h)}</th>`).join('')+'</tr>';
+  const empty=!data.length?(canUpload()?'No file uploaded yet — open <b>Data source</b> to upload the candidate export.':'No file has been uploaded yet.'):(!state.clients.length||!state.locations.length)?'Pick at least one client and one location on the left (or use <b>Select all</b>).':'Nothing matches these filters.';
+  t.querySelector('tbody').innerHTML=report.rows.length?report.rows.map((r,i)=>`<tr><td class="dr-act"><input type="checkbox" data-sel="${i}" aria-label="Select row ${i+1}"><button type="button" class="dr-x" data-rm="${i}" title="Remove row" aria-label="Remove row">×</button><button type="button" class="dr-hide-btn" data-hide="${i}" title="Hide row">Hide</button></td><td>${esc(r.client)}</td><td>${esc(r.location)}${r.pairs.size>1?'<span class="dr-badge">merged</span>':''}${[...r.pairs].some(p=>state.addedPairs.includes(p))?'<span class="dr-badge lock">added</span>':''}</td>${r.counts.map(n=>`<td class="num">${n.toLocaleString()}</td>`).join('')}</tr>`).join(''):`<tr><td class="dr-empty" colspan="${H.length+1}">${empty}</td></tr>`;
+  t.querySelector('tfoot').innerHTML=report.rows.length?`<tr><td></td><td>Total</td><td></td>${report.totals.map(n=>`<td class="num">${n.toLocaleString()}</td>`).join('')}</tr>`:'';
+  t.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>removePairs([...report.rows[+b.dataset.rm].pairs]));
+  t.querySelectorAll('[data-hide]').forEach(b=>b.onclick=()=>{ state.hiddenPairs=[...new Set([...state.hiddenPairs,...report.rows[+b.dataset.hide].pairs])]; refresh(); status('Row hidden — find it under Hidden to bring it back.'); });
+  t.querySelectorAll('[data-sel]').forEach(cb=>cb.onchange=()=>{ const n=t.querySelectorAll('[data-sel]:checked').length; $('dr-merge-rows').disabled=n<2; $('dr-sel-count').textContent=n?n+' selected':''; });
+  $('dr-title').textContent=mod==='west'?'West · weekly report':'North / SE / SC';
+  $('dr-meta').textContent=records.length.toLocaleString()+' records · '+report.rows.length+' rows'+(mod==='west'?' · week ending '+fmtDate(state.weekEnd):' · schedules '+fmtDate(state.scheduleDate)+' · interviews '+fmtDate(state.interviewDate));
+  // red flags
+  if(flagMode){
+   const keys=['recruiter','candidate','eid','client','location','branchSchedule','apptDate','reason'], ft=$('dr-flag-table');
+   ft.querySelector('thead').innerHTML='<tr>'+FLAG_HEADERS.map((h,i)=>{ const k=keys[i], on=state.flags.headerKey===k; return `<th scope="col" aria-sort="${on?(state.flags.direction==='desc'?'descending':'ascending'):'none'}"><button type="button" class="dr-sort" data-key="${k}">${esc(h)} <span>${on?(state.flags.direction==='desc'?'↓':'↑'):'↕'}</span></button></th>`; }).join('')+'</tr>';
+   ft.querySelector('tbody').innerHTML=flags.length?flagMatrix().slice(1).map(row=>'<tr>'+row.map((v,i)=>`<td>${i===7?`<span class="dr-reason">${esc(v)}</span>`:esc(v)}</td>`).join('')+'</tr>').join(''):`<tr><td colspan="8" class="dr-empty">${data.length?'No red flags for these filters.':'No file uploaded yet.'}</td></tr>`;
+   ft.querySelectorAll('[data-key]').forEach(b=>b.onclick=()=>{ const k=b.dataset.key; state.flags.direction=state.flags.headerKey===k&&state.flags.direction!=='desc'?'desc':'asc'; state.flags.headerKey=k; render(); });
+   $('dr-flag-count').textContent=flags.length.toLocaleString();
+  }
+  // stats
+  const stat=(n,l,cls)=>`<div class="dr-stat ${cls||''}"><strong>${Number(n||0).toLocaleString()}</strong><span>${l}</span></div>`;
+  $('dr-stats').innerHTML=flagMode?stat(flags.length,'Red flags','alert')
+   : mod==='west'?stat(report.rows.length,'Rows')+stat(report.totals[0],'Pending onboarding')+stat(report.totals[1],'In branch')+stat((report.totals[2]||0)+(report.totals[3]||0),'Pipeline')
+   : stat(report.rows.length,'Rows')+stat(report.totals[1],'Schedules today')+stat(report.totals[2],'Interviews today')+stat(report.totals[4],'Total pipeline');
+  const has=flagMode?flags.length:report.rows.length; ['dr-download','dr-copy'].forEach(id=>$(id).disabled=!has);
+  save();
+ }
+ function removePairs(keys){ const rm=new Set(state.removedPairs); keys.forEach(k=>rm.add(k)); state.removedPairs=[...rm]; state.addedPairs=state.addedPairs.filter(k=>!rm.has(k)); refresh(); status('Row removed — tick its client and location again, or use Add rows, to bring it back.'); }
+ function lockPairs(keys){ state.addedPairs=[...new Set([...state.addedPairs,...keys])]; state.removedPairs=state.removedPairs.filter(k=>!keys.includes(k)); state.hiddenPairs=state.hiddenPairs.filter(k=>!keys.includes(k)); refresh(); status(keys.length+' row'+(keys.length===1?'':'s')+' added to the report.'); }
+ function dialog(html){ const d=document.createElement('div'); d.className='modal-overlay dr-modal'; d.innerHTML=`<div class="modal" role="dialog" aria-modal="true">${html}</div>`; document.body.append(d); d.addEventListener('click',e=>{ if(e.target===d||e.target.closest('[data-close]')) d.remove(); }); return d; }
+ function editDimension(action){
+  if(!data.length) return; let kind='location', picked=new Set();
+  const d=dialog(`<div class="modal-header"><h3>${action==='merge'?'Merge clients or locations':'Hide clients or locations'}</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div><div class="modal-body">
+   <div class="dr-seg"><label><input type="radio" name="dr-dim" value="location" checked> Locations</label><label><input type="radio" name="dr-dim" value="client"> Clients</label></div>
+   <input type="search" class="dr-search dr-pick-search" placeholder="Search" aria-label="Search"><div class="dr-mini"><button type="button" class="dr-pick-all">Select all</button><button type="button" class="dr-pick-none">Clear</button></div>
+   <div class="dr-checks dr-pick-list"></div>${action==='merge'?'<label class="dr-field">Group name<input class="dr-group-name" placeholder="Optional — e.g. Louisville area"></label>':''}
+   <div class="dr-preview" aria-live="polite"></div>
+   <div class="dr-foot"><button type="button" class="btn btn-secondary" data-close>Cancel</button><button type="button" class="btn btn-primary dr-apply" disabled>${action==='merge'?'Merge':'Hide'}</button></div></div>`);
+  const q=s=>d.querySelector(s);
+  const preview=()=>{ q('.dr-apply').disabled=picked.size<(action==='merge'?2:1);
+   if(action==='hide'){ q('.dr-preview').textContent=picked.size?picked.size+' '+kind+(picked.size===1?'':'s')+' selected':''; return; }
+   if(picked.size<2){ q('.dr-preview').textContent=''; return; }
+   const next={...state,[kind+'Groups']:replaceDimensionGroup(state[kind+'Groups'],[...picked],q('.dr-group-name').value,'preview')};
+   q('.dr-preview').innerHTML=`<b>${report.rows.length} → ${groupedReport(visibleRecords(data,next),next).rows.length} report rows</b>`; };
+  const paint=()=>{ const term=q('.dr-pick-search').value.toLowerCase(), list=q('.dr-pick-list'); list.innerHTML='';
+   contextualValues(kind).filter(v=>v.toLowerCase().includes(term)).forEach(v=>{ const lab=document.createElement('label'); lab.className='dr-check'; const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=picked.has(v); const sp=document.createElement('span'); sp.textContent=v; lab.append(cb,sp); list.append(lab); cb.onchange=()=>{ cb.checked?picked.add(v):picked.delete(v); preview(); }; });
+   if(!list.children.length) list.innerHTML='<p class="hint">Nothing to pick — tick some clients and locations on the left first.</p>'; preview(); };
+  d.querySelectorAll('[name=dr-dim]').forEach(r=>r.onchange=()=>{ kind=r.value; picked=new Set(); q('.dr-pick-search').value=''; paint(); });
+  q('.dr-pick-search').oninput=paint; if(action==='merge') q('.dr-group-name').oninput=preview;
+  q('.dr-pick-all').onclick=()=>{ picked=new Set(contextualValues(kind)); paint(); }; q('.dr-pick-none').onclick=()=>{ picked.clear(); paint(); };
+  q('.dr-apply').onclick=()=>{ if(action==='merge') state[kind+'Groups']=replaceDimensionGroup(state[kind+'Groups'],[...picked],q('.dr-group-name').value,'g'+Date.now()+Math.random().toString(36).slice(2,7));
+   else { const key=kind==='client'?'hiddenClients':'hiddenLocations'; state[key]=[...new Set([...state[key],...picked])]; }
+   refresh(); status(action==='merge'?'Group saved.':'Hidden — find it under Hidden to bring it back.'); d.remove(); };
+  paint(); q('.dr-pick-search').focus();
+ }
+ function addRows(){
+  const pairs=[...new Map(data.map(r=>[pairKey(r.client,r.location),[r.client,r.location]])).entries()].sort((a,b)=>a[1][0].localeCompare(b[1][0])||a[1][1].localeCompare(b[1][1]));
+  const picked=new Set();
+  const d=dialog(`<div class="modal-header"><h3>Add rows to the report</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div><div class="modal-body"><p class="hint">Added rows always show, whatever the filters.</p><input type="search" class="dr-search dr-pair-search" placeholder="Search client or location" aria-label="Search"><div class="dr-checks dr-pair-list"></div><div class="dr-foot"><button type="button" class="btn btn-secondary" data-close>Cancel</button><button type="button" class="btn btn-primary dr-apply" disabled>Add to report</button></div></div>`);
+  const q=s=>d.querySelector(s);
+  const paint=()=>{ const term=q('.dr-pair-search').value.toLowerCase(), list=q('.dr-pair-list'); list.innerHTML='';
+   pairs.filter(([,p])=>p.join(' ').toLowerCase().includes(term)).slice(0,400).forEach(([k,p])=>{ const lab=document.createElement('label'); lab.className='dr-check'; const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=picked.has(k); const sp=document.createElement('span'); sp.textContent=p.join(' · '); lab.append(cb,sp); list.append(lab);
+    cb.onchange=()=>{ cb.checked?picked.add(k):picked.delete(k); q('.dr-apply').disabled=!picked.size; q('.dr-apply').textContent='Add to report'+(picked.size?' ('+picked.size+')':''); }; }); };
+  q('.dr-pair-search').oninput=paint; q('.dr-apply').onclick=()=>{ lockPairs([...picked]); d.remove(); }; paint(); q('.dr-pair-search').focus();
+ }
+ function mergeRows(){
+  const t=$('dr-table'), sel=[...t.querySelectorAll('[data-sel]:checked')].map(cb=>report.rows[+cb.dataset.sel]); if(sel.length<2) return;
+  const pairs=[...new Set(sel.flatMap(r=>[...r.pairs]))];
+  const d=dialog(`<div class="modal-header"><h3>Merge ${sel.length} rows</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div><div class="modal-body"><label class="dr-field">Client label<input class="dr-rc"></label><label class="dr-field">Location label<input class="dr-rl"></label><div class="dr-foot"><button type="button" class="btn btn-secondary" data-close>Cancel</button><button type="button" class="btn btn-primary dr-apply">Merge rows</button></div></div>`);
+  d.querySelector('.dr-rc').value=[...new Set(sel.map(r=>r.client))].join(' / '); d.querySelector('.dr-rl').value=[...new Set(sel.map(r=>r.location))].join(' / ');
+  d.querySelector('.dr-apply').onclick=()=>{ const set=new Set(pairs); state.rowGroups=state.rowGroups.filter(g=>!g.pairs.some(p=>set.has(p)));
+   state.rowGroups.push({id:'rows'+Date.now(),pairs,clientLabel:d.querySelector('.dr-rc').value.trim()||'Merged clients',locationLabel:d.querySelector('.dr-rl').value.trim()||'Merged locations'});
+   d.remove(); lockPairs(pairs); status('Rows merged.'); };
+ }
+ function bind(){
+  const host=$('view-divreport');
+  host.querySelectorAll('[data-dr-mod]').forEach(b=>b.onclick=async()=>{ state.module=b.dataset.drMod; if(state.module==='flags'&&!namesLoaded){ await loadData(true); } render(); });
+  $('dr-search').oninput=e=>{ state.search=e.target.value; render(); };
+  for(const [id,key] of [['dr-schedule-date','scheduleDate'],['dr-interview-date','interviewDate'],['dr-week-end','weekEnd']]) $(id).onchange=e=>{ if(!e.target.value){ e.target.value=state[key]; return; } state[key]=e.target.value; render(); };
+  for(const [id,key] of [['dr-recruiter','recruiter'],['dr-flag-date-field','dateField'],['dr-flag-from','from'],['dr-flag-to','to'],['dr-flag-sort','sort']]) $(id).onchange=e=>{ state.flags[key]=e.target.value; if(key==='sort') delete state.flags.headerKey; render(); };
+  $('dr-reset-flags').onclick=()=>{ state.flags=fresh().flags; syncControls(); render(); };
+  $('dr-reset').onclick=()=>{ if(!confirm('Reset your filters, groups, added and hidden rows?')) return; const m=state.module; state=fresh(); state.module=m; syncControls(); refresh(); status('Your filters and groups were reset.'); };
+  $('dr-merge').onclick=()=>editDimension('merge'); $('dr-hide').onclick=()=>editDimension('hide'); $('dr-add').onclick=addRows; $('dr-merge-rows').onclick=mergeRows;
+  $('dr-upload').onclick=()=>$('dr-file').click(); $('dr-file').onchange=e=>{ uploadFile(e.target.files[0]); e.target.value=''; };
+  $('dr-remove')?.addEventListener('click',removeFile);
+  const drop=$('dr-drop'); ['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('on'); })); ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,()=>drop.classList.remove('on')));
+  drop.addEventListener('drop',e=>{ e.preventDefault(); uploadFile(e.dataTransfer.files[0]); });
+  $('dr-copy').onclick=async()=>{ const text=toTSV(state.module==='flags'?flagMatrix():reportMatrix()); try{ await navigator.clipboard.writeText(text); showToast('Copied — paste into Excel or an email.'); }catch(e){ showToast('Your browser blocked copying.'); } };
+  $('dr-download').onclick=()=>{ if(typeof XLSX==='undefined'){ showToast('The Excel writer didn’t load — check your connection.'); return; }
+   const isF=state.module==='flags', v=isF?flagMatrix():reportMatrix(), wb=XLSX.utils.book_new(), sh=XLSX.utils.aoa_to_sheet(v); sh['!cols']=v[0].map((_,i)=>({wch:i<2?30:22}));
+   XLSX.utils.book_append_sheet(wb,sh,isF?'Red flags':state.module==='west'?'West weekly':'Division reporting'); XLSX.writeFile(wb,(isF?'red-flags':state.module==='west'?'west-weekly':'division-reporting')+'-'+localDay(new Date())+'.xlsx'); };
+ }
+ async function show(){
+  const host=$('view-divreport'); if(!host) return;
+  loadState();
+  if(!loadedAt){ host.innerHTML='<div class="panel"><p class="hint">Loading division report…</p></div>'; }
+  try{ await loadData(Date.now()-loadedAt>60000); }catch(e){ if(!/Could not find|does not exist/i.test(e.message||'')) status('Couldn’t load the uploaded file: '+cleanErr(e),true); }
+  if(currentView!=='divreport') return;
+  // first visit: start with everything ticked so the report isn't empty
+  if(data.length&&!state.clients.length&&!state.locations.length&&!state._init){ state.clients=allClients(); state.locations=allLocations(); state._init=true; }
+  build();
+ }
+ return {show};
+})();
+function renderDivReportView(){ DivReport.show(); }
+
 </script>
 </body>
 </html>
