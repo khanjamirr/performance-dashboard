@@ -1498,6 +1498,11 @@ body{background:var(--paper)!important}
 }
 
 /* ---------- Division Reporting ---------- */
+.dr-divbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:10px 16px;border-bottom:1px solid var(--line,#e2eaed);background:#fafcfc}
+.dr-chip{border:1px solid #d3dfe3;background:#fff;border-radius:999px;padding:4px 11px;font:inherit;font-size:12px;color:#58717c;cursor:pointer}
+.dr-chip b{font-weight:600;margin-left:3px;color:inherit}.dr-chip.on{background:#e6f4f2;border-color:#9fd3cc;color:#1c6f69}
+.dr-nodiv{margin-left:auto;font-size:11.5px;color:#a66a00;background:#fff7e6;border-radius:6px;padding:3px 8px;cursor:help}
+
 .dr-srcs{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin:14px 0}
 .dr-src{display:flex;gap:10px;align-items:flex-start;border:1px solid #d6e2e6;border-radius:12px;padding:14px;cursor:pointer;background:#fff}
 .dr-src.on{border-color:#1c8c84;background:#f3faf9;box-shadow:0 0 0 1px #1c8c84 inset}.dr-src.off{opacity:.6;cursor:not-allowed}
@@ -7752,9 +7757,10 @@ const Server = {
     // Opt-in rights (grant.*) are also kept in dash_user_grants, which the database checks itself —
     // so they work even if the users table drops unknown section keys.
     if(fn==='dash_me') return r.then(async me=>{ await this.mergeGrants(me); return me; });
-    if(fn==='dash_user_save' && args && args.p && args.p.id!=null){ const p=args.p;
-      r=r.then(async res=>{ try{ await this.call('dash_user_grants_set',{p_token:this.token, p_user_id:String(p.id), p_grants:(p.hidden_sections||[]).filter(k=>k.startsWith('grant.'))}); }
-        catch(e){ if(!/Could not find|does not exist|schema cache/i.test(e.message||'')) throw e; } return res; }); }
+    if(fn==='dash_user_save' && args && args.p){ const p=args.p;
+      r=r.then(async res=>{ const id=p.id!=null?p.id:(res&&res.id); if(id==null) return res;
+        try{ await this.call('dash_user_grants_set',{p_token:this.token, p_user_id:String(id), p_grants:(p.hidden_sections||[]).filter(k=>k.startsWith('grant.'))}); }
+        catch(e){ if(!/Could not find|does not exist|schema cache/i.test(e.message||'')) throw e; if(res&&typeof res==='object') res._grantsMissing=true; } return res; }); }
     if(fn==='dash_users_list') r=r.then(async list=>{ if(!Array.isArray(list)) return list; let all=null;
       try{ all=await this.call('dash_user_grants_all',{p_token:this.token}); }catch(e){}
       if(all) list.forEach(u=>{ const g=all[String(u.id)]||[]; if(g.length) u.hidden_sections=[...new Set([...(u.hidden_sections||[]), ...g])]; });
@@ -9590,12 +9596,17 @@ function drawUserForm(){
       const dvSel = host.querySelector('#ufDefaultView'); const uid = (saved&&saved.id)||u.id;
       if(dvSel && uid!=null && (adminDefaultViews()[uid]||'')!==dvSel.value){ const m={...adminDefaultViews()}; if(dvSel.value) m[uid]=dvSel.value; else delete m[uid]; await storageSet('userDefaultViews', m); }
       // the server keeps only rights it knows; if one was dropped its SQL is out of date
-      const dropped = (p.modules||[]).filter(m=>saved && Array.isArray(saved.modules) && !saved.modules.includes(m));
+      // (page rights such as Division Reporting are kept in the rights table instead — see Server.rpc)
+      const dropped = (p.modules||[]).filter(m=>!GRANT_MODULES.includes(m) && saved && Array.isArray(saved.modules) && !saved.modules.includes(m));
+      const grantLost = (p.modules||[]).filter(m=>GRANT_MODULES.includes(m) && saved && saved._grantsMissing && !(saved.hidden_sections||[]).includes('grant.'+m));
       if(dropped.length){
         const names = dropped.map(k=>(MODULES.find(m=>m.key===k)||{label:k}).label).join(', ');
         alert('The database did not accept these rights: '+names+'.\n\nIts setup is older than this page. Open Supabase → SQL Editor, paste the latest supabase_setup.sql, click Run, then tick the rights again.');
+      } else if(grantLost.length){
+        const names = grantLost.map(k=>(MODULES.find(m=>m.key===k)||{label:k}).label).join(', ');
+        alert(names+' couldn’t be saved yet.\n\nOpen Supabase → SQL Editor, paste team_candidates.sql (it adds the rights table), click Run, then tick it again.');
       }
-      showToast(isNew ? 'User created. Share the name and password with '+p.name+' privately.' : 'Saved.'+(dropped.length?' Some rights were not accepted — see the message.':' '+p.name+' sees the change within a few seconds.'));
+      showToast(isNew ? 'User created. Share the name and password with '+p.name+' privately.' : 'Saved.'+(dropped.length||grantLost.length?' Some rights were not accepted — see the message.':' '+p.name+' sees the change within a few seconds.'));
       if(isNew && pw) host.insertAdjacentHTML('afterend','');
       editingUserId=null; renderUsersAdmin();
       if(!isNew && u.id===Server.user.id){ Server.user = await Server.rpc('dash_me'); applyPermissions(); }
@@ -10861,11 +10872,11 @@ const DivReport=(()=>{
  const toTSV=m=>m.map(row=>row.map(v=>{ const s=String(v??'').replace(/[\r\n\t]+/g,' '); return typeof v==='string'&&/^[=+@-]/.test(s)?"'"+s:s; }).join('\t')).join('\n');
  function contextualValues(kind){
   const opp=new Set(kind==='client'?state.locations:state.clients), hidden=new Set(kind==='client'?state.hiddenClients:state.hiddenLocations), otherHidden=new Set(kind==='client'?state.hiddenLocations:state.hiddenClients);
-  return [...new Set(data.filter(r=>opp.has(kind==='client'?r.location:r.client)&&!otherHidden.has(kind==='client'?r.location:r.client)&&!hidden.has(kind==='client'?r.client:r.location)).map(r=>kind==='client'?r.client:r.location))].sort();
+  return [...new Set(scoped().filter(r=>opp.has(kind==='client'?r.location:r.client)&&!otherHidden.has(kind==='client'?r.location:r.client)&&!hidden.has(kind==='client'?r.client:r.location)).map(r=>kind==='client'?r.client:r.location))].sort();
  }
  // ---------- state (per person, this browser) ----------
  const stateKey=()=>'ipd_divreport:'+(Server.user?Server.user.id:'me');
- function fresh(){ const t=localDay(new Date()); return {module:'ns',addedPairs:[],removedPairs:[],hiddenPairs:[],rowGroups:[],clients:[],locations:[],hiddenClients:[],hiddenLocations:[],clientGroups:[],locationGroups:[],search:'',scheduleDate:t,interviewDate:t,weekEnd:t,flags:{recruiter:'',dateField:'dateAdded',from:'',to:'',sort:'recruiter'},source:canSupabase()?'supabase':'upload',sbFrom:'',sbTo:''}; }
+ function fresh(){ const t=localDay(new Date()); return {module:'ns',addedPairs:[],removedPairs:[],hiddenPairs:[],rowGroups:[],clients:[],locations:[],hiddenClients:[],hiddenLocations:[],clientGroups:[],locationGroups:[],search:'',scheduleDate:t,interviewDate:t,weekEnd:t,flags:{recruiter:'',dateField:'dateAdded',from:'',to:'',sort:'recruiter'},source:canSupabase()?'supabase':'upload',sbFromDate:'',sbToDate:''}; }
  function loadState(){ if(stateFor===stateKey()&&state) return; stateFor=stateKey(); state=fresh(); try{ const s=JSON.parse(localStorage.getItem(stateFor)||'null'); if(s&&typeof s==='object') state={...state,...s,flags:{...state.flags,...(s.flags||{})}}; }catch(e){} }
  function save(){ try{ localStorage.setItem(stateKey(),JSON.stringify(state)); }catch(e){} }
  // ---------- rights ----------
@@ -10896,11 +10907,12 @@ const DivReport=(()=>{
    ebStatusReason:pick('EB Status Reason','Status Reason')};
  }
  const weekList=()=>[...weeksData].map(w=>w.weekEndDate).sort();
+ // dashboard data covers a date range — by default the past 28 days (today included)
+ function sbRange(){ const t=localDay(new Date()); let from=state.sbFromDate||tgShift(t,-27), to=state.sbToDate||t; if(from>to) [from,to]=[to,from]; return {from,to}; }
  function weeksNeeded(){
   const all=weekList(); if(!all.length) return [];
-  const cur=weekOfDate(localDay(new Date())).weekEnd, last=all.filter(w=>w<=cur).pop()||all[all.length-1];
-  let from=state.sbFrom&&all.includes(state.sbFrom)?state.sbFrom:last, to=state.sbTo&&all.includes(state.sbTo)?state.sbTo:last; if(from>to) [from,to]=[to,from];
-  const set=new Set(all.filter(w=>w>=from&&w<=to));
+  const {from,to}=sbRange();
+  const set=new Set(all.filter(w=>w>=from&&tgShift(w,-6)<=to));
   [state.scheduleDate,state.interviewDate,state.weekEnd].forEach(d=>{ const w=d&&weekOfDate(d).weekEnd; if(w&&all.includes(w)) set.add(w); });
   return [...set].sort();
  }
@@ -10920,11 +10932,13 @@ const DivReport=(()=>{
    meta=uploaded?{kind:'upload',label:uploaded.fileName,count:data.length,at:uploaded.at}:null; sbKey=''; return;
   }
   if(!canSupabase()){ data=[]; meta=null; return; }
-  const weeks=weeksNeeded(), key=weeks.join(',');
+  const weeks=weeksNeeded(), r0=sbRange(), key=weeks.join(',')+'|'+r0.from+'|'+r0.to+'|'+state.scheduleDate+'|'+state.interviewDate+'|'+state.weekEnd;
   if(key===sbKey&&meta) return;
   if(loading) return loading;
-  loading=(async()=>{ const rows=await fetchSupabase(weeks); data=rows.map((r,i)=>({...r,id:i})); sbKey=key;
-   meta={kind:'supabase',label:weeks.length?(weeks.length===1?'Wk '+weekOfDate(weeks[0]).number+' · ending '+fmtDate(weeks[0]):'Wk '+weekOfDate(weeks[0]).number+' – Wk '+weekOfDate(weeks[weeks.length-1]).number):'no weeks',count:data.length,weeks}; })();
+  loading=(async()=>{ const rows=await fetchSupabase(weeks), {from,to}=sbRange();
+   const ws=tgShift(state.weekEnd,-6), keep=d=>!!d&&((d>=from&&d<=to)||d===state.scheduleDate||d===state.interviewDate||(d>=ws&&d<=state.weekEnd));
+   data=rows.filter(r=>keep(r.dateAdded)||keep(r.apptDate)).map((r,i)=>({...r,id:i})); sbKey=key;
+   meta={kind:'supabase',label:fmtDate(from).replace(/, \d{4}$/,'')+' – '+fmtDate(to),count:data.length,weeks}; })();
   try{ await loading; } finally{ loading=null; }
  }
  // earlier versions kept a shared copy of the upload — remove it, nothing is stored now
@@ -10958,9 +10972,33 @@ const DivReport=(()=>{
   if(force&&!state.clients.length) state.clients=[...cs]; if(force&&!state.locations.length) state.locations=[...ls]; }
  function status(text,error=false){ msg={text,error}; const el=$('dr-status'); if(el){ el.textContent=text; el.classList.toggle('error',!!error); } }
  // ---------- view ----------
- const allClients=()=>[...new Set(data.map(r=>r.client))].sort();
- const allLocations=()=>[...new Set(data.map(r=>r.location))].sort();
- function modules(){ return [['ns','North / SE / SC'],['west','West weekly'],...(canFlags()?[['flags','Red flags']]:[]),['source','Data source']]; }
+ // ---------- division of each row ----------
+ // North / SE / SC tab = North, South-East and South-Central branches; West tab = West branches.
+ // Division comes from the dashboard's branch divisions (Settings → Branches): the branch itself, then any
+ // branch at the same location (for uploads, Job Site "Louisville, KY" ↔ "Louisville, KY - PLX"), then the
+ // recruiter's division.
+ const NS_DIVS=['North','South-East','South-Central'];
+ const normDiv=d=>{ const k=String(d||'').toLowerCase().replace(/[^a-z]/g,''); return k==='north'?'North':k==='southeast'?'South-East':k==='southcentral'?'South-Central':k==='west'?'West':d?String(d):'Unassigned'; };
+ let divIdx=null, divIdxKey='';
+ function divIndex(){
+  const key=JSON.stringify(branchDivisions).length+'|'+Object.keys(branchDivisions).length; if(divIdx&&divIdxKey===key) return divIdx;
+  const byLoc=new Map();
+  Object.entries(branchDivisions||{}).forEach(([b,d])=>{ if(!d||d==='Unassigned') return; const l=splitBranch(b).location.toLowerCase(); const cur=byLoc.get(l); byLoc.set(l,cur===undefined||cur===d?d:null); });
+  divIdx={byLoc}; divIdxKey=key; return divIdx;
+ }
+ const divMemo=new WeakMap();
+ function divOf(r){
+  if(divMemo.has(r)) return divMemo.get(r);
+  let d=branchDivisions[r.location]||branchDivisions[branchAlias(r.location)];
+  if(!d||d==='Unassigned'){ const l=splitBranch(r.location).location.toLowerCase(), hit=divIndex().byLoc.get(l)||divIndex().byLoc.get(normalizeLocation(r.location).toLowerCase()); if(hit) d=hit; }
+  if((!d||d==='Unassigned')&&r.recruiter){ const w=r.dateAdded||r.apptDate; d=getEffectiveRecruiterDivision(r.recruiter, w?weekOfDate(w).weekEnd:null); }
+  d=normDiv(d); divMemo.set(r,d); return d;
+ }
+ const tabDivs=()=>state.module==='west'?['West']:state.module==='ns'?NS_DIVS.filter(d=>!(state.nsOff||[]).includes(d)):null;
+ function scoped(){ const ds=tabDivs(); return ds?data.filter(r=>ds.includes(divOf(r))):data; }
+ const allClients=()=>[...new Set(scoped().map(r=>r.client))].sort();
+ const allLocations=()=>[...new Set(scoped().map(r=>r.location))].sort();
+ function modules(){ return [['ns','North / SE / SC'],['west','West weekly'],['source','Data source']]; }
  function build(){
   const host=$('view-divreport'); if(!host) return;
   loadState();
@@ -10997,18 +11035,18 @@ const DivReport=(()=>{
         <span class="dr-row"><button type="button" class="btn btn-primary btn-sm" id="dr-upload">${uploaded?'Replace file':'Choose Excel file'}</button>${uploaded?'<button type="button" class="btn btn-secondary btn-sm" id="dr-clear">Clear uploaded data</button>':''}</span>
         <span class="dr-drop" id="dr-drop">${uploaded?`Loaded: <b>${esc(uploaded.fileName)}</b> · ${uploaded.rows.length.toLocaleString()} rows`:'…or drop the file here'}</span></span></label>
        <label class="dr-src ${state.source==='supabase'?'on':''} ${canSupabase()?'':'off'}"><input type="radio" name="dr-src" value="supabase" ${state.source==='supabase'?'checked':''} ${canSupabase()?'':'disabled'}>
-        <span class="dr-src-body"><b>Dashboard data (Supabase)</b><em>${canSupabase()?'The Created On and Date Of rows already uploaded to the dashboard. Weeks holding your reporting dates are added automatically.':'Needs the Candidate Hub right — ask your admin.'}</em>
-        ${canSupabase()?`<span class="dr-row"><label class="dr-field">From week<select id="dr-sb-from">${weekList().slice().reverse().map(w=>`<option value="${w}">Wk ${weekOfDate(w).number} · ending ${fmtDate(w)}</option>`).join('')}</select></label><label class="dr-field">To week<select id="dr-sb-to">${weekList().slice().reverse().map(w=>`<option value="${w}">Wk ${weekOfDate(w).number} · ending ${fmtDate(w)}</option>`).join('')}</select></label></span>`:''}</span></label>
+        <span class="dr-src-body"><b>Dashboard data (Supabase)</b><em>${canSupabase()?'The Created On and Date Of rows already uploaded to the dashboard, for the dates you pick (past 28 days unless you change it). Rows created or with an appointment in that range are used.':'Needs the Candidate Hub right — ask your admin.'}</em>
+        ${canSupabase()?`<span class="dr-row"><label class="dr-field">From<input type="date" id="dr-sb-from" value="${sbRange().from}" max="${localDay(new Date())}"></label><label class="dr-field">To<input type="date" id="dr-sb-to" value="${sbRange().to}" max="${localDay(new Date())}"></label></span><span class="dr-row dr-quick">${[[7,'7 days'],[28,'28 days'],[90,'90 days']].map(([n,l])=>`<button type="button" class="dr-chip ${!state.sbToDate&&sbRange().from===tgShift(localDay(new Date()),-(n-1))?'on':''}" data-sb-days="${n}">Past ${l}</button>`).join('')}</span>`:''}</span></label>
       </div>
       <input type="file" id="dr-file" accept=".xlsx,.xls" hidden>
       <details class="dr-map"><summary>How dashboard data fills each column</summary><table class="dr-table"><thead><tr><th>Report uses</th><th>Taken from</th></tr></thead><tbody>
        <tr><td>Date added</td><td>Created On</td></tr><tr><td>Branch appointment date</td><td>Date Of</td></tr>
        <tr><td>Location</td><td>Branch (full name, merged branches included) — or Job Site when the export has it</td></tr><tr><td>Client</td><td>Left blank (—) — or Client List Selector when the export has it</td></tr>
        <tr><td>Branch schedule?</td><td>“Yes” for every Created On row</td></tr><tr><td>Recruiter</td><td>Created By</td></tr><tr><td>Candidate / EID</td><td>Candidate Name / Employee Number</td></tr>
-       <tr><td>Onboarding stage</td><td>Onboarding Stage if present, otherwise complete when I-9 Completed = Yes</td></tr><tr><td>EB status reason (West pipeline)</td><td>Status Reason — Available / OAE and Unavailable / Inactive</td></tr><tr><td>Total schedules / pipeline</td><td>Every row in the weeks picked above</td></tr></tbody></table></details>
+       <tr><td>Onboarding stage</td><td>Onboarding Stage if present, otherwise complete when I-9 Completed = Yes</td></tr><tr><td>EB status reason (West pipeline)</td><td>Status Reason — Available / OAE and Unavailable / Inactive</td></tr><tr><td>Total schedules / pipeline</td><td>Every row created or with an appointment in the dates picked above</td></tr></tbody></table></details>
      </section>
      <div class="dr-tools" id="dr-tools"><button type="button" class="btn btn-primary btn-sm" id="dr-merge-rows" disabled>Merge selected rows</button><span class="hint" id="dr-sel-count"></span><span class="dr-grow"></span><button type="button" class="btn btn-secondary btn-sm" id="dr-copy">📋 Copy</button><button type="button" class="btn btn-secondary btn-sm" id="dr-download">⬇ Excel</button></div>
-     <section class="panel dr-panel" id="dr-report-panel"><div class="dr-head"><h3 id="dr-title"></h3><span class="hint" id="dr-meta"></span></div><div class="dr-scroll"><table class="dr-table" id="dr-table"><thead></thead><tbody></tbody><tfoot></tfoot></table></div></section>
+     <section class="panel dr-panel" id="dr-report-panel"><div class="dr-head"><h3 id="dr-title"></h3><span class="hint" id="dr-meta"></span></div><div class="dr-divbar" id="dr-divbar"></div><div class="dr-scroll"><table class="dr-table" id="dr-table"><thead></thead><tbody></tbody><tfoot></tfoot></table></div></section>
      <section class="panel dr-panel" id="dr-flags-panel"><div class="dr-head"><h3>Red flags</h3><span class="dr-count" id="dr-flag-count">0</span><span class="hint">Branch schedule “Yes” with no appointment date, or an appointment date without “Yes”.</span></div><div class="dr-scroll"><table class="dr-table dr-flags" id="dr-flag-table"><thead></thead><tbody></tbody></table></div></section>
     </div></div>`;
   status(msg.text,msg.error);
@@ -11073,7 +11111,8 @@ const DivReport=(()=>{
  function render(){
   const host=$('view-divreport'); if(!host||!$('dr-table')) return;
   const mod=state.module, flagMode=mod==='flags', src=mod==='source';
-  const records=visibleRecords(data,state); report=groupedReport(records,state); flags=flagMode?redFlags(data,state.flags):[];
+  const inTab=scoped(), records=visibleRecords(inTab,state); report=groupedReport(records,state); flags=flagMode?redFlags(data,state.flags):[];
+  const noDiv=(mod==='ns'||mod==='west')?data.filter(r=>!['West',...NS_DIVS].includes(divOf(r))).length:0;
   host.querySelectorAll('[data-dr-mod]').forEach(b=>{ b.classList.toggle('on',b.dataset.drMod===mod); b.setAttribute('aria-selected',String(b.dataset.drMod===mod)); });
   $('dr-source').hidden=!src; $('dr-tools').hidden=src; $('dr-report-panel').hidden=flagMode||src; $('dr-flags-panel').hidden=!flagMode;
   $('dr-dates').hidden=flagMode||src; $('dr-filters').hidden=flagMode||src; $('dr-flag-controls').hidden=!flagMode; $('dr-stats').hidden=src;
@@ -11090,7 +11129,12 @@ const DivReport=(()=>{
   t.querySelectorAll('[data-hide]').forEach(b=>b.onclick=()=>{ state.hiddenPairs=[...new Set([...state.hiddenPairs,...report.rows[+b.dataset.hide].pairs])]; refresh(); status('Row hidden — find it under Hidden to bring it back.'); });
   t.querySelectorAll('[data-sel]').forEach(cb=>cb.onchange=()=>{ const n=t.querySelectorAll('[data-sel]:checked').length; $('dr-merge-rows').disabled=n<2; $('dr-sel-count').textContent=n?n+' selected':''; });
   $('dr-title').textContent=mod==='west'?'West · weekly report':'North / SE / SC';
-  $('dr-meta').textContent=records.length.toLocaleString()+' records · '+report.rows.length+' rows'+(mod==='west'?' · week ending '+fmtDate(state.weekEnd):' · schedules '+fmtDate(state.scheduleDate)+' · interviews '+fmtDate(state.interviewDate));
+  { const bar=$('dr-divbar'), cnt=d=>data.filter(r=>divOf(r)===d).length;
+    bar.innerHTML=(mod==='ns'?`<span class="hint">Divisions</span>${NS_DIVS.map(d=>`<button type="button" class="dr-chip ${(state.nsOff||[]).includes(d)?'':'on'}" data-div="${d}" aria-pressed="${!(state.nsOff||[]).includes(d)}">${d} <b>${cnt(d).toLocaleString()}</b></button>`).join('')}`:mod==='west'?`<span class="hint">Division</span><span class="dr-chip on">West <b>${cnt('West').toLocaleString()}</b></span>`:'')
+     +(noDiv?`<span class="dr-nodiv" title="Give these branches a division in Settings → Branches (or their recruiters a division) and they’ll appear in the right tab.">${noDiv.toLocaleString()} row${noDiv===1?'':'s'} not in any division — left out</span>`:'');
+    bar.hidden=!bar.innerHTML;
+    bar.querySelectorAll('[data-div]').forEach(b=>b.onclick=()=>{ const d=b.dataset.div, off=new Set(state.nsOff||[]); off.has(d)?off.delete(d):off.add(d); if(off.size===NS_DIVS.length) return; state.nsOff=[...off]; build(); }); }
+  $('dr-meta').textContent=(tabDivs()?tabDivs().join(', ')+' · ':'')+records.length.toLocaleString()+' records · '+report.rows.length+' rows'+(mod==='west'?' · week ending '+fmtDate(state.weekEnd):' · schedules '+fmtDate(state.scheduleDate)+' · interviews '+fmtDate(state.interviewDate));
   // red flags
   if(flagMode){
    const keys=['recruiter','candidate','eid','client','location','branchSchedule','apptDate','reason'], ft=$('dr-flag-table');
@@ -11123,7 +11167,7 @@ const DivReport=(()=>{
    if(action==='hide'){ q('.dr-preview').textContent=picked.size?picked.size+' '+kind+(picked.size===1?'':'s')+' selected':''; return; }
    if(picked.size<2){ q('.dr-preview').textContent=''; return; }
    const next={...state,[kind+'Groups']:replaceDimensionGroup(state[kind+'Groups'],[...picked],q('.dr-group-name').value,'preview')};
-   q('.dr-preview').innerHTML=`<b>${report.rows.length} → ${groupedReport(visibleRecords(data,next),next).rows.length} report rows</b>`; };
+   q('.dr-preview').innerHTML=`<b>${report.rows.length} → ${groupedReport(visibleRecords(scoped(),next),next).rows.length} report rows</b>`; };
   const paint=()=>{ const term=q('.dr-pick-search').value.toLowerCase(), list=q('.dr-pick-list'); list.innerHTML='';
    contextualValues(kind).filter(v=>v.toLowerCase().includes(term)).forEach(v=>{ const lab=document.createElement('label'); lab.className='dr-check'; const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=picked.has(v); const sp=document.createElement('span'); sp.textContent=v; lab.append(cb,sp); list.append(lab); cb.onchange=()=>{ cb.checked?picked.add(v):picked.delete(v); preview(); }; });
    if(!list.children.length) list.innerHTML='<p class="hint">Nothing to pick — tick some clients and locations on the left first.</p>'; preview(); };
@@ -11136,7 +11180,7 @@ const DivReport=(()=>{
   paint(); q('.dr-pick-search').focus();
  }
  function addRows(){
-  const pairs=[...new Map(data.map(r=>[pairKey(r.client,r.location),[r.client,r.location]])).entries()].sort((a,b)=>a[1][0].localeCompare(b[1][0])||a[1][1].localeCompare(b[1][1]));
+  const pairs=[...new Map(scoped().map(r=>[pairKey(r.client,r.location),[r.client,r.location]])).entries()].sort((a,b)=>a[1][0].localeCompare(b[1][0])||a[1][1].localeCompare(b[1][1]));
   const picked=new Set();
   const d=dialog(`<div class="modal-header"><h3>Add rows to the report</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div><div class="modal-body"><p class="hint">Added rows always show, whatever the filters.</p><input type="search" class="dr-search dr-pair-search" placeholder="Search client or location" aria-label="Search"><div class="dr-checks dr-pair-list"></div><div class="dr-foot"><button type="button" class="btn btn-secondary" data-close>Cancel</button><button type="button" class="btn btn-primary dr-apply" disabled>Add to report</button></div></div>`);
   const q=s=>d.querySelector(s);
@@ -11156,7 +11200,7 @@ const DivReport=(()=>{
  }
  function bind(){
   const host=$('view-divreport');
-  host.querySelectorAll('[data-dr-mod]').forEach(b=>b.onclick=()=>{ state.module=b.dataset.drMod; render(); });
+  host.querySelectorAll('[data-dr-mod]').forEach(b=>b.onclick=()=>{ state.module=b.dataset.drMod; build(); });
   $('dr-search').oninput=e=>{ state.search=e.target.value; render(); };
   for(const [id,key] of [['dr-schedule-date','scheduleDate'],['dr-interview-date','interviewDate'],['dr-week-end','weekEnd']]) $(id).onchange=async e=>{ if(!e.target.value){ e.target.value=state[key]; return; } state[key]=e.target.value;
    if(state.source==='supabase'&&weeksNeeded().join(',')!==sbKey){ status('Loading the week for that date…'); try{ await loadData(); status(''); }catch(err){ status('Couldn’t load that week: '+cleanErr(err),true); } build(); return; } render(); };
@@ -11167,8 +11211,10 @@ const DivReport=(()=>{
   $('dr-upload').onclick=e=>{ e.preventDefault(); $('dr-file').click(); }; $('dr-file').onchange=e=>{ uploadFile(e.target.files[0]); e.target.value=''; };
   $('dr-clear')?.addEventListener('click',e=>{ e.preventDefault(); clearUpload(); });
   host.querySelectorAll('[name=dr-src]').forEach(r=>r.onchange=()=>{ if(r.checked) useSource(r.value); });
-  const wf=$('dr-sb-from'), wt=$('dr-sb-to'); if(wf&&wt){ const need=weeksNeeded(); wf.value=state.sbFrom||need[0]||''; wt.value=state.sbTo||need[need.length-1]||'';
-   const ch=()=>{ state.sbFrom=wf.value; state.sbTo=wt.value; useSource('supabase'); }; wf.onchange=ch; wt.onchange=ch; }
+  const wf=$('dr-sb-from'), wt=$('dr-sb-to'); if(wf&&wt){ const t=localDay(new Date());
+   const ch=()=>{ if(!tgDate(wf.value)||!tgDate(wt.value)) return; state.sbFromDate=wf.value; state.sbToDate=wt.value===t?'':wt.value; if(state.sbFromDate===tgShift(t,-27)&&!state.sbToDate) state.sbFromDate=''; useSource('supabase'); };
+   wf.onchange=ch; wt.onchange=ch;
+   host.querySelectorAll('[data-sb-days]').forEach(b=>b.onclick=e=>{ e.preventDefault(); const n=+b.dataset.sbDays; state.sbToDate=''; state.sbFromDate=n===28?'':tgShift(t,-(n-1)); useSource('supabase'); }); }
   const drop=$('dr-drop'); ['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('on'); })); ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,()=>drop.classList.remove('on')));
   drop.addEventListener('drop',e=>{ e.preventDefault(); uploadFile(e.dataTransfer.files[0]); });
   $('dr-copy').onclick=async()=>{ const text=toTSV(state.module==='flags'?flagMatrix():reportMatrix()); try{ await navigator.clipboard.writeText(text); showToast('Copied — paste into Excel or an email.'); }catch(e){ showToast('Your browser blocked copying.'); } };
