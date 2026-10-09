@@ -4542,10 +4542,14 @@ function renderPeriodPickerList(searchText){
   list.innerHTML = listHtml;
 }
 document.getElementById('periodPickerBtn').addEventListener('click', (e)=>{
-  e.stopPropagation();
-  const panel = document.getElementById('periodPickerPanel');
-  if(panel.classList.contains('hidden')) openPeriodPicker();
-  else closePeriodPicker();
+  e.stopPropagation(); closePeriodPicker();
+  // calendar: click a day to pick its week, click another day to cover several weeks; quick picks on the left
+  const weeks=[...new Set(weeksData.map(w=>w.weekEndDate))].sort();
+  const sel=selectedWeekEndDates.length?[...selectedWeekEndDates].sort():(currentWeekEndDate&&currentWeekEndDate!=='all-weeks'?[currentWeekEndDate]:[]);
+  DatePick.open(e.currentTarget,{mode:'period', weeks, from:sel.length?tgShift(sel[0],-6):null, to:sel.length?sel[sel.length-1]:null, all:currentWeekEndDate==='all-weeks'&&!selectedWeekEndDates.length, title:'Pick weeks',
+    onPick:v=>{ if(v==='all'){ selectPeriodAllWeeks(); return; } if(!v||!v.length) return;
+      if(v.length===1){ selectedWeekEndDates=[v[0]]; currentWeekEndDate=v[0]; } else { selectedWeekEndDates=v; currentWeekEndDate=null; }
+      applyPeriodSelection(); }});
 });
 document.getElementById('periodPickerPanel').addEventListener('click', (e)=> e.stopPropagation());
 document.getElementById('periodPickerSearch').addEventListener('input', (e)=>{
@@ -11807,10 +11811,10 @@ const DatePick=(()=>{
  // ---- open ----
  function open(anchor,cfg){
   close();
-  st={...cfg, anchor, view:(cfg.mode==='range'?(cfg.to||cfg.from):cfg.value)||today(), a:cfg.from||null, b:cfg.to||null, hover:null};
+  st={...cfg, anchor, view:(cfg.mode==='range'||cfg.mode==='period'?(cfg.to||cfg.from):cfg.value)||today(), a:cfg.from||null, b:cfg.to||null, hover:null};
   st.view=monthStart(st.view);
   // two months side by side: show the end date's month on the right
-  if(cfg.mode==='range'&&innerWidth>720){ const d=parse(st.view); d.setMonth(d.getMonth()-1); st.view=iso(d); }
+  if((cfg.mode==='range'||cfg.mode==='period')&&innerWidth>720){ const d=parse(st.view); d.setMonth(d.getMonth()-1); st.view=iso(d); }
   pop=document.createElement('div'); pop.className='dp-pop'; pop.setAttribute('role','dialog'); pop.setAttribute('aria-label',cfg.title||'Pick a date');
   document.body.appendChild(pop); draw(); place();
   pop.addEventListener('mousedown',e=>e.stopPropagation());
@@ -11825,9 +11829,10 @@ const DatePick=(()=>{
  function monthGrid(m){
   const first=parse(m), start=add(m,-first.getDay()), cells=[]; for(let i=0;i<42;i++) cells.push(add(start,i));
   const month=m.slice(0,7), t=today();
-  const inRange=d=>{ if(st.mode!=='range') return false; const a=st.a, b=st.b||(st.a&&st.hover?st.hover:null); if(!a||!b) return false; const lo=a<b?a:b, hi=a<b?b:a; return d>=lo&&d<=hi; };
+  const inRange=d=>{ if(st.mode==='period'){ const a=st.a, b=st.b||(st.a?(st.hover?weekEnd(st.hover):weekEnd(st.a)):null); if(!a||!b) return false; const lo=a<b?a:weekStart(b), hi=a<b?b:weekEnd(a); return d>=lo&&d<=hi; }
+   if(st.mode!=='range') return false; const a=st.a, b=st.b||(st.a&&st.hover?st.hover:null); if(!a||!b) return false; const lo=a<b?a:b, hi=a<b?b:a; return d>=lo&&d<=hi; };
   const weekSel=d=>st.mode==='week'&&st.value&&weekEnd(d)===st.value;
-  const weekOk=d=>st.mode!=='week'||st.weeks.includes(weekEnd(d));
+  const weekOk=d=>(st.mode!=='week'&&st.mode!=='period')||st.weeks.includes(weekEnd(d));
   const head=['Su','Mo','Tu','We','Th','Fr','Sa'].map(x=>`<span class="dp-dow">${x}</span>`).join('');
   return `<div class="dp-month"><div class="dp-mtitle">${parse(m).toLocaleDateString(undefined,{month:'long',year:'numeric'})}</div><div class="dp-grid">${head}${cells.map(d=>{
    const ok=clampOk(d,st.min,st.max)&&weekOk(d), other=d.slice(0,7)!==month;
@@ -11836,38 +11841,51 @@ const DatePick=(()=>{
  }
  function draw(){
   if(!pop||!st) return;
-  const two=st.mode==='range'&&innerWidth>720;
+  const two=(st.mode==='range'||st.mode==='period')&&innerWidth>720;
   const next=(()=>{ const d=parse(st.view); d.setMonth(d.getMonth()+1); return iso(d); })();
   let presets='';
   if(st.mode==='range') presets=RANGE_PRESETS().map(([l,a,b])=>{ const A=st.min&&a<st.min?st.min:a, B=st.max&&b>st.max?st.max:b; return A<=B?`<button type="button" data-pa="${A}" data-pb="${B}" class="${st.a===A&&st.b===B?'on':''}">${l}</button>`:''; }).join('');
   else if(st.mode==='single') presets=SINGLE_PRESETS().filter(([,d])=>clampOk(d,st.min,st.max)).map(([l,d])=>`<button type="button" data-p1="${d}" class="${st.value===d?'on':''}">${l}</button>`).join('')+(st.clearable?'<button type="button" data-p1="" class="dp-clear">No date</button>':'');
+  else if(st.mode==='period'){ const W=st.weeks.slice().sort(), t=today(), latest=W[W.length-1]||weekEnd(t), lastN=n=>W.slice(-n);
+   const span=(a,b)=>{ const ws=W.filter(w=>w>=weekEnd(a)&&w<=weekEnd(b)); return ws.length?[weekStart(ws[0]),ws[ws.length-1]]:null; };
+   const lm=add(monthStart(t),-1), lq=add(qStart(t),-1);
+   const list=[['Latest week',[weekStart(latest),latest]],['Last 4 weeks',lastN(4).length?[weekStart(lastN(4)[0]),latest]:null],['Last 13 weeks',lastN(13).length?[weekStart(lastN(13)[0]),latest]:null],
+    ['This month',span(monthStart(t),monthEnd(t))],['Last month',span(monthStart(lm),monthEnd(lm))],['This quarter',span(qStart(t),qEnd(t))],['Last quarter',span(qStart(lq),qEnd(lq))],['Year to date',span(t.slice(0,4)+'-01-01',t)]];
+   presets=list.filter(([,r])=>r).map(([l,[a,b]])=>`<button type="button" data-pa="${a}" data-pb="${b}" class="${st.a===a&&st.b===b?'on':''}">${l}</button>`).join('')+`<button type="button" data-pall="1" class="${st.all?'on':''}">All weeks</button>`; }
   else { const t=today(), have=w=>st.weeks.includes(w), latest=st.weeks.slice().sort().pop();
    const list=[['This week',weekEnd(t)],['Last week',add(weekEnd(t),-7)],['2 weeks ago',add(weekEnd(t),-14)],['4 weeks ago',add(weekEnd(t),-28)],['Latest uploaded',latest]].filter(([,w])=>w&&have(w));
    const seen=new Set(); presets=list.filter(([,w])=>!seen.has(w)&&seen.add(w)).map(([l,w])=>`<button type="button" data-pw="${w}" class="${st.value===w?'on':''}">${l}</button>`).join('')
     +(st.extra||[]).map(o=>`<button type="button" data-pw="${escapeHtml(o.value)}" class="${st.value===o.value?'on':''}">${escapeHtml(o.label)}</button>`).join(''); }
-  const sum=st.mode==='range'?(st.a?fmt(st.a<= (st.b||st.a)?st.a:st.b)+' – '+(st.b?fmt(st.a<=st.b?st.b:st.a):'pick the end date'):'Pick the start date')
+  const periodWeeks=()=>{ if(!st.a) return []; const b=st.b||weekEnd(st.a); return st.weeks.filter(w=>w>=weekEnd(st.a)&&w<=b); };
+  const sum=st.mode==='period'?(st.a?(()=>{ const ws=periodWeeks(); const wn=w=>{ const x=(typeof weeksData!=='undefined'?weeksData:[]).find(y=>y.weekEndDate===w); return x&&x.weekNumber!=null?x.weekNumber:weekOfDate(w).number; }; return ws.length===1?'Week '+wn(ws[0])+' · ending '+fmt(ws[0]):ws.length?ws.length+' weeks · Week '+wn(ws[0])+' – Week '+wn(ws[ws.length-1]):'No uploaded weeks in these dates'; })()+(st.b?'':' — click another day to extend'):'Click a day to pick its week')
+   :st.mode==='range'?(st.a?fmt(st.a<= (st.b||st.a)?st.a:st.b)+' – '+(st.b?fmt(st.a<=st.b?st.b:st.a):'pick the end date'):'Pick the start date')
    :st.mode==='week'?(st.value&&/^\d{4}/.test(st.value)?'Week ending '+fmt(st.value):'Pick any day in a week'):(st.value?fmt(st.value):'Pick a date');
   pop.innerHTML=`<div class="dp-presets">${presets}</div><div class="dp-main">
     <div class="dp-nav"><button type="button" data-nav="-1" aria-label="Previous month">‹</button><span class="dp-sum">${escapeHtml(sum)}</span><button type="button" data-nav="1" aria-label="Next month">›</button></div>
     <div class="dp-months">${monthGrid(st.view)}${two?monthGrid(next):''}</div>
-    ${st.mode==='range'?`<div class="dp-foot"><button type="button" class="btn btn-secondary btn-sm" data-act="cancel">Cancel</button><button type="button" class="btn btn-primary btn-sm" data-act="apply" ${st.a&&st.b?'':'disabled'}>Apply</button></div>`:''}</div>`;
+    ${st.mode==='range'||st.mode==='period'?`<div class="dp-foot"><button type="button" class="btn btn-secondary btn-sm" data-act="cancel">Cancel</button><button type="button" class="btn btn-primary btn-sm" data-act="apply" ${(st.mode==='range'?st.a&&st.b:st.a&&periodWeeks().length)?'':'disabled'}>Apply</button></div>`:''}</div>`;
   pop.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>{ const d=parse(st.view); d.setMonth(d.getMonth()+Number(b.dataset.nav)); st.view=iso(d); draw(); });
   pop.querySelectorAll('.dp-day:not([disabled])').forEach(b=>{
    b.onclick=()=>{ const d=b.dataset.d;
     if(st.mode==='single'){ finish(d); return; }
     if(st.mode==='week'){ finish(weekEnd(d)); return; }
+    if(st.mode==='period'){ st.all=false; if(!st.a||st.b){ st.a=weekStart(d); st.b=null; } else { const e=weekEnd(d); if(e<st.a){ st.b=weekEnd(st.a); st.a=weekStart(d); } else st.b=e; } draw(); return; }
     if(!st.a||st.b){ st.a=d; st.b=null; } else { if(d<st.a){ st.b=st.a; st.a=d; } else st.b=d; } draw(); };
    if(st.mode==='range') b.onmouseenter=()=>{ if(st.a&&!st.b){ st.hover=b.dataset.d; pop.querySelectorAll('.dp-day').forEach(x=>{ const lo=st.a<st.hover?st.a:st.hover, hi=st.a<st.hover?st.hover:st.a; x.classList.toggle('in',x.dataset.d>=lo&&x.dataset.d<=hi); }); } };
+   if(st.mode==='period') b.onmouseenter=()=>{ if(st.a&&!st.b){ st.hover=b.dataset.d; const he=weekEnd(st.hover), lo=st.a<he?st.a:weekStart(st.hover), hi=st.a<he?he:weekEnd(st.a); pop.querySelectorAll('.dp-day').forEach(x=>x.classList.toggle('in',x.dataset.d>=lo&&x.dataset.d<=hi)); } };
    if(st.mode==='week') b.onmouseenter=()=>{ const we=weekEnd(b.dataset.d); pop.querySelectorAll('.dp-day').forEach(x=>x.classList.toggle('hv',weekEnd(x.dataset.d)===we&&!x.disabled)); };
   });
-  pop.querySelectorAll('[data-pa]').forEach(b=>b.onclick=()=>{ st.a=b.dataset.pa; st.b=b.dataset.pb; finish(); });
+  pop.querySelectorAll('[data-pa]').forEach(b=>b.onclick=()=>{ st.a=b.dataset.pa; st.b=b.dataset.pb; st.all=false; finish(); });
+  pop.querySelectorAll('[data-pall]').forEach(b=>b.onclick=()=>{ const s=st; close(); s.onPick('all'); });
   pop.querySelectorAll('[data-p1]').forEach(b=>b.onclick=()=>finish(b.dataset.p1));
   pop.querySelectorAll('[data-pw]').forEach(b=>b.onclick=()=>finish(b.dataset.pw));
   pop.querySelector('[data-act="cancel"]')?.addEventListener('click',close);
-  pop.querySelector('[data-act="apply"]')?.addEventListener('click',()=>finish());
+  pop.querySelector('[data-act="apply"]')?.addEventListener('click',()=>{ if(st.mode==='period'&&!st.b) st.b=weekEnd(st.a); finish(); });
   place();
  }
- function finish(v){ const s=st; close(); if(s&&s.onPick) s.onPick(s.mode==='range'?[s.a,s.b||s.a]:v); }
+ function finish(v){ const s=st; close(); if(!s||!s.onPick) return;
+  if(s.mode==='period'){ const b=s.b||weekEnd(s.a); s.onPick(s.weeks.filter(w=>w>=weekEnd(s.a)&&w<=b)); return; }
+  s.onPick(s.mode==='range'?[s.a,s.b||s.a]:v); }
  // ---- wiring to real fields ----
  const fire=el=>{ if(!el) return; el.dispatchEvent(new Event('input',{bubbles:true})); el.dispatchEvent(new Event('change',{bubbles:true})); };
  function partnerOf(el){
@@ -11908,7 +11926,7 @@ const DatePick=(()=>{
  document.addEventListener('keydown',e=>{ const el=e.target; if(el&&el.matches&&el.matches('input[type=date]')&&(e.key==='Enter'||e.key===' '||(e.altKey&&e.key==='ArrowDown'))){ e.preventDefault(); openFor(el); } },true);
  // week drop-downs (options are Saturday week-endings): a calendar where you click any day of the week
  document.addEventListener('mousedown',e=>{
-  if(pop&&!e.target.closest('.dp-pop')&&!(st&&st.anchor===e.target)) close();
+  if(pop&&!e.target.closest('.dp-pop')&&!(st&&st.anchor.contains(e.target))) close();
   const sel=e.target.closest&&e.target.closest('select'); if(!sel||!isWeekSelect(sel)) return;
   e.preventDefault(); sel.focus(); openWeek(sel);
  },true);
