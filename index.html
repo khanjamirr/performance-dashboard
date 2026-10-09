@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.41.0</title>
+<title>Performance Dashboard · v4.42.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -1062,6 +1062,26 @@ button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #183442
 .goals-table td{padding-top:8px!important;padding-bottom:8px!important;vertical-align:middle!important}
 #goalsEditor .hint{font-size:12px!important;color:var(--text-secondary)}
 .goals-actions{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:12px}
+.onb-demo{background:#fff8e6;border:1px solid #f1e2a8;color:#5c4400;border-radius:8px;padding:9px 12px;margin:0 0 12px;font-size:13px}.onb-demo.bad{background:#fdecec;border-color:#f3c2c2;color:#8a1c1c}.onb-demo code{background:#fff;padding:1px 5px;border-radius:4px}
+.onb-form{border-top:3px solid #1d4ed8}.onb-form-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.onb-form-head h3{margin:0;font-size:15px}
+.onb-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px 12px}.onb-grid label{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#64748b}
+.onb-grid input,.onb-grid select{padding:8px 10px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:13.5px;font-weight:500;text-transform:none;letter-spacing:0;color:#0f1f3d;background:#fff;min-width:0;width:100%;box-sizing:border-box}.onb-grid input[readonly]{background:#f3f6fa;color:#475569}
+.onb-grid .onb-wide{grid-column:span 1}
+.onb-form-foot{display:flex;align-items:center;gap:12px;margin-top:12px;flex-wrap:wrap}.onb-form-foot>span:first-child{flex:1;min-width:200px}.onb-err{color:#b91c1c;font-size:12.5px}
+.onb-link{font-size:12px;border-radius:999px;padding:2px 9px;display:inline-block}.onb-link.ok{background:#e7f6ec;color:#166534}.onb-link.no{background:#f1f5f9;color:#64748b}
+.onb-tools{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 14px;margin:4px 0 12px}.onb-range{display:flex;gap:8px}.onb-range label{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#64748b}.onb-range input{padding:7px 9px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:13px}.onb-q input{min-width:220px}
+.onb-tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:12px}.onb-tile{background:#fff;border:1px solid #e1e7ef;border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:2px}.onb-tile span{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#64748b}.onb-tile strong{font-size:24px;color:#0a1f44}.onb-tile em{font-style:normal;font-size:11.5px;color:#64748b}.onb-tile.good strong{color:#15803d}.onb-tile.info strong{color:#1d4ed8}
+.onb-charts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}.onb-charts .panel{margin:0}.onb-charts h4{margin:0 0 8px;font-size:13px;color:#0a1f44}
+.onb-bar{display:flex;height:14px;border-radius:7px;overflow:hidden;background:#eef1f6;gap:2px}.onb-bar i{display:block;min-width:4px}
+.onb-legend{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:8px;font-size:12px;color:#334155}.onb-legend b{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:0}.onb-legend small{color:#94a3b8}
+.t0{background:#1d4ed8}.t1{background:#0891b2}.t2{background:#7c3aed}.t3{background:#d97706}.s0{background:#94a3b8}.s1{background:#f59e0b}.s2{background:#60a5fa}.s3{background:#16a34a}
+.onb-type,.onb-st{display:inline-block;font-size:11.5px;font-weight:600;border-radius:999px;padding:2px 9px;color:#fff;white-space:nowrap}
+.onb-form-foot .hint{font-size:12.5px!important}.onb-q input{padding:8px 10px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:13px;background:#fff}
+#view-onboarding .panel-head{display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap}#view-onboarding .panel-head>div:first-child{flex:1}
+.onb-table td:first-child{white-space:nowrap}
+.onb-scroll{overflow:auto;max-height:560px}.onb-table{width:100%;margin:0}.onb-table th.num,.onb-table td.num{text-align:right}.onb-act{white-space:nowrap}.onb-act .link-btn{margin-left:8px}
+@media(max-width:1100px){.onb-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.onb-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:700px){.onb-grid{grid-template-columns:1fr 1fr}.onb-tiles{grid-template-columns:1fr 1fr}.onb-charts{grid-template-columns:1fr}}
 .me-box{border:1px solid #dfe6f0;border-radius:8px;background:#f8fafd;padding:8px 12px;margin:0 0 10px}.me-box>summary{display:flex;align-items:center;gap:8px;flex-wrap:wrap;cursor:pointer;list-style:none}.me-box>summary::-webkit-details-marker{display:none}.me-box>summary .hint{flex:1;font-size:12px}
 .me-scroll{overflow:auto;max-height:320px;margin-top:8px;background:#fff;border:1px solid #e3e8ef;border-radius:6px}.me-table{margin:0;width:100%;font-size:12.5px}.me-table td,.me-table th{white-space:nowrap}
 .me-tag{display:inline-block;font-size:10.5px;font-weight:700;border-radius:999px;padding:1px 7px;margin-right:3px}.me-tag.s{background:#e3edf9;color:#0b5cad}.me-tag.v{background:#e7f6ec;color:#15803d}.me-tag.e{background:#fff4d6;color:#8a6d00}
@@ -1854,6 +1874,7 @@ input[type=date]::-webkit-calendar-picker-indicator{cursor:pointer}
       <button data-view="alerts" title="Who needs attention this week, and remarks"><span class="dot"></span>Action Center</button>
       <button data-view="divreport" title="Pipeline by client and location, per division"><span class="dot"></span>Division Report</button>
       <button data-view="pivot" title="Build your own tables and charts"><span class="dot"></span>Report Builder</button>
+      <button data-view="onboarding" title="Onboarding call log, linked to interviews by EID"><span class="dot"></span>Onboarding</button>
     </nav>
     <div class="side-label side-label-tools">Tools</div>
     <div class="ribbon-actions">
@@ -1943,6 +1964,7 @@ input[type=date]::-webkit-calendar-picker-indicator{cursor:pointer}
         <div id="view-pivot" class="hidden"></div>
         <div id="view-history" class="hidden"></div>
         <div id="view-divreport" class="hidden"></div>
+        <div id="view-onboarding" class="hidden"></div>
       </div>
       <div class="muted-note" id="storageModeNote" style="text-align:center;margin-top:24px;">Data stored locally in this browser.</div>
       <div class="muted-note" style="text-align:center;margin-top:4px;opacity:.65;">
@@ -2746,7 +2768,7 @@ document.addEventListener('mouseout', (e)=>{
 });
 // Candidate names / Employee Numbers are only shown to people with the Candidates right.
 const TEAM_SCOPE='scope.team_names_only';
-const GRANT_MODULES=['divreport'];   // page rights stored as grant.<key> (see Server.rpc)
+const GRANT_MODULES=['divreport','onboarding'];   // page rights stored as grant.<key> (see Server.rpc)
 function canSeeCandidates(){ return Server.can('candidates'); }
 // v4.21: the hover lists moved to Report Builder — tables show plain numbers everywhere.
 function candidateCellHtml(value, list, metricKey, entityName){
@@ -4196,6 +4218,7 @@ const VIEW_META = {
   alerts:{title:'Action Center', sub:'Who needs attention this week — below 50% of goal first'},
   pivot:{title:'Report Builder', sub:'Drag fields into Rows, Columns, Values and Filters — the chart builds itself'},
   divreport:{title:'Division Report', sub:'Pipeline by client and location, per division'},
+  onboarding:{title:'Onboarding', sub:'Onboarder call log — each EID linked to its schedule and interview'},
   history:{title:'History', sub:'Every week on record'},
   master:{title:'Candidate Hub', sub:'Every candidate row from every import, in one sheet — filter any column, exclude or include candidates'},
   settings:{title:'Settings', sub:'Uploads, saved weeks, divisions, users and your account'},
@@ -4259,7 +4282,7 @@ async function refreshUI(){
   // The Uploads page must stay reachable even with zero weeks saved — it's the page you use
   // to add the first one — so it's treated as always-showable, unlike Performance/Recruiter/
   // Branch which genuinely have nothing to render without data.
-  const showDashboardViews = hasData || currentView==='master' || currentView==='teams' || currentView==='leads' || currentView==='divreport';
+  const showDashboardViews = hasData || currentView==='master' || currentView==='teams' || currentView==='leads' || currentView==='divreport' || currentView==='onboarding';
   document.getElementById('emptyState').classList.toggle('hidden', showDashboardViews);
   document.getElementById('dashboardViews').classList.toggle('hidden', !showDashboardViews);
   document.getElementById('downloadDropdownWrap').classList.toggle('hidden', !hasData);
@@ -4268,11 +4291,11 @@ async function refreshUI(){
   document.getElementById('viewTitle').textContent = meta.title;
   document.getElementById('viewSub').textContent = showDashboardViews ? meta.sub : 'No data uploaded yet';
 
-  ['teams','leads','performance','recruiters','branches','master','candidates','alerts','pivot','history','divreport'].forEach(v=>{
+  ['teams','leads','performance','recruiters','branches','master','candidates','alerts','pivot','history','divreport','onboarding'].forEach(v=>{
     document.getElementById('view-'+v).classList.toggle('hidden', v!==currentView);
   });
 
-  document.getElementById('topbarCenter').classList.toggle('hidden', !showDashboardViews || ['teams','leads','candidates','alerts','pivot','history','divreport'].includes(currentView));
+  document.getElementById('topbarCenter').classList.toggle('hidden', !showDashboardViews || ['teams','leads','candidates','alerts','pivot','history','divreport','onboarding'].includes(currentView));
 
   if(currentView!=='recruiters' && currentView!=='branches' && currentView!=='master' && currentView!=='candidates' && currentView!=='alerts' && currentView!=='pivot'){
     const extra = document.getElementById('topbarExtra');
@@ -4282,11 +4305,12 @@ async function refreshUI(){
   renderPeriodPickerButton();
   closePeriodPicker();
   syncDedupeControls();
-  document.getElementById('periodPicker')?.classList.toggle('hidden', currentView==='teams' || currentView==='leads' || currentView==='candidates' || currentView==='alerts' || currentView==='pivot' || currentView==='history' || currentView==='divreport');
+  document.getElementById('periodPicker')?.classList.toggle('hidden', currentView==='teams' || currentView==='leads' || currentView==='candidates' || currentView==='alerts' || currentView==='pivot' || currentView==='history' || currentView==='divreport' || currentView==='onboarding');
   ['weeklyDivisionSelect','weeklyDivisionSelectLbl'].forEach(id=>document.getElementById(id).classList.toggle('hidden',currentView!=='performance'));
   if(currentView==='teams'){ renderTeamGroups(); return; }
   if(currentView==='leads'){ renderLeadsView(); return; }
   if(currentView==='divreport'){ renderDivReportView(); return; }
+  if(currentView==='onboarding'){ Onboarding.show(); return; }
   if(!hasData){ if(showDashboardViews) renderMasterView(); return; }
 
   if(!currentWeekEndDate || (currentWeekEndDate!=='all-weeks' && !weeksData.find(w=>w.weekEndDate===currentWeekEndDate))){
@@ -7930,6 +7954,7 @@ const MODULES = [
   {key:'candidates',  label:'Candidate Hub — pipeline and names', hint:'Candidate names & Employee Numbers anywhere: the Candidates page, hover lists in tables and the recruiter detail page'},
   {key:'alerts',      label:'Alerts', hint:'Recruiters below 50% of their goal, other signals and remarks'},
   {key:'pivot',       label:'Report Builder', hint:'Build their own pivot tables and charts, and save views'},
+  {key:'onboarding',  label:'Onboarding', hint:'Onboarding call log — onboarders add and edit their own calls; admins see everyone'},
   {key:'divreport',   label:'Division Report', hint:'Client / location pipeline (North / SE / SC and West weekly); red flags need the candidate-names right'},
   {key:'master',      label:'Candidate Hub — all records', hint:'Browse and filter every candidate row'},
   {key:'master_edit', label:'Candidate Hub — exclude / include', hint:'Remove candidates from the metrics or bring them back'},
@@ -7939,7 +7964,7 @@ const MODULES = [
   {key:'settings',    label:'Settings', hint:'Divisions, branch divisions, show/hide recruiters, saved weeks'},
   {key:'export',      label:'Download & share', hint:'Excel, PDF, Word, master sheet download, snapshots'},
 ];
-const VIEW_MODULE = {teams:'teams',leads:'teams',performance:'performance', recruiters:'recruiters', branches:'branches', master:'master', candidates:'candidate_hub', alerts:'alerts', pivot:'pivot', divreport:'divreport'};
+const VIEW_MODULE = {teams:'teams',leads:'teams',performance:'performance', recruiters:'recruiters', branches:'branches', master:'master', candidates:'candidate_hub', alerts:'alerts', pivot:'pivot', divreport:'divreport', onboarding:'onboarding'};
 
 function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
 // ---------- Reload keeps you on the same page (this tab) ----------
@@ -7978,7 +8003,7 @@ async function restoreNav(){
 }
 window.addEventListener('beforeunload',()=>saveNav());
 // Default page: the person's own choice (this browser) → the one an admin set for them → first page they can open.
-const DEFAULT_VIEW_LABELS = {performance:'Performance Overview', teams:'My Team', leads:'Team Leads (admins)', recruiters:'Recruiter Scorecards', branches:'Branch Results', alerts:'Action Center', candidates:'Candidates', master:'Candidates — master sheet', pivot:'Report Builder', divreport:'Division Report'};
+const DEFAULT_VIEW_LABELS = {performance:'Performance Overview', teams:'My Team', leads:'Team Leads (admins)', recruiters:'Recruiter Scorecards', branches:'Branch Results', alerts:'Action Center', candidates:'Candidates', master:'Candidates — master sheet', pivot:'Report Builder', divreport:'Division Report', onboarding:'Onboarding'};
 function adminDefaultViews(){ return KV.get('userDefaultViews')||{}; }
 function defaultViewOptions(u){ const can=v=>v==='teams'&&(u?u.role!=='user':Server.isAdmin())?false:v==='leads'?(u?u.role!=='user':Server.isAdmin()):(!u||u.role!=='user'||v==='teams'||(u.modules||[]).includes(VIEW_MODULE[v])); return Object.keys(DEFAULT_VIEW_LABELS).filter(v=>VIEW_MODULE[v]&&can(v)).map(v=>[v,DEFAULT_VIEW_LABELS[v]]); }
 function myDefaultViewKey(){ return 'ipd_default_view:'+(Server.user?.id||''); }
@@ -10339,6 +10364,7 @@ const UF_PAGES = [
   {mod:'branches', label:'Branches', desc:'Branch table, trends and history', sec:'branches', extras:['grant.branch_merge']},
   {mod:'alerts', label:'Action Center', desc:'Who is below goal and other signals', sec:'alerts', extras:['remarks_approve']},
   {mod:'divreport', label:'Division Report', desc:'Pipeline by client and location, per division'},
+  {mod:'onboarding', label:'Onboarding', desc:'Log onboarding calls by EID — they see and edit their own entries (needs onboarding.sql)'},
   {mod:'pivot', label:'Report Builder', desc:'Build their own tables and charts', sec:'pivot'},
   {mod:'candidates', label:'Candidates', desc:'Settings → Candidates, plus candidate names and Employee Numbers everywhere', sec:'candidates', extras:['master','master_edit']},
 ];
@@ -10347,6 +10373,7 @@ const UF_EXTRA_LABEL = {remarks:'Can add remarks', remarks_approve:'Can approve 
   master:'Browse all candidate records', master_edit:'Exclude or include candidates', upload:'Upload spreadsheets', export:'Download and share', settings:'Settings — divisions, branches, goals'};
 const UF_PRESETS = [
   {name:'Viewer', desc:'Overview, recruiters and branches', modules:['performance','recruiters','branches']},
+  {name:'Onboarder', desc:'Only the Onboarding page — logs their own calls', modules:['onboarding'], grants:['grant.no_team']},
   {name:'Team lead', desc:'Viewer + Action Center, remarks, team names', modules:['performance','recruiters','branches','alerts','remarks'], grants:['grant.team_names','grant.break_image']},
   {name:'Manager', desc:'Every page, approves remarks, downloads', modules:['performance','recruiters','branches','alerts','remarks','remarks_approve','divreport','pivot','candidates','master','export'], grants:['grant.team_names','grant.break_image','grant.branch_merge']},
 ];
@@ -11452,7 +11479,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.41.0';   // shown only in the browser tab title
+const APP_VERSION = '4.42.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -11500,7 +11527,7 @@ document.addEventListener('keydown', e=>{
   const search=document.querySelector('#topbarExtra input[type="search"]'); if(search){ e.preventDefault(); search.focus(); }
 });
 // ---------- Manage access in place (super admin) ----------
-const PAGE_MODULE = {performance:'performance', recruiters:'recruiters', branches:'branches', candidates:'candidates', master:'master', alerts:'alerts', pivot:'pivot', divreport:'divreport'};
+const PAGE_MODULE = {performance:'performance', recruiters:'recruiters', branches:'branches', candidates:'candidates', master:'master', alerts:'alerts', pivot:'pivot', divreport:'divreport', onboarding:'onboarding'};
 const PAGE_EDIT = {performance:['upload','export'], recruiters:['remarks','export'], branches:['export','grant.branch_merge'], candidates:['master_edit','export'], master:['master_edit','export'], alerts:['remarks','remarks_approve'], pivot:['export'], teams:['grant.team_names','grant.break_image'], leads:[], divreport:['upload','candidates']};
 const EDIT_LABEL = {'grant.branch_merge':'Merge branches', 'grant.break_image':'Copy third-break list as image', 'grant.team_names':'See their team’s candidate names', candidates:'See all candidate names'};
 let accessMode=false, accessObs=null;
@@ -11664,8 +11691,9 @@ function toggleNavMore(force){ const on=force===undefined?!document.body.classLi
     alerts:'<path d="M12 3l9.5 16.5h-19z"/><path d="M12 10v4M12 17.5v.5"/>',
     pivot:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/><path d="M13 17v-3M16 17v-5M19 17v-2" stroke-width="1.6"/>',
     divreport:'<path d="M4 4h16v4H4zM4 10h7v10H4zM13 10h7v4h-7zM13 16h7v4h-7z"/>',
+    onboarding:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/>',
     candidates:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2.2"/><path d="M5.8 16c.6-1.6 1.8-2.4 3.2-2.4s2.6.8 3.2 2.4M14.5 10h4M14.5 13.5h3"/>'};
-  const short = {teams:'My Team', leads:'Leads', performance:'Overview', recruiters:'Recruiters', branches:'Branches', master:'Master', candidates:'Names', alerts:'Alerts', pivot:'Pivot', divreport:'Divisions'};
+  const short = {teams:'My Team', leads:'Leads', performance:'Overview', recruiters:'Recruiters', branches:'Branches', master:'Master', candidates:'Names', alerts:'Alerts', pivot:'Pivot', divreport:'Divisions', onboarding:'Onboard'};
   document.querySelectorAll('#navList button[data-view]').forEach(b=>{
     const v=b.dataset.view; if(!icons[v]) return;
     [...b.childNodes].forEach(n=>{ if(n.nodeType===3 && n.textContent.trim()){ const s=document.createElement('span'); s.className='nav-full'; s.textContent=n.textContent; b.replaceChild(s,n); } });
@@ -12176,6 +12204,134 @@ const DivReport=(()=>{
   }catch(e){ console.warn('division report publish',e); } finally{ pubBusy=false; }
  }
  return {show, publish};
+})();
+/* ============================== ONBOARDING ==============================
+   Onboarders log each call: Date, EID, Call Type, Duration, Status. EID links the call to the
+   candidate's schedule / interview from the uploaded data. Stored in dash_onboarding (onboarding.sql);
+   until that SQL is run the page works in demo mode, saved in this browser only. */
+const Onboarding=(()=>{
+ const CALL_TYPES=['Live Transfer','Outbound','Inbound','Schedule Later'];
+ const STATUSES=['In Process','EB Complete / I9 Section-1 Pending','EB Complete / I9 Section-1 Complete','EB Complete / I9 Complete'];
+ const ST_CLS={'In Process':'s0','EB Complete / I9 Section-1 Pending':'s1','EB Complete / I9 Section-1 Complete':'s2','EB Complete / I9 Complete':'s3'};
+ const DEMO_KEY='ipd_onb_demo';
+ const today=()=>ltToday(), back=n=>{ const d=new Date(); d.setDate(d.getDate()-n); return toIsoDateOnly(d); };
+ const st={from:back(13), to:today(), rows:null, demo:false, err:'', fOnb:'', fType:'', fStatus:'', q:'', editing:null, busy:false};
+ const normEid=v=>normalizeEmployeeNumber(String(v||'').trim());
+ const demoRows=()=>{ try{ return JSON.parse(localStorage.getItem(DEMO_KEY)||'[]'); }catch(e){ return []; } };
+ const demoSave=list=>{ try{ localStorage.setItem(DEMO_KEY, JSON.stringify(list)); }catch(e){} };
+ const missing=e=>/Could not find|schema cache|does not exist|PGRST202/i.test(String(e&&e.message||e));
+ async function load(){
+  st.err='';
+  try{ st.rows=await Server.rpc('dash_onb_list',{p_from:st.from, p_to:st.to}) || []; st.demo=false; }
+  catch(e){ if(missing(e)||!Server.token){ st.demo=true; const me=Server.user&&Server.user.id; st.rows=demoRows().filter(r=>r.call_date>=st.from&&r.call_date<=st.to&&(Server.isAdmin()||r.onboarder_id===me)).sort((a,b)=>b.call_date.localeCompare(a.call_date)||b.id-a.id); }
+   else { st.rows=[]; st.err=cleanErr(e); } }
+ }
+ async function save(row){
+  if(!st.demo){ return Server.rpc('dash_onb_save',{p_row:row}); }
+  const list=demoRows(); const now=new Date().toISOString();
+  if(row.id){ const i=list.findIndex(x=>String(x.id)===String(row.id)); if(i>=0) list[i]={...list[i], ...row, updated_at:now}; }
+  else list.push({...row, id:Date.now(), onboarder_id:Server.user.id, onboarder:(Server.isAdmin()&&row.onboarder)||Server.user.name, created_at:now, updated_at:now});
+  demoSave(list); return true;
+ }
+ async function del(id){ if(!st.demo) return Server.rpc('dash_onb_delete',{p_id:id}); demoSave(demoRows().filter(x=>String(x.id)!==String(id))); return true; }
+ // EID → what the uploaded data knows about this candidate (latest first)
+ let eidIdx=null, eidKey='';
+ function eidIndex(){
+  const k=weeksData.length+'|'+weeksData.map(w=>w.savedAt||'').join(); if(eidIdx&&k===eidKey) return eidIdx; eidKey=k; eidIdx=new Map();
+  const put=(eid,patch)=>{ const e=normEid(eid); if(!e||e==='–') return; const cur=eidIdx.get(e)||{}; eidIdx.set(e,{...cur,...Object.fromEntries(Object.entries(patch).filter(([kk,v])=>v!=null&&(cur[kk]==null||kk==='last')))}); };
+  [...weeksData].sort((a,b)=>a.weekEndDate.localeCompare(b.weekEndDate)).forEach(w=>Object.entries(w.byRecruiter||{}).forEach(([rec,r])=>{
+   (r.schedulesList||[]).forEach(c=>put(c.eid,{recruiter:rec, branch:c.branch||r.branch, scheduled:c.date, name:c.name}));
+   (r.interviewsList||[]).forEach(c=>put(c.eid,{recruiter:rec, branch:c.branch||r.branch, interview:c.date, name:c.name}));
+   (r.showsList||[]).forEach(c=>put(c.eid,{showed:c.date||true}));
+   (r.noShowsList||[]).forEach(c=>put(c.eid,{noShow:c.date||true}));
+   (r.i9List||[]).forEach(c=>put(c.eid,{hired:c.date||true}));
+  }));
+  return eidIdx;
+ }
+ const linkOf=eid=>eidIndex().get(normEid(eid))||null;
+ const linkHtml=l=>l?`<span class="onb-link ok" title="Found in the uploaded schedules / interviews">✓ ${escapeHtml(l.recruiter||'')}${l.branch?' · '+escapeHtml(l.branch):''}${l.interview?' · interview '+fmtDate(l.interview):l.scheduled?' · scheduled '+fmtDate(l.scheduled):''}${l.showed?' · showed':l.noShow?' · no-show':''}${l.hired?' · hired':''}</span>`:'<span class="onb-link no" title="This EID isn’t in the loaded schedule / interview data">Not matched yet</span>';
+ function stats(rows){
+  const t=today(), wk=weekOfDate(t), n=rows.length, by=k=>{ const m={}; rows.forEach(r=>{ m[r[k]]=(m[r[k]]||0)+1; }); return m; };
+  const dur=rows.filter(r=>r.duration_min!=null&&r.duration_min!==''), avg=dur.length?dur.reduce((a,r)=>a+Number(r.duration_min),0)/dur.length:null;
+  const linked=rows.filter(r=>linkOf(r.eid)).length;
+  return {n, todayN:rows.filter(r=>r.call_date===t).length, weekN:rows.filter(r=>r.call_date>=wk.weekStart&&r.call_date<=wk.weekEnd).length, types:by('call_type'), statuses:by('status'), avg, linked, complete:rows.filter(r=>r.status==='EB Complete / I9 Complete').length};
+ }
+ function formHtml(){
+  const e=st.editing||{}, adm=Server.isAdmin();
+  return `<form class="panel onb-form" id="onbForm" autocomplete="off">
+   <div class="onb-form-head"><h3>${e.id?'Edit call':'Log a call'}</h3>${e.id?'<button type="button" class="link-btn" id="onbCancel">Cancel edit</button>':''}</div>
+   <div class="onb-grid">
+    <label>Onboarder<input id="onbWho" value="${escapeHtml(e.onboarder||Server.user.name)}" ${adm?'':'readonly'}></label>
+    <label>Date *<input type="date" id="onbDate" value="${escapeHtml(e.call_date||today())}" max="${today()}"></label>
+    <label>EID *<input id="onbEid" value="${escapeHtml(e.eid||'')}" placeholder="Employee Number" inputmode="numeric" required></label>
+    <label>Call type *<select id="onbType" required><option value="">Choose…</option>${CALL_TYPES.map(c=>`<option ${e.call_type===c?'selected':''}>${c}</option>`).join('')}</select></label>
+    <label>Duration (min)<input type="number" id="onbDur" min="0" step="0.5" value="${e.duration_min??''}" placeholder="e.g. 12"></label>
+    <label class="onb-wide">Status *<select id="onbStatus" required><option value="">Choose…</option>${STATUSES.map(c=>`<option ${e.status===c?'selected':''}>${c}</option>`).join('')}</select></label>
+   </div>
+   <div class="onb-form-foot"><span id="onbMatch">${e.eid?linkHtml(linkOf(e.eid)):'<span class="hint">Type the EID to see the matching schedule / interview.</span>'}</span><span class="onb-err" id="onbErr" role="alert"></span><button type="submit" class="btn btn-primary" ${st.busy?'disabled':''}>${e.id?'Save changes':'＋ Add call'}</button></div>
+  </form>`;
+ }
+ function render(){
+  const host=document.getElementById('view-onboarding'); if(!host) return;
+  if(!Server.can('onboarding')){ host.innerHTML='<div class="panel"><p class="hint" style="margin:0">Ask an admin for the Onboarding right.</p></div>'; return; }
+  const all=st.rows||[], adm=Server.isAdmin(), q=st.q.trim().toLowerCase();
+  const rows=all.filter(r=>(!st.fOnb||r.onboarder===st.fOnb)&&(!st.fType||r.call_type===st.fType)&&(!st.fStatus||r.status===st.fStatus)&&(!q||String(r.eid).toLowerCase().includes(q)||String(r.onboarder).toLowerCase().includes(q)||String((linkOf(r.eid)||{}).recruiter||'').toLowerCase().includes(q)));
+  const S=stats(rows), onbs=[...new Set(all.map(r=>r.onboarder))].sort();
+  const tile=(lbl,val,sub,cls)=>`<div class="onb-tile ${cls||''}"><span>${lbl}</span><strong>${val}</strong>${sub?`<em>${sub}</em>`:''}</div>`;
+  const bar=(m,keys,cls)=>{ const tot=keys.reduce((a,k)=>a+(m[k]||0),0)||1; return `<div class="onb-bar">${keys.map(k=>m[k]?`<i class="${cls?cls(k):''}" style="flex:${m[k]}" title="${escapeHtml(k)}: ${m[k]}"></i>`:'').join('')}</div><div class="onb-legend">${keys.map(k=>`<span><b class="${cls?cls(k):''}"></b>${escapeHtml(k)} · <strong>${m[k]||0}</strong> <small>${Math.round((m[k]||0)/tot*100)}%</small></span>`).join('')}</div>`; };
+  // per-onboarder summary (admins)
+  const per=adm?onbs.map(o=>{ const rs=rows.filter(r=>r.onboarder===o), d=rs.filter(r=>r.duration_min!=null&&r.duration_min!==''); return {o, n:rs.length, done:rs.filter(r=>r.status==='EB Complete / I9 Complete').length, ip:rs.filter(r=>r.status==='In Process').length, avg:d.length?d.reduce((a,r)=>a+Number(r.duration_min),0)/d.length:null, types:CALL_TYPES.map(t=>rs.filter(r=>r.call_type===t).length)}; }).filter(x=>x.n).sort((a,b)=>b.n-a.n):[];
+  host.innerHTML=`${st.demo?'<div class="onb-demo"><strong>Demo mode</strong> — entries are saved in this browser only. Run <code>onboarding.sql</code> in Supabase to share them with everyone.</div>':''}${st.err?`<div class="onb-demo bad">Could not load: ${escapeHtml(st.err)}</div>`:''}
+   ${formHtml()}
+   <div class="onb-tools">
+    <div class="onb-range"><label>From<input type="date" id="onbFrom" value="${st.from}"></label><label>To<input type="date" id="onbTo" value="${st.to}"></label></div>
+    ${adm?`<label class="cand-field"><span>Onboarder</span><select id="onbFOnb"><option value="">Everyone</option>${onbs.map(o=>`<option ${st.fOnb===o?'selected':''}>${escapeHtml(o)}</option>`).join('')}</select></label>`:''}
+    <label class="cand-field"><span>Call type</span><select id="onbFType"><option value="">All</option>${CALL_TYPES.map(c=>`<option ${st.fType===c?'selected':''}>${c}</option>`).join('')}</select></label>
+    <label class="cand-field"><span>Status</span><select id="onbFStatus"><option value="">All</option>${STATUSES.map(c=>`<option ${st.fStatus===c?'selected':''}>${c}</option>`).join('')}</select></label>
+    <label class="cand-field onb-q"><span>Search</span><input type="search" id="onbQ" value="${escapeHtml(st.q)}" placeholder="EID, onboarder or recruiter"></label>
+   </div>
+   <div class="onb-tiles">${tile('Calls',fmtNum(S.n),fmtDate(st.from)+' – '+fmtDate(st.to))}${tile('Today',fmtNum(S.todayN),'this week '+fmtNum(S.weekN))}${tile('Fully complete',fmtNum(S.complete),S.n?Math.round(S.complete/S.n*100)+'% EB + I9 complete':'','good')}${tile('Avg. duration',S.avg==null?'–':S.avg.toFixed(1)+' min','')}${tile('Linked to an interview',fmtNum(S.linked),S.n?Math.round(S.linked/S.n*100)+'% of EIDs matched':'','info')}</div>
+   <div class="onb-charts"><div class="panel"><h4>Call type</h4>${bar(S.types,CALL_TYPES,k=>'t'+CALL_TYPES.indexOf(k))}</div><div class="panel"><h4>Status</h4>${bar(S.statuses,STATUSES,k=>ST_CLS[k])}</div></div>
+   ${per.length?`<section class="panel"><div class="panel-head"><h3>By onboarder</h3></div><div class="onb-scroll"><table class="users-table onb-table"><thead><tr><th>Onboarder</th><th class="num">Calls</th>${CALL_TYPES.map(t=>`<th class="num">${t}</th>`).join('')}<th class="num">In process</th><th class="num">Fully complete</th><th class="num">Avg. min</th></tr></thead><tbody>${per.map(x=>`<tr><td><button type="button" class="link-btn" data-onb-pick="${escapeHtml(x.o)}">${escapeHtml(x.o)}</button></td><td class="num"><strong>${x.n}</strong></td>${x.types.map(n=>`<td class="num">${n||'–'}</td>`).join('')}<td class="num">${x.ip||'–'}</td><td class="num">${x.done||'–'}</td><td class="num">${x.avg==null?'–':x.avg.toFixed(1)}</td></tr>`).join('')}</tbody></table></div></section>`:''}
+   <section class="panel"><div class="panel-head"><div><h3>Call log <span class="al-count">${rows.length}</span></h3><span class="hint">${adm?'Everyone’s calls.':'Your calls.'} The last column shows what the uploaded data has for that EID.</span></div>${rows.length?copyBtnHtml('onbTable')+(Server.can('export')?downloadBtnHtml('onbTable','onboarding-calls.xlsx'):''):''}</div>
+    ${rows.length?`<div class="onb-scroll"><table class="users-table onb-table" id="onbTable"><thead><tr><th>Date</th><th>Onboarder</th><th>EID</th><th>Call type</th><th class="num">Duration</th><th>Status</th><th>Schedule / interview (by EID)</th><th></th></tr></thead><tbody>
+     ${rows.map(r=>`<tr><td>${fmtDate(r.call_date)}</td><td>${escapeHtml(r.onboarder)}</td><td><strong>${escapeHtml(r.eid)}</strong></td><td><span class="onb-type t${CALL_TYPES.indexOf(r.call_type)}">${escapeHtml(r.call_type)}</span></td><td class="num">${r.duration_min!=null&&r.duration_min!==''?Number(r.duration_min)+' min':'–'}</td><td><span class="onb-st ${ST_CLS[r.status]||''}">${escapeHtml(r.status)}</span></td><td>${linkHtml(linkOf(r.eid))}</td><td class="onb-act">${adm||r.onboarder_id===Server.user.id?`<button class="link-btn" data-onb-edit="${r.id}">Edit</button><button class="link-btn danger" data-onb-del="${r.id}">Delete</button>`:''}</td></tr>`).join('')}
+    </tbody></table></div>`:`<p class="hint" style="margin:0">${all.length?'No calls match these filters.':'No calls logged in these dates yet — use “Log a call” above.'}</p>`}</section>`;
+  wire(host, rows);
+ }
+ function wire(host, rows){
+  const $=sel=>host.querySelector(sel);
+  const eidIn=$('#onbEid'); eidIn.addEventListener('input',()=>{ const v=eidIn.value.trim(); $('#onbMatch').innerHTML=v?linkHtml(linkOf(v)):'<span class="hint">Type the EID to see the matching schedule / interview.</span>'; });
+  $('#onbCancel')?.addEventListener('click',()=>{ st.editing=null; render(); });
+  $('#onbForm').addEventListener('submit',async ev=>{ ev.preventDefault();
+   const err=t=>{ $('#onbErr').textContent=t; };
+   const row={id:st.editing&&st.editing.id||undefined, call_date:$('#onbDate').value, eid:normEid(eidIn.value)||eidIn.value.trim(), call_type:$('#onbType').value, duration_min:$('#onbDur').value===''?'':String(Number($('#onbDur').value)), status:$('#onbStatus').value, onboarder:$('#onbWho').value.trim()};
+   if(!row.call_date) return err('Pick the date.'); if(!row.eid) return err('Enter the EID.'); if(!row.call_type) return err('Choose the call type.'); if(!row.status) return err('Choose the status.');
+   if(row.duration_min!==''&&!(Number(row.duration_min)>=0)) return err('Duration must be 0 or more minutes.');
+   st.busy=true;
+   try{ await save(row); showToast(row.id?'Call updated.':'Call logged for EID '+row.eid+'.'); st.editing=null; if(row.call_date<st.from) st.from=row.call_date; if(row.call_date>st.to) st.to=row.call_date; await load(); }
+   catch(e){ st.busy=false; return err('Not saved: '+cleanErr(e)); }
+   st.busy=false; render(); setTimeout(()=>document.getElementById('onbEid')?.focus(),30);
+  });
+  const reload=async()=>{ await load(); render(); };
+  $('#onbFrom').addEventListener('change',e=>{ if(e.target.value){ st.from=e.target.value; if(st.to<st.from) st.to=st.from; reload(); } });
+  $('#onbTo').addEventListener('change',e=>{ if(e.target.value){ st.to=e.target.value; reload(); } });
+  $('#onbFOnb')?.addEventListener('change',e=>{ st.fOnb=e.target.value; render(); });
+  $('#onbFType').addEventListener('change',e=>{ st.fType=e.target.value; render(); });
+  $('#onbFStatus').addEventListener('change',e=>{ st.fStatus=e.target.value; render(); });
+  let t; $('#onbQ').addEventListener('input',e=>{ clearTimeout(t); t=setTimeout(()=>{ st.q=e.target.value; render(); const q=document.getElementById('onbQ'); if(q){ q.focus(); q.setSelectionRange(q.value.length,q.value.length); } },250); });
+  host.querySelectorAll('[data-onb-pick]').forEach(b=>b.onclick=()=>{ st.fOnb=b.dataset.onbPick; render(); });
+  host.querySelectorAll('[data-onb-edit]').forEach(b=>b.onclick=()=>{ st.editing=(st.rows||[]).find(r=>String(r.id)===b.dataset.onbEdit)||null; render(); window.scrollTo({top:0,behavior:'smooth'}); });
+  host.querySelectorAll('[data-onb-del]').forEach(b=>b.onclick=async()=>{ const r=(st.rows||[]).find(x=>String(x.id)===b.dataset.onbDel); if(!r||!confirm('Delete the '+r.call_type+' call for EID '+r.eid+' on '+fmtDate(r.call_date)+'?')) return;
+   try{ await del(r.id); showToast('Call deleted.'); await load(); render(); }catch(e){ showToast('Could not delete: '+cleanErr(e)); } });
+ }
+ async function show(){
+  const host=document.getElementById('view-onboarding'); if(!host) return;
+  if(st.rows==null){ host.innerHTML='<div class="panel"><p class="hint" style="margin:0">Loading onboarding calls…</p></div>'; await load(); }
+  if(currentView!=='onboarding') return;
+  render();
+ }
+ return {show, reload:async()=>{ await load(); render(); }, CALL_TYPES, STATUSES};
 })();
 function renderDivReportView(){ DivReport.show(); }
 
