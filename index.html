@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.38.0</title>
+<title>Performance Dashboard · v4.39.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -1062,6 +1062,13 @@ button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #183442
 .goals-table td{padding-top:8px!important;padding-bottom:8px!important;vertical-align:middle!important}
 #goalsEditor .hint{font-size:12px!important;color:var(--text-secondary)}
 .goals-actions{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:12px}
+.goals-filter{display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap;margin:12px 0 8px}.goals-filter .ge-search{flex:0 1 280px;margin:0}.goals-filter .ge-search input{width:100%}
+.goals-wrap{overflow-x:auto;max-width:100%;border:1px solid #e3e8ef;border-radius:8px}
+#goalsEditor .goals-table{width:100%;min-width:560px;table-layout:auto;margin:0}
+#goalsEditor .goals-table thead th{position:sticky;top:0;background:#f6f8fc;z-index:1}
+#goalsEditor .goals-table .goal-input{width:100px;max-width:100%}
+.ge-idle{display:inline-block;margin-left:8px;font-size:10.5px;color:#8a6d00;background:#fff7db;border:1px solid #f1e2a8;border-radius:999px;padding:0 7px;vertical-align:1px}
+#goalsEditor .goals-actions{position:sticky;bottom:0;background:#fff;padding:10px 0 2px;margin-top:8px}
 
 .uw-label{display:block;font-size:12px;font-weight:700;color:#3b5562;margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
 #uwDate{width:100%;font-size:15px;padding:10px 12px;background:#fff;border:1px solid #cfdde2;border-radius:9px;box-sizing:border-box;font-family:inherit}
@@ -4350,10 +4357,18 @@ function renderGoalsEditor(){
   const weeks = [...sats].filter(d=>/^\d{4}-\d{2}-\d{2}$/.test(d)).sort().reverse();
   if(!st.week || !weeks.includes(st.week)) st.week = thisSat;
   const saved = KV.get('goals:'+st.week) || {};
-  // recruiters: anyone active that week, in the 4 weeks before it, or with a saved goal
-  const names = new Set(Object.keys(saved));
-  weeksData.filter(w=>w.weekEndDate<=st.week).slice(-5).forEach(w=>Object.keys(w.byRecruiter||{}).forEach(n=>{ if(n && n!=='Unassigned') names.add(n); }));
-  const list = [...names].filter(n=>typeof isRecruiterHidden!=='function' || !isRecruiterHidden(n)).sort((a,b)=>a.localeCompare(b));
+  // recruiters: everyone ever uploaded, anyone with a goal in any week, and every team member —
+  // so nobody is missing just because they had no schedules lately
+  const names = new Set(Object.keys(saved)), lastSeen = {};
+  [...weeksData].sort((a,b)=>a.weekEndDate.localeCompare(b.weekEndDate)).forEach(w=>Object.entries(w.byRecruiter||{}).forEach(([n,r])=>{ if(n && n!=='Unassigned'){ names.add(n); if((r.schedules||0)+(r.scheduledDateOf||0)>0) lastSeen[n]=w.weekEndDate; } }));
+  [...KV.keys()].filter(k=>k.startsWith('goals:')).forEach(k=>Object.keys(KV.get(k)||{}).forEach(n=>n&&names.add(n)));
+  try{ (ltLeads.teams||[]).forEach(t=>{ if(t.recruiter_name) names.add(t.recruiter_name); (t.memberships||[]).forEach(m=>m&&m.name&&names.add(m.name)); }); }catch(e){}
+  const recentFrom = (()=>{ const d=new Date(st.week+'T00:00:00'); d.setDate(d.getDate()-35); return toIsoDateOnly(d); })();
+  const isRecent = n=>saved[n]!==undefined || (lastSeen[n] && lastSeen[n]>=recentFrom && lastSeen[n]<=st.week) || (lastSeen[n] && lastSeen[n]>st.week);
+  const allList = [...names].filter(n=>n && !excludedRecruitersSet.has(n)).sort((a,b)=>a.localeCompare(b));
+  const q = (st.q||'').trim().toLowerCase(), show = st.show||'all';
+  const list = allList.filter(n=>(!q || n.toLowerCase().includes(q) || String(getEffectiveRecruiterDivision(n, st.week)||'').toLowerCase().includes(q)) && (show==='all' || (show==='recent'?isRecent(n):!isRecent(n))));
+  const nRecent = allList.filter(isRecent).length;
   const canEdit = Server.can('settings') || Server.can('upload');
   const w = weekOfDate(st.week);
   host.innerHTML = `<div class="panel">
@@ -4362,14 +4377,23 @@ function renderGoalsEditor(){
       <label class="cand-field"><span>Week ending (Saturday)</span><select id="geWeek">${weeks.map(d=>`<option value="${d}" ${d===st.week?'selected':''}>Sat ${fmtDate(d)} · Week ${weekOfDate(d).number}${d===thisSat?' (this week)':''}${KV.has('goals:'+d)?' · goals set':''}</option>`).join('')}</select></label>
       ${canEdit?`<div class="goals-bulk"><label class="cand-field"><span>Set every recruiter to</span><input type="number" id="geAll" min="0" step="1" value="${DEFAULT_WEEKLY_GOAL}"></label><button class="btn btn-secondary btn-sm" id="geApplyAll">Apply</button><button class="btn btn-secondary btn-sm" id="geCopyPrev">Copy previous week</button></div>`:''}
     </div>
-    <p class="hint" style="margin:6px 0 10px;">Week ${w.number}: Sun ${fmtDate(w.weekStart)} – Sat ${fmtDate(w.weekEnd)} · ${list.length} recruiter${list.length===1?'':'s'}</p>
-    <div style="overflow-x:auto;max-height:520px;"><table class="users-table goals-table"><thead><tr><th>Recruiter</th><th>Division</th><th style="width:140px;">Goal</th><th>Schedules that week</th></tr></thead><tbody>
-    ${list.map(n=>{ const has = saved[n]!==undefined && saved[n]!==null && saved[n]!==''; const wk = weeksData.find(x=>x.weekEndDate===st.week); const sch = wk && wk.byRecruiter && wk.byRecruiter[n] ? fmtNum(wk.byRecruiter[n].schedules||0) : '–';
-      return `<tr><td>${escapeHtml(n)}</td><td class="hint">${escapeHtml(getEffectiveRecruiterDivision(n, st.week)||'Unassigned')}</td><td><input type="number" min="0" step="1" class="goal-input" data-name="${escapeHtml(n)}" value="${has?Number(saved[n]):''}" placeholder="${DEFAULT_WEEKLY_GOAL}" ${canEdit?'':'disabled'} aria-label="Goal for ${escapeHtml(n)}"></td><td>${sch}</td></tr>`; }).join('') || '<tr><td colspan="4" class="hint" style="padding:14px;">No recruiters yet — upload data first.</td></tr>'}
+    <div class="goals-filter"><div class="header-search ge-search"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input type="search" id="geSearch" placeholder="Find a recruiter or division…" value="${escapeHtml(st.q||'')}" autocomplete="off"></div>
+      <div class="ua-filter" role="tablist">${[['all','All · '+allList.length],['recent','Active lately · '+nRecent],['inactive','Not active lately · '+(allList.length-nRecent)]].map(([k,l])=>`<button type="button" data-ge-show="${k}" class="${show===k?'on':''}">${l}</button>`).join('')}</div>
+      <span class="hint">Week ${w.number}: Sun ${fmtDate(w.weekStart)} – Sat ${fmtDate(w.weekEnd)} · showing ${list.length} of ${allList.length}</span></div>
+    <div class="goals-wrap"><table class="users-table goals-table"><thead><tr><th>Recruiter</th><th>Division</th><th style="width:130px;">Goal</th><th>Schedules that week</th></tr></thead><tbody>
+    ${allList.map(n=>{ const has = saved[n]!==undefined && saved[n]!==null && saved[n]!==''; const wk = weeksData.find(x=>x.weekEndDate===st.week); const sch = wk && wk.byRecruiter && wk.byRecruiter[n] ? fmtNum(wk.byRecruiter[n].schedules||0) : '–';
+      return `<tr ${list.includes(n)?'':'hidden'}><td>${escapeHtml(n)}${isRecent(n)?'':`<span class="ge-idle" title="No schedules or interviews in the 5 weeks up to this week">${lastSeen[n]?'last active Wk '+weekOfDate(lastSeen[n]).number:'no activity yet'}</span>`}</td><td class="hint">${escapeHtml(getEffectiveRecruiterDivision(n, st.week)||'Unassigned')}</td><td><input type="number" min="0" step="1" class="goal-input" data-name="${escapeHtml(n)}" value="${has?Number(saved[n]):''}" placeholder="${DEFAULT_WEEKLY_GOAL}" ${canEdit?'':'disabled'} aria-label="Goal for ${escapeHtml(n)}"></td><td>${sch}</td></tr>`; }).join('') || '<tr><td colspan="4" class="hint" style="padding:14px;">No recruiters yet — upload data first.</td></tr>'}
     </tbody></table></div>
-    ${canEdit && list.length?`<div class="goals-actions"><span class="hint" id="geMsg"></span><button class="btn btn-primary btn-sm" id="geSave">Save goals for week ${w.number}</button></div>`:''}
+    ${canEdit && allList.length?`<div class="goals-actions"><span class="hint" id="geMsg"></span><button class="btn btn-primary btn-sm" id="geSave">Save goals for week ${w.number}</button></div>`:''}
   </div>`;
   host.querySelector('#geWeek').onchange = e=>{ st.week = e.target.value; renderGoalsEditor(); };
+  // search / filter keep typed (unsaved) goals: they only hide rows, they don't redraw the table
+  const applyFilter = ()=>{ const qq=(st.q||'').trim().toLowerCase(), sh=st.show||'all'; let n=0;
+    host.querySelectorAll('.goals-table tbody tr').forEach(tr=>{ const inp=tr.querySelector('.goal-input'); if(!inp) return; const name=inp.dataset.name, div=tr.children[1].textContent.toLowerCase();
+      const ok=(!qq||name.toLowerCase().includes(qq)||div.includes(qq))&&(sh==='all'||(sh==='recent'?isRecent(name):!isRecent(name))); tr.hidden=!ok; if(ok) n++; });
+    const h=host.querySelector('.goals-filter > .hint'); if(h) h.textContent=`Week ${w.number}: Sun ${fmtDate(w.weekStart)} – Sat ${fmtDate(w.weekEnd)} · showing ${n} of ${allList.length}`; };
+  const gs=host.querySelector('#geSearch'); if(gs) gs.addEventListener('input',()=>{ st.q=gs.value; applyFilter(); });
+  host.querySelectorAll('[data-ge-show]').forEach(b=>b.onclick=()=>{ st.show=b.dataset.geShow; host.querySelectorAll('[data-ge-show]').forEach(x=>x.classList.toggle('on',x===b)); applyFilter(); });
   if(!canEdit) return;
   const inputs = ()=>[...host.querySelectorAll('.goal-input')];
   const dirty = ()=>{ const m=host.querySelector('#geMsg'); if(m) m.textContent='Unsaved changes'; };
@@ -11266,7 +11290,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.38.0';   // shown only in the browser tab title
+const APP_VERSION = '4.39.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
