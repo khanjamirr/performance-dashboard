@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.34.0</title>
+<title>Performance Dashboard · v4.36.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -1734,32 +1734,55 @@ body.uf-lock{overflow:hidden}
 .al-group>summary{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
 @media(max-width:760px){.al-bgrid{grid-template-columns:1fr!important}.al-branch{flex:1 1 100%}}
 
-/* calendar picker */
-.dp-pop{position:fixed;z-index:3000;display:flex;background:#fff;border:1px solid #d3dbe7;border-radius:12px;box-shadow:0 18px 44px #0a1f4433,0 2px 6px #0a1f441a;overflow:hidden;font-size:13px;color:#13264a;max-width:calc(100vw - 16px)}
-.dp-presets{display:flex;flex-direction:column;gap:1px;padding:10px 8px;background:#f6f8fc;border-right:1px solid #e3e8ef;min-width:170px;max-height:440px;overflow:auto}
-.dp-presets button{border:0;background:transparent;text-align:left;padding:7px 10px;border-radius:7px;font:inherit;font-size:12.5px;color:#13264a;cursor:pointer;white-space:nowrap}
-.dp-presets .dp-ph{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#64748b;padding:9px 10px 3px}.dp-presets .dp-ph:first-child{padding-top:2px}
-.dp-presets button small{display:block;font-size:10.5px;color:#64748b;font-weight:400;margin-top:1px}.dp-presets button.on small{color:#c7d4ee}
-.dp-presets button.dp-na{color:#a0aec0;cursor:not-allowed}.dp-presets button.dp-na:hover{background:transparent}
-.dp-pop.sheet .dp-presets .dp-ph{flex-basis:100%}
-.dp-presets button:hover{background:#e8efff}.dp-presets button.on{background:#0a1f44;color:#fff;font-weight:600}.dp-presets .dp-clear{color:#b91c1c;margin-top:6px}
-.dp-main{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px}
-.dp-nav{display:flex;align-items:center;gap:8px}.dp-nav button{border:1px solid #d3dbe7;background:#fff;border-radius:7px;width:30px;height:28px;font-size:16px;cursor:pointer;color:#13264a}.dp-nav button:hover{background:#eef3fe}
-.dp-sum{flex:1;text-align:center;font-weight:700;font-size:12.5px;color:#0a1f44}
-.dp-months{display:flex;gap:18px}
-.dp-mtitle{text-align:center;font-weight:700;font-size:12.5px;margin:2px 0 6px;color:#0a1f44}
-.dp-grid{display:grid;grid-template-columns:repeat(7,34px);gap:2px}
-.dp-dow{font-size:10.5px;font-weight:700;color:#7b8aa3;text-align:center;padding:2px 0}
-.dp-day{height:32px;border:0;background:transparent;border-radius:7px;font:inherit;font-size:12.5px;color:#13264a;cursor:pointer}
-.dp-day:hover:not(:disabled){background:#e8efff}
-.dp-day.other{color:#a3adbd}.dp-day.today{box-shadow:inset 0 0 0 1.5px #c8102e;font-weight:700}
-.dp-day.in,.dp-day.hv{background:#dbe5fd;border-radius:0}.dp-day.sel{background:#1d4ed8!important;color:#fff;border-radius:7px;font-weight:700}
-.dp-day.wk{background:#1d4ed8;color:#fff}
-.dp-day:disabled{color:#cfd6e2;cursor:default;background:transparent}
-.dp-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
-.dp-pop.sheet{left:0!important;right:0;bottom:0;top:auto!important;border-radius:14px 14px 0 0;flex-direction:column;max-width:none}
-.dp-pop.sheet .dp-presets{flex-direction:row;flex-wrap:wrap;border-right:0;border-bottom:1px solid #e3e8ef;max-height:none;min-width:0}
-.dp-pop.sheet .dp-grid{grid-template-columns:repeat(7,1fr)}.dp-pop.sheet .dp-months{justify-content:center}.dp-pop.sheet .dp-month{flex:1}
+/* calendar picker (compact) — quick picks on the left, typed From/To fields, two months, Cancel / Done */
+.dp-pop{position:fixed;z-index:3000;display:grid;grid-template-columns:auto 1fr;grid-template-rows:1fr auto;background:#fff;border:1px solid #d6dce5;border-radius:6px;box-shadow:0 10px 30px rgba(10,31,68,.16),0 1px 4px rgba(10,31,68,.08);font-size:12px;color:#1f2a37;max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);overflow:hidden;font-family:inherit}
+.dp-presets{grid-row:1;display:flex;flex-direction:column;gap:0;padding:8px 5px;width:auto;min-width:140px;max-width:220px;max-height:300px;overflow-y:auto;overflow-x:hidden;border-right:1px solid #eceff3;scrollbar-width:thin}
+.dp-presets button{display:flex;align-items:baseline;justify-content:space-between;gap:6px;border:0;background:transparent;text-align:left;padding:4px 8px;border-radius:4px;font:inherit;font-size:12px;color:#1f2a37;cursor:pointer;white-space:nowrap;line-height:1.3}
+.dp-presets button:hover{background:#f3f6fa}
+.dp-presets button.on{background:#eef4fb;color:#0b5cad;font-weight:600}
+.dp-presets .dp-custom{margin-bottom:3px}
+.dp-presets .dp-ph{height:1px;background:#eceff3;margin:4px 8px;font-size:0;overflow:hidden;flex:0 0 1px}
+.dp-presets button small{font-size:10px;color:#8a95a2;font-weight:400;flex:0 0 auto}.dp-presets button.on small{color:#4f7fb5}
+.dp-presets button.dp-na{color:#b3bcc6;cursor:not-allowed}.dp-presets button.dp-na:hover{background:transparent}
+.dp-presets .dp-clear{color:#b91c1c}
+.dp-main{grid-row:1;padding:8px 12px 6px;display:flex;flex-direction:column;gap:6px;min-width:0;overflow:auto}
+.dp-fields{display:flex;align-items:center;gap:6px}
+.dp-f{display:flex;flex-direction:column;border:1px solid #cfd6df;border-radius:4px;padding:2px 7px 3px;width:116px;flex:0 0 auto;background:#fff;cursor:text}
+.dp-f:focus-within{border-color:#0b5cad;box-shadow:0 0 0 1px #0b5cad}
+.dp-f span{font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#6b7785;line-height:1.3}
+.dp-f input{border:0!important;outline:0;padding:0!important;height:auto!important;min-height:0!important;font:inherit;font-size:12.5px;color:#1f2a37;background:transparent!important;width:100%;box-shadow:none!important;min-width:0!important}
+.dp-f input.bad{color:#b91c1c}
+.dp-dash{color:#9aa5b1;font-size:13px}
+.dp-months{display:flex;gap:16px}
+.dp-mtitle{display:grid;grid-template-columns:22px 1fr 22px;align-items:center;text-align:center;font-weight:600;font-size:12.5px;margin:0 0 3px;color:#1f2a37}
+.dp-arrow{border:0;background:transparent;width:22px;height:22px;border-radius:50%;font-size:16px;line-height:1;color:#6b7785;cursor:pointer;padding:0}.dp-arrow:hover{background:#f0f3f7;color:#0b5cad}
+.dp-grid{display:grid;grid-template-columns:repeat(7,27px);gap:1px}
+.dp-dow{font-size:10.5px;font-weight:700;color:#4b5563;text-align:center;padding:2px 0}
+.dp-day{height:25px;border:1px solid transparent;background:transparent;border-radius:3px;font:inherit;font-size:11.5px;color:#1f2a37;cursor:pointer;padding:0;min-width:0}
+.dp-day:hover:not(:disabled){background:#eef2f7}
+.dp-day.other{color:#a3adb8}
+.dp-day.today{border-color:#0b5cad;color:#0b5cad;font-weight:600}
+.dp-day.in,.dp-day.hv{background:#e3edf9;border-radius:0}
+.dp-day.sel,.dp-day.wk{background:#0b5cad!important;color:#fff!important;border-radius:3px;font-weight:700;border-color:#0b5cad}
+.dp-day.wk{border-radius:0}
+.dp-day:disabled{color:#b6bec8;cursor:default;background:transparent;text-decoration:line-through}
+.dp-mgrid{display:grid;grid-template-columns:repeat(3,62px);gap:4px}.dp-mon{height:30px;font-size:12px}
+.dp-foot{grid-column:1 / -1;grid-row:2;display:flex;align-items:center;justify-content:flex-end;gap:6px;padding:6px 10px;border-top:1px solid #eceff3;background:#fff}
+.dp-foot .dp-note{margin-right:auto;font-size:11.5px;color:#4b5563;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dp-foot .btn{min-width:68px;justify-content:center;padding:5px 12px!important;font-size:12px!important;min-height:0!important;height:auto!important}
+.dp-foot .dp-clearbtn{min-width:0}
+.dp-foot .btn-primary{background:#0b5cad;border-color:#0b5cad}.dp-foot .btn-primary:hover:not(:disabled){background:#094c8f}.dp-foot .btn-secondary{color:#0b5cad;border-color:#cfd6df;background:#fff}
+.dp-pop.sheet{left:0!important;right:0;bottom:0;top:auto!important;border-radius:12px 12px 0 0;grid-template-columns:1fr;grid-template-rows:auto auto auto;max-width:none;max-height:88vh;overflow:auto;font-size:13px}
+.dp-pop.sheet .dp-presets{grid-row:1;flex-direction:row;flex-wrap:nowrap;overflow-x:auto;border-right:0;border-bottom:1px solid #eceff3;max-height:none;width:auto;padding:8px;gap:5px}
+.dp-pop.sheet .dp-presets .dp-ph{width:1px;height:auto;margin:3px 2px}
+.dp-pop.sheet .dp-presets button{flex:0 0 auto;border:1px solid #dfe5ec;border-radius:999px;padding:5px 10px;margin:0;font-size:12.5px}
+.dp-pop.sheet .dp-main{grid-row:2;padding:10px}
+.dp-pop.sheet .dp-f{flex:1 1 0;width:auto}
+.dp-pop.sheet .dp-grid{grid-template-columns:repeat(7,1fr)}.dp-pop.sheet .dp-day{height:36px;font-size:13.5px}.dp-pop.sheet .dp-months{justify-content:center}.dp-pop.sheet .dp-month{flex:1}
+.dp-pop.sheet .dp-mgrid{grid-template-columns:repeat(3,1fr)}.dp-pop.sheet .dp-mon{height:40px}
+.dp-pop.sheet .dp-foot{grid-row:3;position:sticky;bottom:0;padding:10px}
+.dp-pop.sheet .dp-foot .btn{padding:8px 16px!important;font-size:13px!important}
+.dp-pop.sheet .dp-foot .dp-note{display:none}
 input[type=date]{cursor:pointer}
 input[type=date]::-webkit-calendar-picker-indicator{cursor:pointer}
 </style>
@@ -10734,7 +10757,7 @@ function renderTeamGroups(){
  const rangeText=mode==='day'?fmtDate(p.from):`${fmtDate(p.from)} – ${fmtDate(p.to)}`;
  host.innerHTML=`<div class="lt-sticky">
  <header class="lt-toolbar">${Server.isAdmin()?'<button type="button" class="btn btn-secondary btn-sm lt-back" id="ltBackLeads">← All team leads</button>':''}<div class="lt-title"><h2>${escapeHtml(a.team_name)}</h2><span>${escapeHtml(leader)} · ${escapeHtml(a.recruiter_name)}</span></div>${ltTeamPicker()}
- <div class="lt-period" role="group" aria-label="Team reporting period"><label class="lt-field">View<select id="ltRangeMode"><option value="day" ${mode==='day'?'selected':''}>Day</option><option value="week" ${mode==='week'?'selected':''}>Week</option><option value="month" ${mode==='month'?'selected':''}>Month</option></select></label><button class="btn btn-secondary" id="ltPrevious" aria-label="Previous ${mode}">←</button><label class="lt-field">${mode==='month'?'Month':mode==='week'?'Week ending':'Date'}<input id="ltAnchor" type="${mode==='month'?'month':'date'}" value="${mode==='month'?anchor.slice(0,7):mode==='week'?p.to:anchor}" max="${mode==='month'?today.slice(0,7):mode==='week'?weekOfDate(today).weekEnd:today}"></label><button class="btn btn-secondary" id="ltNext" aria-label="Next ${mode}" ${p.to>=today?'disabled':''}>→</button><button class="btn btn-secondary" id="ltCurrent">${mode==='day'?'Today':mode==='month'?'This month':'This week'}</button></div>
+ <div class="lt-period" role="group" aria-label="Team reporting period"><label class="lt-field">View<select id="ltRangeMode"><option value="day" ${mode==='day'?'selected':''}>Day</option><option value="week" ${mode==='week'?'selected':''}>Week</option><option value="month" ${mode==='month'?'selected':''}>Month</option></select></label><button class="btn btn-secondary" id="ltPrevious" aria-label="Previous ${mode}">←</button><label class="lt-field">${mode==='month'?'Month':mode==='week'?'Week ending':'Date'}<input id="ltAnchor" type="${mode==='month'?'month':'date'}" ${mode==='week'?'data-dp="week"':''} value="${mode==='month'?anchor.slice(0,7):mode==='week'?p.to:anchor}" max="${mode==='month'?today.slice(0,7):mode==='week'?weekOfDate(today).weekEnd:today}"></label><button class="btn btn-secondary" id="ltNext" aria-label="Next ${mode}" ${p.to>=today?'disabled':''}>→</button><button class="btn btn-secondary" id="ltCurrent">${mode==='day'?'Today':mode==='month'?'This month':'This week'}</button></div>
  <label class="lt-field">Division<select id="ltDivision"><option value="">All team divisions</option>${divisions.map(d=>`<option ${d===g.division?'selected':''}>${escapeHtml(d)}</option>`).join('')}</select></label><button class="btn btn-secondary" id="ltRefresh" aria-label="Refresh team" title="Refresh team">↻</button></header>
  <div class="lt-scope"><span><strong>${rangeText}</strong> · ${escapeHtml(g.division||'All divisions')}${p.to>today?' · through today':''}</span><span title="Dates and cutoff times use your system timezone">${escapeHtml(zone)}</span></div>
  <section class="lt-summary" aria-label="Team performance summary" data-section="team.summary"><div class="kpi-grid mk-grid mk-team">${ltCompactCards(report, mode==='month'?Math.round(ltWorkdays(p.from,cutoff).length/5*10)/10:1, mode==='day'&&isHeldShowDay(p.from))}</div></section>
@@ -11155,7 +11178,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.34.0';   // shown only in the browser tab title
+const APP_VERSION = '4.36.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -11924,9 +11947,7 @@ const DatePick=(()=>{
  function open(anchor,cfg){
   close();
   st={...cfg, anchor, view:(cfg.mode==='range'||cfg.mode==='period'?(cfg.to||cfg.from):cfg.value)||today(), a:cfg.from||null, b:cfg.to||null, hover:null};
-  st.view=monthStart(st.view);
-  // two months side by side: show the end date's month on the right
-  if((cfg.mode==='range'||cfg.mode==='period')&&innerWidth>720){ const d=parse(st.view); d.setMonth(d.getMonth()-1); st.view=iso(d); }
+  if(cfg.mode==='month') st.view=(cfg.value||today()).slice(0,4)+'-01-01'; else focusMonth(st.view);
   pop=document.createElement('div'); pop.className='dp-pop'; pop.setAttribute('role','dialog'); pop.setAttribute('aria-label',cfg.title||'Pick a date');
   document.body.appendChild(pop); draw(); place();
   pop.addEventListener('mousedown',e=>e.stopPropagation());
@@ -11938,22 +11959,68 @@ const DatePick=(()=>{
   let left=Math.min(Math.max(8,r.left), vw-w-8), top=r.bottom+6; if(top+h>vh-8) top=Math.max(8,r.top-h-6);
   pop.style.left=left+'px'; pop.style.top=top+'px';
  }
- function monthGrid(m){
-  const first=parse(m), start=add(m,-first.getDay()), cells=[]; for(let i=0;i<42;i++) cells.push(add(start,i));
+ const twoUp=()=>innerWidth>720;
+ const mdy=s=>{ const d=parse(s); return d?String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0')+'/'+d.getFullYear():''; };
+ const readIn=v=>{ v=String(v||'').trim(); let m=/^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(v); if(m) return valid(+m[1],+m[2],+m[3]);
+  m=/^(\d{1,2})[\/\-. ](\d{1,2})[\/\-. ](\d{2}|\d{4})$/.exec(v); if(m) return valid(m[3].length===2?2000+ +m[3]:+m[3],+m[1],+m[2]); return null; };
+ const valid=(y,mo,d)=>{ const x=new Date(y,mo-1,d); return x.getFullYear()===y&&x.getMonth()===mo-1&&x.getDate()===d?iso(x):null; };
+ // show the month of d (on the right when two months are visible)
+ function focusMonth(d){ if(!st||!d||!parse(d)) return; let v=monthStart(d); if(twoUp()){ const x=parse(v); x.setMonth(x.getMonth()-1); v=iso(x); } st.view=v; }
+ function monthGrid(m,i,n){
+  const first=parse(m), start=add(m,-first.getDay()), cells=[]; for(let k=0;k<42;k++) cells.push(add(start,k));
   const month=m.slice(0,7), t=today();
-  const inRange=d=>{ if(st.mode==='period'){ const a=st.a, b=st.b||(st.a?(st.hover?weekEnd(st.hover):weekEnd(st.a)):null); if(!a||!b) return false; const lo=a<b?a:weekStart(b), hi=a<b?b:weekEnd(a); return d>=lo&&d<=hi; }
+  const inRange=d=>{ if(st.mode==='period'){ if(st.all) return st.weeks.includes(weekEnd(d)); const a=st.a, b=st.b||(st.a?(st.hover?weekEnd(st.hover):weekEnd(st.a)):null); if(!a||!b) return false; const lo=a<b?a:weekStart(b), hi=a<b?b:weekEnd(a); return d>=lo&&d<=hi; }
    if(st.mode!=='range') return false; const a=st.a, b=st.b||(st.a&&st.hover?st.hover:null); if(!a||!b) return false; const lo=a<b?a:b, hi=a<b?b:a; return d>=lo&&d<=hi; };
+  const ends=d=>{ if(st.mode==='range') return d===st.a||d===(st.b||st.a);
+   if(st.mode==='period'&&st.a&&!st.all){ const b=st.b||weekEnd(st.a); return d===st.a||d===b; } return false; };
   const weekSel=d=>st.mode==='week'&&st.value&&weekEnd(d)===st.value;
   const weekOk=d=>(st.mode!=='week'&&st.mode!=='period')||st.weeks.includes(weekEnd(d));
   const head=['Su','Mo','Tu','We','Th','Fr','Sa'].map(x=>`<span class="dp-dow">${x}</span>`).join('');
-  return `<div class="dp-month"><div class="dp-mtitle">${parse(m).toLocaleDateString(undefined,{month:'long',year:'numeric'})}</div><div class="dp-grid">${head}${cells.map(d=>{
+  const title=parse(m).toLocaleDateString(undefined,{month:'long',year:'numeric'});
+  return `<div class="dp-month"><div class="dp-mtitle">${i===0?'<button type="button" class="dp-arrow" data-nav="-1" aria-label="Previous month">‹</button>':'<span class="dp-arrow-sp"></span>'}<span>${title}</span>${i===n-1?'<button type="button" class="dp-arrow" data-nav="1" aria-label="Next month">›</button>':'<span class="dp-arrow-sp"></span>'}</div><div class="dp-grid">${head}${cells.map(d=>{
    const ok=clampOk(d,st.min,st.max)&&weekOk(d), other=d.slice(0,7)!==month;
-   const cls=['dp-day',other?'other':'',d===t?'today':'',(st.mode==='single'&&d===st.value)||(st.mode==='range'&&(d===st.a||d===st.b))?'sel':'',inRange(d)?'in':'',weekSel(d)?'in wk':'',!ok?'off':''].filter(Boolean).join(' ');
+   const sel=(st.mode==='single'&&d===st.value)||ends(d);
+   const cls=['dp-day',other?'other':'',d===t?'today':'',sel?'sel':'',inRange(d)||weekSel(d)?'in':'',weekSel(d)?'wk':'',!ok?'off':''].filter(Boolean).join(' ');
    return `<button type="button" class="${cls}" data-d="${d}" ${ok?'':'disabled'} tabindex="-1">${+d.slice(8)}</button>`; }).join('')}</div></div>`;
+ }
+ function canDone(){ if(!st) return false;
+  if(st.mode==='range') return !!st.a; if(st.mode==='single') return !!st.value||(st.clearable&&st.value==='');
+  if(st.mode==='week'||st.mode==='month') return !!st.value; return st.all||(!!st.a&&periodWeeks().length>0); }
+ function periodWeeks(){ if(!st||!st.a) return []; const b=st.b||weekEnd(st.a); return st.weeks.filter(w=>w>=weekEnd(st.a)&&w<=b); }
+ const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+ const mLabel=v=>/^\d{4}-\d{2}$/.test(v||'')?parse(v+'-01').toLocaleDateString(undefined,{month:'long',year:'numeric'}):'';
+ // month fields (input type=month): a year of months instead of days
+ function drawMonth(){
+  const t=today().slice(0,7), y=+st.view.slice(0,4), ok=m=>(!st.min||m>=st.min.slice(0,7))&&(!st.max||m<=st.max.slice(0,7));
+  const back=n=>{ const d=parse(t+'-01'); d.setMonth(d.getMonth()-n); return iso(d).slice(0,7); };
+  const qs=back((+t.slice(5,7)-1)%3), ly=String(+t.slice(0,4)-1);
+  const list=[['This month',t],['Last month',back(1)],['2 months ago',back(2)],['3 months ago',back(3)],['6 months ago',back(6)],['#'],['Start of this quarter',qs],['Start of last quarter',back((+t.slice(5,7)-1)%3+3)],['#'],['January '+t.slice(0,4),t.slice(0,4)+'-01'],['Same month last year',ly+t.slice(4)],['December '+ly,ly+'-12']];
+  const anyOn=list.some(([,m])=>m===st.value);
+  const presets=`<button type="button" class="dp-custom ${anyOn?'':'on'}" data-custom="1">Custom month</button>`+list.map(([l,m])=>l==='#'?'<div class="dp-ph"></div>':ok(m)?`<button type="button" data-pm="${m}" class="${st.value===m?'on':''}">${l}</button>`:'').join('');
+  pop.innerHTML=`<div class="dp-presets">${presets}</div><div class="dp-main">
+    <div class="dp-fields"><label class="dp-f"><span>Month</span><input type="text" data-fm="1" autocomplete="off" value="${st.value?st.value.slice(5,7)+'/'+st.value.slice(0,4):''}" placeholder="MM/YYYY"></label></div>
+    <div class="dp-month dp-year"><div class="dp-mtitle"><button type="button" class="dp-arrow" data-ny="-1" aria-label="Previous year">‹</button><span>${y}</span><button type="button" class="dp-arrow" data-ny="1" aria-label="Next year">›</button></div>
+    <div class="dp-mgrid">${MON.map((n,i)=>{ const m=y+'-'+String(i+1).padStart(2,'0'); return `<button type="button" class="dp-day dp-mon${m===st.value?' sel':''}${m===t?' today':''}" data-m="${m}" ${ok(m)?'':'disabled'}>${n}</button>`; }).join('')}</div></div>
+    </div><div class="dp-foot"><span class="dp-note">${escapeHtml(mLabel(st.value)||'Pick a month')}</span><button type="button" class="btn btn-secondary btn-sm" data-act="cancel">Cancel</button><button type="button" class="btn btn-primary btn-sm" data-act="apply" ${st.value?'':'disabled'}>Done</button></div>`;
+  pop.querySelectorAll('[data-ny]').forEach(b=>b.onclick=()=>{ st.view=(y+Number(b.dataset.ny))+'-01-01'; drawMonth(); });
+  pop.querySelectorAll('[data-m]:not([disabled])').forEach(b=>{ b.onclick=()=>{ st.value=b.dataset.m; drawMonth(); }; b.ondblclick=()=>done(); });
+  pop.querySelectorAll('[data-pm]').forEach(b=>b.onclick=()=>{ st.value=b.dataset.pm; st.view=st.value.slice(0,4)+'-01-01'; drawMonth(); });
+  pop.querySelector('[data-custom]').onclick=()=>{ const f=pop.querySelector('[data-fm]'); f.focus(); f.select(); };
+  const f=pop.querySelector('[data-fm]');
+  const commit=()=>{ const m=/^(\d{1,2})[\/\-. ](\d{4})$/.exec(f.value.trim())||/^(\d{4})-(\d{1,2})$/.exec(f.value.trim()); if(!m){ f.classList.add('bad'); return false; }
+   const yy=m[2].length===4?m[2]:m[1], mm=String(m[2].length===4?m[1]:m[2]).padStart(2,'0'), v=yy+'-'+mm; if(+mm<1||+mm>12||!ok(v)){ f.classList.add('bad'); return false; }
+   st.value=v; st.view=yy+'-01-01'; drawMonth(); return true; };
+  f.addEventListener('change',()=>{ if(!f._skip) commit(); f._skip=false; });
+  f.addEventListener('keydown',e=>{ if(e.key!=='Enter') return; e.preventDefault(); f._skip=true; if(f.value.trim()&&!commit()) return; if(st&&st.value) done(); });
+  f.addEventListener('input',()=>f.classList.remove('bad'));
+  pop.querySelector('[data-act="cancel"]').onclick=close;
+  pop.querySelector('[data-act="apply"]').onclick=()=>{ if(st.value) done(); };
+  place();
  }
  function draw(){
   if(!pop||!st) return;
-  const two=(st.mode==='range'||st.mode==='period')&&innerWidth>720;
+  if(st.mode==='month') return drawMonth();
+  const two=twoUp();
   const next=(()=>{ const d=parse(st.view); d.setMonth(d.getMonth()+1); return iso(d); })();
   let presets='';
   const H=x=>`<div class="dp-ph">${x}</div>`, tidy=h=>h.replace(/(<div class="dp-ph">[^<]*<\/div>)+(?=<div class="dp-ph">|$)/g,'');
@@ -11988,36 +12055,71 @@ const DatePick=(()=>{
      if(!have(w)) return exact?`<button type="button" disabled class="dp-na" title="Week ending ${fmt(w)} is not uploaded yet">${l}<small>not uploaded</small></button>`:'';
      return `<button type="button" data-pw="${w}" class="${st.value===w?'on':''}" title="Week ending ${fmt(w)}">${l}<small>Wk ${weekOfDate(w).number} · ${short(w)}</small></button>`; }).join(''))
     +((st.extra||[]).length?H('Other')+(st.extra||[]).map(o=>`<button type="button" data-pw="${escapeHtml(o.value)}" class="${st.value===o.value?'on':''}">${escapeHtml(o.label)}</button>`).join(''):''); }
-  const periodWeeks=()=>{ if(!st.a) return []; const b=st.b||weekEnd(st.a); return st.weeks.filter(w=>w>=weekEnd(st.a)&&w<=b); };
-  const sum=st.mode==='period'?(st.a?(()=>{ const ws=periodWeeks(); const wn=w=>{ const x=(typeof weeksData!=='undefined'?weeksData:[]).find(y=>y.weekEndDate===w); return x&&x.weekNumber!=null?x.weekNumber:weekOfDate(w).number; }; return ws.length===1?'Week '+wn(ws[0])+' · ending '+fmt(ws[0]):ws.length?ws.length+' weeks · Week '+wn(ws[0])+' – Week '+wn(ws[ws.length-1]):'No uploaded weeks in these dates'; })()+(st.b?'':' — click another day to extend'):'Click a day to pick its week')
-   :st.mode==='range'?(st.a?fmt(st.a<= (st.b||st.a)?st.a:st.b)+' – '+(st.b?fmt(st.a<=st.b?st.b:st.a):'pick the end date'):'Pick the start date')
-   :st.mode==='week'?(st.value&&/^\d{4}/.test(st.value)?'Week ending '+fmt(st.value):'Pick any day in a week'):(st.value?fmt(st.value):'Pick a date');
-  pop.innerHTML=`<div class="dp-presets">${presets}</div><div class="dp-main">
-    <div class="dp-nav"><button type="button" data-nav="-1" aria-label="Previous month">‹</button><span class="dp-sum">${escapeHtml(sum)}</span><button type="button" data-nav="1" aria-label="Next month">›</button></div>
-    <div class="dp-months">${monthGrid(st.view)}${two?monthGrid(next):''}</div>
-    ${st.mode==='range'||st.mode==='period'?`<div class="dp-foot"><button type="button" class="btn btn-secondary btn-sm" data-act="cancel">Cancel</button><button type="button" class="btn btn-primary btn-sm" data-act="apply" ${(st.mode==='range'?st.a&&st.b:st.a&&periodWeeks().length)?'':'disabled'}>Apply</button></div>`:''}</div>`;
+  const anyOn=/class="[^"]*\bon\b/.test(presets);
+  presets=`<button type="button" class="dp-custom ${anyOn?'':'on'}" data-custom="1">Custom ${st.mode==='single'?'date':st.mode==='week'?'week':'range'}</button>`+presets;
+  const sum=st.mode==='period'?(st.all?'All '+st.weeks.length+' uploaded weeks':st.a?(()=>{ const ws=periodWeeks(); const wn=w=>{ const x=(typeof weeksData!=='undefined'?weeksData:[]).find(y=>y.weekEndDate===w); return x&&x.weekNumber!=null?x.weekNumber:weekOfDate(w).number; }; return ws.length===1?'Week '+wn(ws[0])+' · ending '+fmt(ws[0]):ws.length?ws.length+' weeks · Week '+wn(ws[0])+' – Week '+wn(ws[ws.length-1]):'No uploaded weeks in these dates'; })()+(st.b?'':' — click another day to extend'):'Click a day to pick its week')
+   :st.mode==='range'?(st.a?(()=>{ const b=st.b||st.a, n=Math.round((parse(b)-parse(st.a))/864e5)+1; return n+' day'+(n===1?'':'s')+(st.b?'':' — click another day to extend'); })():'Click a start date')
+   :st.mode==='week'?(st.value&&/^\d{4}/.test(st.value)?'Week '+weekOfDate(st.value).number+' · Sun '+fmt(weekStart(st.value))+' – Sat '+fmt(st.value):st.value?((st.extra||[]).find(o=>o.value===st.value)||{}).label||'':'Click any day of a week')
+   :(st.value?parse(st.value).toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric',year:'numeric'}):st.clearable?'No date':'Click a date');
+  const F=(lbl,val,key,ph)=>`<label class="dp-f"><span>${lbl}</span><input type="text" inputmode="numeric" autocomplete="off" spellcheck="false" data-fk="${key}" value="${val?mdy(val):''}" placeholder="${ph||'MM/DD/YYYY'}"></label>`;
+  const dash='<span class="dp-dash" aria-hidden="true">–</span>';
+  const isDate=v=>/^\d{4}-\d{2}-\d{2}$/.test(v||'');
+  const pa=st.all?(st.weeks.slice().sort()[0]?weekStart(st.weeks.slice().sort()[0]):''):st.a, pb=st.all?st.weeks.slice().sort().pop():(st.b||(st.a?weekEnd(st.a):''));
+  const fields=st.mode==='range'?F('Day from',st.a,'a')+dash+F('Day to',st.b||'','b')
+   :st.mode==='period'?F('Week from',pa,'a')+dash+F('Week to',pb,'b')
+   :st.mode==='week'?F('Week from',isDate(st.value)?weekStart(st.value):'','w')+dash+F('Week to',isDate(st.value)?st.value:'','w')
+   :F('Date',st.value,'v');
+  const months=two?[st.view,next]:[st.view];
+  pop.innerHTML=`<div class="dp-presets" role="listbox" aria-label="Quick picks">${presets}</div><div class="dp-main">
+    <div class="dp-fields">${fields}</div>
+    <div class="dp-months">${months.map((m,i)=>monthGrid(m,i,months.length)).join('')}</div>
+    </div><div class="dp-foot"><span class="dp-note">${escapeHtml(sum)}</span>${st.clearable&&st.mode==='single'?'<button type="button" class="btn btn-secondary btn-sm dp-clearbtn" data-p1="">Clear</button>':''}<button type="button" class="btn btn-secondary btn-sm" data-act="cancel">Cancel</button><button type="button" class="btn btn-primary btn-sm" data-act="apply" ${canDone()?'':'disabled'}>Done</button></div>`;
   pop.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>{ const d=parse(st.view); d.setMonth(d.getMonth()+Number(b.dataset.nav)); st.view=iso(d); draw(); });
   pop.querySelectorAll('.dp-day:not([disabled])').forEach(b=>{
    b.onclick=()=>{ const d=b.dataset.d;
-    if(st.mode==='single'){ finish(d); return; }
-    if(st.mode==='week'){ finish(weekEnd(d)); return; }
+    if(st.mode==='single'){ st.value=d; draw(); return; }
+    if(st.mode==='week'){ st.value=weekEnd(d); draw(); return; }
     if(st.mode==='period'){ st.all=false; if(!st.a||st.b){ st.a=weekStart(d); st.b=null; } else { const e=weekEnd(d); if(e<st.a){ st.b=weekEnd(st.a); st.a=weekStart(d); } else st.b=e; } draw(); return; }
     if(!st.a||st.b){ st.a=d; st.b=null; } else { if(d<st.a){ st.b=st.a; st.a=d; } else st.b=d; } draw(); };
+   b.ondblclick=()=>{ if(st.mode==='single'||st.mode==='week') done(); };
    if(st.mode==='range') b.onmouseenter=()=>{ if(st.a&&!st.b){ st.hover=b.dataset.d; pop.querySelectorAll('.dp-day').forEach(x=>{ const lo=st.a<st.hover?st.a:st.hover, hi=st.a<st.hover?st.hover:st.a; x.classList.toggle('in',x.dataset.d>=lo&&x.dataset.d<=hi); }); } };
    if(st.mode==='period') b.onmouseenter=()=>{ if(st.a&&!st.b){ st.hover=b.dataset.d; const he=weekEnd(st.hover), lo=st.a<he?st.a:weekStart(st.hover), hi=st.a<he?he:weekEnd(st.a); pop.querySelectorAll('.dp-day').forEach(x=>x.classList.toggle('in',x.dataset.d>=lo&&x.dataset.d<=hi)); } };
    if(st.mode==='week') b.onmouseenter=()=>{ const we=weekEnd(b.dataset.d); pop.querySelectorAll('.dp-day').forEach(x=>x.classList.toggle('hv',weekEnd(x.dataset.d)===we&&!x.disabled)); };
   });
-  pop.querySelectorAll('[data-pa]').forEach(b=>b.onclick=()=>{ st.a=b.dataset.pa; st.b=b.dataset.pb; st.all=false; finish(); });
-  pop.querySelectorAll('[data-pall]').forEach(b=>b.onclick=()=>{ const s=st; close(); s.onPick('all'); });
-  pop.querySelectorAll('[data-p1]').forEach(b=>b.onclick=()=>finish(b.dataset.p1));
-  pop.querySelectorAll('[data-pw]').forEach(b=>b.onclick=()=>finish(b.dataset.pw));
-  pop.querySelector('[data-act="cancel"]')?.addEventListener('click',close);
-  pop.querySelector('[data-act="apply"]')?.addEventListener('click',()=>{ if(st.mode==='period'&&!st.b) st.b=weekEnd(st.a); finish(); });
+  pop.querySelector('.dp-months').onmouseleave=()=>{ pop.querySelectorAll('.dp-day.hv').forEach(x=>x.classList.remove('hv')); };
+  // quick picks fill the selection; Done applies it
+  pop.querySelectorAll('[data-pa]').forEach(b=>b.onclick=()=>{ st.a=b.dataset.pa; st.b=b.dataset.pb; st.all=false; focusMonth(st.b); draw(); });
+  pop.querySelectorAll('[data-pall]').forEach(b=>b.onclick=()=>{ st.all=true; st.a=null; st.b=null; const l=st.weeks.slice().sort().pop(); if(l) focusMonth(l); draw(); });
+  pop.querySelectorAll('[data-p1]').forEach(b=>b.onclick=()=>{ st.value=b.dataset.p1; if(st.value) focusMonth(st.value); draw(); });
+  pop.querySelectorAll('[data-pw]').forEach(b=>b.onclick=()=>{ st.value=b.dataset.pw; if(isDate(st.value)) focusMonth(st.value); draw(); });
+  pop.querySelector('[data-custom]').onclick=()=>{ const f=pop.querySelector('.dp-f input'); if(f){ f.focus(); f.select(); } };
+  // typed dates (MM/DD/YYYY or YYYY-MM-DD)
+  pop.querySelectorAll('[data-fk]').forEach(inp=>{
+   const commit=()=>{ const raw=inp.value.trim(), k=inp.dataset.fk; if(!raw){ if(k==='v'&&st.clearable){ st.value=''; draw(); } return; }
+    const d=readIn(raw); const bad=()=>{ inp.classList.add('bad'); inp.title='Type a date like 10/08/2026'; };
+    if(!d) return bad();
+    if(k==='v'){ if(!clampOk(d,st.min,st.max)) return bad(); st.value=d; }
+    else if(k==='w'){ const we=weekEnd(d); if(!st.weeks.includes(we)) { inp.title='That week isn’t uploaded'; return bad(); } st.value=we; }
+    else if(st.mode==='range'){ if(!clampOk(d,st.min,st.max)) return bad(); if(k==='a'){ st.a=d; if(st.b&&st.b<d) st.b=null; } else { if(!st.a||d<st.a){ st.b=st.a||d; st.a=d; } else st.b=d; } }
+    else { st.all=false; if(k==='a'){ st.a=weekStart(d); if(st.b&&st.b<st.a) st.b=null; } else { const e=weekEnd(d); if(!st.a||e<st.a){ st.a=weekStart(d); st.b=e; } else st.b=e; } }
+    focusMonth(d); draw(); const again=pop&&pop.querySelector(`[data-fk="${k}"]`); if(again&&k!=='w') again.focus(); return true; };
+   inp.addEventListener('change',()=>{ if(!inp._skip) commit(); inp._skip=false; });
+   // Enter: From moves to To; anywhere else applies
+   inp.addEventListener('keydown',e=>{ if(e.key!=='Enter') return; e.preventDefault(); const k=inp.dataset.fk; inp._skip=true;
+     if(inp.value.trim()&&commit()===undefined) return;
+     if(k==='a'&&(st.mode==='range'||st.mode==='period')){ const nb=pop&&pop.querySelector('[data-fk="b"]'); if(nb){ nb.focus(); nb.select(); } return; }
+     if(canDone()) done(); });
+   inp.addEventListener('input',()=>inp.classList.remove('bad'));
+  });
+  pop.querySelector('[data-act="cancel"]').onclick=close;
+  pop.querySelector('[data-act="apply"]').onclick=()=>{ if(canDone()) done(); };
   place();
  }
- function finish(v){ const s=st; close(); if(!s||!s.onPick) return;
-  if(s.mode==='period'){ const b=s.b||weekEnd(s.a); s.onPick(s.weeks.filter(w=>w>=weekEnd(s.a)&&w<=b)); return; }
-  s.onPick(s.mode==='range'?[s.a,s.b||s.a]:v); }
+ function done(){ const s=st; if(!s) return;
+  if(s.mode==='period'){ close(); if(!s.onPick) return; if(s.all){ s.onPick('all'); return; } const b=s.b||weekEnd(s.a); s.onPick(s.weeks.filter(w=>w>=weekEnd(s.a)&&w<=b)); return; }
+  close(); if(!s.onPick) return;
+  s.onPick(s.mode==='range'?[s.a,s.b||s.a]:s.value); }
+ function finish(v){ if(st&&v!==undefined) st.value=v; done(); }
  // ---- wiring to real fields ----
  const fire=el=>{ if(!el) return; el.dispatchEvent(new Event('input',{bubbles:true})); el.dispatchEvent(new Event('change',{bubbles:true})); };
  function partnerOf(el){
@@ -12029,6 +12131,12 @@ const DatePick=(()=>{
  }
  function openFor(el){
   if(el.disabled||el.readOnly) return;
+  if(el.type==='month'){ open(el,{mode:'month', value:el.value||'', min:el.min||'', max:el.max||'', title:'Pick a month', onPick:v=>{ el.value=v||''; fire(el); }}); return; }
+  // a date field that stands for a whole week (data-dp="week"): pick any Sunday–Saturday week
+  if(el.dataset.dp==='week'){ const mx=el.max||'', last=weekEnd(mx&&mx<weekEnd(today())?mx:today()), weeks=[]; for(let i=0;i<260;i++) weeks.push(add(last,-7*i));
+   const ws=weeks.filter(w=>clampOk(w,el.min?weekEnd(el.min):'',el.max?weekEnd(el.max):''));
+   open(el,{mode:'week', value:el.value?weekEnd(el.value):'', weeks:ws, extra:[], title:'Pick a week', onPick:w=>{ el.value=w; fire(el); }});
+   if(st&&el.value){ focusMonth(el.value); draw(); } return; }
   const pair=partnerOf(el);
   if(pair){ const from=pair.isFrom?el:pair.other, to=pair.isFrom?pair.other:el;
    open(el,{mode:'range', from:from.value||null, to:to.value||null, min:from.min||to.min||'', max:to.max||from.max||'', title:'Pick dates',
@@ -12046,16 +12154,16 @@ const DatePick=(()=>{
   const extra=opts.filter(o=>!/^\d{4}-\d{2}-\d{2}$/.test(o.value)).map(o=>({value:o.value,label:o.textContent.trim()}));
   const v=sel.value;
   open(sel,{mode:'week', value:v, weeks, extra, title:'Pick a week', onPick:w=>{ if([...sel.options].some(o=>o.value===w)){ sel.value=w; fire(sel); } }});
-  if(/^\d{4}/.test(v)&&st){ st.view=monthStart(v); draw(); }
-  else if(st&&weeks.length){ st.view=monthStart(weeks.slice().sort().pop()); draw(); }
+  if(/^\d{4}/.test(v)&&st){ focusMonth(v); draw(); }
+  else if(st&&weeks.length){ focusMonth(weeks.slice().sort().pop()); draw(); }
  }
  // date fields: our calendar replaces the browser's own picker (typing a date still works)
  document.addEventListener('mousedown',e=>{
-  const el=e.target.closest&&e.target.closest('input[type=date]'); if(!el||el.dataset.dpNo!==undefined||el.disabled) return;
+  const el=e.target.closest&&e.target.closest('input[type=date],input[type=month]'); if(!el||el.dataset.dpNo!==undefined||el.disabled) return;
   e.preventDefault(); el.focus({preventScroll:true}); if(st&&st.anchor===el) { close(); return; } openFor(el);
  },true);
- document.addEventListener('click',e=>{ const el=e.target.closest&&e.target.closest('input[type=date]'); if(el&&el.dataset.dpNo===undefined) e.preventDefault(); },true);
- document.addEventListener('keydown',e=>{ const el=e.target; if(el&&el.matches&&el.matches('input[type=date]')&&(e.key==='Enter'||e.key===' '||(e.altKey&&e.key==='ArrowDown'))){ e.preventDefault(); openFor(el); } },true);
+ document.addEventListener('click',e=>{ const el=e.target.closest&&e.target.closest('input[type=date],input[type=month]'); if(el&&el.dataset.dpNo===undefined) e.preventDefault(); },true);
+ document.addEventListener('keydown',e=>{ const el=e.target; if(el&&el.matches&&el.matches('input[type=date],input[type=month]')&&(e.key==='Enter'||e.key===' '||(e.altKey&&e.key==='ArrowDown'))){ e.preventDefault(); openFor(el); } },true);
  // week drop-downs (options are Saturday week-endings): a calendar where you click any day of the week
  document.addEventListener('mousedown',e=>{
   if(pop&&!e.target.closest('.dp-pop')&&!(st&&st.anchor.contains(e.target))) close();
