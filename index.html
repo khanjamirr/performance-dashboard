@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.33.0</title>
+<title>Performance Dashboard · v4.34.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -1788,7 +1788,6 @@ input[type=date]::-webkit-calendar-picker-indicator{cursor:pointer}
       <button data-view="alerts" title="Who needs attention this week, and remarks"><span class="dot"></span>Action Center</button>
       <button data-view="divreport" title="Pipeline by client and location, per division"><span class="dot"></span>Division Report</button>
       <button data-view="pivot" title="Build your own tables and charts"><span class="dot"></span>Report Builder</button>
-      <button data-view="candidates" title="Find candidates and their status"><span class="dot"></span>Candidates</button>
     </nav>
     <div class="side-label side-label-tools">Tools</div>
     <div class="ribbon-actions">
@@ -1829,7 +1828,7 @@ input[type=date]::-webkit-calendar-picker-indicator{cursor:pointer}
 
     <div class="content">
       <div id="view-settings" class="hidden settings-page">
-      <nav class="settings-tabs" id="settingsTabs" aria-label="Settings sections"><div class="settings-group">Data</div><button class="settings-tab active" data-tab="sync"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg><span>Uploads</span></button><button class="settings-tab" data-tab="fetched"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Saved weeks</span></button><div class="settings-group">Team</div><button class="settings-tab" data-tab="goals"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span>Goals</span></button><button class="settings-tab" data-tab="recruiters"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M17 11l2 2 4-4"/></svg><span>Recruiters</span></button><button class="settings-tab" data-tab="divisions"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Divisions</span></button><button class="settings-tab" data-tab="branches"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21V9l9-5 9 5v12"/><path d="M9 21v-6h6v6"/></svg><span>Branches</span></button><div class="settings-group">Access</div><button class="settings-tab" data-tab="users"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><circle cx="17.5" cy="9" r="2.5"/><path d="M16.8 14.6c2.4.3 4 2 4.7 4.9"/></svg><span>Users</span></button><button class="settings-tab" data-tab="activity"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg><span>Activity</span></button><button class="settings-tab" data-tab="account"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.2-4 4.2-6 8-6s6.8 2 8 6"/></svg><span>My account</span></button></nav>
+      <nav class="settings-tabs" id="settingsTabs" aria-label="Settings sections"><div class="settings-group">Data</div><button class="settings-tab active" data-tab="sync"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg><span>Uploads</span></button><button class="settings-tab" data-tab="fetched"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Saved weeks</span></button><button class="settings-tab" data-tab="candidates"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="11" r="2.5"/><path d="M5.5 17c.6-1.9 1.9-3 3.5-3s2.9 1.1 3.5 3"/><path d="M15 9h3M15 13h3"/></svg><span>Candidates</span></button><div class="settings-group">Team</div><button class="settings-tab" data-tab="goals"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span>Goals</span></button><button class="settings-tab" data-tab="recruiters"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M17 11l2 2 4-4"/></svg><span>Recruiters</span></button><button class="settings-tab" data-tab="divisions"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Divisions</span></button><button class="settings-tab" data-tab="branches"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21V9l9-5 9 5v12"/><path d="M9 21v-6h6v6"/></svg><span>Branches</span></button><div class="settings-group">Access</div><button class="settings-tab" data-tab="users"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><circle cx="17.5" cy="9" r="2.5"/><path d="M16.8 14.6c2.4.3 4 2 4.7 4.9"/></svg><span>Users</span></button><button class="settings-tab" data-tab="activity"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg><span>Activity</span></button><button class="settings-tab" data-tab="account"><svg class="st-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.2-4 4.2-6 8-6s6.8 2 8 6"/></svg><span>My account</span></button></nav>
       <div class="settings-tab-content">
         <div id="settingsPane-sync">
           <section class="panel upload-times hidden" id="uploadTimesPanel"><h3>Last uploads</h3><div class="upload-times-grid" id="uploadTimes"></div></section>
@@ -1844,7 +1843,7 @@ input[type=date]::-webkit-calendar-picker-indicator{cursor:pointer}
             
           </div>
         </div>
-        <div id="settingsPane-divisions" class="hidden"><div id="divisionNameSettings"></div></div><div id="settingsPane-recruiters" class="hidden"><p class="hint">Checked recruiters are visible. Changes save automatically.</p><div id="settingsRecruiterVisibilityList"></div></div><div id="settingsPane-fetched" class="hidden"><div id="view-manage"></div></div>
+        <div id="settingsPane-divisions" class="hidden"><div id="divisionNameSettings"></div></div><div id="settingsPane-recruiters" class="hidden"><p class="hint">Checked recruiters are visible. Changes save automatically.</p><div id="settingsRecruiterVisibilityList"></div></div><div id="settingsPane-fetched" class="hidden"><div id="view-manage"></div></div><div id="settingsPane-candidates" class="hidden"></div>
         <div id="settingsPane-branches" class="hidden"><div id="view-branchDivisions"></div></div>
         <div id="settingsPane-goals" class="hidden"><div id="goalsEditor"></div></div>
         <div id="settingsPane-users" class="hidden"><div id="usersAdmin"></div><div id="teamAssignmentsAdmin"></div></div>
@@ -4171,6 +4170,8 @@ async function refreshUI(){
  if(currentView!=='history'){ document.getElementById('topBack')?.classList.add('hidden'); document.body.classList.remove('on-history'); }
  renderUploadStamp();
  if(currentView==='candidates'&&!Server.can('candidates')&&Server.can('master'))currentView='master';
+ // Candidates moved into Settings: any route to the old page opens Settings → Candidates
+ if(currentView==='candidates'||currentView==='master'){ candHubView=currentView; currentView=(viewBeforeSettings&&!['candidates','master','settings'].includes(viewBeforeSettings))?viewBeforeSettings:'performance'; openSettingsModal('candidates'); return; }
   closeEntityPopover();
   const hasData = weeksData.length>0;
   const onSettings = currentView==='settings';
@@ -4182,7 +4183,7 @@ async function refreshUI(){
     document.getElementById('emptyState').classList.add('hidden');
     document.getElementById('dashboardViews').classList.add('hidden');
     document.getElementById('topbarCenter').classList.add('hidden');
-    const extra = document.getElementById('topbarExtra'); if(extra) extra.innerHTML = '';
+    const extra = document.getElementById('topbarExtra'); if(extra && settingsActiveTab!=='candidates') extra.innerHTML = '';
     document.getElementById('downloadDropdownWrap').classList.toggle('hidden', !hasData);
     document.getElementById('viewTitle').textContent = VIEW_META.settings.title;
     document.getElementById('viewSub').textContent = VIEW_META.settings.sub;
@@ -4348,6 +4349,8 @@ function renderGoalsEditor(){
   };
 }
 function switchSettingsTab(tabName){
+  if(settingsActiveTab==='candidates' && tabName!=='candidates'){ const x=document.getElementById('topbarExtra'); if(x) x.innerHTML=''; }
+  settingsActiveTab = tabName;
   if(tabName==='divisions')renderDivisionNameSettings();
   if(tabName==='recruiters') renderRecruiterVisibility('settingsRecruiterVisibilityList');
   document.querySelectorAll('.settings-tab').forEach(b=> b.classList.toggle('active', b.dataset.tab===tabName));
@@ -4357,12 +4360,26 @@ function switchSettingsTab(tabName){
   if(tabName==='activity') renderActivityLog();
   if(tabName==='account') renderMyAccount();
   if(tabName==='goals') renderGoalsEditor();
-  ['sync','fetched','branches','recruiters','divisions','goals','users','activity','account'].forEach(t=>{
+  if(tabName==='candidates') renderSettingsCandidates();
+  ['sync','fetched','candidates','branches','recruiters','divisions','goals','users','activity','account'].forEach(t=>{
     document.getElementById('settingsPane-'+t).classList.toggle('hidden', t!==tabName);
   });
 }
 // Settings is a full page like the other sections (it used to be a pop-up dialog).
 let viewBeforeSettings = 'performance';
+// The Candidates hub (pipeline + all candidate records) lives in Settings → Candidates.
+let settingsActiveTab = 'sync', candHubView = 'candidates';
+function candHubShown(k){ return currentView==='settings' && settingsActiveTab==='candidates' && candHubView===k; }
+function renderSettingsCandidates(){
+  const pane=document.getElementById('settingsPane-candidates'); if(!pane) return;
+  ['view-candidates','view-master'].forEach(id=>{ const el=document.getElementById(id); if(el && el.parentNode!==pane) pane.appendChild(el); });
+  if(candHubView==='candidates' && !Server.can('candidates') && Server.can('master')) candHubView='master';
+  if(candHubView==='master' && !Server.can('master')) candHubView='candidates';
+  document.getElementById('view-candidates').classList.toggle('hidden', candHubView!=='candidates');
+  document.getElementById('view-master').classList.toggle('hidden', candHubView!=='master');
+  if(!Server.can('candidates') && !Server.can('master')){ pane.querySelector('#view-candidates').innerHTML='<div class="panel"><p class="hint" style="margin:0">Ask an admin for the Candidates right.</p></div>'; return; }
+  candHubView==='master' ? renderMasterView() : renderCandidatesView();
+}
 function openSettingsModal(tabName){
   if(currentView!=='settings') viewBeforeSettings = currentView;
   currentView = 'settings';
@@ -8173,8 +8190,8 @@ const Server = {
       try{ const me = await this.rpc('dash_me'); const changed = JSON.stringify(me.modules)!==JSON.stringify(this.user.modules) || JSON.stringify(me.hidden_sections||[])!==JSON.stringify(this.user.hidden_sections||[]) || me.name!==this.user.name; this.user=me; if(changed){ applyPermissions(); refreshUI(); showToast('Your access rights were updated.'); } }catch(e){}
       if(settingsModalOpen && !document.getElementById('settingsPane-users')?.classList.contains('hidden')) renderUsersAdmin();
     }
-    if(master){ candState.cache.clear(); if(currentView==='candidates') renderCandidatesView(); }
-    if(master && currentView==='master') drawMasterTable(true);
+    if(master){ candState.cache.clear(); if(currentView==='candidates'||candHubShown('candidates')) renderCandidatesView(); }
+    if(master && (currentView==='master'||candHubShown('master'))) drawMasterTable(true);
     if(kvKeys.size || remarks) LiveReload.schedule([...authors]);
     else if(master && authors.size) showToast('Master sheet updated by '+[...authors].join(', '));
   },
@@ -8287,7 +8304,7 @@ function applyPermissions(){
   document.body.classList.toggle('no-upload', !Server.can('upload'));
   document.body.classList.toggle('no-settings', !Server.can('settings'));
   document.body.classList.toggle('no-views', !allowedViews.length);
-  const tabs = {sync: Server.can('upload')||Server.can('settings'), fetched: Server.can('settings'), divisions: Server.can('settings'), branches: Server.can('settings'), recruiters: Server.can('settings'), goals: Server.can('settings')||Server.can('upload'), users: Server.isAdmin(), activity: Server.isAdmin(), account: true};
+  const tabs = {candidates: Server.can('candidates')||Server.can('master'), sync: Server.can('upload')||Server.can('settings'), fetched: Server.can('settings'), divisions: Server.can('settings'), branches: Server.can('settings'), recruiters: Server.can('settings'), goals: Server.can('settings')||Server.can('upload'), users: Server.isAdmin(), activity: Server.isAdmin(), account: true};
   document.querySelectorAll('#settingsTabs .settings-tab').forEach(t=>t.classList.toggle('hidden', tabs[t.dataset.tab]===false));
   document.querySelectorAll('#settingsTabs .settings-group').forEach(g=>{ let n=g.nextElementSibling, any=false; while(n && !n.classList.contains('settings-group')){ if(!n.classList.contains('hidden')) any=true; n=n.nextElementSibling; } g.classList.toggle('hidden', !any); });
   const chip = document.getElementById('userChip');
@@ -8786,7 +8803,7 @@ async function ingestFiles(entries, {interactive=true, week=null}={}){
     const u=document.getElementById('uploadFilesBtn'); if(u) u.textContent='Upload Excel files';
     const f=document.getElementById('folderSyncNowBtn'); if(f) f.textContent='Sync Now';
     if(settingsModalOpen){ renderFolderUploadExplainer(); renderUploadHistory(); renderNumberCheck(); }
-    if(currentView==='master') drawMasterTable(true);
+    if(currentView==='master'||candHubShown('master')) drawMasterTable(true);
     candState.cache.clear();
   }
 }
@@ -9203,8 +9220,8 @@ function masterQuery(extra){
     weeks: st.periodOnly ? selectedPeriodWeeks().map(w=>w.weekEndDate) : [], sort:st.sort, dir:st.dir, offset:st.offset, limit:st.limit, ...(extra||{})};
 }
 function fmtMasterCell(v){ v = v==null ? '' : String(v); return v.replace(/^(\d{4}-\d{2}-\d{2}) 00:00:00$/,'$1').replace(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}):\d{2}$/,'$1'); }
-function candidateHubTabs(){return `<div class="panel" style="padding:12px;display:flex;gap:8px">${[['candidates','Candidate pipeline'],['master','All candidate records']].filter(([k])=>Server.can(k)).map(([k,l])=>`<button class="btn ${currentView===k?'btn-primary':'btn-secondary'}" data-candidate-hub="${k}">${l}</button>`).join('')}</div>`;}
-document.addEventListener('click',e=>{const b=e.target.closest('[data-candidate-hub]');if(!b||!Server.can(b.dataset.candidateHub))return;currentView=b.dataset.candidateHub;candState.rev++;refreshUI();});
+function candidateHubTabs(){return `<div class="panel" style="padding:12px;display:flex;gap:8px">${[['candidates','Candidate pipeline'],['master','All candidate records']].filter(([k])=>Server.can(k)).map(([k,l])=>`<button class="btn ${(currentView==='settings'?candHubView:currentView)===k?'btn-primary':'btn-secondary'}" data-candidate-hub="${k}">${l}</button>`).join('')}</div>`;}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-candidate-hub]');if(!b||!Server.can(b.dataset.candidateHub))return;candHubView=b.dataset.candidateHub;candState.rev++;if(currentView==='settings'){ renderSettingsCandidates(); return; }currentView=b.dataset.candidateHub;refreshUI();});
 async function renderMasterView(){
   const container = document.getElementById('view-master'); if(!container) return;
   const st = masterViewState;
@@ -10027,7 +10044,7 @@ const UF_PAGES = [
   {mod:'alerts', label:'Action Center', desc:'Who is below goal and other signals', sec:'alerts', extras:['remarks_approve']},
   {mod:'divreport', label:'Division Report', desc:'Pipeline by client and location, per division'},
   {mod:'pivot', label:'Report Builder', desc:'Build their own tables and charts', sec:'pivot'},
-  {mod:'candidates', label:'Candidates', desc:'Candidate names and Employee Numbers everywhere', sec:'candidates', extras:['master','master_edit']},
+  {mod:'candidates', label:'Candidates', desc:'Settings → Candidates, plus candidate names and Employee Numbers everywhere', sec:'candidates', extras:['master','master_edit']},
 ];
 const UF_TOOLS = ['upload','export','settings'];
 const UF_EXTRA_LABEL = {remarks:'Can add remarks', remarks_approve:'Can approve and edit remarks', 'grant.team_names':'See their team’s candidate names', 'grant.break_image':'Copy third-break lists as images', 'grant.branch_merge':'Merge branches (applies for everyone)',
@@ -11138,7 +11155,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.33.0';   // shown only in the browser tab title
+const APP_VERSION = '4.34.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
