@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.30.0</title>
+<title>Performance Dashboard · v4.32.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -1732,8 +1732,12 @@ body.uf-lock{overflow:hidden}
 
 /* calendar picker */
 .dp-pop{position:fixed;z-index:3000;display:flex;background:#fff;border:1px solid #d3dbe7;border-radius:12px;box-shadow:0 18px 44px #0a1f4433,0 2px 6px #0a1f441a;overflow:hidden;font-size:13px;color:#13264a;max-width:calc(100vw - 16px)}
-.dp-presets{display:flex;flex-direction:column;gap:2px;padding:10px 8px;background:#f6f8fc;border-right:1px solid #e3e8ef;min-width:150px;max-height:420px;overflow:auto}
+.dp-presets{display:flex;flex-direction:column;gap:1px;padding:10px 8px;background:#f6f8fc;border-right:1px solid #e3e8ef;min-width:170px;max-height:440px;overflow:auto}
 .dp-presets button{border:0;background:transparent;text-align:left;padding:7px 10px;border-radius:7px;font:inherit;font-size:12.5px;color:#13264a;cursor:pointer;white-space:nowrap}
+.dp-presets .dp-ph{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#64748b;padding:9px 10px 3px}.dp-presets .dp-ph:first-child{padding-top:2px}
+.dp-presets button small{display:block;font-size:10.5px;color:#64748b;font-weight:400;margin-top:1px}.dp-presets button.on small{color:#c7d4ee}
+.dp-presets button.dp-na{color:#a0aec0;cursor:not-allowed}.dp-presets button.dp-na:hover{background:transparent}
+.dp-pop.sheet .dp-presets .dp-ph{flex-basis:100%}
 .dp-presets button:hover{background:#e8efff}.dp-presets button.on{background:#0a1f44;color:#fff;font-weight:600}.dp-presets .dp-clear{color:#b91c1c;margin-top:6px}
 .dp-main{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px}
 .dp-nav{display:flex;align-items:center;gap:8px}.dp-nav button{border:1px solid #d3dbe7;background:#fff;border-radius:7px;width:30px;height:28px;font-size:16px;cursor:pointer;color:#13264a}.dp-nav button:hover{background:#eef3fe}
@@ -2130,9 +2134,25 @@ function allRawBranches(){
   [...KV.entries()].forEach(([k,v])=>{ if(!k.startsWith('weekly:')||k.endsWith(LISTS_SUFFIX)||!v) return; [v.deduped,v.raw,v].forEach(x=>Object.keys((x&&x.byBranch)||{}).forEach(b=>s.add(b))); });
   return [...s].filter(b=>b&&b!=='Unassigned').sort((a,b)=>a.localeCompare(b));
 }
+// Who may merge: admins, or users given "Merge branches" in Settings → Users (grant.branch_merge).
+function canMergeBranches(){ return !!(Server.user && (Server.isAdmin() || (Server.user.hidden_sections||[]).includes('grant.branch_merge'))); }
+// Merges are also kept in dash_branch_merges (branch_merges.sql) so granted users can save them.
+let _bmSyncAt=0;
+async function syncBranchMergesFromServer(force){
+  if(typeof Server==='undefined'||!Server.token) return false;
+  if(!force&&Date.now()-_bmSyncAt<60000) return false; _bmSyncAt=Date.now();
+  try{ const r=await Server.rpc('dash_branch_merges_get',{p_token:Server.token});
+    if(r&&Array.isArray(r.merges)&&JSON.stringify(r.merges)!==JSON.stringify(KV.get('branchMerges')||[])){ KV.set('branchMerges',r.merges); _aliasKey=''; return true; } }catch(e){}
+  return false;
+}
 async function saveBranchMerges(list){
-  const ok=await storageSet('branchMerges',list);
-  if(ok===null) return false;
+  let ok=null, srvErr=null;
+  try{ await Server.rpc('dash_branch_merges_set',{p_token:Server.token, p_merges:list}); ok=true; KV.set('branchMerges',list); }catch(e){ srvErr=e; }
+  if(Server.isAdmin()){ const k=await storageSet('branchMerges',list); if(k!==null) ok=true; }
+  if(ok===null){ const m=String(srvErr&&srvErr.message||srvErr||'');
+    showToast(/does not exist|Could not find|schema cache|PGRST202|404/i.test(m)?'Saving merges for non-admins needs branch_merges.sql — ask an admin to run it in Supabase.':/FORBIDDEN/.test(m)?'You don’t have the “Merge branches” right.':'Merges not saved: '+m);
+    return false; }
+  _bmSyncAt=Date.now();
   _aliasKey=''; await loadAllWeeks(); addMergedBranchDivisions(); candState.cache?.clear?.(); refreshUI();
   return true;
 }
@@ -2141,7 +2161,7 @@ function openBranchMergeFromTable(){ const sel=selectedPieTargets.branches||[]; 
 function updateMergeSelectedBtn(){ const n=(selectedPieTargets.branches||[]).length;
   document.querySelectorAll('#view-branches [data-merge-open]').forEach(b=>{ b.textContent=n>=2?`⇄ Merge ${n} selected`:`⇄ Merge branches${branchMergeList().length?' · '+branchMergeList().length:''}`; b.classList.toggle('btn-primary',n>=2); b.classList.toggle('btn-secondary',n<2); }); }
 function openBranchMergeDialog(pre){
-  if(!Server.isAdmin()) return;
+  if(!canMergeBranches()) return;
   document.getElementById('bmDialog')?.remove();
   const wrap=document.createElement('div'); wrap.className='modal-overlay'; wrap.id='bmDialog';
   let editing=null, picked=new Set(), q='', name='', busy=false;
@@ -2421,6 +2441,7 @@ let heldDay=toIsoDateOnly(new Date());
 setInterval(async()=>{ const d=toIsoDateOnly(new Date()); if(d===heldDay) return; heldDay=d;
   try{ if(typeof Server!=='undefined' && Server.user && weeksData.length){ await loadAllWeeks(); refreshUI(); } }catch(e){} }, 60000);
 async function loadAllWeeks(){
+  await syncBranchMergesFromServer();
   const keys = await storageListKeys('weekly:');
   const out = [];
   for(const k of keys){
@@ -6262,7 +6283,7 @@ async function renderPeopleView(mode){
     <div class="people-layout-grid">
       <div>
         <div class="panel" data-section="${mode==='recruiters'?'rec.table':'br.table'}">
-          <div class="panel-head"><h3>${mode==='recruiters'?'Recruiter':'Branch'} Detail</h3><div style="display:flex;align-items:center;gap:10px;"><span class="hint">Click a row for its trend · Ctrl/Cmd-click to compare · click a column to sort · &#9660; to filter${mode==='recruiters'?' · Remarks are saved per week':''}</span>${mode==='branches'&&Server.isAdmin()?`<button type="button" class="btn btn-secondary btn-sm" data-merge-open onclick="openBranchMergeFromTable()">${(selectedPieTargets.branches||[]).length>=2?`⇄ Merge ${(selectedPieTargets.branches||[]).length} selected`:`⇄ Merge branches${branchMergeList().length?' · '+branchMergeList().length:''}`}</button>`:''}${copyBtnHtml('peopleTable_'+mode)}${downloadBtnHtml('peopleTable_'+mode, (mode==='recruiters'?'recruiter':'branch')+'-performance.xlsx')}</div></div>
+          <div class="panel-head"><h3>${mode==='recruiters'?'Recruiter':'Branch'} Detail</h3><div style="display:flex;align-items:center;gap:10px;"><span class="hint">Click a row for its trend · Ctrl/Cmd-click to compare · click a column to sort · &#9660; to filter${mode==='recruiters'?' · Remarks are saved per week':''}</span>${mode==='branches'&&canMergeBranches()?`<button type="button" class="btn btn-secondary btn-sm" data-merge-open onclick="openBranchMergeFromTable()">${(selectedPieTargets.branches||[]).length>=2?`⇄ Merge ${(selectedPieTargets.branches||[]).length} selected`:`⇄ Merge branches${branchMergeList().length?' · '+branchMergeList().length:''}`}</button>`:''}${copyBtnHtml('peopleTable_'+mode)}${downloadBtnHtml('peopleTable_'+mode, (mode==='recruiters'?'recruiter':'branch')+'-performance.xlsx')}</div></div>
           <table id="peopleTable_${mode}"></table>
         </div>
       </div>
@@ -9938,19 +9959,19 @@ const UF_PAGES = [
   {mod:'performance', label:'Overview', desc:'Weekly, monthly and quarterly results', sec:'performance'},
   {mod:null, offGrant:'grant.no_team', label:'My Team', desc:'Their own team, day by day — for team leads with a team assigned', sec:'teams', extras:['grant.team_names','grant.break_image']},
   {mod:'recruiters', label:'Recruiters', desc:'Recruiter table, trends and history', sec:'recruiters', extras:['remarks']},
-  {mod:'branches', label:'Branches', desc:'Branch table, trends and history', sec:'branches'},
+  {mod:'branches', label:'Branches', desc:'Branch table, trends and history', sec:'branches', extras:['grant.branch_merge']},
   {mod:'alerts', label:'Action Center', desc:'Who is below goal and other signals', sec:'alerts', extras:['remarks_approve']},
   {mod:'divreport', label:'Division Report', desc:'Pipeline by client and location, per division'},
   {mod:'pivot', label:'Report Builder', desc:'Build their own tables and charts', sec:'pivot'},
   {mod:'candidates', label:'Candidates', desc:'Candidate names and Employee Numbers everywhere', sec:'candidates', extras:['master','master_edit']},
 ];
 const UF_TOOLS = ['upload','export','settings'];
-const UF_EXTRA_LABEL = {remarks:'Can add remarks', remarks_approve:'Can approve and edit remarks', 'grant.team_names':'See their team’s candidate names', 'grant.break_image':'Copy third-break lists as images',
+const UF_EXTRA_LABEL = {remarks:'Can add remarks', remarks_approve:'Can approve and edit remarks', 'grant.team_names':'See their team’s candidate names', 'grant.break_image':'Copy third-break lists as images', 'grant.branch_merge':'Merge branches (applies for everyone)',
   master:'Browse all candidate records', master_edit:'Exclude or include candidates', upload:'Upload spreadsheets', export:'Download and share', settings:'Settings — divisions, branches, goals'};
 const UF_PRESETS = [
   {name:'Viewer', desc:'Overview, recruiters and branches', modules:['performance','recruiters','branches']},
   {name:'Team lead', desc:'Viewer + Action Center, remarks, team names', modules:['performance','recruiters','branches','alerts','remarks'], grants:['grant.team_names','grant.break_image']},
-  {name:'Manager', desc:'Every page, approves remarks, downloads', modules:['performance','recruiters','branches','alerts','remarks','remarks_approve','divreport','pivot','candidates','master','export'], grants:['grant.team_names','grant.break_image']},
+  {name:'Manager', desc:'Every page, approves remarks, downloads', modules:['performance','recruiters','branches','alerts','remarks','remarks_approve','divreport','pivot','candidates','master','export'], grants:['grant.team_names','grant.break_image','grant.branch_merge']},
 ];
 function readFormRights(host){
   return { modules:[...host.querySelectorAll('input[data-mod]:checked')].map(i=>i.value),
@@ -10650,7 +10671,7 @@ function renderTeamGroups(){
   </div>
   <div class="lt-pane" data-lt-pane="daily" data-section="team.daily"><div class="lt-pane-head"><h4>Day by day</h4>${copyBtnHtml('ltTodayTable')}</div><div class="hp-table-wrap"><table class="ep-table" id="ltTodayTable"><thead><tr><th>Date</th>${TG_METRICS.map(([,l])=>`<th>${l}</th>`).join('')}</tr></thead><tbody>${daily.map(x=>{const target=[...new Set(g.memberships.filter(m=>tgActive(g,m.name,x.date)&&(!g.division||(getEffectiveRecruiterDivision(m.name,weekOfDate(x.date).weekEnd)||'Unassigned')===g.division)).map(m=>m.name))].reduce((sum,n)=>sum+ltDailyGoal(n,x.date),0),signal=recruiterSignal(x.r.total.schedules,x.r.total.shows,x.r.total.scheduledDateOf,target);return `<tr${mode==='day'&&x.date===p.from?' class="lt-mine"':''}><td>${new Date(x.date+'T12:00:00Z').toLocaleDateString(undefined,{weekday:'short',timeZone:'UTC'})} · ${fmtDate(x.date)}${mode==='day'&&x.date===p.from?' <span class="pill good">selected</span>':''}</td>${TG_METRICS.map(([k])=>(k==='shows'||k==='noShows')&&isHeldShowDay(x.date)?`<td class="ep-held" title="Shows are final once the day ends — they appear tomorrow">tomorrow</td>`:`<td class="${k==='schedules'?'rc-'+signal.schedule:k==='shows'?'rc-'+signal.visits:''}">${tgNumber(x.r.total[k])}</td>`).join('')}</tr>`;}).join('')||'<tr><td colspan="7">No days yet in this week.</td></tr>'}</tbody><tfoot><tr><td>${dw?'Week so far':'Total'}</td>${TG_METRICS.map(([k])=>`<td>${tgNumber(dReport.total[k])}</td>`).join('')}</tr></tfoot></table></div><div class="lt-daily-chart" data-section="team.charts"><h4>Schedules, visits &amp; hires</h4><div class="tg-chart"><canvas id="ltTimeline" role="img" aria-label="Daily activity"></canvas></div></div></div>
   <div class="lt-pane" data-lt-pane="branches">
-   <div class="lt-subbar"><div class="lt-seg" role="group" aria-label="Branch view"><button type="button" data-br="compare" data-section="team.analytics.branches">Team vs other recruiters</button><button type="button" data-br="multi" data-section="team.multibranch">Recruiters at several branches</button></div>${Server.isAdmin()?`<button type="button" class="btn btn-secondary btn-sm" data-merge-open>⇄ Merge branches${branchMergeList().length?` · ${branchMergeList().length}`:''}</button>`:''}</div>
+   <div class="lt-subbar"><div class="lt-seg" role="group" aria-label="Branch view"><button type="button" data-br="compare" data-section="team.analytics.branches">Team vs other recruiters</button><button type="button" data-br="multi" data-section="team.multibranch">Recruiters at several branches</button></div>${canMergeBranches()?`<button type="button" class="btn btn-secondary btn-sm" data-merge-open>⇄ Merge branches${branchMergeList().length?` · ${branchMergeList().length}`:''}</button>`:''}</div>
    <div data-br-pane="compare" data-section="team.analytics.branches">${AN.branches||'<div class="lt-empty"><strong>No branch to compare yet.</strong><span>Your team’s branches appear here once they have activity in this period.</span></div>'}</div>
    <div data-br-pane="multi" data-section="team.multibranch" id="ltMultiBranch"></div>
   </div>
@@ -11053,7 +11074,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.30.0';   // shown only in the browser tab title
+const APP_VERSION = '4.32.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -11102,8 +11123,8 @@ document.addEventListener('keydown', e=>{
 });
 // ---------- Manage access in place (super admin) ----------
 const PAGE_MODULE = {performance:'performance', recruiters:'recruiters', branches:'branches', candidates:'candidates', master:'master', alerts:'alerts', pivot:'pivot', divreport:'divreport'};
-const PAGE_EDIT = {performance:['upload','export'], recruiters:['remarks','export'], branches:['export'], candidates:['master_edit','export'], master:['master_edit','export'], alerts:['remarks','remarks_approve'], pivot:['export'], teams:['grant.team_names','grant.break_image'], leads:[], divreport:['upload','candidates']};
-const EDIT_LABEL = {'grant.break_image':'Copy third-break list as image', 'grant.team_names':'See their team’s candidate names', candidates:'See all candidate names'};
+const PAGE_EDIT = {performance:['upload','export'], recruiters:['remarks','export'], branches:['export','grant.branch_merge'], candidates:['master_edit','export'], master:['master_edit','export'], alerts:['remarks','remarks_approve'], pivot:['export'], teams:['grant.team_names','grant.break_image'], leads:[], divreport:['upload','candidates']};
+const EDIT_LABEL = {'grant.branch_merge':'Merge branches', 'grant.break_image':'Copy third-break list as image', 'grant.team_names':'See their team’s candidate names', candidates:'See all candidate names'};
 let accessMode=false, accessObs=null;
 function sectionLabel(key){ for(const secs of Object.values(PAGE_SECTIONS)) for(const [k,l] of secs) if(k===key) return l.replace(/^·+ /,''); return null; }
 // Super admin: locks appear on hover everywhere (no mode needed); "Show all locks" pins them all on.
@@ -11797,13 +11818,23 @@ const DatePick=(()=>{
  const monthEnd=s=>{ const d=parse(monthStart(s)); d.setMonth(d.getMonth()+1); d.setDate(0); return iso(d); };
  const qStart=s=>{ const d=parse(s); d.setMonth(Math.floor(d.getMonth()/3)*3,1); return iso(d); };
  const qEnd=s=>{ const d=parse(qStart(s)); d.setMonth(d.getMonth()+3,0); return iso(d); };
- const RANGE_PRESETS=()=>{ const t=today(), lw=add(weekStart(t),-7), lm=add(monthStart(t),-1), lq=add(qStart(t),-1);
-  return [['Today',t,t],['Yesterday',add(t,-1),add(t,-1)],['Last 7 days',add(t,-6),t],['Last 28 days',add(t,-27),t],['Last 30 days',add(t,-29),t],
-   ['This week',weekStart(t),t],['Last week',lw,add(lw,6)],['This month',monthStart(t),t],['Last month',monthStart(lm),monthEnd(lm)],
-   ['This quarter',qStart(t),t],['Last quarter',qStart(lq),qEnd(lq)],['Year to date',t.slice(0,4)+'-01-01',t]]; };
- const SINGLE_PRESETS=()=>{ const t=today();
-  return [['Today',t],['Yesterday',add(t,-1)],['7 days ago',add(t,-7)],['30 days ago',add(t,-30)],['Start of this week',weekStart(t)],['End of this week',weekEnd(t)],
-   ['End of last week',add(weekStart(t),-1)],['Start of this month',monthStart(t)],['Start of this quarter',qStart(t)]]; };
+ // Presets are grouped: ['#','Heading'] rows start a group.
+ const yStart=t=>t.slice(0,4)+'-01-01', yEnd=t=>t.slice(0,4)+'-12-31', mBack=(t,n)=>{ const d=parse(monthStart(t)); d.setMonth(d.getMonth()-n); return iso(d); };
+ const qOf=d=>Math.floor((+d.slice(5,7)-1)/3)+1, qN=(y,n)=>[y+'-'+String(n*3-2).padStart(2,'0')+'-01', qEnd(y+'-'+String(n*3).padStart(2,'0')+'-01')];
+ const mName=d=>parse(d).toLocaleDateString(undefined,{month:'long'});
+ const RANGE_PRESETS=()=>{ const t=today(), lw=add(weekStart(t),-7), lm=add(monthStart(t),-1), lq=add(qStart(t),-1), ly=String(+t.slice(0,4)-1), y=t.slice(0,4);
+  const qs=[]; for(let n=1;n<=qOf(t);n++){ const [qa,qb]=qN(y,n); qs.push(['Q'+n+' '+y,qa,qb>t?t:qb]); }
+  return [['#','Days'],['Today',t,t],['Yesterday',add(t,-1),add(t,-1)],['Last 7 days',add(t,-6),t],['Last 14 days',add(t,-13),t],['Last 28 days',add(t,-27),t],['Last 30 days',add(t,-29),t],['Last 60 days',add(t,-59),t],['Last 90 days',add(t,-89),t],
+   ['#','Weeks'],['This week',weekStart(t),t],['Last week',lw,add(lw,6)],['Last 2 weeks',add(weekStart(t),-14),add(weekStart(t),-1)],['Last 4 weeks',add(weekStart(t),-28),add(weekStart(t),-1)],
+   ['#','Months'],['This month',monthStart(t),t],['Last month',monthStart(lm),monthEnd(lm)],[mName(mBack(t,2)),mBack(t,2),monthEnd(mBack(t,2))],['Last 3 months',mBack(t,3),add(monthStart(t),-1)],['Last 6 months',mBack(t,6),add(monthStart(t),-1)],
+   ['#','Quarters'],['This quarter',qStart(t),t],['Last quarter',qStart(lq),qEnd(lq)],...qs.reverse().slice(2),
+   ['#','Year'],['Year to date',yStart(t),t],['Last 12 months',add(t,-364),t],['Last year ('+ly+')',ly+'-01-01',ly+'-12-31']]; };
+ const SINGLE_PRESETS=()=>{ const t=today(), lm=add(monthStart(t),-1), lq=add(qStart(t),-1);
+  return [['#','Days'],['Today',t],['Yesterday',add(t,-1)],['Tomorrow',add(t,1)],['7 days ago',add(t,-7)],['30 days ago',add(t,-30)],
+   ['#','Weeks'],['Start of this week',weekStart(t)],['End of this week',weekEnd(t)],['Start of last week',add(weekStart(t),-7)],['End of last week',add(weekStart(t),-1)],
+   ['#','Months'],['Start of this month',monthStart(t)],['End of this month',monthEnd(t)],['Start of last month',monthStart(lm)],['End of last month',monthEnd(lm)],
+   ['#','Quarters'],['Start of this quarter',qStart(t)],['End of this quarter',qEnd(t)],['Start of last quarter',qStart(lq)],['End of last quarter',qEnd(lq)],
+   ['#','Year'],['Start of this year',yStart(t)],['End of this year',yEnd(t)]]; };
  let pop=null, st=null;
  function close(){ if(pop){ pop.remove(); pop=null; st=null; document.removeEventListener('keydown',onKey,true); } }
  function onKey(e){ if(e.key==='Escape'&&pop){ e.stopPropagation(); close(); } }
@@ -11844,18 +11875,38 @@ const DatePick=(()=>{
   const two=(st.mode==='range'||st.mode==='period')&&innerWidth>720;
   const next=(()=>{ const d=parse(st.view); d.setMonth(d.getMonth()+1); return iso(d); })();
   let presets='';
-  if(st.mode==='range') presets=RANGE_PRESETS().map(([l,a,b])=>{ const A=st.min&&a<st.min?st.min:a, B=st.max&&b>st.max?st.max:b; return A<=B?`<button type="button" data-pa="${A}" data-pb="${B}" class="${st.a===A&&st.b===B?'on':''}">${l}</button>`:''; }).join('');
-  else if(st.mode==='single') presets=SINGLE_PRESETS().filter(([,d])=>clampOk(d,st.min,st.max)).map(([l,d])=>`<button type="button" data-p1="${d}" class="${st.value===d?'on':''}">${l}</button>`).join('')+(st.clearable?'<button type="button" data-p1="" class="dp-clear">No date</button>':'');
-  else if(st.mode==='period'){ const W=st.weeks.slice().sort(), t=today(), latest=W[W.length-1]||weekEnd(t), lastN=n=>W.slice(-n);
+  const H=x=>`<div class="dp-ph">${x}</div>`, tidy=h=>h.replace(/(<div class="dp-ph">[^<]*<\/div>)+(?=<div class="dp-ph">|$)/g,'');
+  const wkNo=w=>{ const x=(typeof weeksData!=='undefined'?weeksData:[]).find(y=>y.weekEndDate===w); return x&&x.weekNumber!=null?x.weekNumber:weekOfDate(w).number; };
+  const short=d=>parse(d).toLocaleDateString(undefined,{month:'short',day:'numeric'});
+  if(st.mode==='range') presets=tidy(RANGE_PRESETS().map(([l,a,b])=>{ if(l==='#') return H(a); const A=st.min&&a<st.min?st.min:a, B=st.max&&b>st.max?st.max:b; return A<=B?`<button type="button" data-pa="${A}" data-pb="${B}" class="${st.a===A&&st.b===B?'on':''}" title="${fmt(A)} – ${fmt(B)}">${l}</button>`:''; }).join(''));
+  else if(st.mode==='single') presets=tidy(SINGLE_PRESETS().map(([l,d])=>l==='#'?H(d):clampOk(d,st.min,st.max)?`<button type="button" data-p1="${d}" class="${st.value===d?'on':''}" title="${fmt(d)}">${l}</button>`:'').join(''))+(st.clearable?'<button type="button" data-p1="" class="dp-clear">No date</button>':'');
+  else if(st.mode==='period'){ const W=st.weeks.slice().sort(), t=today(), latest=W[W.length-1]||weekEnd(t), lastN=n=>W.slice(-n), y=t.slice(0,4), ly=String(+y-1);
    const span=(a,b)=>{ const ws=W.filter(w=>w>=weekEnd(a)&&w<=weekEnd(b)); return ws.length?[weekStart(ws[0]),ws[ws.length-1]]:null; };
-   const lm=add(monthStart(t),-1), lq=add(qStart(t),-1);
-   const list=[['Latest week',[weekStart(latest),latest]],['Last 4 weeks',lastN(4).length?[weekStart(lastN(4)[0]),latest]:null],['Last 13 weeks',lastN(13).length?[weekStart(lastN(13)[0]),latest]:null],
-    ['This month',span(monthStart(t),monthEnd(t))],['Last month',span(monthStart(lm),monthEnd(lm))],['This quarter',span(qStart(t),qEnd(t))],['Last quarter',span(qStart(lq),qEnd(lq))],['Year to date',span(t.slice(0,4)+'-01-01',t)]];
-   presets=list.filter(([,r])=>r).map(([l,[a,b]])=>`<button type="button" data-pa="${a}" data-pb="${b}" class="${st.a===a&&st.b===b?'on':''}">${l}</button>`).join('')+`<button type="button" data-pall="1" class="${st.all?'on':''}">All weeks</button>`; }
-  else { const t=today(), have=w=>st.weeks.includes(w), latest=st.weeks.slice().sort().pop();
-   const list=[['This week',weekEnd(t)],['Last week',add(weekEnd(t),-7)],['2 weeks ago',add(weekEnd(t),-14)],['4 weeks ago',add(weekEnd(t),-28)],['Latest uploaded',latest]].filter(([,w])=>w&&have(w));
-   const seen=new Set(); presets=list.filter(([,w])=>!seen.has(w)&&seen.add(w)).map(([l,w])=>`<button type="button" data-pw="${w}" class="${st.value===w?'on':''}">${l}</button>`).join('')
-    +(st.extra||[]).map(o=>`<button type="button" data-pw="${escapeHtml(o.value)}" class="${st.value===o.value?'on':''}">${escapeHtml(o.label)}</button>`).join(''); }
+   const lastNr=n=>lastN(n).length>=Math.min(n,W.length)&&W.length?[weekStart(lastN(n)[0]),latest]:null;
+   const prev=W.length>1?W[W.length-2]:null, lm=add(monthStart(t),-1), lq=add(qStart(t),-1);
+   const qs=[]; for(let n=qOf(t)-1;n>=1;n--){ const [qa,qb]=qN(y,n); qs.push(['Q'+n+' '+y,span(qa,qb)]); }
+   const list=[['#','Weeks'],['Latest week',[weekStart(latest),latest]],['Previous week',prev?[weekStart(prev),prev]:null],['Last 2 weeks',lastNr(2)],['Last 4 weeks',lastNr(4)],['Last 8 weeks',lastNr(8)],['Last 13 weeks',lastNr(13)],['Last 26 weeks',lastNr(26)],
+    ['#','Months'],['This month',span(monthStart(t),monthEnd(t))],['Last month',span(monthStart(lm),monthEnd(lm))],[mName(mBack(t,2)),span(mBack(t,2),monthEnd(mBack(t,2)))],['Last 3 months',span(mBack(t,3),t)],['Last 6 months',span(mBack(t,6),t)],
+    ['#','Quarters'],['This quarter',span(qStart(t),qEnd(t))],['Last quarter',span(qStart(lq),qEnd(lq))],...qs.slice(1),
+    ['#','Year'],['Year to date',span(yStart(t),t)],['Last 12 months',span(add(t,-364),t)],['Last year ('+ly+')',span(ly+'-01-01',ly+'-12-31')]];
+   const seen=new Set();
+   presets=tidy(list.map(([l,r])=>{ if(l==='#') return H(r); if(!r) return ''; const k=l+r[0]+r[1]; if(seen.has(k)) return ''; seen.add(k);
+     const n=W.filter(w=>w>=weekEnd(r[0])&&w<=r[1]).length; return `<button type="button" data-pa="${r[0]}" data-pb="${r[1]}" class="${st.a===r[0]&&st.b===r[1]?'on':''}" title="${fmt(r[0])} – ${fmt(r[1])}">${l}<small>${n} wk${n===1?'':'s'}</small></button>`; }).join(''))
+    +H('All')+`<button type="button" data-pall="1" class="${st.all?'on':''}">All weeks<small>${W.length}</small></button>`; }
+  else { const t=today(), W=st.weeks.slice().filter(w=>/^\d{4}-\d{2}-\d{2}$/.test(w)).sort(), have=w=>!!w&&W.includes(w);
+   const lastIn=(a,b)=>{ const ws=W.filter(w=>w>=a&&w<=b); return ws[ws.length-1]||null; }, firstIn=(a,b)=>W.find(w=>w>=a&&w<=b)||null;
+   const nearest=d=>W.reduce((best,w)=>best==null||Math.abs(parse(w)-parse(d))<Math.abs(parse(best)-parse(d))?w:best,null);
+   const lm=add(monthStart(t),-1), m2=mBack(t,2), lq=add(qStart(t),-1), ly=add(weekEnd(t),-364);
+   const list=[['#','Days'],['Today',weekEnd(t),1],['Yesterday',weekEnd(add(t,-1)),1],['7 days ago',weekEnd(add(t,-7)),1],['30 days ago',weekEnd(add(t,-30)),1],
+    ['#','Weeks'],['This week',weekEnd(t),1],['Last week',add(weekEnd(t),-7),1],['2 weeks ago',add(weekEnd(t),-14),1],['3 weeks ago',add(weekEnd(t),-21),1],['4 weeks ago',add(weekEnd(t),-28),1],['8 weeks ago',add(weekEnd(t),-56),1],
+    ['#','Months'],['This month · latest',lastIn(monthStart(t),monthEnd(t))],['This month · first',firstIn(monthStart(t),monthEnd(t))],['Last month · last week',lastIn(monthStart(lm),monthEnd(lm))],['Last month · first week',firstIn(monthStart(lm),monthEnd(lm))],[mName(m2)+' · last week',lastIn(m2,monthEnd(m2))],
+    ['#','Quarters'],['This quarter · latest',lastIn(qStart(t),qEnd(t))],['This quarter · first',firstIn(qStart(t),qEnd(t))],['Last quarter · last week',lastIn(qStart(lq),qEnd(lq))],['Last quarter · first week',firstIn(qStart(lq),qEnd(lq))],
+    ['#','Year'],['This year · first week',firstIn(yStart(t),yEnd(t))],['Same week last year',have(ly)?ly:(W.length&&Math.abs(parse(nearest(ly))-parse(ly))<=7*864e5?nearest(ly):null)],
+    ['#','Uploaded'],['Latest uploaded',W[W.length-1]],['Previous upload',W.length>1?W[W.length-2]:null],['Earliest uploaded',W[0]]];
+   presets=tidy(list.map(([l,w,exact])=>{ if(l==='#') return H(w); if(!w) return '';
+     if(!have(w)) return exact?`<button type="button" disabled class="dp-na" title="Week ending ${fmt(w)} is not uploaded yet">${l}<small>not uploaded</small></button>`:'';
+     return `<button type="button" data-pw="${w}" class="${st.value===w?'on':''}" title="Week ending ${fmt(w)}">${l}<small>Wk ${weekOfDate(w).number} · ${short(w)}</small></button>`; }).join(''))
+    +((st.extra||[]).length?H('Other')+(st.extra||[]).map(o=>`<button type="button" data-pw="${escapeHtml(o.value)}" class="${st.value===o.value?'on':''}">${escapeHtml(o.label)}</button>`).join(''):''); }
   const periodWeeks=()=>{ if(!st.a) return []; const b=st.b||weekEnd(st.a); return st.weeks.filter(w=>w>=weekEnd(st.a)&&w<=b); };
   const sum=st.mode==='period'?(st.a?(()=>{ const ws=periodWeeks(); const wn=w=>{ const x=(typeof weeksData!=='undefined'?weeksData:[]).find(y=>y.weekEndDate===w); return x&&x.weekNumber!=null?x.weekNumber:weekOfDate(w).number; }; return ws.length===1?'Week '+wn(ws[0])+' · ending '+fmt(ws[0]):ws.length?ws.length+' weeks · Week '+wn(ws[0])+' – Week '+wn(ws[ws.length-1]):'No uploaded weeks in these dates'; })()+(st.b?'':' — click another day to extend'):'Click a day to pick its week')
    :st.mode==='range'?(st.a?fmt(st.a<= (st.b||st.a)?st.a:st.b)+' – '+(st.b?fmt(st.a<=st.b?st.b:st.a):'pick the end date'):'Pick the start date')
