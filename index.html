@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.39.0</title>
+<title>Performance Dashboard · v4.41.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -1062,6 +1062,21 @@ button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #183442
 .goals-table td{padding-top:8px!important;padding-bottom:8px!important;vertical-align:middle!important}
 #goalsEditor .hint{font-size:12px!important;color:var(--text-secondary)}
 .goals-actions{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:12px}
+.me-box{border:1px solid #dfe6f0;border-radius:8px;background:#f8fafd;padding:8px 12px;margin:0 0 10px}.me-box>summary{display:flex;align-items:center;gap:8px;flex-wrap:wrap;cursor:pointer;list-style:none}.me-box>summary::-webkit-details-marker{display:none}.me-box>summary .hint{flex:1;font-size:12px}
+.me-scroll{overflow:auto;max-height:320px;margin-top:8px;background:#fff;border:1px solid #e3e8ef;border-radius:6px}.me-table{margin:0;width:100%;font-size:12.5px}.me-table td,.me-table th{white-space:nowrap}
+.me-tag{display:inline-block;font-size:10.5px;font-weight:700;border-radius:999px;padding:1px 7px;margin-right:3px}.me-tag.s{background:#e3edf9;color:#0b5cad}.me-tag.v{background:#e7f6ec;color:#15803d}.me-tag.e{background:#fff4d6;color:#8a6d00}
+.me-act{display:flex;gap:10px}.link-btn.danger{color:#b91c1c}
+.me-modal{max-width:640px;width:calc(100vw - 24px)}
+.me-nums{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 14px;margin:0 0 12px}.me-nums label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:#334155}
+.me-step{display:flex;border:1px solid #cfd6df;border-radius:6px;overflow:hidden;background:#fff}.me-step button{border:0;background:#f3f6fa;width:32px;font-size:16px;color:#0a1f44;cursor:pointer}.me-step button:hover{background:#e3edf9}
+.me-step input{border:0!important;width:100%;min-width:0;text-align:center;padding:7px 4px!important;font:inherit;font-size:14px;font-weight:600;box-shadow:none!important;-moz-appearance:textfield}.me-step input::-webkit-inner-spin-button{display:none}
+.me-table td.num,.me-table th.num{text-align:center}.me-table td.pos{color:#15803d;font-weight:700}.me-table td.neg{color:#b91c1c;font-weight:700}
+.me-recent{margin-top:12px}.me-recent>summary{cursor:pointer;font-size:12.5px;font-weight:600;color:#0a1f44}
+@media(max-width:600px){.me-nums{grid-template-columns:repeat(2,1fr)}}.me-note{margin:0 0 10px;font-size:12.5px;background:#fff8e6;border:1px solid #f1e2a8;border-radius:6px;padding:8px 10px}
+.me-counts,.me-outcome{display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap;margin:0 0 12px}.me-counts label,.me-outcome label{display:inline-flex;align-items:center;gap:6px;font-size:13px}.me-lbl{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#64748b;flex-basis:100%}
+.me-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin-bottom:12px}.me-grid label,.me-notefield{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:#334155}.me-grid input,.me-notefield input{padding:8px 10px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:13.5px;font-weight:400}
+.me-grid .off,.me-outcome.off{display:none}.me-err{color:#b91c1c;font-size:12.5px;margin:8px 0 0;min-height:1em}
+@media(max-width:600px){.me-grid{grid-template-columns:1fr}}
 .goals-filter{display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap;margin:12px 0 8px}.goals-filter .ge-search{flex:0 1 280px;margin:0}.goals-filter .ge-search input{width:100%}
 .goals-wrap{overflow-x:auto;max-width:100%;border:1px solid #e3e8ef;border-radius:8px}
 #goalsEditor .goals-table{width:100%;min-width:560px;table-layout:auto;margin:0}
@@ -2500,7 +2515,7 @@ async function loadAllWeeks(){
   const out = [];
   for(const k of keys){
     const rec = await storageGet(k);
-    if(rec) out.push(holdTodaysShows(applyBranchMerges(normalizeWeekRecord(resolveWeekRecord(rec)))));
+    if(rec) out.push(holdTodaysShows(applyBranchMerges(applyManualAdjust(normalizeWeekRecord(resolveWeekRecord(rec))))));
   }
   out.sort((a,b)=> a.weekEndDate.localeCompare(b.weekEndDate));
   weeksData = out;
@@ -6372,7 +6387,7 @@ async function renderPeopleView(mode){
     <div class="people-layout-grid">
       <div>
         <div class="panel" data-section="${mode==='recruiters'?'rec.table':'br.table'}">
-          <div class="panel-head"><h3>${mode==='recruiters'?'Recruiter':'Branch'} Detail</h3><div style="display:flex;align-items:center;gap:10px;"><span class="hint">Click a row for its trend · Ctrl/Cmd-click to compare · click a column to sort · &#9660; to filter${mode==='recruiters'?' · Remarks are saved per week':''}</span>${mode==='branches'&&canMergeBranches()?`<button type="button" class="btn btn-secondary btn-sm" data-merge-open onclick="openBranchMergeFromTable()">${(selectedPieTargets.branches||[]).length>=2?`⇄ Merge ${(selectedPieTargets.branches||[]).length} selected`:`⇄ Merge branches${branchMergeList().length?' · '+branchMergeList().length:''}`}</button>`:''}${copyBtnHtml('peopleTable_'+mode)}${downloadBtnHtml('peopleTable_'+mode, (mode==='recruiters'?'recruiter':'branch')+'-performance.xlsx')}</div></div>
+          <div class="panel-head"><h3>${mode==='recruiters'?'Recruiter':'Branch'} Detail</h3><div style="display:flex;align-items:center;gap:10px;"><span class="hint">Click a row for its trend · Ctrl/Cmd-click to compare · click a column to sort · &#9660; to filter${mode==='recruiters'?' · Remarks are saved per week':''}</span>${mode==='recruiters'&&canManualEdit()?`<button type="button" class="btn btn-secondary btn-sm" onclick="openManualEntryDialog({})" title="Add or take away schedules, interviews, shows or hires by hand">＋ Adjust numbers</button>`:''}${mode==='branches'&&canMergeBranches()?`<button type="button" class="btn btn-secondary btn-sm" data-merge-open onclick="openBranchMergeFromTable()">${(selectedPieTargets.branches||[]).length>=2?`⇄ Merge ${(selectedPieTargets.branches||[]).length} selected`:`⇄ Merge branches${branchMergeList().length?' · '+branchMergeList().length:''}`}</button>`:''}${copyBtnHtml('peopleTable_'+mode)}${downloadBtnHtml('peopleTable_'+mode, (mode==='recruiters'?'recruiter':'branch')+'-performance.xlsx')}</div></div>
           <table id="peopleTable_${mode}"></table>
         </div>
       </div>
@@ -8933,6 +8948,11 @@ async function rebuildWeeks(weeks, localRows, progress){
     if(r.s && per.has(r.sw)) per.get(r.sw).s.push([Number(r.so)||0, d]);
     if(r.v && per.has(r.vw)) per.get(r.vw).v.push([Number(r.vo)||0, d]);
   });
+  // schedules / interviews added or corrected by hand (Candidates → All candidate records → Manual entries)
+  const manualData = new Set();
+  manualRowsList().forEach((m,i)=>{ const d=m.data||{}; manualData.add(d);
+    if(m.s && d['Created On']){ const w=weekOfDate(String(d['Created On']).slice(0,10)).weekEnd; if(per.has(w)) per.get(w).s.push([1e9+i, d]); }
+    if(m.v && d['Date Of']){ const w=weekOfDate(String(d['Date Of']).slice(0,10)).weekEnd; if(per.has(w)) per.get(w).v.push([1e9+i, d]); } });
   let i=0;
   for(const wed of list){
     if(progress) progress('Recalculating week '+(++i)+' of '+list.length+'…');
@@ -8941,10 +8961,17 @@ async function rebuildWeeks(weeks, localRows, progress){
     const wn = isoWeekNumber(new Date(wed+'T00:00:00'));
     const ded = buildWeekRecord(wed, wn, processFile1(rows1, MAP1, wed, true), processFile2(rows2, MAP2, wed, true));
     const raw = buildWeekRecord(wed, wn, processFile1(rows1, MAP1, wed, false), processFile2(rows2, MAP2, wed, false));
+    // how much the manual entries add, so "Check numbers" still matches the master sheet
+    let manualAdj = null;
+    if(rows1.some(d=>manualData.has(d)) || rows2.some(d=>manualData.has(d))){
+      const r1=rows1.filter(d=>!manualData.has(d)), r2=rows2.filter(d=>!manualData.has(d));
+      const d0=buildWeekRecord(wed, wn, processFile1(r1, MAP1, wed, true), processFile2(r2, MAP2, wed, true)).totals, w0=buildWeekRecord(wed, wn, processFile1(r1, MAP1, wed, false), processFile2(r2, MAP2, wed, false)).totals;
+      manualAdj={sched_raw:raw.totals.schedules-w0.schedules, sched_dedup:ded.totals.schedules-d0.schedules, int_raw:raw.totals.scheduledDateOf-w0.scheduledDateOf, int_dedup:ded.totals.scheduledDateOf-d0.scheduledDateOf, n:rows1.filter(d=>manualData.has(d)).length+rows2.filter(d=>manualData.has(d)).length};
+    }
     const empty = !ded.totals.schedules && !ded.totals.scheduledDateOf && !raw.totals.schedules && !raw.totals.scheduledDateOf;
     if(empty){ if(KV.has('weekly:'+wed)) await storageDelete('weekly:'+wed); }
     else {
-      const rec={weekEndDate:wed, weekNumber:wn, savedAt:new Date().toISOString(), source:'master', rules:COUNT_RULES,
+      const rec={weekEndDate:wed, weekNumber:wn, savedAt:new Date().toISOString(), source:'master', rules:COUNT_RULES, ...(manualAdj?{manualAdj}:{}),
         deduped:{totals:ded.totals, byRecruiter:ded.byRecruiter, byBranch:ded.byBranch, diagnostics:ded.diagnostics},
         raw:{totals:raw.totals, byRecruiter:raw.byRecruiter, byBranch:raw.byBranch, diagnostics:raw.diagnostics}};
       const bd=branchDailyFromRecord(rec);
@@ -8966,6 +8993,7 @@ async function recalculateAllWeeks(){
     for(const col of ['Created On','Date Of']) (await Server.rpc('dash_master_distinct', {q:{}, p_column:col})).forEach(v=>{ if(/^\d{4}-\d{2}-\d{2}$/.test(v.value)) days.add(v.value); });
     const weeks = new Set([...days].map(d=>toIsoDateOnly(saturdayOnOrAfter(new Date(d+'T00:00:00')))));
     [...KV.keys()].filter(k=>k.startsWith('weekly:')).forEach(k=>weeks.add(k.slice(7)));
+    manualRowsList().forEach(m=>manualWeeksOf(m).forEach(w=>weeks.add(w)));
     await rebuildWeeks([...weeks], null, setLoading);
     await loadAllWeeks(); refreshUI();
     showToast('Recalculated '+weeks.size+' week'+(weeks.size===1?'':'s')+' from the master sheet.');
@@ -9310,6 +9338,7 @@ async function renderMasterView(){
         <button class="btn btn-primary btn-sm upload-only" data-upload-raw>Upload Excel files</button>
       </div>
     </div>
+    <div id="manualEntries"></div>
     <div class="master-selbar" id="masterSelBar"></div>
     <div class="master-scroll"><table id="masterTable" class="master-table"></table></div>
     <div class="master-pager" id="masterPager"></div>
@@ -9318,6 +9347,7 @@ async function renderMasterView(){
   container.querySelector('#masterPeriodOnly').onchange=e=>{ st.periodOnly=e.target.checked; st.offset=0; drawMasterTable(); };
   container.querySelector('#masterClearFilters').onclick=()=>{ st.filters={}; st.search=''; st.offset=0; const s=document.getElementById('masterSearch'); if(s) s.value=''; drawMasterTable(); };
   container.querySelector('#masterDownload').onclick=downloadMasterSheet;
+  renderManualEntries();
   container.querySelector('[data-upload-raw]').onclick=()=>pickSpreadsheetsToUpload();
   drawMasterTable(true);
 }
@@ -9357,7 +9387,7 @@ async function drawMasterTable(freshCount){
   if(res.total!=null && st.total==null){ st.total = res.total; st.excluded = res.excluded; } // older SQL always counts
   const cols = masterColumnsList();
   const rows = res.rows || [];
-  st.pageRows = rows.length;
+  st.pageRows = rows.length; st.pageData = new Map(rows.map(r=>[r.id, r]));
   if(!rows.length && !st.offset && !Object.keys(st.filters).length && !st.search && st.files==='all' && !st.periodOnly){
     table.innerHTML = `<tbody><tr><td class="master-empty-cell"><h3>The master sheet is empty</h3><p class="hint">${Server.can('upload')?'Upload your Created On and Date Of exports (and the goals file). Contact numbers are removed, rows are merged into this single sheet on the server, and the uploaded files are discarded.':'Ask someone with upload rights to import the latest exports.'}</p>${Server.can('upload')?'<button class="btn btn-primary" data-upload-raw2>Upload Excel files</button>':''}</td></tr></tbody>`;
     table.querySelector('[data-upload-raw2]')?.addEventListener('click', ()=>pickSpreadsheetsToUpload());
@@ -9418,6 +9448,137 @@ async function masterSelectionAction(act){
     showToast((excluded?'Excluded ':'Included ')+fmtNum(res.count)+' row'+(res.count===1?'':'s')+(res.weeks?.length?' · '+res.weeks.length+' week'+(res.weeks.length===1?'':'s')+' recalculated':'')+'.');
   }catch(e){ showToast('Could not update: '+cleanErr(e)); }
   finally{ Server.ownMasterUntil=Date.now()+8000; setLoading(null); drawMasterTable(true); }
+}
+/* ---------- Manual entries: add / edit schedules and interviews by hand ----------
+   Kept in the shared store as "manualRows" and counted when weeks are (re)calculated, exactly like
+   uploaded rows. Editing an uploaded row excludes the original and adds a corrected copy, so
+   deleting the manual entry brings the original back. Removing = "Exclude from metrics". */
+function manualRowsList(){ const v=KV.get('manualRows'); return Array.isArray(v)?v.filter(m=>m&&m.data):[]; }
+function canManualEdit(){ return !!Server.user && (Server.isAdmin() || Server.can('master_edit')); }
+function manualWeeksOf(m){ const d=(m&&m.data)||{}, w=[]; if(m.s&&d['Created On']) w.push(weekOfDate(String(d['Created On']).slice(0,10)).weekEnd); if(m.v&&d['Date Of']) w.push(weekOfDate(String(d['Date Of']).slice(0,10)).weekEnd); return w; }
+async function commitManualRows(list, weeks, msg){
+  Server.ownMasterUntil = Date.now()+10*60*1000;
+  try{
+    setLoading('Saving…');
+    const ok = await storageSet('manualRows', list);
+    if(ok===null) throw new Error('the store did not accept the change');
+    KV.set('manualRows', list);
+    const ws=[...new Set(weeks)].filter(Boolean);
+    if(ws.length) await rebuildWeeks(ws, null, setLoading);
+    await loadAllWeeks(); candState.cache?.clear?.(); refreshUI();
+    showToast(msg+(ws.length?' · '+ws.length+' week'+(ws.length===1?'':'s')+' recalculated':''));
+    return true;
+  }catch(e){ showToast('Not saved: '+cleanErr(e)); return false; }
+  finally{ Server.ownMasterUntil=Date.now()+8000; setLoading(null); renderManualEntries(); if(document.getElementById('masterTable')) drawMasterTable(true); }
+}
+/* ---------- Number adjustments: admins add or take away counts by hand (no candidate details) ----------
+   Stored as "manualAdjust" [{id, date, recruiter, branch, sched, int, shows, noShows, hires, placed, note, by, at}]
+   and added on top of the uploaded numbers whenever weeks load — for everyone, on every page.
+   Negative numbers remove. The uploaded data itself is never changed, so deleting an adjustment undoes it. */
+const ADJ_FIELDS=[['sched','schedules','Schedules'],['int','scheduledDateOf','Interviews'],['shows','shows','Shows'],['noShows','noShows','No-shows'],['hires','i9','Hires'],['placed','placed','Placed']];
+function manualAdjList(){ const v=KV.get('manualAdjust'); return Array.isArray(v)?v.filter(a=>a&&a.date&&a.recruiter):[]; }
+function applyManualAdjust(week){
+  if(!week||!week.weekEndDate) return week;
+  const list=manualAdjList().filter(a=>weekOfDate(a.date).weekEnd===week.weekEndDate); if(!list.length) return week;
+  const byRecruiter={...(week.byRecruiter||{})}, byBranch={...(week.byBranch||{})}, totals={...(week.totals||{})};
+  const blank=()=>({schedules:0,scheduledDateOf:0,shows:0,noShows:0,i9:0,placed:0});
+  list.forEach(a=>{
+    const cur=byRecruiter[a.recruiter], r={...blank(), schedulesList:[], interviewsList:[], showsList:[], noShowsList:[], i9List:[], placedList:[], ...(cur||{}), branch:(cur&&cur.branch)||a.branch||'Unassigned'};
+    if(r.daily) r.daily={...r.daily};
+    const br=a.branch||r.branch, b={...blank(), ...(byBranch[br]||{})};
+    ADJ_FIELDS.forEach(([k,f])=>{ const n=Number(a[k])||0; if(!n) return;
+      r[f]=Math.max(0,(r[f]||0)+n); b[f]=Math.max(0,(b[f]||0)+n); totals[f]=Math.max(0,(totals[f]||0)+n);
+      if(r.daily){ const d=r.daily[a.date]={...(r.daily[a.date]||(typeof emptyTotals==='function'?emptyTotals():{}))}; d[f]=Math.max(0,(d[f]||0)+n); } });
+    r.adjusted=(r.adjusted||0)+1; byRecruiter[a.recruiter]=r; byBranch[br]=b;
+  });
+  return {...week, byRecruiter, byBranch, totals, adjusted:list.length};
+}
+async function commitManualAdj(list, msg){
+  try{
+    setLoading('Saving…');
+    const ok=await storageSet('manualAdjust', list);
+    if(ok===null) throw new Error('the store did not accept the change');
+    KV.set('manualAdjust', list);
+    await loadAllWeeks(); candState.cache?.clear?.(); refreshUI();
+    showToast(msg); return true;
+  }catch(e){ showToast('Not saved: '+cleanErr(e)); return false; }
+  finally{ setLoading(null); renderManualEntries(); }
+}
+function adjSummary(a){ return ADJ_FIELDS.filter(([k])=>Number(a[k])).map(([k,,l])=>(a[k]>0?'+':'')+a[k]+' '+l.toLowerCase()).join(', '); }
+function renderManualEntries(){
+  const host=document.getElementById('manualEntries'); if(!host) return;
+  const list=manualAdjList().slice().sort((x,y)=>String(y.date).localeCompare(String(x.date))), can=canManualEdit();
+  if(!can && !list.length){ host.innerHTML=''; return; }
+  host.innerHTML=`<details class="me-box" ${list.length&&!host.dataset.closed?'open':''}><summary><strong>Manual number adjustments</strong> <span class="al-count">${list.length}</span><span class="hint">Counts added or taken away by hand, on top of the uploaded numbers.</span>${can?'<button type="button" class="btn btn-primary btn-sm" id="meAdd">＋ Adjust numbers</button>':''}</summary>
+   ${list.length?adjTableHtml(list, can):'<p class="hint" style="margin:8px 0 0">None yet.</p>'}</details>`;
+  const det=host.querySelector('details'); det.addEventListener('toggle',()=>{ if(det.open) delete host.dataset.closed; else host.dataset.closed='1'; });
+  host.querySelector('#meAdd')?.addEventListener('click',e=>{ e.preventDefault(); openManualEntryDialog({}); });
+  wireAdjTable(host);
+}
+function adjTableHtml(list, can){
+  return `<div class="me-scroll"><table class="users-table me-table"><thead><tr><th>Date</th><th>Week</th><th>Recruiter</th><th>Branch</th>${ADJ_FIELDS.map(([,,l])=>`<th class="num">${l}</th>`).join('')}<th>Note</th><th>By</th>${can?'<th></th>':''}</tr></thead><tbody>
+   ${list.map(a=>`<tr><td>${fmtDate(a.date)}</td><td>Wk ${weekOfDate(a.date).number}</td><td>${escapeHtml(a.recruiter)}</td><td>${escapeHtml(a.branch||'')}</td>${ADJ_FIELDS.map(([k])=>{ const n=Number(a[k])||0; return `<td class="num ${n>0?'pos':n<0?'neg':''}">${n?(n>0?'+':'')+n:'–'}</td>`; }).join('')}<td class="hint">${escapeHtml(a.note||'')}</td><td class="hint" title="${escapeHtml(a.at?new Date(a.at).toLocaleString():'')}">${escapeHtml(a.by||'')}</td>${can?`<td class="me-act"><button class="link-btn" data-me-edit="${escapeHtml(a.id)}">Edit</button><button class="link-btn danger" data-me-del="${escapeHtml(a.id)}">Delete</button></td>`:''}</tr>`).join('')}
+   </tbody></table></div>`;
+}
+function wireAdjTable(host){
+  host.querySelectorAll('[data-me-edit]').forEach(b=>b.onclick=()=>{ const a=manualAdjList().find(x=>x.id===b.dataset.meEdit); if(a) openManualEntryDialog({adj:a}); });
+  host.querySelectorAll('[data-me-del]').forEach(b=>b.onclick=()=>deleteManualEntry(b.dataset.meDel));
+}
+async function deleteManualEntry(id){
+  const list=manualAdjList(), a=list.find(x=>x.id===id); if(!a) return;
+  if(!confirm('Delete this adjustment ('+adjSummary(a)+' for '+a.recruiter+')? The numbers go back to the uploaded figures.')) return;
+  document.getElementById('meDialog')?.remove();
+  await commitManualAdj(list.filter(x=>x.id!==id), 'Adjustment deleted');
+}
+// {} = new · {adj} = edit · {recruiter, date} = prefill
+function openManualEntryDialog(opts){
+  if(!canManualEdit()){ showToast('Only admins can adjust numbers.'); return; }
+  opts=opts||{}; const a=opts.adj||{};
+  const names=[...new Set(weeksData.flatMap(w=>Object.keys(w.byRecruiter||{})))].filter(n=>n&&n!=='Unassigned').sort();
+  const branches=[...new Set(weeksData.flatMap(w=>Object.keys(w.byBranch||{})))].filter(b=>b&&b!=='Unassigned').sort();
+  const lastBranch=n=>{ for(let i=weeksData.length-1;i>=0;i--){ const r=(weeksData[i].byRecruiter||{})[n]; if(r&&r.branch&&r.branch!=='Unassigned') return r.branch; } return ''; };
+  const date=a.date||opts.date||ltToday();
+  document.getElementById('meDialog')?.remove();
+  const wrap=document.createElement('div'); wrap.className='modal-overlay'; wrap.id='meDialog';
+  const recent=manualAdjList().slice().sort((x,y)=>String(y.at||'').localeCompare(String(x.at||''))).slice(0,6);
+  wrap.innerHTML=`<div class="modal me-modal" role="dialog" aria-modal="true" aria-labelledby="meTitle"><div class="modal-header"><h3 id="meTitle">${opts.adj?'Edit adjustment':'Adjust numbers'}</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div>
+   <div class="modal-body">
+    <p class="hint me-note">Add the numbers to <strong>add</strong>, or use a minus to <strong>take away</strong> (e.g. −2). They’re added on top of the uploaded figures for that recruiter, day and week — the uploaded data isn’t changed.</p>
+    <div class="me-grid">
+     <label>Recruiter *<input id="meRec" list="meRecList" value="${escapeHtml(a.recruiter||opts.recruiter||'')}" autocomplete="off"><datalist id="meRecList">${names.map(n=>`<option value="${escapeHtml(n)}">`).join('')}</datalist></label>
+     <label>Branch<input id="meBr" list="meBrList" value="${escapeHtml(a.branch||'')}" placeholder="Their usual branch" autocomplete="off"><datalist id="meBrList">${branches.map(n=>`<option value="${escapeHtml(n)}">`).join('')}</datalist></label>
+     <label>Date *<input type="date" id="meDate" value="${date}"></label>
+     <label>Week<input id="meWeek" disabled></label>
+    </div>
+    <div class="me-nums">${ADJ_FIELDS.map(([k,,l])=>`<label>${l}<div class="me-step"><button type="button" data-step="-1" data-k="${k}" aria-label="Less ${l}">−</button><input type="number" step="1" id="me_${k}" value="${Number(a[k])||''}" placeholder="0" inputmode="numeric"><button type="button" data-step="1" data-k="${k}" aria-label="More ${l}">+</button></div></label>`).join('')}</div>
+    <label class="me-notefield">Reason / note<input id="meNoteIn" value="${escapeHtml(a.note||'')}" placeholder="e.g. 2 schedules missed in the CRM export"></label>
+    <p class="me-err" id="meErr" role="alert"></p>
+    ${recent.length&&!opts.adj?`<details class="me-recent"><summary>Recent adjustments (${manualAdjList().length})</summary>${adjTableHtml(recent, true)}</details>`:''}
+   </div>
+   <div class="modal-footer">${opts.adj?'<button class="btn btn-secondary" id="meDel" style="margin-right:auto;color:#b91c1c">Delete</button>':''}<button class="btn btn-secondary" data-close>Cancel</button><button class="btn btn-primary" id="meSave">Save</button></div></div>`;
+  document.body.appendChild(wrap);
+  const $=sel=>wrap.querySelector(sel);
+  const wk=()=>{ const v=$('#meDate').value; $('#meWeek').value=v?'Week '+weekOfDate(v).number+' · ending '+fmtDate(weekOfDate(v).weekEnd):''; };
+  $('#meDate').addEventListener('change',wk); $('#meDate').addEventListener('input',wk); wk();
+  $('#meRec').addEventListener('change',()=>{ if(!$('#meBr').value) $('#meBr').placeholder=lastBranch($('#meRec').value.trim())||'Their usual branch'; });
+  if(a.recruiter||opts.recruiter) $('#meBr').placeholder=lastBranch(a.recruiter||opts.recruiter)||'Their usual branch';
+  wrap.querySelectorAll('[data-step]').forEach(b=>b.onclick=()=>{ const i=$('#me_'+b.dataset.k); i.value=String((Number(i.value)||0)+Number(b.dataset.step)); if(i.value==='0') i.value=''; });
+  wrap.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>wrap.remove());
+  $('#meDel')?.addEventListener('click',()=>deleteManualEntry(a.id));
+  wireAdjTable(wrap);
+  $('#meSave').onclick=async()=>{
+    const err=t=>{ $('#meErr').textContent=t; };
+    const rec=$('#meRec').value.trim(), d=$('#meDate').value;
+    if(!rec) return err('Enter the recruiter.'); if(!d) return err('Pick the date.');
+    const nums={}; let any=false;
+    for(const [k,,l] of ADJ_FIELDS){ const raw=$('#me_'+k).value.trim(); if(raw==='') { nums[k]=0; continue; } const n=Number(raw); if(!Number.isInteger(n)) return err(l+' must be a whole number.'); nums[k]=n; if(n) any=true; }
+    if(!any) return err('Enter at least one number.');
+    const entry={id:a.id||'adj:'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), date:d, recruiter:rec, branch:$('#meBr').value.trim()||lastBranch(rec)||'', ...nums, note:$('#meNoteIn').value.trim(), by:Server.user.name, at:new Date().toISOString()};
+    const list=manualAdjList(); const next=a.id?list.map(x=>x.id===a.id?entry:x):[...list, entry];
+    $('#meSave').disabled=true; wrap.remove();
+    await commitManualAdj(next, (a.id?'Adjustment updated':'Numbers adjusted')+': '+adjSummary(entry)+' for '+rec+' (Week '+weekOfDate(d).number+')');
+  };
+  setTimeout(()=>(a.recruiter||opts.recruiter?$('#me_sched'):$('#meRec')).focus(),30);
 }
 async function downloadMasterSheet(){
   if(!Server.can('export')){ showToast('Your account cannot download data.'); return; }
@@ -10617,7 +10778,8 @@ async function checkWeeklyNumbers(){
   return rows.map(r=>{
     const v = KV.get('weekly:'+r.week);
     const d = v && (v.deduped||v).totals, raw = v && (v.raw||v).totals;
-    const dash = {sched_raw: raw?raw.schedules:0, sched_dedup: d?d.schedules:0, int_raw: raw?raw.scheduledDateOf:0, int_dedup: d?d.scheduledDateOf:0};
+    const adj = (v && v.manualAdj) || {};
+    const dash = {sched_raw: (raw?raw.schedules:0)-(adj.sched_raw||0), sched_dedup: (d?d.schedules:0)-(adj.sched_dedup||0), int_raw: (raw?raw.scheduledDateOf:0)-(adj.int_raw||0), int_dedup: (d?d.scheduledDateOf:0)-(adj.int_dedup||0)};
     const ok = dash.sched_raw===r.sched_raw && dash.sched_dedup===r.sched_dedup && dash.int_raw===r.int_raw && dash.int_dedup===r.int_dedup;
     return {...r, dash, ok};
   });
@@ -11290,7 +11452,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.39.0';   // shown only in the browser tab title
+const APP_VERSION = '4.41.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
