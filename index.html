@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.36.0</title>
+<title>Performance Dashboard · v4.38.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -912,7 +912,28 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
 .al-toolbar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:flex-end;margin-bottom:14px}
 .al-toolbar select{padding:8px 10px;border:1px solid #cfdde2;border-radius:8px;font:inherit;font-size:13px;background:#fff;min-width:260px}
 .al-basis{margin:0 0 4px!important;font-size:12.5px!important;max-width:620px}
-.al-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.al-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:6px}
+.al-multi-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 12px}.al-multi-hint{margin:0;font-size:11.5px}
+.al-hi-btn{background:#fff;border:1px solid #c7d4ee;color:#1d4ed8;font-weight:600;display:inline-flex;align-items:center;gap:6px}.al-hi-btn:hover{background:#eef3fe}.al-hi-btn.on{background:#1d4ed8;color:#fff;border-color:#1d4ed8}
+.al-hi-badge{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#c8102e;color:#fff;font-size:10.5px;font-weight:700}
+.al-dot.info{background:#1d4ed8}
+.hi-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.hi-box{border:1px solid #e3e8ef;border-radius:10px;padding:12px 14px;background:#fff;min-width:0}
+.hi-box.bad{border-top:3px solid #c8102e}.hi-box.top{border-top:3px solid #1d4ed8}.hi-box.good{border-top:3px solid #15803d}.hi-box.warn{border-top:3px solid #d97706}
+.hi-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px}.hi-head h4{margin:0;font-size:13.5px;color:#0a1f44}.hi-head .hint{font-size:11px}
+.hi-list{list-style:none;margin:0;padding:0;max-height:300px;overflow:auto}
+.hi-list li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 2px;border-top:1px solid #f0f2f6}.hi-list li:first-child{border-top:0}
+.hi-list li>div{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0}
+.hi-right{justify-content:flex-end;text-align:right}
+.hi-name{border:0;background:none;padding:0;font:inherit;font-weight:600;font-size:13px;color:#0a1f44;cursor:pointer;text-align:left}.hi-name:hover{color:#1d4ed8;text-decoration:underline}
+.hi-sub{font-size:11.5px;color:#64748b}
+.hi-right strong{font-size:12.5px}.hi-right strong.bad{color:#b91c1c}.hi-right strong.good{color:#15803d}.hi-right strong.warn{color:#b45309}
+.hi-chips{display:inline-flex;gap:2px}.hi-chips i{font-style:normal;font-size:10px;font-weight:700;min-width:24px;text-align:center;padding:2px 3px;border-radius:3px;color:#fff}
+.hi-chips i.r{background:#c8102e}.hi-chips i.w{background:#e48a1b}.hi-chips i.a{background:#7aa95c}.hi-chips i.g{background:#15803d}
+.hi-tabs{display:flex;flex-wrap:wrap;gap:4px;margin:0 0 6px}.hi-tabs button{border:1px solid #d6dde8;background:#fff;border-radius:999px;padding:3px 10px;font:inherit;font-size:11.5px;color:#334155;cursor:pointer}.hi-tabs button.on{background:#0a1f44;border-color:#0a1f44;color:#fff}
+.hi-medal{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;font-size:10px;font-weight:700;background:#e2e8f0;color:#334155}.hi-medal.m1{background:#f5c542;color:#4a3500}.hi-medal.m2{background:#cfd6df}.hi-medal.m3{background:#e3a76f;color:#4a2a00}
+.hi-empty{margin:6px 0 0;font-size:12.5px}
+@media(max-width:900px){.hi-grid{grid-template-columns:1fr}.al-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .al-tile{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:14px 16px;border-radius:14px;border:1px solid #e1eaed;background:#fff;text-align:left;font:inherit;cursor:default;box-shadow:0 1px 2px #1834420a}
 button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #18344214}
 .al-tile span{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6b818c}
@@ -4091,7 +4112,7 @@ document.getElementById('navList').addEventListener('click', (e)=>{
   const btn = e.target.closest('button[data-view]');
   if(!btn) return;
   if(btn.dataset.view==='pivot' && currentView!=='pivot') pivotOpened=false;
-  if(btn.dataset.view==='alerts' && currentView!=='alerts') alertsState.band='below';
+  if(btn.dataset.view==='alerts' && currentView!=='alerts'){ alertsState.band='below'; alertsState.bands=['below']; alertsState.hiOpen=false; }
   currentView = btn.dataset.view;
   document.querySelectorAll('#navList button').forEach(b=> b.classList.toggle('active', b===btn));
   document.getElementById('settingsNavBtn').classList.remove('active');
@@ -8297,7 +8318,7 @@ const PAGE_SECTIONS = {
   branches:[['br.table','Branch table'],['hist.team','History page — recruiters in the branch']],
   candidates:[['cand.list','Category boxes and candidate list'],['cand.explain','“How are these counted?” breakdown']],
   pivot:[['pivot.chart','Chart'],['pivot.table','Pivot table']],
-  alerts:[['alerts.summary','Summary tiles'],['alerts.below','Below 50% of goal'],['alerts.watch','50–79% of goal'],['alerts.approvals','Remarks awaiting approval (approvers only)']],
+  alerts:[['alerts.summary','Summary tiles'],['alerts.highlights','Highlights (streaks, top performers, consistency)'],['alerts.below','Below 50% of goal'],['alerts.watch','50–79% of goal'],['alerts.approvals','Remarks awaiting approval (approvers only)']],
 };
 function applySectionAccess(){
   let st = document.getElementById('sectionAccessStyle');
@@ -9775,7 +9796,7 @@ function drawPivot(){
 // Who needs attention in a week. Main list: recruiters below 50% of their schedule goal (for the
 // week in progress: below 50% of where they should be by today). Then 50–79%, other signals
 // (show rate drops, no-shows, inactivity, wins), and remarks waiting for approval.
-const alertsState = {week:null, signals:'attention', search:'', group:lsGet('ipd_alerts_group2')||'none', band:'below', basis:lsGet('ipd_alerts_basis')||'week'};
+const alertsState = {week:null, signals:'attention', search:'', group:lsGet('ipd_alerts_group2')||'none', band:'below', bands:['below'], basis:lsGet('ipd_alerts_basis')||'week'};
 // Groups alert items as Division › Branch (or Branch only, or none). Biggest groups first.
 // Smart grouping: small branches sit side by side, single-recruiter branches share one box, and each
 // group header carries its own summary (average %, schedules vs goal) so you can scan without opening cards.
@@ -9864,6 +9885,60 @@ function alertsRemarkLine(name, week){
   const latest = ap[0];
   return `<div class="al-remark">${latest?`<span class="al-remark-text" title="${escapeHtml(latest.remark)}">“${escapeHtml(latest.remark.length>90?latest.remark.slice(0,90)+'…':latest.remark)}” <em>— ${escapeHtml(latest.author||'')}</em></span>`:'<span class="al-remark-none">No remark yet</span>'}${pend.length?`<span class="rm-badge pending">${pend.length} awaiting approval</span>`:''}</div>`;
 }
+// Highlights: goal-miss streaks, top performers per category, steady vs up-and-down recruiters.
+// Uses completed weeks only for streaks and consistency (a week still in progress can't be judged yet).
+function alertsHighlights(weekEnd, rows, inProgress){
+  const all=[...weeksData].sort((a,b)=>a.weekEndDate.localeCompare(b.weekEndDate));
+  const idx=all.findIndex(w=>w.weekEndDate===weekEnd);
+  const done=all.slice(0, inProgress?idx:idx+1);                 // completed weeks up to the selected one
+  const goalOf=(w,n)=>{ const g=(KV.get('goals:'+w)||{})[n]; return (g!==undefined&&g!==null&&g!=='')?Number(g):DEFAULT_WEEKLY_GOAL; };
+  const recOf=(w,n)=>(w.byRecruiter||{})[n];
+  const streak=[], steady=[], swing=[];
+  rows.forEach(row=>{ const n=row.name;
+    // back-to-back weeks below goal, newest first
+    let k=0; const weeks=[];
+    for(let i=done.length-1;i>=0;i--){ const w=done[i], r=recOf(w,n), g=goalOf(w.weekEndDate,n); if(!r||!(g>0)) break; const sc=r.schedules||0; if(sc>=g) break; k++; weeks.push({w:w.weekEndDate, sc, g, pct:Math.round(sc/g*100)}); }
+    if(k>=3) streak.push({row, n:k, weeks:weeks.slice(0,6), avg:Math.round(weeks.reduce((a,x)=>a+x.pct,0)/weeks.length)});
+    // consistency over the last 8 completed weeks they worked
+    const last=done.slice(-8).map(w=>({w:w.weekEndDate, r:recOf(w,n), g:goalOf(w.weekEndDate,n)})).filter(x=>x.r&&((x.r.schedules||0)+(x.r.scheduledDateOf||0))>0&&x.g>0);
+    if(last.length>=4){ const v=last.map(x=>x.r.schedules||0), mean=v.reduce((a,b)=>a+b,0)/v.length, sd=Math.sqrt(v.reduce((a,b)=>a+(b-mean)**2,0)/v.length), cv=mean?sd/mean:9;
+      const hit=last.filter(x=>(x.r.schedules||0)>=x.g*0.8).length, info={row, weeks:last.length, hit, mean:Math.round(mean), min:Math.min(...v), max:Math.max(...v), cv:Math.round(cv*100), pcts:last.map(x=>Math.round((x.r.schedules||0)/x.g*100))};
+      if(cv<=0.35&&hit>=Math.ceil(last.length*0.75)) steady.push(info);
+      else if(cv>=0.5) swing.push(info); }
+  });
+  streak.sort((a,b)=>b.n-a.n||a.avg-b.avg); steady.sort((a,b)=>b.hit/b.weeks-a.hit/a.weeks||a.cv-b.cv); swing.sort((a,b)=>b.cv-a.cv);
+  // top 3 in each category for the selected week
+  const wk=all[idx]||{byRecruiter:{}}, names=new Set(rows.map(r=>r.name)), byName=new Map(rows.map(r=>[r.name,r]));
+  const list=[...names].map(n=>({row:byName.get(n), r:recOf(wk,n)||{}}));
+  const cat=(key,label,val,fmt,min)=>({key,label,list:list.filter(x=>min?min(x):val(x)>0).map(x=>({row:x.row, v:val(x), t:fmt(x)})).filter(x=>x.v!=null&&x.v>0).sort((a,b)=>b.v-a.v).slice(0,5)});
+  const top=[cat('goal','Goal %',x=>x.row.pct,x=>Math.round(x.row.pct)+'% of goal'),
+    cat('sched','Schedules',x=>x.r.schedules||0,x=>fmtNum(x.r.schedules||0)+' schedules'),
+    cat('int','Interviews',x=>x.r.scheduledDateOf||0,x=>fmtNum(x.r.scheduledDateOf||0)+' interviews'),
+    cat('shows','Shows',x=>x.r.shows||0,x=>fmtNum(x.r.shows||0)+' shows'),
+    cat('rate','Show rate',x=>(x.r.scheduledDateOf||0)>=5?x.r.shows/x.r.scheduledDateOf*100:null,x=>Math.round(x.r.shows/x.r.scheduledDateOf*100)+'% · '+x.r.shows+'/'+x.r.scheduledDateOf,x=>(x.r.scheduledDateOf||0)>=5),
+    cat('hires','Hires',x=>x.r.i9||0,x=>fmtNum(x.r.i9||0)+' hires'),
+    cat('placed','Placed',x=>x.r.placed||0,x=>fmtNum(x.r.placed||0)+' placed')].filter(c=>c.list.length);
+  return {streak, steady, swing, top, completed:done.length};
+}
+function alertsHighlightsHtml(h, weekEnd, inProgress){
+  const st=alertsState, nm=r=>`<button type="button" class="hi-name" data-hi-name="${escapeHtml(r.name)}">${escapeHtml(r.name)}</button>`;
+  const sub=r=>`<span class="hi-sub">${escapeHtml(r.branch||r.division||'')}</span>`;
+  const chips=p=>`<span class="hi-chips">${p.map(v=>`<i class="${v>=100?'g':v>=80?'a':v>=50?'w':'r'}" title="${v}% of goal">${v}</i>`).join('')}</span>`;
+  if(!st.hiCat||!h.top.some(c=>c.key===st.hiCat)) st.hiCat=(h.top[0]||{}).key;
+  const empty=t=>`<p class="hint hi-empty">${t}</p>`;
+  return `<div class="panel-head"><div><h3><span class="al-dot info"></span>Highlights</h3><span class="hint">${inProgress?'Streaks and consistency use completed weeks only — the week in progress isn’t judged yet. ':''}Click a name for their remarks.</span></div></div>
+  <div class="hi-grid">
+   <div class="hi-box bad"><div class="hi-head"><h4>Below goal 3+ weeks in a row <span class="al-count">${h.streak.length}</span></h4>${h.streak.length?'<button type="button" class="btn btn-secondary btn-sm" data-hi-copy="1" title="Copy these recruiters with their remarks">📋 Copy remarks</button>':''}</div>
+    ${h.streak.length?`<ol class="hi-list">${h.streak.map(x=>`<li><div>${nm(x.row)}${sub(x.row)}</div><div class="hi-right"><strong class="bad">${x.n} weeks</strong>${chips(x.weeks.slice().reverse().map(w=>w.pct))}</div></li>`).join('')}</ol>`:empty('Nobody has missed their schedule goal 3 weeks running. 🎉')}</div>
+   <div class="hi-box top"><div class="hi-head"><h4>Top this week</h4></div>
+    ${h.top.length?`<div class="hi-tabs" role="tablist">${h.top.map(c=>`<button type="button" data-hi-cat="${c.key}" class="${st.hiCat===c.key?'on':''}">${c.label}</button>`).join('')}</div>
+    ${h.top.map(c=>`<ol class="hi-list hi-rank" data-hi-list="${c.key}" ${st.hiCat===c.key?'':'hidden'}>${c.list.map((x,i)=>`<li><div><span class="hi-medal m${i+1}">${i+1}</span>${nm(x.row)}${sub(x.row)}</div><div class="hi-right"><strong>${escapeHtml(x.t)}</strong></div></li>`).join('')}</ol>`).join('')}`:empty('No results for this week yet.')}</div>
+   <div class="hi-box good"><div class="hi-head"><h4>Most consistent <span class="al-count">${h.steady.length}</span></h4><span class="hint">80%+ of goal in at least 3 of 4 weeks, steady numbers</span></div>
+    ${h.steady.length?`<ol class="hi-list">${h.steady.slice(0,8).map(x=>`<li><div>${nm(x.row)}${sub(x.row)}</div><div class="hi-right"><strong class="good">${x.hit}/${x.weeks} weeks</strong><span class="hi-sub">~${x.mean}/wk</span>${chips(x.pcts)}</div></li>`).join('')}</ol>`:empty(h.completed<4?'Needs at least 4 completed weeks of data.':'Nobody is steadily at goal over the last 8 weeks.')}</div>
+   <div class="hi-box warn"><div class="hi-head"><h4>Up and down <span class="al-count">${h.swing.length}</span></h4><span class="hint">Big swings week to week</span></div>
+    ${h.swing.length?`<ol class="hi-list">${h.swing.slice(0,8).map(x=>`<li><div>${nm(x.row)}${sub(x.row)}</div><div class="hi-right"><strong class="warn">${x.min}–${x.max}/wk</strong><span class="hi-sub">hit goal ${x.hit}/${x.weeks}</span>${chips(x.pcts)}</div></li>`).join('')}</ol>`:empty(h.completed<4?'Needs at least 4 completed weeks of data.':'Nobody swings much — schedules are steady across the team.')}</div>
+  </div>`;
+}
 async function renderAlertsView(){
   const host = document.getElementById('view-alerts'); if(!host) return;
   const st = alertsState;
@@ -9902,7 +9977,12 @@ async function renderAlertsView(){
       <div class="al-actions">${Remarks.canAdd()?`<button class="btn btn-secondary btn-sm" data-al-add="${escapeHtml(r.name)}">Add remark</button>`:''}<button class="link-btn" data-al-remarks="${escapeHtml(r.name)}">${Remarks.forRecruiter(r.name).length?'Remarks ('+Remarks.forRecruiter(r.name).length+')':'History'}</button></div>
     </div>`;
   const belowShown = below.filter(match), watchShown = watch.filter(match), goodShown = onTrack.filter(match).sort((a,b)=>b.score-a.score);
-  if(!['below','watch','good'].includes(st.band)) st.band='below';
+  // several cards can be on at once (click to add / remove); Highlights is a card too
+  if(!Array.isArray(st.bands)) st.bands=['below'];
+  st.bands=st.bands.filter(b=>['below','watch','good'].includes(b));
+  const on=b=>st.bands.includes(b);
+  const hi=alertsHighlights(st.week, rows, inProgress);
+  const hiShown={...hi, streak:hi.streak.filter(x=>match(x.row)), steady:hi.steady.filter(x=>match(x.row)), swing:hi.swing.filter(x=>match(x.row)), top:hi.top.map(c=>({...c, list:c.list.filter(x=>match(x.row))}))};
   const sigList = (st.signals==='wins'?wins:attention).filter(a=>!q || a.name.toLowerCase().includes(q));
   host.innerHTML = `
     <div class="al-toolbar">
@@ -9912,29 +9992,37 @@ async function renderAlertsView(){
       <p class="hint al-basis">${today?`Week in progress — ${elapsed} of 5 working days so far. Each recruiter’s schedules are compared with their goal so far (daily goal × ${elapsed} day${elapsed===1?'':'s'}).`:inProgress?`Week in progress — ${elapsed} of 5 working days so far. Groups compare schedules with each recruiter’s full weekly goal; each card also shows where they should be by today. Recruiters with no schedules yet are included.`:`Completed week — schedules compared with each recruiter’s weekly goal (default ${DEFAULT_WEEKLY_GOAL}).`}</p>
     </div>
     <div class="al-tiles" data-section="alerts.summary">
-      <button type="button" class="al-tile bad ${st.band==='below'?'sel':''}" data-band="below" aria-pressed="${st.band==='below'}"><span>Below 50% of goal</span><strong>${below.length}</strong><em>${noRemark?noRemark+' without a remark':'all have remarks'}</em></button>
-      <button type="button" class="al-tile warn ${st.band==='watch'?'sel':''}" data-band="watch" aria-pressed="${st.band==='watch'}"><span>50–79% of goal</span><strong>${watch.length}</strong><em>keep an eye on</em></button>
-      <button type="button" class="al-tile good ${st.band==='good'?'sel':''}" data-band="good" aria-pressed="${st.band==='good'}"><span>On track (80%+)</span><strong>${onTrack.length}</strong><em>of ${rows.length} recruiters</em></button>
-      
+      <button type="button" class="al-tile bad ${on('below')?'sel':''}" data-band="below" aria-pressed="${on('below')}"><span>Below 50% of goal</span><strong>${below.length}</strong><em>${noRemark?noRemark+' without a remark':'all have remarks'}</em></button>
+      <button type="button" class="al-tile warn ${on('watch')?'sel':''}" data-band="watch" aria-pressed="${on('watch')}"><span>50–79% of goal</span><strong>${watch.length}</strong><em>keep an eye on</em></button>
+      <button type="button" class="al-tile good ${on('good')?'sel':''}" data-band="good" aria-pressed="${on('good')}"><span>On track (80%+)</span><strong>${onTrack.length}</strong><em>of ${rows.length} recruiters</em></button>
+    </div>
+    <div class="al-multi-row"><p class="hint al-multi-hint">Click cards to show or hide them — pick as many as you like.</p><button type="button" class="btn btn-sm al-hi-btn ${st.hiOpen?'on':''}" id="alHiBtn" aria-expanded="${!!st.hiOpen}" data-section="alerts.highlights">✦ ${st.hiOpen?'Hide highlights':'Show highlights'}${hi.streak.length?` <span class="al-hi-badge" title="Below goal 3+ weeks running">${hi.streak.length}</span>`:''}</button></div>
+    <div>
     </div>
     ${pending.length?`<section class="panel al-section" id="alApprovals" data-section="alerts.approvals"><div class="panel-head"><div><h3>Remarks awaiting approval</h3><span class="hint">Only you and the author can see these until they’re approved.</span></div></div>
       <div class="al-approvals">${pending.map(r=>`<div class="al-appr" data-id="${escapeHtml(r.id)}"><div class="al-appr-meta"><strong>${escapeHtml(r.recruiter)}</strong> · Wk ${weekOfDate(r.week_end_date).number} · by ${escapeHtml(r.author||'')} · ${new Date(r.created_at).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</div><div class="al-appr-text">${escapeHtml(r.remark)}</div><div class="al-actions"><button class="btn btn-primary btn-sm" data-appr="1">Approve</button><button class="btn btn-secondary btn-sm" data-appr="0">Reject</button><button class="link-btn" data-appr-edit="${escapeHtml(r.recruiter)}" data-week="${r.week_end_date}">Edit…</button></div></div>`).join('')}</div></section>`:''}
-    <section class="panel al-section" id="alBelow" data-section="alerts.below" ${st.band==='below'?'':'hidden'}>
+    <section class="panel al-section al-hi" id="alHighlights" data-section="alerts.highlights" ${st.hiOpen?'':'hidden'}>${alertsHighlightsHtml(hiShown, st.week, inProgress)}</section>
+    ${st.bands.length?'':'<div class="panel"><p class="hint" style="margin:0">No card selected — click one or more cards above.</p></div>'}
+    <section class="panel al-section" id="alBelow" data-section="alerts.below" ${on('below')?'':'hidden'}>
       <div class="panel-head"><div><h3><span class="al-dot bad"></span>Below 50% of goal <span class="al-count">${belowShown.length}</span></h3><span class="hint">Lowest first. Click a card for the remark history.</span></div>${belowShown.length?'<button type="button" class="btn btn-secondary btn-sm al-copy" data-al-copy="below" title="Copy a table of these recruiters and their remarks — paste into email or Excel">📋 Copy remarks</button>':''}</div>
       ${belowShown.length?alertsGroupHtml(belowShown, x=>x, r=>card(r,'bad'), 'al-grid'):`<p class="hint" style="margin:0;">${q?'No match.':'Nobody is below 50% of goal this week. 🎉'}</p>`}
     </section>
-    <section class="panel al-section" id="alWatch" data-section="alerts.watch" ${st.band==='watch'?'':'hidden'}>
+    <section class="panel al-section" id="alWatch" data-section="alerts.watch" ${on('watch')?'':'hidden'}>
       <details open><summary><h3><span class="al-dot warn"></span>50–79% of goal <span class="al-count">${watchShown.length}</span></h3>${watchShown.length?'<button type="button" class="btn btn-secondary btn-sm al-copy" data-al-copy="watch" title="Copy a table of these recruiters and their remarks">📋 Copy remarks</button>':''}</summary>
       ${watchShown.length?`<div class="al-watch-body">${alertsGroupHtml(watchShown, x=>x, r=>card(r,'warn'), 'al-grid')}</div>`:'<p class="hint" style="margin:8px 0 0;">Nobody in this range.</p>'}</details>
     </section>
-    <section class="panel al-section" id="alGood" ${st.band==='good'?'':'hidden'}>
+    <section class="panel al-section" id="alGood" ${on('good')?'':'hidden'}>
       <div class="panel-head"><div><h3><span class="al-dot good"></span>On track (80%+) <span class="al-count">${goodShown.length}</span></h3><span class="hint">Highest first.</span></div>${goodShown.length?'<button type="button" class="btn btn-secondary btn-sm al-copy" data-al-copy="good" title="Copy a table of these recruiters and their remarks">📋 Copy remarks</button>':''}</div>
       ${goodShown.length?alertsGroupHtml(goodShown, x=>x, r=>card(r,'good'), 'al-grid'):`<p class="hint" style="margin:0;">${q?'No match.':'Nobody is at 80% or more yet.'}</p>`}
     </section>
 `;
   host.querySelector('#alWeek').onchange = e=>{ st.week=e.target.value; renderAlertsView(); };
   host.querySelector('#alGroup').onchange = e=>{ st.group=e.target.value; lsSet('ipd_alerts_group2', st.group); renderAlertsView(); };
-  host.querySelectorAll('[data-band]').forEach(b=>b.onclick=()=>{ st.band=b.dataset.band; renderAlertsView(); });
+  host.querySelectorAll('[data-band]').forEach(b=>b.onclick=()=>{ const k=b.dataset.band; st.bands=on(k)?st.bands.filter(x=>x!==k):[...st.bands,k]; st.band=st.bands[0]||''; renderAlertsView(); });
+  host.querySelector('#alHiBtn')?.addEventListener('click',()=>{ st.hiOpen=!st.hiOpen; renderAlertsView(); if(st.hiOpen) setTimeout(()=>document.getElementById('alHighlights')?.scrollIntoView({behavior:'smooth',block:'start'}),50); });
+  host.querySelectorAll('[data-hi-name]').forEach(b=>b.onclick=()=>openRemarksModal(b.dataset.hiName, st.week));
+  host.querySelectorAll('[data-hi-cat]').forEach(b=>b.onclick=()=>{ st.hiCat=b.dataset.hiCat; host.querySelectorAll('[data-hi-cat]').forEach(x=>x.classList.toggle('on',x===b)); host.querySelectorAll('[data-hi-list]').forEach(x=>x.hidden=x.dataset.hiList!==st.hiCat); });
+  host.querySelector('[data-hi-copy]')?.addEventListener('click',e=>{ e.preventDefault(); copyRemarksTable(hiShown.streak.map(x=>x.row), st.week, 'below', today); });
   host.querySelectorAll('[data-al-basis]').forEach(b=>b.onclick=()=>{ if(b.disabled) return; st.basis=b.dataset.alBasis; lsSet('ipd_alerts_basis', st.basis); renderAlertsView(); });
   host.querySelectorAll('[data-sig]').forEach(b=>b.onclick=()=>{ st.signals=b.dataset.sig; renderAlertsView(); });
   host.querySelectorAll('[data-al-remarks]').forEach(b=>b.onclick=()=>openRemarksModal(b.dataset.alRemarks, st.week));
@@ -11178,7 +11266,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.36.0';   // shown only in the browser tab title
+const APP_VERSION = '4.38.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
