@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.42.0</title>
+<title>Performance Dashboard · v4.43.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -1082,6 +1082,28 @@ button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #183442
 .onb-scroll{overflow:auto;max-height:560px}.onb-table{width:100%;margin:0}.onb-table th.num,.onb-table td.num{text-align:right}.onb-act{white-space:nowrap}.onb-act .link-btn{margin-left:8px}
 @media(max-width:1100px){.onb-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.onb-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:700px){.onb-grid{grid-template-columns:1fr 1fr}.onb-tiles{grid-template-columns:1fr 1fr}.onb-charts{grid-template-columns:1fr}}
+.onb-remark{grid-column:1 / -1}.onb-remark textarea{padding:8px 10px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:13.5px;text-transform:none;letter-spacing:0;font-weight:400;resize:vertical;min-height:40px}
+.onb-form-head>div{display:flex;gap:10px;align-items:center}
+.onb-rule{margin:0 0 8px;font-size:12px}
+.onb-tiles{grid-template-columns:repeat(7,minmax(0,1fr))!important}
+button.onb-tile{font:inherit;text-align:left;cursor:pointer}button.onb-tile:disabled{cursor:default;color:inherit}button.onb-tile:not(:disabled):hover{box-shadow:0 4px 14px #0a1f4414}button.onb-tile.sel{box-shadow:0 0 0 2px #1d4ed8 inset}
+.onb-tile.i9 strong{color:#2563eb}.onb-tile.warn strong{color:#b45309}.onb-tile.bad strong{color:#c8102e}
+.onb-mix{margin-bottom:12px}.onb-mix h4{margin:0 0 8px;font-size:13px;color:#0a1f44}
+.c-complete{background:#16a34a}.c-i9{background:#60a5fa}.c-ip{background:#94a3b8}.c-lvm{background:#f59e0b}.c-nr{background:#c8102e}.c-other{background:#a78bfa}
+.onb-cat{display:inline-block;font-size:11px;font-weight:700;border-radius:4px;padding:2px 7px;color:#fff;white-space:nowrap}
+.onb-link.prev{background:#eef3fe;color:#1e3a8a;margin-left:6px}
+.onb-table td.num small{display:block;font-size:10.5px;color:#64748b;font-weight:400}.onb-total td{background:#f6f8fc;font-weight:600;border-top:2px solid #dbe3ee}
+.onb-table td,.onb-table th{white-space:nowrap}.onb-table .onb-link{white-space:normal;max-width:260px}
+.onb-note{max-width:260px;white-space:normal!important;font-size:12.5px;color:#334155}
+.onb-sub td{background:#fafbfd;font-size:12.5px;border-top:1px dashed #e3e8ef}.onb-cand td{border-top:1px solid #e3e8ef}
+.onb-tabs{margin-bottom:4px}
+.t4{background:#0f766e}.t5{background:#be185d}.t6{background:#4d7c0f}.t7{background:#475569}.t9{background:#64748b}
+.ol-modal{max-width:640px;width:calc(100vw - 24px)}.ol-modal h4{margin:14px 0 6px;font-size:13px;color:#0a1f44}.ol-modal h4:first-child{margin-top:0}
+.ol-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}.ol-row{display:flex;gap:8px;align-items:center}.ol-row input{flex:1;padding:7px 9px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:13px;min-width:0}.ol-row select{padding:7px 8px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:12.5px;width:170px}
+.ol-move{display:flex;flex-direction:column}.ol-move button{border:0;background:none;font-size:9px;line-height:1;padding:1px 4px;color:#64748b;cursor:pointer}.ol-move button:disabled{opacity:.3;cursor:default}
+.ol-note{font-size:12px;margin:12px 0 0}
+@media(max-width:1200px){.onb-tiles{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+@media(max-width:700px){.onb-tiles{grid-template-columns:1fr 1fr!important}.ol-row select{width:120px}}
 .me-box{border:1px solid #dfe6f0;border-radius:8px;background:#f8fafd;padding:8px 12px;margin:0 0 10px}.me-box>summary{display:flex;align-items:center;gap:8px;flex-wrap:wrap;cursor:pointer;list-style:none}.me-box>summary::-webkit-details-marker{display:none}.me-box>summary .hint{flex:1;font-size:12px}
 .me-scroll{overflow:auto;max-height:320px;margin-top:8px;background:#fff;border:1px solid #e3e8ef;border-radius:6px}.me-table{margin:0;width:100%;font-size:12.5px}.me-table td,.me-table th{white-space:nowrap}
 .me-tag{display:inline-block;font-size:10.5px;font-weight:700;border-radius:999px;padding:1px 7px;margin-right:3px}.me-tag.s{background:#e3edf9;color:#0b5cad}.me-tag.v{background:#e7f6ec;color:#15803d}.me-tag.e{background:#fff4d6;color:#8a6d00}
@@ -11479,7 +11501,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.42.0';   // shown only in the browser tab title
+const APP_VERSION = '4.43.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -12210,12 +12232,23 @@ const DivReport=(()=>{
    candidate's schedule / interview from the uploaded data. Stored in dash_onboarding (onboarding.sql);
    until that SQL is run the page works in demo mode, saved in this browser only. */
 const Onboarding=(()=>{
- const CALL_TYPES=['Live Transfer','Outbound','Inbound','Schedule Later'];
- const STATUSES=['In Process','EB Complete / I9 Section-1 Pending','EB Complete / I9 Section-1 Complete','EB Complete / I9 Complete'];
- const ST_CLS={'In Process':'s0','EB Complete / I9 Section-1 Pending':'s1','EB Complete / I9 Section-1 Complete':'s2','EB Complete / I9 Complete':'s3'};
+ // ---- dropdowns: admins add / rename / delete / reorder them (stored as "onbLists"); each status has a report category ----
+ const CATS=[['complete','Onboarding complete'],['i9','Between I9 stages'],['in_process','In process'],['lvm','LVM / No answer'],['no_response','Never responded'],['other','Other']];
+ const CAT_LBL=Object.fromEntries(CATS), CAT_CLS={complete:'c-complete',i9:'c-i9',in_process:'c-ip',lvm:'c-lvm',no_response:'c-nr',other:'c-other'};
+ const DEFAULT_LISTS={
+  callTypes:[{label:'Live Transfer'},{label:'Outbound'},{label:'Inbound'},{label:'Schedule Later'}],
+  statuses:[{label:'In Process',cat:'in_process'},{label:'EB Complete / I9 Section-1 Pending',cat:'i9'},{label:'EB Complete / I9 Section-1 Complete',cat:'i9'},{label:'EB Complete / I9 Complete',cat:'complete'},{label:'LVM / No Answer',cat:'lvm'},{label:'Never Responded',cat:'no_response'}],
+  retired:[]};
+ const lists=()=>{ const v=KV.get('onbLists'); return v&&Array.isArray(v.callTypes)&&Array.isArray(v.statuses)?{retired:[],...v}:DEFAULT_LISTS; };
+ const callTypes=()=>lists().callTypes.map(x=>x.label);
+ const statuses=()=>lists().statuses.map(x=>x.label);
+ function catOf(label){ const L=lists(), k=String(label||'').trim().toLowerCase(); if(!k) return 'other';
+  for(const s of [...L.statuses, ...(L.retired||[])]) if(s.label.toLowerCase()===k || (s.aliases||[]).some(a=>a.toLowerCase()===k)) return s.cat||'other';
+  return 'other'; }
+ const typeIdx=t=>{ const i=callTypes().indexOf(t); return i<0?9:i%8; };
  const DEMO_KEY='ipd_onb_demo';
  const today=()=>ltToday(), back=n=>{ const d=new Date(); d.setDate(d.getDate()-n); return toIsoDateOnly(d); };
- const st={from:back(13), to:today(), rows:null, demo:false, err:'', fOnb:'', fType:'', fStatus:'', q:'', editing:null, busy:false};
+ const st={from:back(29), to:today(), rows:null, demo:false, err:'', fOnb:'', fType:'', fCat:'', q:'', editing:null, busy:false, tab:'cand', open:new Set()};
  const normEid=v=>normalizeEmployeeNumber(String(v||'').trim());
  const demoRows=()=>{ try{ return JSON.parse(localStorage.getItem(DEMO_KEY)||'[]'); }catch(e){ return []; } };
  const demoSave=list=>{ try{ localStorage.setItem(DEMO_KEY, JSON.stringify(list)); }catch(e){} };
@@ -12223,25 +12256,25 @@ const Onboarding=(()=>{
  async function load(){
   st.err='';
   try{ st.rows=await Server.rpc('dash_onb_list',{p_from:st.from, p_to:st.to}) || []; st.demo=false; }
-  catch(e){ if(missing(e)||!Server.token){ st.demo=true; const me=Server.user&&Server.user.id; st.rows=demoRows().filter(r=>r.call_date>=st.from&&r.call_date<=st.to&&(Server.isAdmin()||r.onboarder_id===me)).sort((a,b)=>b.call_date.localeCompare(a.call_date)||b.id-a.id); }
+  catch(e){ if(missing(e)||!Server.token){ st.demo=true; const me=Server.user&&Server.user.id; st.rows=demoRows().filter(r=>r.call_date>=st.from&&r.call_date<=st.to&&(Server.isAdmin()||r.onboarder_id===me)); }
    else { st.rows=[]; st.err=cleanErr(e); } }
  }
  async function save(row){
-  if(!st.demo){ return Server.rpc('dash_onb_save',{p_row:row}); }
+  if(!st.demo) return Server.rpc('dash_onb_save',{p_row:row});
   const list=demoRows(); const now=new Date().toISOString();
-  if(row.id){ const i=list.findIndex(x=>String(x.id)===String(row.id)); if(i>=0) list[i]={...list[i], ...row, updated_at:now}; }
+  if(row.id){ const i=list.findIndex(x=>String(x.id)===String(row.id)); if(i>=0) list[i]={...list[i], ...row, onboarder:(Server.isAdmin()&&row.onboarder)||list[i].onboarder, updated_at:now}; }
   else list.push({...row, id:Date.now(), onboarder_id:Server.user.id, onboarder:(Server.isAdmin()&&row.onboarder)||Server.user.name, created_at:now, updated_at:now});
   demoSave(list); return true;
  }
  async function del(id){ if(!st.demo) return Server.rpc('dash_onb_delete',{p_id:id}); demoSave(demoRows().filter(x=>String(x.id)!==String(id))); return true; }
- // EID → what the uploaded data knows about this candidate (latest first)
+ // ---- EID → uploaded schedule / interview data ----
  let eidIdx=null, eidKey='';
  function eidIndex(){
   const k=weeksData.length+'|'+weeksData.map(w=>w.savedAt||'').join(); if(eidIdx&&k===eidKey) return eidIdx; eidKey=k; eidIdx=new Map();
-  const put=(eid,patch)=>{ const e=normEid(eid); if(!e||e==='–') return; const cur=eidIdx.get(e)||{}; eidIdx.set(e,{...cur,...Object.fromEntries(Object.entries(patch).filter(([kk,v])=>v!=null&&(cur[kk]==null||kk==='last')))}); };
+  const put=(eid,patch)=>{ const e=normEid(eid); if(!e||e==='–') return; const cur=eidIdx.get(e)||{}; eidIdx.set(e,{...cur,...Object.fromEntries(Object.entries(patch).filter(([,v])=>v!=null))}); };
   [...weeksData].sort((a,b)=>a.weekEndDate.localeCompare(b.weekEndDate)).forEach(w=>Object.entries(w.byRecruiter||{}).forEach(([rec,r])=>{
-   (r.schedulesList||[]).forEach(c=>put(c.eid,{recruiter:rec, branch:c.branch||r.branch, scheduled:c.date, name:c.name}));
-   (r.interviewsList||[]).forEach(c=>put(c.eid,{recruiter:rec, branch:c.branch||r.branch, interview:c.date, name:c.name}));
+   (r.schedulesList||[]).forEach(c=>put(c.eid,{recruiter:rec, branch:c.branch||r.branch, scheduled:c.date}));
+   (r.interviewsList||[]).forEach(c=>put(c.eid,{recruiter:rec, branch:c.branch||r.branch, interview:c.date}));
    (r.showsList||[]).forEach(c=>put(c.eid,{showed:c.date||true}));
    (r.noShowsList||[]).forEach(c=>put(c.eid,{noShow:c.date||true}));
    (r.i9List||[]).forEach(c=>put(c.eid,{hired:c.date||true}));
@@ -12250,62 +12283,127 @@ const Onboarding=(()=>{
  }
  const linkOf=eid=>eidIndex().get(normEid(eid))||null;
  const linkHtml=l=>l?`<span class="onb-link ok" title="Found in the uploaded schedules / interviews">✓ ${escapeHtml(l.recruiter||'')}${l.branch?' · '+escapeHtml(l.branch):''}${l.interview?' · interview '+fmtDate(l.interview):l.scheduled?' · scheduled '+fmtDate(l.scheduled):''}${l.showed?' · showed':l.noShow?' · no-show':''}${l.hired?' · hired':''}</span>`:'<span class="onb-link no" title="This EID isn’t in the loaded schedule / interview data">Not matched yet</span>';
- function stats(rows){
-  const t=today(), wk=weekOfDate(t), n=rows.length, by=k=>{ const m={}; rows.forEach(r=>{ m[r[k]]=(m[r[k]]||0)+1; }); return m; };
-  const dur=rows.filter(r=>r.duration_min!=null&&r.duration_min!==''), avg=dur.length?dur.reduce((a,r)=>a+Number(r.duration_min),0)/dur.length:null;
-  const linked=rows.filter(r=>linkOf(r.eid)).length;
-  return {n, todayN:rows.filter(r=>r.call_date===t).length, weekN:rows.filter(r=>r.call_date>=wk.weekStart&&r.call_date<=wk.weekEnd).length, types:by('call_type'), statuses:by('status'), avg, linked, complete:rows.filter(r=>r.status==='EB Complete / I9 Complete').length};
+ // ---- one candidate per EID: every call combined, the LATEST call's status counts ----
+ const order=(a,b)=>String(a.call_date).localeCompare(String(b.call_date))||String(a.created_at||'').localeCompare(String(b.created_at||''))||(Number(a.id)||0)-(Number(b.id)||0);
+ function candidates(rows){
+  const m=new Map(); rows.forEach(r=>{ const k=normEid(r.eid)||String(r.eid); if(!m.has(k)) m.set(k,[]); m.get(k).push(r); });
+  return [...m.entries()].map(([eid,calls])=>{ calls.sort(order); const last=calls[calls.length-1], first=calls[0];
+   const done=calls.find(c=>catOf(c.status)==='complete');
+   return {eid, calls, last, first, cat:catOf(last.status), status:last.status, onboarder:last.onboarder, onboarders:[...new Set(calls.map(c=>c.onboarder))],
+    days:done?Math.round((new Date(done.call_date)-new Date(first.call_date))/864e5):null, remark:[...calls].reverse().find(c=>c.note)?.note||''}; })
+   .sort((a,b)=>order(b.last,a.last));
  }
+ const pct=(n,d)=>d?Math.round(n/d*100)+'%':'–';
+ const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
+ function summary(cands, calls){
+  const by={}; CATS.forEach(([k])=>by[k]=0); cands.forEach(c=>by[c.cat]++);
+  const durs=calls.filter(r=>r.duration_min!=null&&r.duration_min!=='').map(r=>Number(r.duration_min));
+  const days=cands.filter(c=>c.cat==='complete'&&c.days!=null).map(c=>c.days);
+  return {n:cands.length, calls:calls.length, by, avgCalls:cands.length?calls.length/cands.length:null, avgDur:avg(durs), avgDays:avg(days), linked:cands.filter(c=>linkOf(c.eid)).length};
+ }
+ function perOnboarder(cands, rows){
+  const names=[...new Set(rows.map(r=>r.onboarder))].sort();
+  return names.map(o=>{ const own=cands.filter(c=>c.onboarder===o), myCalls=rows.filter(r=>r.onboarder===o), touched=new Set(myCalls.map(r=>normEid(r.eid)||r.eid));
+   const s=summary(own, own.flatMap(c=>c.calls)); s.myCalls=myCalls.length; s.touched=touched.size;
+   const d=myCalls.filter(r=>r.duration_min!=null&&r.duration_min!=='').map(r=>Number(r.duration_min)); s.avgDur=avg(d);
+   return {o, ...s}; }).filter(x=>x.myCalls).sort((a,b)=>b.n-a.n||b.myCalls-a.myCalls);
+ }
+ // ---- UI ----
+ const sel=(id,opts,val,ph)=>`<select id="${id}" required><option value="">${ph||'Choose…'}</option>${opts.map(c=>`<option ${val===c?'selected':''}>${escapeHtml(c)}</option>`).join('')}${val&&!opts.includes(val)?`<option selected>${escapeHtml(val)}</option>`:''}</select>`;
  function formHtml(){
   const e=st.editing||{}, adm=Server.isAdmin();
   return `<form class="panel onb-form" id="onbForm" autocomplete="off">
-   <div class="onb-form-head"><h3>${e.id?'Edit call':'Log a call'}</h3>${e.id?'<button type="button" class="link-btn" id="onbCancel">Cancel edit</button>':''}</div>
+   <div class="onb-form-head"><h3>${e.id?'Edit call':'Log a call'}</h3><div>${e.id?'<button type="button" class="link-btn" id="onbCancel">Cancel edit</button>':''}${adm?'<button type="button" class="btn btn-secondary btn-sm" id="onbLists">⚙ Manage dropdowns</button>':''}</div></div>
    <div class="onb-grid">
     <label>Onboarder<input id="onbWho" value="${escapeHtml(e.onboarder||Server.user.name)}" ${adm?'':'readonly'}></label>
     <label>Date *<input type="date" id="onbDate" value="${escapeHtml(e.call_date||today())}" max="${today()}"></label>
     <label>EID *<input id="onbEid" value="${escapeHtml(e.eid||'')}" placeholder="Employee Number" inputmode="numeric" required></label>
-    <label>Call type *<select id="onbType" required><option value="">Choose…</option>${CALL_TYPES.map(c=>`<option ${e.call_type===c?'selected':''}>${c}</option>`).join('')}</select></label>
+    <label>Call type *${sel('onbType',callTypes(),e.call_type)}</label>
     <label>Duration (min)<input type="number" id="onbDur" min="0" step="0.5" value="${e.duration_min??''}" placeholder="e.g. 12"></label>
-    <label class="onb-wide">Status *<select id="onbStatus" required><option value="">Choose…</option>${STATUSES.map(c=>`<option ${e.status===c?'selected':''}>${c}</option>`).join('')}</select></label>
+    <label>Status *${sel('onbStatus',statuses(),e.status)}</label>
+    <label class="onb-remark">Remarks<textarea id="onbNote" rows="2" maxlength="500" placeholder="What happened on this call, next step…">${escapeHtml(e.note||'')}</textarea></label>
    </div>
-   <div class="onb-form-foot"><span id="onbMatch">${e.eid?linkHtml(linkOf(e.eid)):'<span class="hint">Type the EID to see the matching schedule / interview.</span>'}</span><span class="onb-err" id="onbErr" role="alert"></span><button type="submit" class="btn btn-primary" ${st.busy?'disabled':''}>${e.id?'Save changes':'＋ Add call'}</button></div>
+   <div class="onb-form-foot"><span id="onbMatch"></span><span class="onb-err" id="onbErr" role="alert"></span><button type="submit" class="btn btn-primary" ${st.busy?'disabled':''}>${e.id?'Save changes':'＋ Add call'}</button></div>
   </form>`;
  }
+ function matchHtml(eid){
+  if(!eid) return '<span class="hint">Type the EID to see the matching schedule / interview and earlier calls.</span>';
+  const prev=(st.rows||[]).filter(r=>(normEid(r.eid)||r.eid)===(normEid(eid)||eid)&&(!st.editing||String(r.id)!==String(st.editing.id))).sort(order);
+  const last=prev[prev.length-1];
+  return linkHtml(linkOf(eid))+(prev.length?` <span class="onb-link prev">${prev.length} earlier call${prev.length===1?'':'s'} · last: <b>${escapeHtml(last.status)}</b> on ${fmtDate(last.call_date)} by ${escapeHtml(last.onboarder)}</span>`:' <span class="onb-link no">First call for this EID</span>');
+ }
+ const catPill=c=>`<span class="onb-cat ${CAT_CLS[c]}">${CAT_LBL[c]}</span>`;
+ const stPill=s=>`<span class="onb-st ${CAT_CLS[catOf(s)]}" title="${escapeHtml(CAT_LBL[catOf(s)])}">${escapeHtml(s)}</span>`;
  function render(){
   const host=document.getElementById('view-onboarding'); if(!host) return;
   if(!Server.can('onboarding')){ host.innerHTML='<div class="panel"><p class="hint" style="margin:0">Ask an admin for the Onboarding right.</p></div>'; return; }
   const all=st.rows||[], adm=Server.isAdmin(), q=st.q.trim().toLowerCase();
-  const rows=all.filter(r=>(!st.fOnb||r.onboarder===st.fOnb)&&(!st.fType||r.call_type===st.fType)&&(!st.fStatus||r.status===st.fStatus)&&(!q||String(r.eid).toLowerCase().includes(q)||String(r.onboarder).toLowerCase().includes(q)||String((linkOf(r.eid)||{}).recruiter||'').toLowerCase().includes(q)));
-  const S=stats(rows), onbs=[...new Set(all.map(r=>r.onboarder))].sort();
-  const tile=(lbl,val,sub,cls)=>`<div class="onb-tile ${cls||''}"><span>${lbl}</span><strong>${val}</strong>${sub?`<em>${sub}</em>`:''}</div>`;
-  const bar=(m,keys,cls)=>{ const tot=keys.reduce((a,k)=>a+(m[k]||0),0)||1; return `<div class="onb-bar">${keys.map(k=>m[k]?`<i class="${cls?cls(k):''}" style="flex:${m[k]}" title="${escapeHtml(k)}: ${m[k]}"></i>`:'').join('')}</div><div class="onb-legend">${keys.map(k=>`<span><b class="${cls?cls(k):''}"></b>${escapeHtml(k)} · <strong>${m[k]||0}</strong> <small>${Math.round((m[k]||0)/tot*100)}%</small></span>`).join('')}</div>`; };
-  // per-onboarder summary (admins)
-  const per=adm?onbs.map(o=>{ const rs=rows.filter(r=>r.onboarder===o), d=rs.filter(r=>r.duration_min!=null&&r.duration_min!==''); return {o, n:rs.length, done:rs.filter(r=>r.status==='EB Complete / I9 Complete').length, ip:rs.filter(r=>r.status==='In Process').length, avg:d.length?d.reduce((a,r)=>a+Number(r.duration_min),0)/d.length:null, types:CALL_TYPES.map(t=>rs.filter(r=>r.call_type===t).length)}; }).filter(x=>x.n).sort((a,b)=>b.n-a.n):[];
+  const rows=all.filter(r=>(!st.fOnb||r.onboarder===st.fOnb)&&(!st.fType||r.call_type===st.fType));
+  let cands=candidates(rows);
+  if(st.fCat) cands=cands.filter(c=>c.cat===st.fCat);
+  if(q) cands=cands.filter(c=>String(c.eid).toLowerCase().includes(q)||c.onboarders.some(o=>o.toLowerCase().includes(q))||String((linkOf(c.eid)||{}).recruiter||'').toLowerCase().includes(q)||c.calls.some(x=>String(x.note||'').toLowerCase().includes(q)));
+  const shownCalls=cands.flatMap(c=>c.calls).sort((a,b)=>order(b,a));
+  const S=summary(cands, shownCalls), per=perOnboarder(candidates(rows), rows), onbs=[...new Set(all.map(r=>r.onboarder))].sort();
+  const tile=(lbl,val,sub,cls,cat)=>`<button type="button" class="onb-tile ${cls||''} ${cat&&st.fCat===cat?'sel':''}" ${cat?`data-onb-cat="${cat}"`:'disabled'}><span>${lbl}</span><strong>${val}</strong>${sub?`<em>${sub}</em>`:''}</button>`;
+  const fmt1=v=>v==null?'–':v.toFixed(1);
+  const barKeys=CATS.map(([k])=>k).filter(k=>k!=='other'||S.by.other);
   host.innerHTML=`${st.demo?'<div class="onb-demo"><strong>Demo mode</strong> — entries are saved in this browser only. Run <code>onboarding.sql</code> in Supabase to share them with everyone.</div>':''}${st.err?`<div class="onb-demo bad">Could not load: ${escapeHtml(st.err)}</div>`:''}
    ${formHtml()}
    <div class="onb-tools">
     <div class="onb-range"><label>From<input type="date" id="onbFrom" value="${st.from}"></label><label>To<input type="date" id="onbTo" value="${st.to}"></label></div>
     ${adm?`<label class="cand-field"><span>Onboarder</span><select id="onbFOnb"><option value="">Everyone</option>${onbs.map(o=>`<option ${st.fOnb===o?'selected':''}>${escapeHtml(o)}</option>`).join('')}</select></label>`:''}
-    <label class="cand-field"><span>Call type</span><select id="onbFType"><option value="">All</option>${CALL_TYPES.map(c=>`<option ${st.fType===c?'selected':''}>${c}</option>`).join('')}</select></label>
-    <label class="cand-field"><span>Status</span><select id="onbFStatus"><option value="">All</option>${STATUSES.map(c=>`<option ${st.fStatus===c?'selected':''}>${c}</option>`).join('')}</select></label>
-    <label class="cand-field onb-q"><span>Search</span><input type="search" id="onbQ" value="${escapeHtml(st.q)}" placeholder="EID, onboarder or recruiter"></label>
+    <label class="cand-field"><span>Call type</span><select id="onbFType"><option value="">All</option>${callTypes().map(c=>`<option ${st.fType===c?'selected':''}>${escapeHtml(c)}</option>`).join('')}</select></label>
+    <label class="cand-field"><span>Latest status</span><select id="onbFCat"><option value="">All</option>${CATS.map(([k,l])=>`<option value="${k}" ${st.fCat===k?'selected':''}>${l}</option>`).join('')}</select></label>
+    <label class="cand-field onb-q"><span>Search</span><input type="search" id="onbQ" value="${escapeHtml(st.q)}" placeholder="EID, onboarder, recruiter or remark"></label>
    </div>
-   <div class="onb-tiles">${tile('Calls',fmtNum(S.n),fmtDate(st.from)+' – '+fmtDate(st.to))}${tile('Today',fmtNum(S.todayN),'this week '+fmtNum(S.weekN))}${tile('Fully complete',fmtNum(S.complete),S.n?Math.round(S.complete/S.n*100)+'% EB + I9 complete':'','good')}${tile('Avg. duration',S.avg==null?'–':S.avg.toFixed(1)+' min','')}${tile('Linked to an interview',fmtNum(S.linked),S.n?Math.round(S.linked/S.n*100)+'% of EIDs matched':'','info')}</div>
-   <div class="onb-charts"><div class="panel"><h4>Call type</h4>${bar(S.types,CALL_TYPES,k=>'t'+CALL_TYPES.indexOf(k))}</div><div class="panel"><h4>Status</h4>${bar(S.statuses,STATUSES,k=>ST_CLS[k])}</div></div>
-   ${per.length?`<section class="panel"><div class="panel-head"><h3>By onboarder</h3></div><div class="onb-scroll"><table class="users-table onb-table"><thead><tr><th>Onboarder</th><th class="num">Calls</th>${CALL_TYPES.map(t=>`<th class="num">${t}</th>`).join('')}<th class="num">In process</th><th class="num">Fully complete</th><th class="num">Avg. min</th></tr></thead><tbody>${per.map(x=>`<tr><td><button type="button" class="link-btn" data-onb-pick="${escapeHtml(x.o)}">${escapeHtml(x.o)}</button></td><td class="num"><strong>${x.n}</strong></td>${x.types.map(n=>`<td class="num">${n||'–'}</td>`).join('')}<td class="num">${x.ip||'–'}</td><td class="num">${x.done||'–'}</td><td class="num">${x.avg==null?'–':x.avg.toFixed(1)}</td></tr>`).join('')}</tbody></table></div></section>`:''}
-   <section class="panel"><div class="panel-head"><div><h3>Call log <span class="al-count">${rows.length}</span></h3><span class="hint">${adm?'Everyone’s calls.':'Your calls.'} The last column shows what the uploaded data has for that EID.</span></div>${rows.length?copyBtnHtml('onbTable')+(Server.can('export')?downloadBtnHtml('onbTable','onboarding-calls.xlsx'):''):''}</div>
-    ${rows.length?`<div class="onb-scroll"><table class="users-table onb-table" id="onbTable"><thead><tr><th>Date</th><th>Onboarder</th><th>EID</th><th>Call type</th><th class="num">Duration</th><th>Status</th><th>Schedule / interview (by EID)</th><th></th></tr></thead><tbody>
-     ${rows.map(r=>`<tr><td>${fmtDate(r.call_date)}</td><td>${escapeHtml(r.onboarder)}</td><td><strong>${escapeHtml(r.eid)}</strong></td><td><span class="onb-type t${CALL_TYPES.indexOf(r.call_type)}">${escapeHtml(r.call_type)}</span></td><td class="num">${r.duration_min!=null&&r.duration_min!==''?Number(r.duration_min)+' min':'–'}</td><td><span class="onb-st ${ST_CLS[r.status]||''}">${escapeHtml(r.status)}</span></td><td>${linkHtml(linkOf(r.eid))}</td><td class="onb-act">${adm||r.onboarder_id===Server.user.id?`<button class="link-btn" data-onb-edit="${r.id}">Edit</button><button class="link-btn danger" data-onb-del="${r.id}">Delete</button>`:''}</td></tr>`).join('')}
-    </tbody></table></div>`:`<p class="hint" style="margin:0">${all.length?'No calls match these filters.':'No calls logged in these dates yet — use “Log a call” above.'}</p>`}</section>`;
-  wire(host, rows);
+   <p class="hint onb-rule">Each candidate (EID) is counted once — all their calls are combined and the <strong>latest call’s status</strong> decides where they land. Click a tile to filter.</p>
+   <div class="onb-tiles">
+    ${tile('Candidates',fmtNum(S.n),fmtNum(S.calls)+' calls · '+fmt1(S.avgCalls)+' per candidate')}
+    ${tile('Onboarding complete',fmtNum(S.by.complete),pct(S.by.complete,S.n)+' · avg '+(S.avgDays==null?'–':fmt1(S.avgDays)+' days'),'good','complete')}
+    ${tile('Between I9 stages',fmtNum(S.by.i9),pct(S.by.i9,S.n),'i9','i9')}
+    ${tile('In process',fmtNum(S.by.in_process),pct(S.by.in_process,S.n),'','in_process')}
+    ${tile('LVM / No answer',fmtNum(S.by.lvm),pct(S.by.lvm,S.n),'warn','lvm')}
+    ${tile('Never responded',fmtNum(S.by.no_response),pct(S.by.no_response,S.n),'bad','no_response')}
+    ${tile('Avg. call',S.avgDur==null?'–':fmt1(S.avgDur)+' min',fmtNum(S.linked)+' of '+fmtNum(S.n)+' EIDs matched to an interview')}
+   </div>
+   <div class="panel onb-mix"><h4>Where candidates stand (latest status)</h4><div class="onb-bar">${barKeys.map(k=>S.by[k]?`<i class="${CAT_CLS[k]}" style="flex:${S.by[k]}" title="${CAT_LBL[k]}: ${S.by[k]}"></i>`:'').join('')}</div>
+    <div class="onb-legend">${barKeys.map(k=>`<span><b class="${CAT_CLS[k]}"></b>${CAT_LBL[k]} · <strong>${S.by[k]}</strong> <small>${pct(S.by[k],S.n)}</small></span>`).join('')}</div></div>
+   ${per.length?`<section class="panel"><div class="panel-head"><div><h3>Onboarder performance</h3><span class="hint">Candidates are credited to whoever made their latest call. % = share of that onboarder’s candidates.</span></div>${copyBtnHtml('onbPerf')}</div>
+    <div class="onb-scroll"><table class="users-table onb-table" id="onbPerf"><thead><tr><th>Onboarder</th><th class="num">Calls made</th><th class="num">EIDs called</th><th class="num">Candidates</th><th class="num">Complete</th><th class="num">Between I9</th><th class="num">In process</th><th class="num">LVM / No ans.</th><th class="num">Never resp.</th><th class="num">Calls / cand.</th><th class="num">Avg. min</th><th class="num">Days to complete</th></tr></thead><tbody>
+    ${[...per, (()=>{ const t=summary(candidates(rows), rows); t.myCalls=rows.length; t.touched=new Set(rows.map(r=>normEid(r.eid)||r.eid)).size; return {o:'All onboarders', total:true, ...t}; })()].map(x=>{ const c=k=>`<td class="num">${x.by[k]||'–'}${x.by[k]?`<small>${pct(x.by[k],x.n)}</small>`:''}</td>`;
+      return `<tr class="${x.total?'onb-total':''}"><td>${x.total?'<strong>All onboarders</strong>':`<button type="button" class="link-btn" data-onb-pick="${escapeHtml(x.o)}">${escapeHtml(x.o)}</button>`}</td><td class="num">${fmtNum(x.myCalls)}</td><td class="num">${fmtNum(x.touched)}</td><td class="num"><strong>${fmtNum(x.n)}</strong></td>${c('complete')}${c('i9')}${c('in_process')}${c('lvm')}${c('no_response')}<td class="num">${fmt1(x.avgCalls)}</td><td class="num">${fmt1(x.avgDur)}</td><td class="num">${x.avgDays==null?'–':fmt1(x.avgDays)}</td></tr>`; }).join('')}
+    </tbody></table></div></section>`:''}
+   <section class="panel"><div class="panel-head"><div><div class="ua-filter onb-tabs" role="tablist"><button type="button" data-onb-tab="cand" class="${st.tab==='cand'?'on':''}">Candidates · ${fmtNum(cands.length)}</button><button type="button" data-onb-tab="calls" class="${st.tab==='calls'?'on':''}">All calls · ${fmtNum(shownCalls.length)}</button></div>
+     <span class="hint">${st.tab==='cand'?'One row per EID. Click “calls” to see every call and remark.':(adm?'Everyone’s calls, newest first.':'Your calls, newest first.')}</span></div>${(st.tab==='cand'?cands.length:shownCalls.length)?copyBtnHtml('onbTable')+(Server.can('export')?downloadBtnHtml('onbTable',st.tab==='cand'?'onboarding-candidates.xlsx':'onboarding-calls.xlsx'):''):''}</div>
+    ${st.tab==='cand'?candTable(cands):callTable(shownCalls)}</section>`;
+  wire(host);
  }
- function wire(host, rows){
-  const $=sel=>host.querySelector(sel);
-  const eidIn=$('#onbEid'); eidIn.addEventListener('input',()=>{ const v=eidIn.value.trim(); $('#onbMatch').innerHTML=v?linkHtml(linkOf(v)):'<span class="hint">Type the EID to see the matching schedule / interview.</span>'; });
+ const canEditRow=r=>Server.isAdmin()||r.onboarder_id===Server.user.id;
+ const actions=r=>canEditRow(r)?`<button class="link-btn" data-onb-edit="${r.id}">Edit</button><button class="link-btn danger" data-onb-del="${r.id}">Delete</button>`:'';
+ const durTxt=r=>r.duration_min!=null&&r.duration_min!==''?Number(r.duration_min)+' min':'–';
+ function candTable(cands){
+  if(!cands.length) return `<p class="hint" style="margin:0">${(st.rows||[]).length?'No candidates match these filters.':'No calls logged in these dates yet — use “Log a call” above.'}</p>`;
+  return `<div class="onb-scroll"><table class="users-table onb-table" id="onbTable"><thead><tr><th>EID</th><th>Latest status</th><th>Result</th><th class="num">Calls</th><th>First call</th><th>Last call</th><th>Onboarder</th><th>Latest remark</th><th>Schedule / interview (by EID)</th><th></th></tr></thead><tbody>
+   ${cands.map(c=>{ const open=st.open.has(c.eid);
+    return `<tr class="onb-cand"><td><strong>${escapeHtml(c.eid)}</strong></td><td>${stPill(c.status)}</td><td>${catPill(c.cat)}</td><td class="num">${c.calls.length}</td><td>${fmtDate(c.first.call_date)}</td><td>${fmtDate(c.last.call_date)}</td><td>${escapeHtml(c.onboarder)}${c.onboarders.length>1?` <small class="hint">+${c.onboarders.length-1}</small>`:''}</td><td class="onb-note">${escapeHtml(c.remark||'')}</td><td>${linkHtml(linkOf(c.eid))}</td><td class="onb-act"><button class="link-btn" data-onb-open="${escapeHtml(c.eid)}">${open?'Hide':'Calls ('+c.calls.length+')'}</button><button class="link-btn" data-onb-new="${escapeHtml(c.eid)}" title="Log another call for this EID">＋ Call</button></td></tr>
+    ${open?[...c.calls].reverse().map(r=>`<tr class="onb-sub"><td></td><td colspan="2">${stPill(r.status)}</td><td class="num">${escapeHtml(r.call_type)}</td><td>${fmtDate(r.call_date)}</td><td>${durTxt(r)}</td><td>${escapeHtml(r.onboarder)}</td><td class="onb-note" colspan="2">${escapeHtml(r.note||'')}</td><td class="onb-act">${actions(r)}</td></tr>`).join(''):''}`; }).join('')}
+   </tbody></table></div>`;
+ }
+ function callTable(calls){
+  if(!calls.length) return `<p class="hint" style="margin:0">${(st.rows||[]).length?'No calls match these filters.':'No calls logged in these dates yet — use “Log a call” above.'}</p>`;
+  return `<div class="onb-scroll"><table class="users-table onb-table" id="onbTable"><thead><tr><th>Date</th><th>Onboarder</th><th>EID</th><th>Call type</th><th class="num">Duration</th><th>Status</th><th>Remarks</th><th>Schedule / interview (by EID)</th><th></th></tr></thead><tbody>
+   ${calls.map(r=>`<tr><td>${fmtDate(r.call_date)}</td><td>${escapeHtml(r.onboarder)}</td><td><strong>${escapeHtml(r.eid)}</strong></td><td><span class="onb-type t${typeIdx(r.call_type)}">${escapeHtml(r.call_type)}</span></td><td class="num">${durTxt(r)}</td><td>${stPill(r.status)}</td><td class="onb-note">${escapeHtml(r.note||'')}</td><td>${linkHtml(linkOf(r.eid))}</td><td class="onb-act">${actions(r)}</td></tr>`).join('')}
+  </tbody></table></div>`;
+ }
+ function wire(host){
+  const $=s=>host.querySelector(s);
+  const eidIn=$('#onbEid'), upd=()=>{ $('#onbMatch').innerHTML=matchHtml(eidIn.value.trim()); };
+  eidIn.addEventListener('input',upd); upd();
   $('#onbCancel')?.addEventListener('click',()=>{ st.editing=null; render(); });
+  $('#onbLists')?.addEventListener('click',openListsDialog);
   $('#onbForm').addEventListener('submit',async ev=>{ ev.preventDefault();
    const err=t=>{ $('#onbErr').textContent=t; };
-   const row={id:st.editing&&st.editing.id||undefined, call_date:$('#onbDate').value, eid:normEid(eidIn.value)||eidIn.value.trim(), call_type:$('#onbType').value, duration_min:$('#onbDur').value===''?'':String(Number($('#onbDur').value)), status:$('#onbStatus').value, onboarder:$('#onbWho').value.trim()};
+   const row={id:st.editing&&st.editing.id||undefined, call_date:$('#onbDate').value, eid:normEid(eidIn.value)||eidIn.value.trim(), call_type:$('#onbType').value, duration_min:$('#onbDur').value===''?'':String(Number($('#onbDur').value)), status:$('#onbStatus').value, onboarder:$('#onbWho').value.trim(), note:$('#onbNote').value.trim()};
    if(!row.call_date) return err('Pick the date.'); if(!row.eid) return err('Enter the EID.'); if(!row.call_type) return err('Choose the call type.'); if(!row.status) return err('Choose the status.');
    if(row.duration_min!==''&&!(Number(row.duration_min)>=0)) return err('Duration must be 0 or more minutes.');
    st.busy=true;
@@ -12318,12 +12416,55 @@ const Onboarding=(()=>{
   $('#onbTo').addEventListener('change',e=>{ if(e.target.value){ st.to=e.target.value; reload(); } });
   $('#onbFOnb')?.addEventListener('change',e=>{ st.fOnb=e.target.value; render(); });
   $('#onbFType').addEventListener('change',e=>{ st.fType=e.target.value; render(); });
-  $('#onbFStatus').addEventListener('change',e=>{ st.fStatus=e.target.value; render(); });
+  $('#onbFCat').addEventListener('change',e=>{ st.fCat=e.target.value; render(); });
   let t; $('#onbQ').addEventListener('input',e=>{ clearTimeout(t); t=setTimeout(()=>{ st.q=e.target.value; render(); const q=document.getElementById('onbQ'); if(q){ q.focus(); q.setSelectionRange(q.value.length,q.value.length); } },250); });
+  host.querySelectorAll('[data-onb-cat]').forEach(b=>b.onclick=()=>{ st.fCat=st.fCat===b.dataset.onbCat?'':b.dataset.onbCat; st.tab='cand'; render(); });
+  host.querySelectorAll('[data-onb-tab]').forEach(b=>b.onclick=()=>{ st.tab=b.dataset.onbTab; render(); });
   host.querySelectorAll('[data-onb-pick]').forEach(b=>b.onclick=()=>{ st.fOnb=b.dataset.onbPick; render(); });
+  host.querySelectorAll('[data-onb-open]').forEach(b=>b.onclick=()=>{ const k=b.dataset.onbOpen; st.open.has(k)?st.open.delete(k):st.open.add(k); render(); });
+  host.querySelectorAll('[data-onb-new]').forEach(b=>b.onclick=()=>{ st.editing=null; render(); const i=document.getElementById('onbEid'); i.value=b.dataset.onbNew; i.dispatchEvent(new Event('input')); window.scrollTo({top:0,behavior:'smooth'}); document.getElementById('onbType')?.focus(); });
   host.querySelectorAll('[data-onb-edit]').forEach(b=>b.onclick=()=>{ st.editing=(st.rows||[]).find(r=>String(r.id)===b.dataset.onbEdit)||null; render(); window.scrollTo({top:0,behavior:'smooth'}); });
   host.querySelectorAll('[data-onb-del]').forEach(b=>b.onclick=async()=>{ const r=(st.rows||[]).find(x=>String(x.id)===b.dataset.onbDel); if(!r||!confirm('Delete the '+r.call_type+' call for EID '+r.eid+' on '+fmtDate(r.call_date)+'?')) return;
    try{ await del(r.id); showToast('Call deleted.'); await load(); render(); }catch(e){ showToast('Could not delete: '+cleanErr(e)); } });
+ }
+ // ---- admin: manage the dropdowns ----
+ function openListsDialog(){
+  if(!Server.isAdmin()) return;
+  const L=JSON.parse(JSON.stringify(lists()));
+  const work={callTypes:L.callTypes.map(x=>({...x, orig:x.label})), statuses:L.statuses.map(x=>({...x, orig:x.label})), retired:L.retired||[]};
+  document.getElementById('onbListsDlg')?.remove();
+  const wrap=document.createElement('div'); wrap.className='modal-overlay'; wrap.id='onbListsDlg';
+  const draw=()=>{
+   const row=(kind,x,i,n)=>`<div class="ol-row"><span class="ol-move"><button type="button" data-mv="${kind}:${i}:-1" ${i?'':'disabled'} aria-label="Move up">▲</button><button type="button" data-mv="${kind}:${i}:1" ${i<n-1?'':'disabled'} aria-label="Move down">▼</button></span><input data-lbl="${kind}:${i}" value="${escapeHtml(x.label)}" maxlength="120">${kind==='statuses'?`<select data-cat="${i}">${CATS.map(([k,l])=>`<option value="${k}" ${x.cat===k?'selected':''}>${l}</option>`).join('')}</select>`:''}<button type="button" class="link-btn danger" data-rm="${kind}:${i}">Delete</button></div>`;
+   wrap.innerHTML=`<div class="modal ol-modal" role="dialog" aria-modal="true" aria-labelledby="olT"><div class="modal-header"><h3 id="olT">Onboarding dropdowns</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div>
+    <div class="modal-body">
+     <h4>Call type</h4><div class="ol-list">${work.callTypes.map((x,i)=>row('callTypes',x,i,work.callTypes.length)).join('')}</div><button type="button" class="btn btn-secondary btn-sm" data-add="callTypes">＋ Add call type</button>
+     <h4>Status <span class="hint">— the category decides where a candidate counts in the report</span></h4><div class="ol-list">${work.statuses.map((x,i)=>row('statuses',x,i,work.statuses.length)).join('')}</div><button type="button" class="btn btn-secondary btn-sm" data-add="statuses">＋ Add status</button>
+     <p class="hint ol-note">Renaming keeps past calls counting under the new name. Deleting only removes the choice from the list — calls already logged with it keep their status and category.</p>
+     <p class="me-err" id="olErr"></p>
+    </div><div class="modal-footer"><button class="btn btn-secondary" id="olReset" style="margin-right:auto">Reset to defaults</button><button class="btn btn-secondary" data-close>Cancel</button><button class="btn btn-primary" id="olSave">Save</button></div></div>`;
+   wrap.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>wrap.remove());
+   wrap.querySelectorAll('[data-lbl]').forEach(i=>i.oninput=()=>{ const [k,n]=i.dataset.lbl.split(':'); work[k][+n].label=i.value; });
+   wrap.querySelectorAll('[data-cat]').forEach(s=>s.onchange=()=>{ work.statuses[+s.dataset.cat].cat=s.value; });
+   wrap.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>{ const [k,i,d]=b.dataset.mv.split(':'), a=work[k], j=+i+(+d); [a[+i],a[j]]=[a[j],a[+i]]; draw(); });
+   wrap.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{ const [k,i]=b.dataset.rm.split(':'); const x=work[k][+i]; if(k==='statuses'&&x.orig) work.retired.push({label:x.orig, cat:x.cat, aliases:x.aliases||[]}); work[k].splice(+i,1); draw(); });
+   wrap.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{ work[b.dataset.add].push(b.dataset.add==='statuses'?{label:'',cat:'in_process'}:{label:''}); draw(); const ins=wrap.querySelectorAll(`[data-lbl^="${b.dataset.add}:"]`); ins[ins.length-1]?.focus(); });
+   wrap.querySelector('#olReset').onclick=()=>{ if(!confirm('Put back the original call types and statuses?')) return; work.callTypes=DEFAULT_LISTS.callTypes.map(x=>({...x})); work.statuses=DEFAULT_LISTS.statuses.map(x=>({...x})); draw(); };
+   wrap.querySelector('#olSave').onclick=async()=>{
+    const err=t=>{ wrap.querySelector('#olErr').textContent=t; };
+    const clean=a=>a.map(x=>({...x, label:String(x.label||'').trim()})).filter(x=>x.label);
+    const ct=clean(work.callTypes), ss=clean(work.statuses);
+    if(!ct.length||!ss.length) return err('Keep at least one call type and one status.');
+    const dup=a=>a.find((x,i)=>a.findIndex(y=>y.label.toLowerCase()===x.label.toLowerCase())!==i);
+    if(dup(ct)||dup(ss)) return err('“'+(dup(ct)||dup(ss)).label+'” is listed twice.');
+    // renamed items remember their old names, so earlier calls still count under them
+    const fin=a=>a.map(({orig,...x})=>({...x, aliases:[...new Set([...(x.aliases||[]), ...(orig&&orig!==x.label?[orig]:[])])].filter(Boolean)}));
+    const out={callTypes:fin(ct), statuses:fin(ss), retired:work.retired.filter(r=>!ss.some(s=>s.label.toLowerCase()===r.label.toLowerCase()))};
+    const ok=await storageSet('onbLists', out); if(ok===null) return err('Not saved — the store did not accept the change.');
+    KV.set('onbLists', out); wrap.remove(); showToast('Dropdowns saved.'); render();
+   };
+  };
+  draw(); document.body.appendChild(wrap);
  }
  async function show(){
   const host=document.getElementById('view-onboarding'); if(!host) return;
@@ -12331,7 +12472,7 @@ const Onboarding=(()=>{
   if(currentView!=='onboarding') return;
   render();
  }
- return {show, reload:async()=>{ await load(); render(); }, CALL_TYPES, STATUSES};
+ return {show, reload:async()=>{ await load(); render(); }, candidates, catOf};
 })();
 function renderDivReportView(){ DivReport.show(); }
 
