@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.46.0</title>
+<title>Performance Dashboard · v4.47.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -1090,6 +1090,7 @@ button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #183442
 .as-in{width:64px;padding:5px 6px;border:1px solid #cfd6df;border-radius:5px;font:inherit;font-size:13px;text-align:right}.as-in::-webkit-inner-spin-button{opacity:.4}.as-pool{background:#fbfcfe}
 .as-add input{width:260px;padding:6px 9px;border:1px dashed #b8c4d6;border-radius:6px;font:inherit;font-size:13px}
 #asCheck{color:#b45309;flex:1}
+.as-auto{display:inline-block;min-width:52px;padding:5px 8px;border-radius:5px;background:#eef6ff;color:#0b5cad;font-weight:700;text-align:right}.as-auto-key{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;background:#0b5cad;color:#fff;border-radius:3px;padding:1px 4px;vertical-align:1px}
 .as-top .hint{font-size:12.5px!important;align-self:center}.as-table td{vertical-align:middle!important}
 .onb-remark{grid-column:1 / -1}.onb-remark textarea{padding:8px 10px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:13.5px;text-transform:none;letter-spacing:0;font-weight:400;resize:vertical;min-height:40px}
 .onb-form-head>div{display:flex;gap:10px;align-items:center}
@@ -11510,7 +11511,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.46.0';   // shown only in the browser tab title
+const APP_VERSION = '4.47.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -12259,6 +12260,33 @@ const Onboarding=(()=>{
  const linkedName=uid=>{ const x=(lists().onboarders||[]).find(o=>o.userId&&String(o.userId)===String(uid)); return x?x.label:null; };
  const myName=()=>linkedName(Server.user&&Server.user.id)||(Server.user&&Server.user.name)||'';
  const canAssign=()=>hasGrant('grant.onb_assign'), canReport=()=>hasGrant('grant.onb_report');
+ // ---- daily assignments worked out from the call log ----
+ // Each candidate (EID) counts once, on the day of their FIRST logged call, for the onboarder who made it:
+ //  · first call already EB Complete / I9 Complete → "Already Completed"
+ //  · otherwise → the assignment type with the same name as that call's type (Live Transfer, Schedule Later)
+ // Types with no matching call type (Local Branch, Self, …) stay typed in by hand, as do the pool and inactive rows.
+ const anorm=s=>String(s||'').toLowerCase().replace(/scheduled/g,'schedule').replace(/completed/g,'complete').replace(/[^a-z]/g,'');
+ const alreadyType=()=>assignTypes().find(t=>/already/i.test(t))||null;
+ const isAuto=t=>t===alreadyType()||callTypes().some(c=>anorm(c)===anorm(t));
+ let autoCache=null, autoKey=null;
+ function autoAssign(){
+  if(autoKey===st.rows&&autoCache) return autoCache; autoKey=st.rows;
+  const out={}, al=alreadyType(), types=assignTypes();
+  candidates(st.rows||[]).forEach(c=>{ const f=c.first, day=f.call_date, o=f.onboarder;
+   const t=catOf(f.status)==='complete'&&al?al:types.find(x=>x!==al&&anorm(x)===anorm(f.call_type));
+   const d=out[day]||(out[day]={rows:{}, other:0});
+   if(!t){ d.other++; return; }
+   const r=d.rows[o]||(d.rows[o]={}); r[t]=(r[t]||0)+1; });
+  return autoCache=out;
+ }
+ // saved (typed) days + call-log days combined; typed numbers only for the types that aren't automatic
+ function mergedAssign(){
+  const auto=autoAssign(), saved=new Map((st.assign||[]).map(d=>[d.day,d])), days=new Set([...saved.keys(), ...Object.keys(auto)]);
+  return [...days].filter(d=>d>=st.from&&d<=st.to).sort().map(day=>{ const sv=saved.get(day), sd=(sv&&sv.data)||{}, rows={};
+   Object.entries(sd.rows||{}).forEach(([n,r])=>{ rows[n]={}; Object.entries(r||{}).forEach(([t,v])=>{ if(!isAuto(t)) rows[n][t]=v; }); });
+   Object.entries((auto[day]||{}).rows||{}).forEach(([n,r])=>{ rows[n]={...(rows[n]||{}), ...r}; });
+   return {day, data:{rows, pool:sd.pool||{}, inactive:sd.inactive||{}}, updated_by:sv&&sv.updated_by, updated_at:sv&&sv.updated_at}; });
+ }
  // "Henry" → "Henry Smith": exact name first, then a unique first-name match
  function resolveName(n){ const r=roster(), k=String(n||'').trim().toLowerCase().replace(/\s+/g,' '); if(!k) return {name:null};
   const ex=r.find(x=>x.toLowerCase()===k); if(ex) return {name:ex};
@@ -12408,7 +12436,7 @@ const Onboarding=(()=>{
   const pages=[['log','📞 Log calls'],...(canAssign()?[['assign','🗂 Daily assignments']]:[]),...(canReport()?[['report','📊 Report']]:[])];
   if(!st.page||!pages.some(([k])=>k===st.page)) st.page=canReport()?'report':'log';
   const rows=all.filter(r=>(!st.fOnb||r.onboarder===st.fOnb)&&(!st.fType||r.call_type===st.fType));
-  const assign=(st.assign||[]).map(d=>st.fOnb?{...d, data:{...d.data, rows:Object.fromEntries(Object.entries((d.data&&d.data.rows)||{}).filter(([n])=>n===st.fOnb))}}:d);
+  const assign=mergedAssign().map(d=>st.fOnb?{...d, data:{...d.data, rows:Object.fromEntries(Object.entries((d.data&&d.data.rows)||{}).filter(([n])=>n===st.fOnb))}}:d);
   let cands=candidates(rows);
   if(st.fCat) cands=cands.filter(c=>c.cat===st.fCat);
   if(q) cands=cands.filter(c=>String(c.eid).toLowerCase().includes(q)||c.onboarders.some(o=>o.toLowerCase().includes(q))||String((linkOf(c.eid)||{}).recruiter||'').toLowerCase().includes(q)||c.calls.some(x=>String(x.note||'').toLowerCase().includes(q)));
@@ -12471,18 +12499,21 @@ const Onboarding=(()=>{
   const types=assignTypes(), day=st.aDay;
   const saved=(st.assign||[]).find(d=>d.day===day), data=st.aDraft&&st.aDraft.day===day?st.aDraft.data:JSON.parse(JSON.stringify((saved&&saved.data)||{rows:{},pool:{},inactive:{}}));
   st.aDraft={day, data}; data.rows=data.rows||{}; data.pool=data.pool||{}; data.inactive=data.inactive||{};
-  const adm=Server.isAdmin(), names=[...new Set([...roster(), ...Object.keys(data.rows)])].sort((a,b)=>a.localeCompare(b));
-  const colTot=t=>names.reduce((a,n)=>a+(Number((data.rows[n]||{})[t])||0),0), rowTot=n=>types.reduce((a,t)=>a+(Number((data.rows[n]||{})[t])||0),0);
-  const cell=(n,t)=>`<input type="number" min="0" step="1" class="as-in" data-as="${escapeHtml(n)}" data-t="${escapeHtml(t)}" value="${(data.rows[n]||{})[t]??''}" placeholder="0">`;
-  const recent=(st.assign||[]).slice().sort((a,b)=>b.day.localeCompare(a.day)).slice(0,10);
+  const A=autoAssign()[day]||{rows:{},other:0}; st.autoDay=A;
+  const adm=Server.isAdmin(), names=[...new Set([...roster(), ...Object.keys(data.rows), ...Object.keys(A.rows)])].sort((a,b)=>a.localeCompare(b));
+  const val=(n,t)=>isAuto(t)?((A.rows[n]||{})[t]||0):(Number((data.rows[n]||{})[t])||0);
+  const colTot=t=>names.reduce((a,n)=>a+val(n,t),0), rowTot=n=>types.reduce((a,t)=>a+val(n,t),0);
+  const cell=(n,t)=>isAuto(t)?`<span class="as-auto" title="From the call log">${val(n,t)||'–'}</span>`:`<input type="number" min="0" step="1" class="as-in" data-as="${escapeHtml(n)}" data-t="${escapeHtml(t)}" value="${(data.rows[n]||{})[t]??''}" placeholder="0">`;
+  const recent=mergedAssign().filter(d=>Object.keys(d.data.rows).length).sort((a,b)=>b.day.localeCompare(a.day)).slice(0,10);
+  const autoList=types.filter(isAuto), manualList=types.filter(t=>!isAuto(t));
   return `<section class="panel onb-asg">
-   <div class="panel-head"><div><h3>Daily assignments</h3><span class="hint">How many candidates of each type each onboarder was given on a day. Type the numbers, or paste the daily message.</span></div></div>
+   <div class="panel-head"><div><h3>Daily assignments</h3><span class="hint"><b class="as-auto-key">Auto</b> columns (${autoList.map(escapeHtml).join(', ')||'none'}) come from Log calls: each EID counts once, on the day of its first call, for whoever made it — a first call that is already EB Complete / I9 Complete counts as ${escapeHtml(alreadyType()||'Already Completed')}. ${manualList.length?`Type ${manualList.map(escapeHtml).join(', ')} and the pool / inactive rows by hand, or paste the daily message.`:''}${A.other?` · ${A.other} candidate${A.other===1?'’s':'s’'} first call that day ${A.other===1?'was':'were'} Outbound / Inbound, so ${A.other===1?'it doesn’t':'they don’t'} fall in a column.`:''}</span></div></div>
    <div class="as-top"><label class="cand-field"><span>Day</span><input type="date" id="asDay" value="${day}" max="${today()}"></label>
     <span class="hint">${saved?`Saved by ${escapeHtml(saved.updated_by||'')} · ${saved.updated_at?new Date(saved.updated_at).toLocaleString():''}`:'Nothing saved for this day yet.'}</span></div>
    <details class="as-paste" ${names.length?'':'open'}><summary>📋 Paste the daily message</summary>
     <textarea id="asText" rows="8" placeholder="Henry&#10;02 - live transfer&#10;23 - schedule later&#10;01 - already completed&#10;32 - local branch&#10;01 - Self&#10;&#10;Total Live transfer - 20&#10;…&#10;Inactive&#10;Scheduled later - 0"></textarea>
-    <div class="as-paste-foot"><span class="hint">Each onboarder’s name (first name is enough), then “number - type” lines. “Total … - n” lines fill the pool row; lines under “Inactive” fill the inactive row.</span><button type="button" class="btn btn-primary btn-sm" id="asParse">Fill the table</button></div><p class="me-err" id="asMsg"></p></details>
-   <div class="onb-scroll"><table class="users-table onb-table as-table"><thead><tr><th>Onboarder</th>${types.map(t=>`<th class="num">${escapeHtml(t)}</th>`).join('')}<th class="num">Total</th><th></th></tr></thead><tbody>
+    <div class="as-paste-foot"><span class="hint">Each onboarder’s name (first name is enough), then “number - type” lines — numbers for Auto columns are ignored (they come from the call log). “Total … - n” lines fill the pool row; lines under “Inactive” fill the inactive row.</span><button type="button" class="btn btn-primary btn-sm" id="asParse">Fill the table</button></div><p class="me-err" id="asMsg"></p></details>
+   <div class="onb-scroll"><table class="users-table onb-table as-table"><thead><tr><th>Onboarder</th>${types.map(t=>`<th class="num">${escapeHtml(t)}${isAuto(t)?' <b class="as-auto-key">Auto</b>':''}</th>`).join('')}<th class="num">Total</th><th></th></tr></thead><tbody>
     ${names.map(n=>`<tr><td>${escapeHtml(n)}</td>${types.map(t=>`<td class="num">${cell(n,t)}</td>`).join('')}<td class="num"><strong data-rt="${escapeHtml(n)}">${rowTot(n)}</strong></td><td>${adm&&!roster().includes(n)?`<button type="button" class="link-btn danger" data-as-rm="${escapeHtml(n)}" title="Not on the onboarder list — remove from this day">✕</button>`:''}</td></tr>`).join('')||`<tr><td colspan="${types.length+3}" class="hint" style="padding:12px">${adm?'No onboarders yet — add them below.':'No onboarders set up yet — ask an admin to add them.'}</td></tr>`}
     ${adm?`<tr class="as-add"><td colspan="${types.length+3}"><input id="asNew" placeholder="＋ Add an onboarder to the list (full name)…" autocomplete="off"> <span class="hint">Admins only · saved to the onboarder list</span></td></tr>`:''}
     <tr class="onb-total"><td><strong>Assigned to onboarders</strong></td>${types.map(t=>`<td class="num" data-ct="${escapeHtml(t)}">${colTot(t)}</td>`).join('')}<td class="num" data-ct="__all">${types.reduce((a,t)=>a+colTot(t),0)}</td><td></td></tr>
@@ -12491,7 +12522,7 @@ const Onboarding=(()=>{
    </tbody></table></div>
    <div class="onb-form-foot"><span class="hint" id="asCheck"></span><button type="button" class="btn btn-secondary" id="asClear">Clear this day</button><button type="button" class="btn btn-primary" id="asSave">Save ${fmtDate(day)}</button></div>
   </section>
-  ${recent.length?`<section class="panel"><div class="panel-head"><h3>Recent days</h3></div><div class="onb-scroll"><table class="users-table onb-table"><thead><tr><th>Day</th><th class="num">Onboarders</th>${types.map(t=>`<th class="num">${escapeHtml(t)}</th>`).join('')}<th class="num">Total</th><th>Saved by</th></tr></thead><tbody>
+  ${recent.length?`<section class="panel"><div class="panel-head"><h3>Recent days</h3></div><div class="onb-scroll"><table class="users-table onb-table"><thead><tr><th>Day</th><th class="num">Onboarders</th>${types.map(t=>`<th class="num">${escapeHtml(t)}</th>`).join('')}<th class="num">Total</th><th>Typed in by</th></tr></thead><tbody>
    ${recent.map(d=>{ const r=(d.data&&d.data.rows)||{}, ct=t=>Object.values(r).reduce((a,x)=>a+(Number(x[t])||0),0); return `<tr><td><button type="button" class="link-btn" data-as-day="${d.day}">${fmtDate(d.day)}</button></td><td class="num">${Object.keys(r).length}</td>${types.map(t=>`<td class="num">${ct(t)||'–'}</td>`).join('')}<td class="num"><strong>${types.reduce((a,t)=>a+ct(t),0)}</strong></td><td class="hint">${escapeHtml(d.updated_by||'')}</td></tr>`; }).join('')}
   </tbody></table></div></section>`:''}`;
  }
@@ -12573,10 +12604,11 @@ const Onboarding=(()=>{
  }
  function wireAssign(host){
   const $=s=>host.querySelector(s), d=st.aDraft, types=assignTypes();
-  const totals=()=>{ const names=Object.keys(d.data.rows); types.forEach(t=>{ const el=host.querySelector(`[data-ct="${CSS.escape(t)}"]`); if(el) el.textContent=names.reduce((a,n)=>a+(Number(d.data.rows[n][t])||0),0); });
-   const all=host.querySelector('[data-ct="__all"]'); if(all) all.textContent=names.reduce((a,n)=>a+types.reduce((b,t)=>b+(Number(d.data.rows[n][t])||0),0),0);
-   names.forEach(n=>{ const el=host.querySelector(`[data-rt="${CSS.escape(n)}"]`); if(el) el.textContent=types.reduce((a,t)=>a+(Number(d.data.rows[n][t])||0),0); });
-   const off=types.filter(t=>{ const p=d.data.pool[t]; return p!==''&&p!=null&&Number(p)!==names.reduce((a,n)=>a+(Number(d.data.rows[n][t])||0),0); });
+  const A=st.autoDay||{rows:{}}, v=(n,t)=>isAuto(t)?((A.rows[n]||{})[t]||0):(Number((d.data.rows[n]||{})[t])||0);
+  const totals=()=>{ const names=[...new Set([...Object.keys(d.data.rows), ...Object.keys(A.rows)])]; types.forEach(t=>{ const el=host.querySelector(`[data-ct="${CSS.escape(t)}"]`); if(el) el.textContent=names.reduce((a,n)=>a+v(n,t),0); });
+   const all=host.querySelector('[data-ct="__all"]'); if(all) all.textContent=names.reduce((a,n)=>a+types.reduce((b,t)=>b+v(n,t),0),0);
+   names.forEach(n=>{ const el=host.querySelector(`[data-rt="${CSS.escape(n)}"]`); if(el) el.textContent=types.reduce((a,t)=>a+v(n,t),0); });
+   const off=types.filter(t=>{ const p=d.data.pool[t]; return p!==''&&p!=null&&Number(p)!==names.reduce((a,n)=>a+v(n,t),0); });
    $('#asCheck').innerHTML=off.length?`⚠ Assigned ≠ pool for ${off.map(escapeHtml).join(', ')}`:''; };
   const num=v=>v===''?'':Math.max(0,Math.round(Number(v)||0));
   host.querySelectorAll('[data-as]').forEach(i=>i.oninput=()=>{ (d.data.rows[i.dataset.as] ||= {})[i.dataset.t]=num(i.value); totals(); });
@@ -12603,7 +12635,7 @@ const Onboarding=(()=>{
    $('#asAddMissing')?.addEventListener('click',async()=>{ if(await addToRoster(m.missingN)){ st.asMsg=null; render(); const t=document.getElementById('asText'); t.value=m.txt; document.getElementById('asParse').click(); } }); }
   $('#asClear').onclick=()=>{ if(!confirm('Clear every number for '+fmtDate(st.aDay)+'?')) return; d.data={rows:{},pool:{},inactive:{}}; render(); };
   $('#asSave').onclick=async()=>{ const b=$('#asSave'); b.disabled=true; st.asMsg=null;
-   Object.keys(d.data.rows).forEach(n=>{ if(!n.trim()) delete d.data.rows[n]; });
+   Object.keys(d.data.rows).forEach(n=>{ if(!n.trim()) { delete d.data.rows[n]; return; } Object.keys(d.data.rows[n]).forEach(t=>{ if(isAuto(t)) delete d.data.rows[n][t]; }); });
    try{ await saveAssign(st.aDay, {...d.data, types}); showToast('Assignments saved for '+fmtDate(st.aDay)+'.'); st.aDraft=null; if(st.aDay<st.from) st.from=st.aDay; await load(); render(); }
    catch(e){ b.disabled=false; showToast('Not saved: '+cleanErr(e)); } };
   totals();
