@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.49.0</title>
+<title>Performance Dashboard · v4.52.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -920,6 +920,9 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
 .ld-brk-lists{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:4px 12px 12px}.ld-brk-lists h5{margin:6px 0;font-size:12px;color:#0a1f44}.ld-brk-lists ul{list-style:none;margin:0;padding:0}
 .ld-brk-lists li{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-top:1px solid #f0f2f6;font-size:12.5px}.ld-brk-lists li small{display:block;font-size:11px;color:#64748b;font-weight:400}.ld-brk-lists li>span:last-child{text-align:right;font-weight:700}.ld-brk-lists .ok{color:#15803d}.ld-brk-lists .no{color:#a16207}
 @media(max-width:760px){.ld-brk-lists{grid-template-columns:1fr}.ld-brk-bar{width:80px}}
+.ep-peers{margin:12px 22px 4px;padding:10px 12px;border:1px solid #e3e8ef;border-radius:10px;background:#f8fafd}.ep-peers h4{margin:0 0 8px;font-size:12.5px;color:#0a1f44}
+.ep-peers-b+.ep-peers-b{margin-top:10px;padding-top:8px;border-top:1px dashed #dbe3ee}.ep-peers-h{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:12.5px;margin-bottom:6px}.ep-peers-h span{color:#64748b;font-size:11.5px}
+.ep-peers-list{display:flex;flex-wrap:wrap;gap:6px}.ep-peer{display:flex;flex-direction:column;align-items:flex-start;border:1px solid #d6dde8;background:#fff;border-radius:8px;padding:5px 9px;font:inherit;cursor:pointer;text-align:left}.ep-peer:hover{border-color:#1d4ed8;box-shadow:0 2px 8px #1d4ed81f}.ep-peer b{font-size:12.5px;color:#0a1f44}.ep-peer small{font-size:11px;color:#64748b}.ep-peer i{font-style:normal;font-weight:700}.ep-peer i.bad{color:#b91c1c}.ep-peer i.warn{color:#a16207}.ep-peer i.good{color:#15803d}
 .al-multi-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 12px}.al-multi-hint{margin:0;font-size:11.5px}
 .al-hi-btn{background:#fff;border:1px solid #c7d4ee;color:#1d4ed8;font-weight:600;display:inline-flex;align-items:center;gap:6px}.al-hi-btn:hover{background:#eef3fe}.al-hi-btn.on{background:#1d4ed8;color:#fff;border-color:#1d4ed8}
 .al-hi-badge{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#c8102e;color:#fff;font-size:10.5px;font-weight:700}
@@ -1097,6 +1100,8 @@ button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #183442
 .as-in{width:64px;padding:5px 6px;border:1px solid #cfd6df;border-radius:5px;font:inherit;font-size:13px;text-align:right}.as-in::-webkit-inner-spin-button{opacity:.4}.as-pool{background:#fbfcfe}
 .as-add input{width:260px;padding:6px 9px;border:1px dashed #b8c4d6;border-radius:6px;font:inherit;font-size:13px}
 #asCheck{color:#b45309;flex:1}
+.as-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:0 0 6px}.as-tile{border:1px solid #e1e7ef;border-radius:8px;padding:10px 12px;background:#fff;display:flex;flex-direction:column;gap:2px}.as-tile span{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#64748b}.as-tile strong{font-size:22px;color:#0a1f44}.as-tile em{font-style:normal;font-size:11.5px;color:#64748b}.as-tile em b{color:#0a1f44}.as-tile.all{background:#f4f8ff;border-color:#cfdcf5}.as-tile-note{margin:0 0 10px;font-size:12px}
+.as-poolrow td{background:#fffbea!important}
 .as-auto{display:inline-block;min-width:52px;padding:5px 8px;border-radius:5px;background:#eef6ff;color:#0b5cad;font-weight:700;text-align:right}.as-auto-key{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;background:#0b5cad;color:#fff;border-radius:3px;padding:1px 4px;vertical-align:1px}
 .as-top .hint{font-size:12.5px!important;align-self:center}.as-table td{vertical-align:middle!important}
 .onb-lock{margin:10px 0 0;padding:9px 12px;border-radius:8px;background:#fff4e5;border:1px solid #f3d29a;color:#7a4b00;font-size:13px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.onb-lock.ok{background:#e9f7ef;border-color:#b6e2c6;color:#14532d}.onb-lock.info{background:#eef3fe;border-color:#c7d4ee;color:#1e3a8a}
@@ -1139,6 +1144,9 @@ button.onb-tile{font:inherit;text-align:left;cursor:pointer}button.onb-tile:disa
 .me-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin-bottom:12px}.me-grid label,.me-notefield{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:#334155}.me-grid input,.me-notefield input{padding:8px 10px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:13.5px;font-weight:400}
 .me-grid .off,.me-outcome.off{display:none}.me-err{color:#b91c1c;font-size:12.5px;margin:8px 0 0;min-height:1em}
 @media(max-width:600px){.me-grid{grid-template-columns:1fr}}
+.ge-multi{margin-top:14px;border-top:3px solid #1d4ed8}.ge-multi-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 18px;margin:12px 0 4px}.ge-multi-grid select{padding:8px 10px;border:1px solid #cfdde2;border-radius:8px;font:inherit;font-size:13px;width:100%}
+.ge-opt{display:flex;flex-direction:column;gap:5px;font-size:13px}.ge-opt label{display:flex;align-items:center;gap:7px}.ge-opt small{color:#64748b}.ge-lbl{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#64748b}#gmNum{width:80px;padding:5px 8px;border:1px solid #cfdde2;border-radius:6px;font:inherit}
+@media(max-width:760px){.ge-multi-grid{grid-template-columns:1fr}}
 .goals-filter{display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap;margin:12px 0 8px}.goals-filter .ge-search{flex:0 1 280px;margin:0}.goals-filter .ge-search input{width:100%}
 .goals-wrap{overflow-x:auto;max-width:100%;border:1px solid #e3e8ef;border-radius:8px}
 #goalsEditor .goals-table{width:100%;min-width:560px;table-layout:auto;margin:0}
@@ -4466,7 +4474,24 @@ function renderGoalsEditor(){
       return `<tr ${list.includes(n)?'':'hidden'}><td>${escapeHtml(n)}${isRecent(n)?'':`<span class="ge-idle" title="No schedules or interviews in the 5 weeks up to this week">${lastSeen[n]?'last active Wk '+weekOfDate(lastSeen[n]).number:'no activity yet'}</span>`}</td><td class="hint">${escapeHtml(getEffectiveRecruiterDivision(n, st.week)||'Unassigned')}</td><td><input type="number" min="0" step="1" class="goal-input" data-name="${escapeHtml(n)}" value="${has?Number(saved[n]):''}" placeholder="${DEFAULT_WEEKLY_GOAL}" ${canEdit?'':'disabled'} aria-label="Goal for ${escapeHtml(n)}"></td><td>${sch}</td></tr>`; }).join('') || '<tr><td colspan="4" class="hint" style="padding:14px;">No recruiters yet — upload data first.</td></tr>'}
     </tbody></table></div>
     ${canEdit && allList.length?`<div class="goals-actions"><span class="hint" id="geMsg"></span><button class="btn btn-primary btn-sm" id="geSave">Save goals for week ${w.number}</button></div>`:''}
-  </div>`;
+  </div>
+  ${canEdit && allList.length?(()=>{ const asc=weeks.slice().reverse(), later=asc.filter(x=>x>st.week), toDef=later.length?later[Math.min(3,later.length-1)]:st.week;
+   const opts=sel=>asc.map(d=>`<option value="${d}" ${d===sel?'selected':''}>Sat ${fmtDate(d)} · Week ${weekOfDate(d).number}</option>`).join('');
+   return `<div class="panel ge-multi"><h3 style="margin:0 0 4px">📅 Goals for several weeks at once</h3><span class="hint">Apply goals to every week in a range, for all recruiters (or just the ones shown above).</span>
+   <div class="ge-multi-grid">
+    <label class="cand-field"><span>From week ending</span><select id="gmFrom">${opts(st.week)}</select></label>
+    <label class="cand-field"><span>To week ending</span><select id="gmTo">${opts(toDef)}</select></label>
+    <div class="ge-opt"><span class="ge-lbl">What to apply</span>
+     <label><input type="radio" name="gmWhat" value="table" checked> The goals in the table above <small>(blank = default ${DEFAULT_WEEKLY_GOAL})</small></label>
+     <label><input type="radio" name="gmWhat" value="num"> The same goal for everyone: <input type="number" id="gmNum" min="0" step="1" value="${DEFAULT_WEEKLY_GOAL}"></label></div>
+    <div class="ge-opt"><span class="ge-lbl">Recruiters</span>
+     <label><input type="radio" name="gmWho" value="all" checked> All ${allList.length} recruiters</label>
+     <label><input type="radio" name="gmWho" value="shown"> Only the ones shown by the search / filter</label></div>
+    <div class="ge-opt"><span class="ge-lbl">Goals already set in those weeks</span>
+     <label><input type="radio" name="gmMode" value="replace" checked> Replace them</label>
+     <label><input type="radio" name="gmMode" value="fill"> Keep them — only fill recruiters without a goal</label></div>
+   </div>
+   <div class="goals-actions"><span class="hint" id="gmMsg"></span><button class="btn btn-primary btn-sm" id="gmApply">Apply to these weeks</button></div></div>`; })():''}`;
   host.querySelector('#geWeek').onchange = e=>{ st.week = e.target.value; renderGoalsEditor(); };
   // search / filter keep typed (unsaved) goals: they only hide rows, they don't redraw the table
   const applyFilter = ()=>{ const qq=(st.q||'').trim().toLowerCase(), sh=st.show||'all'; let n=0;
@@ -4487,6 +4512,29 @@ function renderGoalsEditor(){
     inputs().forEach(i=>{ const v=g[i.dataset.name]; i.value = (v!==undefined && v!==null && v!=='') ? String(v) : ''; });
     dirty(); showToast('Copied goals from the week ending '+fmtDate(prev)+' — click Save to keep them.');
   };
+  // several weeks at once
+  const gmRange=()=>{ let a=host.querySelector('#gmFrom').value, b=host.querySelector('#gmTo').value; if(a>b) [a,b]=[b,a]; const out=[]; for(let d=a; d<=b; d=toIsoDateOnly(new Date(new Date(d+'T00:00:00').getTime()+7*864e5))) out.push(d); return out; };
+  const gmUpd=()=>{ const r=gmRange(), m=host.querySelector('#gmMsg'); if(m) m.textContent=`${r.length} week${r.length===1?'':'s'}: Week ${weekOfDate(r[0]).number} – Week ${weekOfDate(r[r.length-1]).number}${r.some(x=>KV.has('goals:'+x))?' · '+r.filter(x=>KV.has('goals:'+x)).length+' already have goals':''}`; };
+  ['#gmFrom','#gmTo'].forEach(id=>host.querySelector(id)?.addEventListener('change',gmUpd)); if(host.querySelector('#gmFrom')) gmUpd();
+  host.querySelector('#gmNum')?.addEventListener('focus',()=>{ host.querySelector('input[name=gmWhat][value=num]').checked=true; });
+  host.querySelector('#gmApply')?.addEventListener('click', async ()=>{
+    const r=gmRange(), what=host.querySelector('input[name=gmWhat]:checked').value, who=host.querySelector('input[name=gmWho]:checked').value, mode=host.querySelector('input[name=gmMode]:checked').value;
+    if(r.length>60){ showToast('Choose up to 60 weeks at a time.'); return; }
+    const scope=inputs().filter(i=>who==='all'||!i.closest('tr').hidden);
+    const vals={};
+    if(what==='num'){ const raw=host.querySelector('#gmNum').value, v=Number(raw); if(raw===''||!Number.isFinite(v)||v<0){ showToast('Enter a goal of 0 or more.'); return; } scope.forEach(i=>vals[i.dataset.name]=Math.round(v)); }
+    else { for(const i of scope){ if(i.value===''){ vals[i.dataset.name]=null; continue; } const v=Number(i.value); if(!Number.isFinite(v)||v<0){ i.focus(); showToast('Goals must be 0 or more.'); return; } vals[i.dataset.name]=Math.round(v); } }
+    const n=Object.keys(vals).length;
+    if(!confirm(`Apply goals for ${n} recruiter${n===1?'':'s'} to ${r.length} week${r.length===1?'':'s'} (Week ${weekOfDate(r[0]).number} – Week ${weekOfDate(r[r.length-1]).number})?`+(mode==='replace'?'\n\nGoals already set for them in those weeks will be replaced.':'\n\nGoals already set are kept.'))) return;
+    const b=host.querySelector('#gmApply'); b.disabled=true; let done=0, fail=0;
+    for(const wk of r){ const cur={...(KV.get('goals:'+wk)||{})};
+      Object.entries(vals).forEach(([name,v])=>{ const has=cur[name]!==undefined&&cur[name]!==null&&cur[name]!==''; if(mode==='fill'&&has) return; if(v===null) delete cur[name]; else cur[name]=v; });
+      const ok=await storageSet('goals:'+wk, cur); if(ok===null||ok===false) fail++; else done++;
+      const m=host.querySelector('#gmMsg'); if(m) m.textContent=`Saving… ${done+fail} / ${r.length}`; }
+    b.disabled=false;
+    showToast(fail?`Saved ${done} week${done===1?'':'s'} · ${fail} failed.`:`Goals applied to ${done} week${done===1?'':'s'} for ${n} recruiter${n===1?'':'s'}.`);
+    renderGoalsEditor(); refreshUI();
+  });
   const save = host.querySelector('#geSave');
   if(save) save.onclick = async ()=>{
     const out = {};
@@ -6640,6 +6688,25 @@ async function openEntityPopover(mode,name,row){
   requestAnimationFrame(()=>{ back.classList.add('in'); pop.classList.add('in'); });
   pop.querySelector('.ep-close')?.focus({preventScroll:true});
 }
+// Branches a recruiter worked that week (per-branch schedule counts when they split their week), merged branches applied.
+function recruiterBranchCounts(r){
+  const m=new Map(); if(!r) return m;
+  if(r.branchDays) Object.entries(r.branchDays).forEach(([b,days])=>{ const k=branchAlias(b); m.set(k,(m.get(k)||0)+Object.values(days||{}).reduce((a,x)=>a+(Number(x)||0),0)); });
+  if(r.branch&&r.branch!=='Unassigned'&&!m.has(r.branch)) m.set(r.branch, m.size?0:(r.schedules||0));
+  return m;
+}
+// Who else worked the same branch(es) that week, with their numbers
+function sameBranchPeersHtml(week, name){
+  if(!week) return '';
+  const me=(week.byRecruiter||{})[name], mine=recruiterBranchCounts(me); if(!mine.size) return '';
+  const goals=KV.get('goals:'+week.weekEndDate)||{}, goal=n=>{ const v=goals[n]; return v!==undefined&&v!==null&&v!==''?Number(v):DEFAULT_WEEKLY_GOAL; };
+  const others=Object.entries(week.byRecruiter||{}).filter(([n])=>n!==name&&n!=='Unassigned'&&!excludedRecruitersSet.has(n)).map(([n,r])=>({n,r,b:recruiterBranchCounts(r)}));
+  const blocks=[...mine.entries()].sort((a,b)=>b[1]-a[1]).map(([br,myN])=>{
+    const peers=others.filter(o=>o.b.has(br)).map(o=>({n:o.n, here:o.b.get(br), total:o.r.schedules||0, pct:goal(o.n)?Math.round((o.r.schedules||0)/goal(o.n)*100):null, split:o.b.size>1})).sort((a,b)=>b.here-a.here||b.total-a.total);
+    return `<div class="ep-peers-b"><div class="ep-peers-h"><b>${escapeHtml(br)}</b><span>${mine.size>1?`${fmtNum(myN)} of ${escapeHtml(name.split(' ')[0])}’s schedules · `:''}${peers.length?peers.length+' other recruiter'+(peers.length===1?'':'s'):'no one else this week'}</span></div>
+     ${peers.length?`<div class="ep-peers-list">${peers.map(p=>`<button type="button" class="ep-peer" data-ep-peer="${escapeHtml(p.n)}" title="Open ${escapeHtml(p.n)}"><b>${escapeHtml(p.n)}</b><small>${fmtNum(p.here)} sched. here${p.split?` · ${fmtNum(p.total)} total`:''}${p.pct!=null?` · <i class="${p.pct<50?'bad':p.pct<80?'warn':'good'}">${p.pct}% of goal</i>`:''}</small></button>`).join('')}</div>`:''}</div>`; }).join('');
+  return `<section class="ep-peers"><h4>👥 Working the same branch${mine.size>1?'es':''} · Wk ${weekOfDate(week.weekEndDate).number}</h4>${blocks}</section>`;
+}
 function renderEntityDrawer(){
   const pop=document.getElementById('entityDrawer'); if(!pop) return;
   const {mode, names}=epState, single=names.length===1, name=names[0];
@@ -6670,12 +6737,14 @@ function renderEntityDrawer(){
         ${tile('Hires', fmtNum(e.i9), dlt('i9'))}
         ${tile('Placed', fmtNum(e.placed), dlt('placed'))}
       </div>` : `<p class="hint ep-empty">No activity in this week.</p>`) : ''}
+    ${single&&mode==='recruiters'?sameBranchPeersHtml(week, name):''}
     <nav class="ep-tabs" role="tablist">${tabs.map(([k,l])=>`<button type="button" role="tab" data-ep-tab="${k}" aria-selected="${epState.tab===k}">${l}</button>`).join('')}</nav>
     <div class="ep-body" id="epBody"></div>`;
   pop.querySelector('.ep-close').onclick=()=>closeEntityPopover(true);
   ['#epHistory','#epHistory2'].forEach(id=>pop.querySelector(id)?.addEventListener('click',()=>openHistoryPage(mode,name)));
   pop.querySelector('#epWeek').onchange=ev=>{ epState.week=ev.target.value; renderEntityDrawer(); };
   pop.querySelector('#epAddRemark')?.addEventListener('click', ()=>openRemarksModal(name, epState.week));
+  pop.querySelectorAll('[data-ep-peer]').forEach(b=>b.onclick=ev=>{ ev.stopPropagation(); const wk=epState.week; epState.names=[b.dataset.epPeer]; epState.week=wk; renderEntityDrawer(); });
   pop.querySelectorAll('[data-ep-tab]').forEach(b=>b.onclick=()=>{ epState.tab=b.dataset.epTab; renderEntityDrawer(); });
   const body=pop.querySelector('#epBody'); destroyChart('entityTrend'); destroyChart('entityTrendBar');
   if(epState.tab==='trend'){
@@ -11545,7 +11614,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.49.0';   // shown only in the browser tab title
+const APP_VERSION = '4.52.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -12431,7 +12500,12 @@ const Onboarding=(()=>{
  let eidIdx=null, eidKey='';
  function eidIndex(){
   const k=weeksData.length+'|'+weeksData.map(w=>w.savedAt||'').join(); if(eidIdx&&k===eidKey) return eidIdx; eidKey=k; eidIdx=new Map();
-  const put=(eid,patch)=>{ const e=normEid(eid); if(!e||e==='–') return; const cur=eidIdx.get(e)||{}; eidIdx.set(e,{...cur,...Object.fromEntries(Object.entries(patch).filter(([,v])=>v!=null))}); };
+  // the most recent schedule / interview decides the recruiter; earlier recruiters are kept in "others"
+  const put=(eid,patch)=>{ const e=normEid(eid); if(!e||e==='–') return; const cur=eidIdx.get(e)||{others:[]}; const d=patch.scheduled||patch.interview||'';
+   if(patch.recruiter){ const newer=!cur.last||d>=cur.last; if(newer){ if(cur.recruiter&&cur.recruiter!==patch.recruiter&&!cur.others.includes(cur.recruiter)) cur.others.push(cur.recruiter); cur.recruiter=patch.recruiter; cur.branch=patch.branch; cur.last=d; } else if(patch.recruiter!==cur.recruiter&&!cur.others.includes(patch.recruiter)) cur.others.push(patch.recruiter);
+    if(patch.scheduled&&(!cur.scheduled||patch.scheduled>cur.scheduled)) cur.scheduled=patch.scheduled; if(patch.interview&&(!cur.interview||patch.interview>cur.interview)) cur.interview=patch.interview; }
+   else Object.entries(patch).forEach(([k,v])=>{ if(v!=null) cur[k]=v; });
+   cur.others=cur.others.filter(o=>o!==cur.recruiter); eidIdx.set(e,cur); };
   [...weeksData].sort((a,b)=>a.weekEndDate.localeCompare(b.weekEndDate)).forEach(w=>Object.entries(w.byRecruiter||{}).forEach(([rec,r])=>{
    (r.schedulesList||[]).forEach(c=>put(c.eid,{recruiter:rec, branch:c.branch||r.branch, scheduled:c.date}));
    (r.interviewsList||[]).forEach(c=>put(c.eid,{recruiter:rec, branch:c.branch||r.branch, interview:c.date}));
@@ -12441,8 +12515,13 @@ const Onboarding=(()=>{
   }));
   return eidIdx;
  }
- const linkOf=eid=>eidIndex().get(normEid(eid))||null;
- const linkHtml=l=>l?`<span class="onb-link ok" title="Found in the uploaded schedules / interviews">✓ ${escapeHtml(l.recruiter||'')}${l.branch?' · '+escapeHtml(l.branch):''}${l.interview?' · interview '+fmtDate(l.interview):l.scheduled?' · scheduled '+fmtDate(l.scheduled):''}${l.showed?' · showed':l.noShow?' · no-show':''}${l.hired?' · hired':''}</span>`:'<span class="onb-link no" title="This EID isn’t in the loaded schedule / interview data">Not matched yet</span>';
+ // the server lookup covers every week ever uploaded (not just what this browser has loaded)
+ const eidSrv=new Map();
+ const linkOf=eid=>{ const k=normEid(eid), s=eidSrv.get(k), l=eidIndex().get(k)||null;
+  if(s&&s.recruiter&&(!l||!l.last||String(s.day)>=l.last)) return {...(l||{}), recruiter:s.recruiter, branch:s.branch||(l&&l.branch), last:s.day, weeks:s.weeks, others:[...new Set([...(s.others||[]), ...((l&&l.others)||[]), ...(l&&l.recruiter&&l.recruiter!==s.recruiter?[l.recruiter]:[])])].filter(o=>o!==s.recruiter)};
+  return l; };
+ async function lookupEid(eid){ const k=normEid(eid); if(!k||eidSrv.has(k)) return; try{ const r=await Server.rpc('dash_onb_eid',{p_eid:k}); eidSrv.set(k, r||{}); }catch(e){ eidSrv.set(k,{}); } }
+ const linkHtml=l=>l&&l.recruiter?`<span class="onb-link ok" title="Most recent recruiter for this EID${l.others&&l.others.length?' — earlier: '+escapeHtml(l.others.join(', ')):''}">✓ <b>${escapeHtml(l.recruiter)}</b>’s candidate${l.branch?' · '+escapeHtml(l.branch):''}${l.interview?' · interview '+fmtDate(l.interview):l.scheduled?' · scheduled '+fmtDate(l.scheduled):l.last?' · last seen '+fmtDate(String(l.last).slice(0,10)):''}${l.showed?' · showed':l.noShow?' · no-show':''}${l.hired?' · hired':''}${l.others&&l.others.length?` <small>(earlier: ${escapeHtml(l.others.join(', '))})</small>`:''}</span>`:'<span class="onb-link no" title="This EID isn’t in the uploaded schedules / interviews">Not matched yet</span>';
  // ---- one candidate per EID: every call combined, the LATEST call's status counts ----
  const order=(a,b)=>String(a.call_date).localeCompare(String(b.call_date))||String(a.created_at||'').localeCompare(String(b.created_at||''))||(Number(a.id)||0)-(Number(b.id)||0);
  function candidates(rows){
@@ -12583,7 +12662,7 @@ const Onboarding=(()=>{
     <div class="onb-scroll"><table class="users-table onb-table" id="onbAsgTot"><thead><tr><th>Onboarder</th>${types.map(t=>`<th class="num">${escapeHtml(t)}</th>`).join('')}<th class="num">Total</th></tr></thead><tbody>
     ${vol.filter(v=>v.aTot).map(v=>`<tr><td>${escapeHtml(v.o)}</td>${types.map(t=>`<td class="num">${v.assigned[t]||'–'}</td>`).join('')}<td class="num"><strong>${v.aTot}</strong></td></tr>`).join('')}
     <tr class="onb-total"><td><strong>Assigned to onboarders</strong></td>${types.map(t=>`<td class="num">${aTot[t]||0}</td>`).join('')}<td class="num">${types.reduce((a,t)=>a+(aTot[t]||0),0)}</td></tr>
-    <tr class="onb-total"><td><strong>Total in the pool</strong></td>${types.map(t=>`<td class="num">${pool[t]||'–'}${pool[t]&&aTot[t]!==pool[t]?`<small>${pool[t]-(aTot[t]||0)} not assigned</small>`:''}</td>`).join('')}<td class="num">${types.reduce((a,t)=>a+(pool[t]||0),0)||'–'}</td></tr>
+    <tr class="onb-total"><td><strong>Total (typed)</strong></td>${types.map(t=>`<td class="num">${pool[t]||'–'}${pool[t]&&aTot[t]!==pool[t]?`<small>${pool[t]-(aTot[t]||0)} not assigned</small>`:''}</td>`).join('')}<td class="num">${types.reduce((a,t)=>a+(pool[t]||0),0)||'–'}</td></tr>
     </tbody></table></div></section>`:''}
    ${per.length?`<section class="panel"><div class="panel-head"><div><h3>Where each onboarder’s candidates stand</h3><span class="hint">Candidates are credited to whoever made their latest call. % = share of that onboarder’s candidates.</span></div>${copyBtnHtml('onbPerf')}</div>
     <div class="onb-scroll"><table class="users-table onb-table" id="onbPerf"><thead><tr><th>Onboarder</th><th class="num">Candidates</th><th class="num">Complete</th><th class="num">Between I9</th><th class="num">In process</th><th class="num">LVM / No ans.</th><th class="num">Never resp.</th><th class="num">Calls / cand.</th><th class="num">Avg. min</th><th class="num">Days to complete</th></tr></thead><tbody>
@@ -12607,20 +12686,25 @@ const Onboarding=(()=>{
    <div class="panel-head"><div><h3>Daily assignments</h3><span class="hint"><b class="as-auto-key">Auto</b> columns (${autoList.map(escapeHtml).join(', ')||'none'}) come from Log calls: each EID counts once, on the day of its first call, for whoever made it — a first call that is already EB Complete / I9 Complete counts as ${escapeHtml(alreadyType()||'Already Completed')}. ${manualList.length?`Type ${manualList.map(escapeHtml).join(', ')} and the pool / inactive rows by hand, or paste the daily message.`:''}${A.other?` · ${A.other} candidate${A.other===1?'’s':'s’'} first call that day ${A.other===1?'was':'were'} Outbound / Inbound, so ${A.other===1?'it doesn’t':'they don’t'} fall in a column.`:''}</span></div></div>
    <div class="as-top"><label class="cand-field"><span>Day</span><input type="date" id="asDay" value="${day}" max="${today()}"></label>
     <span class="hint">${saved?`Saved by ${escapeHtml(saved.updated_by||'')} · ${saved.updated_at?new Date(saved.updated_at).toLocaleString():''}`:'Nothing saved for this day yet.'}</span></div>
+   <div class="as-tiles">${types.map(t=>{ const pool=data.pool[t], asg=colTot(t), ina=data.inactive[t];
+     return `<div class="as-tile" data-tile="${escapeHtml(t)}"><span>${escapeHtml(t)}</span><strong data-tile-total>${pool!==''&&pool!=null?fmtNum(Number(pool)):'–'}</strong><em><b data-tile-asg>${fmtNum(asg)}</b> assigned · <b data-tile-left>${pool!==''&&pool!=null?fmtNum(Math.max(0,Number(pool)-asg)):'–'}</b> not assigned${ina?` · ${fmtNum(Number(ina))} inactive`:''}</em></div>`; }).join('')}
+    <div class="as-tile all"><span>All types</span><strong data-tile-total-all>${fmtNum(types.reduce((a,t)=>a+(Number(data.pool[t])||0),0))||'–'}</strong><em><b data-tile-asg-all>${fmtNum(types.reduce((a,t)=>a+colTot(t),0))}</b> assigned to onboarders</em></div></div>
+   <p class="hint as-tile-note">Big numbers are the day’s <b>totals</b> typed in the “Total” row below; “assigned” adds up the onboarders’ rows.</p>
    <details class="as-paste" ${names.length?'':'open'}><summary>📋 Paste the daily message</summary>
     <textarea id="asText" rows="8" placeholder="Henry&#10;02 - live transfer&#10;23 - schedule later&#10;01 - already completed&#10;32 - local branch&#10;01 - Self&#10;&#10;Total Live transfer - 20&#10;…&#10;Inactive&#10;Scheduled later - 0"></textarea>
-    <div class="as-paste-foot"><span class="hint">Each onboarder’s name (first name is enough), then “number - type” lines — numbers for Auto columns are ignored (they come from the call log). “Total … - n” lines fill the pool row; lines under “Inactive” fill the inactive row.</span><button type="button" class="btn btn-primary btn-sm" id="asParse">Fill the table</button></div><p class="me-err" id="asMsg"></p></details>
+    <div class="as-paste-foot"><span class="hint">Each onboarder’s name (first name is enough), then “number - type” lines — numbers for Auto columns are ignored (they come from the call log). “Total … - n” lines fill the Total row; lines under “Inactive” fill the inactive row.</span><button type="button" class="btn btn-primary btn-sm" id="asParse">Fill the table</button></div><p class="me-err" id="asMsg"></p></details>
    <div class="onb-scroll"><table class="users-table onb-table as-table"><thead><tr><th>Onboarder</th>${types.map(t=>`<th class="num">${escapeHtml(t)}${isAuto(t)?' <b class="as-auto-key">Auto</b>':''}</th>`).join('')}<th class="num">Total</th><th></th></tr></thead><tbody>
     ${names.map(n=>`<tr><td>${escapeHtml(n)}</td>${types.map(t=>`<td class="num">${cell(n,t)}</td>`).join('')}<td class="num"><strong data-rt="${escapeHtml(n)}">${rowTot(n)}</strong></td><td>${adm&&!roster().includes(n)?`<button type="button" class="link-btn danger" data-as-rm="${escapeHtml(n)}" title="Not on the onboarder list — remove from this day">✕</button>`:''}</td></tr>`).join('')||`<tr><td colspan="${types.length+3}" class="hint" style="padding:12px">${adm?'No onboarders yet — add them below.':'No onboarders set up yet — ask an admin to add them.'}</td></tr>`}
     ${adm?`<tr class="as-add"><td colspan="${types.length+3}"><input id="asNew" placeholder="＋ Add an onboarder to the list (full name)…" autocomplete="off"> <span class="hint">Admins only · saved to the onboarder list</span></td></tr>`:''}
     <tr class="onb-total"><td><strong>Assigned to onboarders</strong></td>${types.map(t=>`<td class="num" data-ct="${escapeHtml(t)}">${colTot(t)}</td>`).join('')}<td class="num" data-ct="__all">${types.reduce((a,t)=>a+colTot(t),0)}</td><td></td></tr>
-    <tr class="onb-total"><td><strong>Total in the pool</strong></td>${types.map(t=>`<td class="num"><input type="number" min="0" class="as-in as-pool" data-pool="${escapeHtml(t)}" value="${data.pool[t]??''}" placeholder="–"></td>`).join('')}<td></td><td></td></tr>
+    <tr class="onb-total as-poolrow"><td><strong>Total</strong> <small class="hint">✎ type the day’s total for each type</small></td>${types.map(t=>`<td class="num"><input type="number" min="0" class="as-in as-pool" data-pool="${escapeHtml(t)}" value="${data.pool[t]??''}" placeholder="–"></td>`).join('')}<td></td><td></td></tr>
     <tr class="onb-total"><td><strong>Inactive</strong></td>${types.map(t=>`<td class="num"><input type="number" min="0" class="as-in as-pool" data-inact="${escapeHtml(t)}" value="${data.inactive[t]??''}" placeholder="–"></td>`).join('')}<td></td><td></td></tr>
    </tbody></table></div>
    <div class="onb-form-foot"><span class="hint" id="asCheck"></span><button type="button" class="btn btn-secondary" id="asClear">Clear this day</button><button type="button" class="btn btn-primary" id="asSave">Save ${fmtDate(day)}</button></div>
   </section>
-  ${recent.length?`<section class="panel"><div class="panel-head"><h3>Recent days</h3></div><div class="onb-scroll"><table class="users-table onb-table"><thead><tr><th>Day</th><th class="num">Onboarders</th>${types.map(t=>`<th class="num">${escapeHtml(t)}</th>`).join('')}<th class="num">Total</th><th>Typed in by</th></tr></thead><tbody>
+  ${recent.length?`<section class="panel"><div class="panel-head"><div><h3>Recent days</h3><span class="hint">Assigned to onboarders per day · bottom row = totals for these days (and the typed totals)</span></div></div><div class="onb-scroll"><table class="users-table onb-table"><thead><tr><th>Day</th><th class="num">Onboarders</th>${types.map(t=>`<th class="num">${escapeHtml(t)}</th>`).join('')}<th class="num">Total</th><th>Typed in by</th></tr></thead><tbody>
    ${recent.map(d=>{ const r=(d.data&&d.data.rows)||{}, ct=t=>Object.values(r).reduce((a,x)=>a+(Number(x[t])||0),0); return `<tr><td><button type="button" class="link-btn" data-as-day="${d.day}">${fmtDate(d.day)}</button></td><td class="num">${Object.keys(r).length}</td>${types.map(t=>`<td class="num">${ct(t)||'–'}</td>`).join('')}<td class="num"><strong>${types.reduce((a,t)=>a+ct(t),0)}</strong></td><td class="hint">${escapeHtml(d.updated_by||'')}</td></tr>`; }).join('')}
+     <tr class="onb-total"><td><strong>Total · ${recent.length} day${recent.length===1?'':'s'}</strong></td><td></td>${types.map(t=>{ const asg=recent.reduce((x,d)=>x+Object.values(d.data.rows||{}).reduce((y,r)=>y+(Number(r[t])||0),0),0), pool=recent.reduce((x,d)=>x+(Number((d.data.pool||{})[t])||0),0); return `<td class="num"><strong>${fmtNum(asg)}</strong>${pool?`<small>of ${fmtNum(pool)} total</small>`:''}</td>`; }).join('')}<td class="num"><strong>${fmtNum(recent.reduce((x,d)=>x+Object.values(d.data.rows||{}).reduce((y,r)=>y+types.reduce((z,t)=>z+(Number(r[t])||0),0),0),0))}</strong></td><td></td></tr>
   </tbody></table></div></section>`:''}`;
  }
  // "Henry / 02 - live transfer / … / Total Live transfer - 20 / Inactive / Scheduled later - 0 / Total / Alex - 28"
@@ -12687,7 +12771,9 @@ const Onboarding=(()=>{
    box.innerHTML=lockHtml(l, eid); sub.disabled=st.busy||!!(l&&l.locked);
    box.querySelector('[data-onb-req]')?.addEventListener('click',async ()=>{ const note=prompt('Add a short note for '+l.owner+' (optional):','')??null; if(note===null) return;
     try{ await requestAccess(eid, note); showToast('Request sent to '+l.owner+'.'); await loadRequests(); showLock(); }catch(e){ showToast('Could not send: '+cleanErr(e)); } }); };
-  const eidIn=$('#onbEid'), upd=()=>{ $('#onbMatch').innerHTML=matchHtml(eidIn.value.trim()); clearTimeout(lockT); lockT=setTimeout(showLock,300); };
+  let eidT;
+  const eidIn=$('#onbEid'), upd=()=>{ $('#onbMatch').innerHTML=matchHtml(eidIn.value.trim()); clearTimeout(lockT); lockT=setTimeout(showLock,300);
+   clearTimeout(eidT); const v=eidIn.value.trim(); if(v.length>=3) eidT=setTimeout(async()=>{ await lookupEid(v); if(eidIn.isConnected&&eidIn.value.trim()===v){ const m=$('#onbMatch'); if(m) m.innerHTML=matchHtml(v); } },350); };
   eidIn.addEventListener('input',upd); upd();
   host.querySelectorAll('[data-onb-dec]').forEach(b=>b.onclick=async()=>{ b.disabled=true; try{ await decide(+b.dataset.onbDec, b.dataset.ok==='1'); showToast(b.dataset.ok==='1'?'Approved — they can log this candidate now.':'Request declined.'); await loadRequests(); render(); }catch(e){ b.disabled=false; showToast(cleanErr(e)); } });
   $('#onbCancel')?.addEventListener('click',()=>{ st.editing=null; render(); });
@@ -12715,7 +12801,11 @@ const Onboarding=(()=>{
    const all=host.querySelector('[data-ct="__all"]'); if(all) all.textContent=names.reduce((a,n)=>a+types.reduce((b,t)=>b+v(n,t),0),0);
    names.forEach(n=>{ const el=host.querySelector(`[data-rt="${CSS.escape(n)}"]`); if(el) el.textContent=types.reduce((a,t)=>a+v(n,t),0); });
    const off=types.filter(t=>{ const p=d.data.pool[t]; return p!==''&&p!=null&&Number(p)!==names.reduce((a,n)=>a+v(n,t),0); });
-   $('#asCheck').innerHTML=off.length?`⚠ Assigned ≠ pool for ${off.map(escapeHtml).join(', ')}`:''; };
+   $('#asCheck').innerHTML=off.length?`⚠ Assigned ≠ total for ${off.map(escapeHtml).join(', ')}`:'';
+   let pAll=0, aAll=0;
+   types.forEach(t=>{ const tile=host.querySelector(`[data-tile="${CSS.escape(t)}"]`); if(!tile) return; const p=d.data.pool[t], a=names.reduce((x,n)=>x+v(n,t),0); aAll+=a; if(p!==''&&p!=null) pAll+=Number(p);
+    tile.querySelector('[data-tile-total]').textContent=p!==''&&p!=null?fmtNum(Number(p)):'–'; tile.querySelector('[data-tile-asg]').textContent=fmtNum(a); tile.querySelector('[data-tile-left]').textContent=p!==''&&p!=null?fmtNum(Math.max(0,Number(p)-a)):'–'; });
+   const ta=host.querySelector('[data-tile-total-all]'); if(ta) ta.textContent=pAll?fmtNum(pAll):'–'; const aa=host.querySelector('[data-tile-asg-all]'); if(aa) aa.textContent=fmtNum(aAll); };
   const num=v=>v===''?'':Math.max(0,Math.round(Number(v)||0));
   host.querySelectorAll('[data-as]').forEach(i=>i.oninput=()=>{ (d.data.rows[i.dataset.as] ||= {})[i.dataset.t]=num(i.value); totals(); });
   host.querySelectorAll('[data-pool]').forEach(i=>i.oninput=()=>{ d.data.pool[i.dataset.pool]=num(i.value); totals(); });
