@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.44.0</title>
+<title>Performance Dashboard · v4.46.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -1108,7 +1108,7 @@ button.onb-tile{font:inherit;text-align:left;cursor:pointer}button.onb-tile:disa
 .onb-tabs{margin-bottom:4px}
 .t4{background:#0f766e}.t5{background:#be185d}.t6{background:#4d7c0f}.t7{background:#475569}.t9{background:#64748b}
 .ol-modal{max-width:640px;width:calc(100vw - 24px)}.ol-modal h4{margin:14px 0 6px;font-size:13px;color:#0a1f44}.ol-modal h4:first-child{margin-top:0}
-.ol-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}.ol-row{display:flex;gap:8px;align-items:center}.ol-row input{flex:1;padding:7px 9px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:13px;min-width:0}.ol-row select{padding:7px 8px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:12.5px;width:170px}
+.ol-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}.ol-row{display:flex;gap:8px;align-items:center}.ol-row input{flex:1;padding:7px 9px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:13px;min-width:0}.ol-row select[data-uid]{width:200px}.ol-row select{padding:7px 8px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:12.5px;width:170px}
 .ol-move{display:flex;flex-direction:column}.ol-move button{border:0;background:none;font-size:9px;line-height:1;padding:1px 4px;color:#64748b;cursor:pointer}.ol-move button:disabled{opacity:.3;cursor:default}
 .ol-note{font-size:12px;margin:12px 0 0}
 @media(max-width:1200px){.onb-tiles{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
@@ -10395,12 +10395,12 @@ const UF_PAGES = [
   {mod:'branches', label:'Branches', desc:'Branch table, trends and history', sec:'branches', extras:['grant.branch_merge']},
   {mod:'alerts', label:'Action Center', desc:'Who is below goal and other signals', sec:'alerts', extras:['remarks_approve']},
   {mod:'divreport', label:'Division Report', desc:'Pipeline by client and location, per division'},
-  {mod:'onboarding', label:'Onboarding', desc:'Log onboarding calls by EID — they see and edit their own entries (needs onboarding.sql)'},
+  {mod:'onboarding', label:'Onboarding', desc:'Log calls — they see and edit their own entries. Tick below for more.', extras:['grant.onb_assign','grant.onb_report']},
   {mod:'pivot', label:'Report Builder', desc:'Build their own tables and charts', sec:'pivot'},
   {mod:'candidates', label:'Candidates', desc:'Settings → Candidates, plus candidate names and Employee Numbers everywhere', sec:'candidates', extras:['master','master_edit']},
 ];
 const UF_TOOLS = ['upload','export','settings'];
-const UF_EXTRA_LABEL = {remarks:'Can add remarks', remarks_approve:'Can approve and edit remarks', 'grant.team_names':'See their team’s candidate names', 'grant.break_image':'Copy third-break lists as images', 'grant.branch_merge':'Merge branches (applies for everyone)',
+const UF_EXTRA_LABEL = {'grant.onb_assign':'Fill in daily assignments', 'grant.onb_report':'See the onboarding report (everyone’s numbers)', remarks:'Can add remarks', remarks_approve:'Can approve and edit remarks', 'grant.team_names':'See their team’s candidate names', 'grant.break_image':'Copy third-break lists as images', 'grant.branch_merge':'Merge branches (applies for everyone)',
   master:'Browse all candidate records', master_edit:'Exclude or include candidates', upload:'Upload spreadsheets', export:'Download and share', settings:'Settings — divisions, branches, goals'};
 const UF_PRESETS = [
   {name:'Viewer', desc:'Overview, recruiters and branches', modules:['performance','recruiters','branches']},
@@ -11510,7 +11510,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.44.0';   // shown only in the browser tab title
+const APP_VERSION = '4.46.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -12246,11 +12246,24 @@ const Onboarding=(()=>{
  const CAT_LBL=Object.fromEntries(CATS), CAT_CLS={complete:'c-complete',i9:'c-i9',in_process:'c-ip',lvm:'c-lvm',no_response:'c-nr',other:'c-other'};
  const DEFAULT_LISTS={
   callTypes:[{label:'Live Transfer'},{label:'Outbound'},{label:'Inbound'},{label:'Schedule Later'}],
+  onboarders:[],
   assignTypes:[{label:'Live Transfer'},{label:'Schedule Later'},{label:'Already Completed'},{label:'Local Branch'},{label:'Self'}],
   statuses:[{label:'In Process',cat:'in_process'},{label:'EB Complete / I9 Section-1 Pending',cat:'i9'},{label:'EB Complete / I9 Section-1 Complete',cat:'i9'},{label:'EB Complete / I9 Complete',cat:'complete'},{label:'LVM / No Answer',cat:'lvm'},{label:'Never Responded',cat:'no_response'}],
   retired:[]};
  const lists=()=>{ const v=KV.get('onbLists'); const L=v&&Array.isArray(v.callTypes)&&Array.isArray(v.statuses)?{retired:[],...v}:{...DEFAULT_LISTS}; if(!Array.isArray(L.assignTypes)||!L.assignTypes.length) L.assignTypes=DEFAULT_LISTS.assignTypes; return L; };
  const assignTypes=()=>lists().assignTypes.map(x=>x.label);
+ // onboarder names: only admins add or remove them (Manage dropdowns → Onboarders)
+ const roster=()=>(lists().onboarders||[]).map(x=>x.label).filter(Boolean);
+ const hasGrant=g=>!!Server.user&&(Server.isAdmin()||(Server.user.hidden_sections||[]).includes(g));
+ // a dashboard user can be linked to their onboarder (pseudo) name — their calls are logged and reported under it
+ const linkedName=uid=>{ const x=(lists().onboarders||[]).find(o=>o.userId&&String(o.userId)===String(uid)); return x?x.label:null; };
+ const myName=()=>linkedName(Server.user&&Server.user.id)||(Server.user&&Server.user.name)||'';
+ const canAssign=()=>hasGrant('grant.onb_assign'), canReport=()=>hasGrant('grant.onb_report');
+ // "Henry" → "Henry Smith": exact name first, then a unique first-name match
+ function resolveName(n){ const r=roster(), k=String(n||'').trim().toLowerCase().replace(/\s+/g,' '); if(!k) return {name:null};
+  const ex=r.find(x=>x.toLowerCase()===k); if(ex) return {name:ex};
+  const first=k.split(' ')[0], m=r.filter(x=>x.toLowerCase().split(/\s+/)[0]===first);
+  if(m.length===1) return {name:m[0]}; if(m.length>1) return {name:null, ambiguous:m}; return {name:null}; }
  const callTypes=()=>lists().callTypes.map(x=>x.label);
  const statuses=()=>lists().statuses.map(x=>x.label);
  function catOf(label){ const L=lists(), k=String(label||'').trim().toLowerCase(); if(!k) return 'other';
@@ -12269,6 +12282,7 @@ const Onboarding=(()=>{
   try{ st.rows=await Server.rpc('dash_onb_list',{p_from:st.from, p_to:st.to}) || []; st.demo=false; }
   catch(e){ if(missing(e)||!Server.token){ st.demo=true; const me=Server.user&&Server.user.id; st.rows=demoRows().filter(r=>r.call_date>=st.from&&r.call_date<=st.to&&(Server.isAdmin()||r.onboarder_id===me)); }
    else { st.rows=[]; st.err=cleanErr(e); } }
+  (st.rows||[]).forEach(r=>{ const ln=linkedName(r.onboarder_id); if(ln) r.onboarder=ln; });
   try{ st.assign=await Server.rpc('dash_onb_assign_list',{p_from:st.from, p_to:st.to}) || []; }
   catch(e){ const d=demoAssign(); st.assign=Object.keys(d).filter(k=>k>=st.from&&k<=st.to).sort().map(k=>({day:k, ...d[k]})); }
  }
@@ -12284,7 +12298,7 @@ const Onboarding=(()=>{
   if(!st.demo) return Server.rpc('dash_onb_save',{p_row:row});
   const list=demoRows(); const now=new Date().toISOString();
   if(row.id){ const i=list.findIndex(x=>String(x.id)===String(row.id)); if(i>=0) list[i]={...list[i], ...row, onboarder:(Server.isAdmin()&&row.onboarder)||list[i].onboarder, updated_at:now}; }
-  else list.push({...row, id:Date.now(), onboarder_id:Server.user.id, onboarder:(Server.isAdmin()&&row.onboarder)||Server.user.name, created_at:now, updated_at:now});
+  else list.push({...row, id:Date.now(), onboarder_id:Server.user.id, onboarder:(Server.isAdmin()&&row.onboarder)||myName(), created_at:now, updated_at:now});
   demoSave(list); return true;
  }
  async function del(id){ if(!st.demo) return Server.rpc('dash_onb_delete',{p_id:id}); demoSave(demoRows().filter(x=>String(x.id)!==String(id))); return true; }
@@ -12336,7 +12350,7 @@ const Onboarding=(()=>{
   return `<form class="panel onb-form" id="onbForm" autocomplete="off">
    <div class="onb-form-head"><h3>${e.id?'Edit call':'Log a call'}</h3><div>${e.id?'<button type="button" class="link-btn" id="onbCancel">Cancel edit</button>':''}</div></div>
    <div class="onb-grid">
-    <label>Onboarder<input id="onbWho" value="${escapeHtml(e.onboarder||Server.user.name)}" ${adm?'':'readonly'}></label>
+    <label>Onboarder${adm?(()=>{ const r=roster(), cur=e.onboarder||linkedName(Server.user.id)||Server.user.name; const opts=[...new Set([cur,...r])]; return `<select id="onbWho">${opts.map(o=>`<option ${o===cur?'selected':''}>${escapeHtml(o)}</option>`).join('')}</select>`; })():`<input id="onbWho" value="${escapeHtml(e.onboarder||myName())}" readonly>`}</label>
     <label>Date *<input type="date" id="onbDate" value="${escapeHtml(e.call_date||today())}" max="${today()}"></label>
     <label>EID *<input id="onbEid" value="${escapeHtml(e.eid||'')}" placeholder="Employee Number" inputmode="numeric" required></label>
     <label>Call type *${sel('onbType',callTypes(),e.call_type)}</label>
@@ -12391,7 +12405,8 @@ const Onboarding=(()=>{
   const host=document.getElementById('view-onboarding'); if(!host) return;
   if(!Server.can('onboarding')){ host.innerHTML='<div class="panel"><p class="hint" style="margin:0">Ask an admin for the Onboarding right.</p></div>'; return; }
   const all=st.rows||[], adm=Server.isAdmin(), q=st.q.trim().toLowerCase();
-  if(!st.page) st.page=adm?'report':'log';
+  const pages=[['log','📞 Log calls'],...(canAssign()?[['assign','🗂 Daily assignments']]:[]),...(canReport()?[['report','📊 Report']]:[])];
+  if(!st.page||!pages.some(([k])=>k===st.page)) st.page=canReport()?'report':'log';
   const rows=all.filter(r=>(!st.fOnb||r.onboarder===st.fOnb)&&(!st.fType||r.call_type===st.fType));
   const assign=(st.assign||[]).map(d=>st.fOnb?{...d, data:{...d.data, rows:Object.fromEntries(Object.entries((d.data&&d.data.rows)||{}).filter(([n])=>n===st.fOnb))}}:d);
   let cands=candidates(rows);
@@ -12399,10 +12414,10 @@ const Onboarding=(()=>{
   if(q) cands=cands.filter(c=>String(c.eid).toLowerCase().includes(q)||c.onboarders.some(o=>o.toLowerCase().includes(q))||String((linkOf(c.eid)||{}).recruiter||'').toLowerCase().includes(q)||c.calls.some(x=>String(x.note||'').toLowerCase().includes(q)));
   const shownCalls=cands.flatMap(c=>c.calls).sort((a,b)=>order(b,a));
   const onbs=[...new Set([...all.map(r=>r.onboarder), ...(st.assign||[]).flatMap(d=>Object.keys((d.data&&d.data.rows)||{}))])].filter(Boolean).sort();
-  const nav=`<div class="onb-nav" role="tablist">${[['log','📞 Log calls'],['assign','🗂 Daily assignments'],['report','📊 Report']].map(([k,l])=>`<button type="button" data-onb-page="${k}" class="${st.page===k?'on':''}">${l}</button>`).join('')}</div>`;
-  const top=`${adm?`<div class="onb-admin"><span><strong>Admin</strong> · call types, statuses and assignment types</span><button type="button" class="btn btn-primary btn-sm" id="onbLists2">⚙ Manage dropdowns</button></div>`:''}${st.demo?'<div class="onb-demo"><strong>Demo mode</strong> — entries are saved in this browser only. Run <code>onboarding.sql</code> in Supabase to share them with everyone.</div>':''}${st.err?`<div class="onb-demo bad">Could not load: ${escapeHtml(st.err)}</div>`:''}${nav}`;
+  const nav=pages.length<2?'':`<div class="onb-nav" role="tablist">${pages.map(([k,l])=>`<button type="button" data-onb-page="${k}" class="${st.page===k?'on':''}">${l}</button>`).join('')}</div>`;
+  const top=`${adm?`<div class="onb-admin"><span><strong>Admin</strong> · onboarder names, call types, statuses and assignment types</span><button type="button" class="btn btn-primary btn-sm" id="onbLists2">⚙ Manage dropdowns</button></div>`:''}${st.demo?'<div class="onb-demo"><strong>Demo mode</strong> — entries are saved in this browser only. Run <code>onboarding.sql</code> in Supabase to share them with everyone.</div>':''}${st.err?`<div class="onb-demo bad">Could not load: ${escapeHtml(st.err)}</div>`:''}${nav}`;
   let body='';
-  if(st.page==='assign') body=assignHtml(onbs);
+  if(st.page==='assign') body=assignHtml();
   else if(st.page==='log') body=`${formHtml()}${filters(adm,onbs,true)}
    <section class="panel"><div class="panel-head"><div><div class="ua-filter onb-tabs" role="tablist"><button type="button" data-onb-tab="cand" class="${st.tab==='cand'?'on':''}">Candidates · ${fmtNum(cands.length)}</button><button type="button" data-onb-tab="calls" class="${st.tab==='calls'?'on':''}">All calls · ${fmtNum(shownCalls.length)}</button></div>
      <span class="hint">${st.tab==='cand'?'One row per EID — all calls combined, the latest status counts. Click “calls” to see every call and remark.':(adm?'Everyone’s calls, newest first.':'Your calls, newest first.')}</span></div>${(st.tab==='cand'?cands.length:shownCalls.length)?copyBtnHtml('onbTable')+(Server.can('export')?downloadBtnHtml('onbTable',st.tab==='cand'?'onboarding-candidates.xlsx':'onboarding-calls.xlsx'):''):''}</div>
@@ -12452,25 +12467,24 @@ const Onboarding=(()=>{
     </tbody></table></div></section>`:''}`;
  }
  // ---- daily assignment sheet: onboarder × assignment type, plus the pool totals; or paste the daily message ----
- function assignHtml(onbs){
+ function assignHtml(){
   const types=assignTypes(), day=st.aDay;
   const saved=(st.assign||[]).find(d=>d.day===day), data=st.aDraft&&st.aDraft.day===day?st.aDraft.data:JSON.parse(JSON.stringify((saved&&saved.data)||{rows:{},pool:{},inactive:{}}));
   st.aDraft={day, data}; data.rows=data.rows||{}; data.pool=data.pool||{}; data.inactive=data.inactive||{};
-  const names=[...new Set([...Object.keys(data.rows), ...onbs])].sort();
+  const adm=Server.isAdmin(), names=[...new Set([...roster(), ...Object.keys(data.rows)])].sort((a,b)=>a.localeCompare(b));
   const colTot=t=>names.reduce((a,n)=>a+(Number((data.rows[n]||{})[t])||0),0), rowTot=n=>types.reduce((a,t)=>a+(Number((data.rows[n]||{})[t])||0),0);
   const cell=(n,t)=>`<input type="number" min="0" step="1" class="as-in" data-as="${escapeHtml(n)}" data-t="${escapeHtml(t)}" value="${(data.rows[n]||{})[t]??''}" placeholder="0">`;
   const recent=(st.assign||[]).slice().sort((a,b)=>b.day.localeCompare(a.day)).slice(0,10);
   return `<section class="panel onb-asg">
    <div class="panel-head"><div><h3>Daily assignments</h3><span class="hint">How many candidates of each type each onboarder was given on a day. Type the numbers, or paste the daily message.</span></div></div>
    <div class="as-top"><label class="cand-field"><span>Day</span><input type="date" id="asDay" value="${day}" max="${today()}"></label>
-    <span class="hint">${saved?`Saved by ${escapeHtml(saved.updated_by||'')} · ${saved.updated_at?new Date(saved.updated_at).toLocaleString():''}`:'Nothing saved for this day yet.'}</span>
-    <button type="button" class="btn btn-secondary btn-sm" id="asCopyPrev">Copy names from the last saved day</button></div>
+    <span class="hint">${saved?`Saved by ${escapeHtml(saved.updated_by||'')} · ${saved.updated_at?new Date(saved.updated_at).toLocaleString():''}`:'Nothing saved for this day yet.'}</span></div>
    <details class="as-paste" ${names.length?'':'open'}><summary>📋 Paste the daily message</summary>
     <textarea id="asText" rows="8" placeholder="Henry&#10;02 - live transfer&#10;23 - schedule later&#10;01 - already completed&#10;32 - local branch&#10;01 - Self&#10;&#10;Total Live transfer - 20&#10;…&#10;Inactive&#10;Scheduled later - 0"></textarea>
-    <div class="as-paste-foot"><span class="hint">Each onboarder’s name, then “number - type” lines. “Total … - n” lines fill the pool row; lines under “Inactive” fill the inactive row.</span><button type="button" class="btn btn-primary btn-sm" id="asParse">Fill the table</button></div><p class="me-err" id="asMsg"></p></details>
+    <div class="as-paste-foot"><span class="hint">Each onboarder’s name (first name is enough), then “number - type” lines. “Total … - n” lines fill the pool row; lines under “Inactive” fill the inactive row.</span><button type="button" class="btn btn-primary btn-sm" id="asParse">Fill the table</button></div><p class="me-err" id="asMsg"></p></details>
    <div class="onb-scroll"><table class="users-table onb-table as-table"><thead><tr><th>Onboarder</th>${types.map(t=>`<th class="num">${escapeHtml(t)}</th>`).join('')}<th class="num">Total</th><th></th></tr></thead><tbody>
-    ${names.map(n=>`<tr><td>${escapeHtml(n)}</td>${types.map(t=>`<td class="num">${cell(n,t)}</td>`).join('')}<td class="num"><strong data-rt="${escapeHtml(n)}">${rowTot(n)}</strong></td><td><button type="button" class="link-btn danger" data-as-rm="${escapeHtml(n)}" title="Remove from this day">✕</button></td></tr>`).join('')}
-    <tr class="as-add"><td colspan="${types.length+3}"><input id="asNew" placeholder="＋ Add an onboarder…" list="asNames"><datalist id="asNames">${onbs.map(o=>`<option value="${escapeHtml(o)}">`).join('')}</datalist></td></tr>
+    ${names.map(n=>`<tr><td>${escapeHtml(n)}</td>${types.map(t=>`<td class="num">${cell(n,t)}</td>`).join('')}<td class="num"><strong data-rt="${escapeHtml(n)}">${rowTot(n)}</strong></td><td>${adm&&!roster().includes(n)?`<button type="button" class="link-btn danger" data-as-rm="${escapeHtml(n)}" title="Not on the onboarder list — remove from this day">✕</button>`:''}</td></tr>`).join('')||`<tr><td colspan="${types.length+3}" class="hint" style="padding:12px">${adm?'No onboarders yet — add them below.':'No onboarders set up yet — ask an admin to add them.'}</td></tr>`}
+    ${adm?`<tr class="as-add"><td colspan="${types.length+3}"><input id="asNew" placeholder="＋ Add an onboarder to the list (full name)…" autocomplete="off"> <span class="hint">Admins only · saved to the onboarder list</span></td></tr>`:''}
     <tr class="onb-total"><td><strong>Assigned to onboarders</strong></td>${types.map(t=>`<td class="num" data-ct="${escapeHtml(t)}">${colTot(t)}</td>`).join('')}<td class="num" data-ct="__all">${types.reduce((a,t)=>a+colTot(t),0)}</td><td></td></tr>
     <tr class="onb-total"><td><strong>Total in the pool</strong></td>${types.map(t=>`<td class="num"><input type="number" min="0" class="as-in as-pool" data-pool="${escapeHtml(t)}" value="${data.pool[t]??''}" placeholder="–"></td>`).join('')}<td></td><td></td></tr>
     <tr class="onb-total"><td><strong>Inactive</strong></td>${types.map(t=>`<td class="num"><input type="number" min="0" class="as-in as-pool" data-inact="${escapeHtml(t)}" value="${data.inactive[t]??''}" placeholder="–"></td>`).join('')}<td></td><td></td></tr>
@@ -12570,32 +12584,52 @@ const Onboarding=(()=>{
   host.querySelectorAll('[data-inact]').forEach(i=>i.oninput=()=>{ d.data.inactive[i.dataset.inact]=num(i.value); });
   host.querySelectorAll('[data-as-rm]').forEach(b=>b.onclick=()=>{ delete d.data.rows[b.dataset.asRm]; render(); });
   host.querySelectorAll('[data-as-day]').forEach(b=>b.onclick=()=>{ st.aDay=b.dataset.asDay; st.aDraft=null; render(); });
-  const nw=$('#asNew'); nw.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); const n=nw.value.trim(); if(n){ d.data.rows[n]=d.data.rows[n]||{}; render(); setTimeout(()=>document.getElementById('asNew')?.focus(),20); } } });
-  nw.addEventListener('change',()=>{ const n=nw.value.trim(); if(n&&!d.data.rows[n]){ d.data.rows[n]={}; render(); } });
-  $('#asDay').addEventListener('change',async e=>{ if(!e.target.value) return; st.aDay=e.target.value; st.aDraft=null; if(st.aDay<st.from){ st.from=st.aDay; await load(); } render(); });
-  $('#asCopyPrev').onclick=()=>{ const prev=(st.assign||[]).filter(x=>x.day<st.aDay).sort((a,b)=>b.day.localeCompare(a.day))[0]; if(!prev){ showToast('No earlier day saved in these dates.'); return; } Object.keys((prev.data&&prev.data.rows)||{}).forEach(n=>{ d.data.rows[n]=d.data.rows[n]||{}; }); render(); };
-  $('#asParse').onclick=()=>{ const {data, unknown}=parseAssignText($('#asText').value); const n=Object.keys(data.rows).length;
-   if(!n&&!Object.keys(data.pool).length){ $('#asMsg').textContent='Nothing recognised — put each onboarder’s name on its own line, then lines like “02 - live transfer”.'; return; }
-   Object.entries(data.rows).forEach(([k,v])=>{ d.data.rows[k]={...(d.data.rows[k]||{}), ...v}; }); Object.assign(d.data.pool, data.pool); Object.assign(d.data.inactive, data.inactive);
-   render(); showToast(`Filled ${n} onboarder${n===1?'':'s'}${unknown.length?' · '+unknown.length+' line(s) not recognised':''} — check and click Save.`); };
+  const nw=$('#asNew');
+  if(nw&&Server.isAdmin()) nw.addEventListener('keydown',async e=>{ if(e.key!=='Enter') return; e.preventDefault(); const n=nw.value.trim().replace(/\s+/g,' '); if(!n) return;
+   if(roster().some(x=>x.toLowerCase()===n.toLowerCase())){ showToast(n+' is already on the list.'); return; }
+   if(await addToRoster([n])){ showToast(n+' added to the onboarder list.'); render(); setTimeout(()=>document.getElementById('asNew')?.focus(),20); } });
+  $('#asDay').addEventListener('change',async e=>{ if(!e.target.value) return; st.aDay=e.target.value; st.aDraft=null; st.asMsg=null; if(st.aDay<st.from){ st.from=st.aDay; await load(); } render(); });
+  $('#asParse').onclick=()=>{ const txt=$('#asText').value, {data, unknown}=parseAssignText(txt);
+   if(!Object.keys(data.rows).length&&!Object.keys(data.pool).length){ $('#asMsg').textContent='Nothing recognised — put each onboarder’s name on its own line, then lines like “02 - live transfer”.'; return; }
+   // match each pasted name to the onboarder list by first name; names not on the list are skipped
+   const matched=[], missingN=[], ambiguous=[];
+   Object.entries(data.rows).forEach(([k,v])=>{ const r=resolveName(k); if(r.name){ d.data.rows[r.name]={...(d.data.rows[r.name]||{}), ...v}; matched.push(r.name); } else if(r.ambiguous) ambiguous.push(k+' ('+r.ambiguous.join(' / ')+')'); else missingN.push(k); });
+   Object.assign(d.data.pool, data.pool); Object.assign(d.data.inactive, data.inactive);
+   st.asMsg={missingN, ambiguous, unknown, txt}; render();
+   showToast(`Filled ${matched.length} onboarder${matched.length===1?'':'s'}${missingN.length+ambiguous.length?' · '+(missingN.length+ambiguous.length)+' name(s) not matched':''} — check and click Save.`); };
+  const m=st.asMsg; if(m&&(m.missingN.length||m.ambiguous.length||m.unknown.length)){ const box=$('#asMsg'); const adm=Server.isAdmin();
+   box.innerHTML=`${m.missingN.length?`Not on the onboarder list (skipped): <strong>${m.missingN.map(escapeHtml).join(', ')}</strong>${adm?' <button type="button" class="btn btn-secondary btn-sm" id="asAddMissing">Add them to the list &amp; fill again</button>':' — ask an admin to add them.'}<br>`:''}${m.ambiguous.length?`More than one onboarder has this first name — type the full name in the message: <strong>${m.ambiguous.map(escapeHtml).join(', ')}</strong><br>`:''}${m.unknown.length?`Lines not understood: ${m.unknown.slice(0,6).map(escapeHtml).join(' · ')}${m.unknown.length>6?' …':''}`:''}`;
+   const pd=host.querySelector('.as-paste'); if(pd) pd.open=true; const ta=$('#asText'); if(ta&&!ta.value) ta.value=m.txt;
+   $('#asAddMissing')?.addEventListener('click',async()=>{ if(await addToRoster(m.missingN)){ st.asMsg=null; render(); const t=document.getElementById('asText'); t.value=m.txt; document.getElementById('asParse').click(); } }); }
   $('#asClear').onclick=()=>{ if(!confirm('Clear every number for '+fmtDate(st.aDay)+'?')) return; d.data={rows:{},pool:{},inactive:{}}; render(); };
-  $('#asSave').onclick=async()=>{ const b=$('#asSave'); b.disabled=true;
+  $('#asSave').onclick=async()=>{ const b=$('#asSave'); b.disabled=true; st.asMsg=null;
    Object.keys(d.data.rows).forEach(n=>{ if(!n.trim()) delete d.data.rows[n]; });
    try{ await saveAssign(st.aDay, {...d.data, types}); showToast('Assignments saved for '+fmtDate(st.aDay)+'.'); st.aDraft=null; if(st.aDay<st.from) st.from=st.aDay; await load(); render(); }
    catch(e){ b.disabled=false; showToast('Not saved: '+cleanErr(e)); } };
   totals();
  }
+ async function addToRoster(names){
+  if(!Server.isAdmin()) return false;
+  const L=JSON.parse(JSON.stringify(lists())); L.onboarders=L.onboarders||[];
+  names.forEach(n=>{ n=String(n).trim().replace(/\s+/g,' '); if(n&&!L.onboarders.some(x=>x.label.toLowerCase()===n.toLowerCase())) L.onboarders.push({label:n}); });
+  L.onboarders.sort((a,b)=>a.label.localeCompare(b.label));
+  const ok=await storageSet('onbLists', L); if(ok===null){ showToast('Not saved — the store did not accept the change.'); return false; }
+  KV.set('onbLists', L); return true;
+ }
  // ---- admin: manage the dropdowns ----
- function openListsDialog(){
+ async function openListsDialog(){
   if(!Server.isAdmin()) return;
+  let users=[]; try{ users=(await Server.rpc('dash_users_list'))||[]; }catch(e){}
+  users=(Array.isArray(users)?users:[]).filter(u=>u&&u.id!=null).sort((a,b)=>String(a.name).localeCompare(String(b.name)));
   const L=JSON.parse(JSON.stringify(lists()));
-  const work={assignTypes:(L.assignTypes||DEFAULT_LISTS.assignTypes).map(x=>({...x, orig:x.label})), callTypes:L.callTypes.map(x=>({...x, orig:x.label})), statuses:L.statuses.map(x=>({...x, orig:x.label})), retired:L.retired||[]};
+  const work={onboarders:(L.onboarders||[]).map(x=>({...x, orig:x.label})), assignTypes:(L.assignTypes||DEFAULT_LISTS.assignTypes).map(x=>({...x, orig:x.label})), callTypes:L.callTypes.map(x=>({...x, orig:x.label})), statuses:L.statuses.map(x=>({...x, orig:x.label})), retired:L.retired||[]};
   document.getElementById('onbListsDlg')?.remove();
   const wrap=document.createElement('div'); wrap.className='modal-overlay'; wrap.id='onbListsDlg';
   const draw=()=>{
-   const row=(kind,x,i,n)=>`<div class="ol-row"><span class="ol-move"><button type="button" data-mv="${kind}:${i}:-1" ${i?'':'disabled'} aria-label="Move up">▲</button><button type="button" data-mv="${kind}:${i}:1" ${i<n-1?'':'disabled'} aria-label="Move down">▼</button></span><input data-lbl="${kind}:${i}" value="${escapeHtml(x.label)}" maxlength="120">${kind==='statuses'?`<select data-cat="${i}">${CATS.map(([k,l])=>`<option value="${k}" ${x.cat===k?'selected':''}>${l}</option>`).join('')}</select>`:''}<button type="button" class="link-btn danger" data-rm="${kind}:${i}">Delete</button></div>`;
+   const row=(kind,x,i,n)=>`<div class="ol-row"><span class="ol-move"><button type="button" data-mv="${kind}:${i}:-1" ${i?'':'disabled'} aria-label="Move up">▲</button><button type="button" data-mv="${kind}:${i}:1" ${i<n-1?'':'disabled'} aria-label="Move down">▼</button></span><input data-lbl="${kind}:${i}" value="${escapeHtml(x.label)}" maxlength="120">${kind==='onboarders'?`<select data-uid="${i}" title="Dashboard user who logs in as this onboarder"><option value="">— no user linked —</option>${users.map(u=>`<option value="${escapeHtml(String(u.id))}" ${String(x.userId||'')===String(u.id)?'selected':''}>${escapeHtml(u.name)}${u.role&&u.role!=='user'?' ('+escapeHtml(u.role.replace('_',' '))+')':''}</option>`).join('')}${x.userId&&!users.some(u=>String(u.id)===String(x.userId))?`<option value="${escapeHtml(String(x.userId))}" selected>User #${escapeHtml(String(x.userId))}</option>`:''}</select>`:''}${kind==='statuses'?`<select data-cat="${i}">${CATS.map(([k,l])=>`<option value="${k}" ${x.cat===k?'selected':''}>${l}</option>`).join('')}</select>`:''}<button type="button" class="link-btn danger" data-rm="${kind}:${i}">Delete</button></div>`;
    wrap.innerHTML=`<div class="modal ol-modal" role="dialog" aria-modal="true" aria-labelledby="olT"><div class="modal-header"><h3 id="olT">Onboarding dropdowns</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div>
     <div class="modal-body">
+     <h4>Onboarders <span class="hint">— names used on the onboarding page; link each to the user who logs in as them. Pasted messages match by first name.</span></h4><div class="ol-list">${work.onboarders.map((x,i)=>row('onboarders',x,i,work.onboarders.length)).join('')||'<p class="hint" style="margin:0">None yet.</p>'}</div><button type="button" class="btn btn-secondary btn-sm" data-add="onboarders">＋ Add onboarder</button>
      <h4>Call type</h4><div class="ol-list">${work.callTypes.map((x,i)=>row('callTypes',x,i,work.callTypes.length)).join('')}</div><button type="button" class="btn btn-secondary btn-sm" data-add="callTypes">＋ Add call type</button>
      <h4>Assignment type <span class="hint">— columns of the daily assignment sheet</span></h4><div class="ol-list">${work.assignTypes.map((x,i)=>row('assignTypes',x,i,work.assignTypes.length)).join('')}</div><button type="button" class="btn btn-secondary btn-sm" data-add="assignTypes">＋ Add assignment type</button>
      <h4>Status <span class="hint">— the category decides where a candidate counts in the report</span></h4><div class="ol-list">${work.statuses.map((x,i)=>row('statuses',x,i,work.statuses.length)).join('')}</div><button type="button" class="btn btn-secondary btn-sm" data-add="statuses">＋ Add status</button>
@@ -12605,6 +12639,7 @@ const Onboarding=(()=>{
    wrap.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>wrap.remove());
    wrap.querySelectorAll('[data-lbl]').forEach(i=>i.oninput=()=>{ const [k,n]=i.dataset.lbl.split(':'); work[k][+n].label=i.value; });
    wrap.querySelectorAll('[data-cat]').forEach(s=>s.onchange=()=>{ work.statuses[+s.dataset.cat].cat=s.value; });
+   wrap.querySelectorAll('[data-uid]').forEach(s=>s.onchange=()=>{ const v=s.value; if(v) work.onboarders.forEach((o,j)=>{ if(j!==+s.dataset.uid&&String(o.userId)===v) o.userId=''; }); work.onboarders[+s.dataset.uid].userId=v; draw(); });
    wrap.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>{ const [k,i,d]=b.dataset.mv.split(':'), a=work[k], j=+i+(+d); [a[+i],a[j]]=[a[j],a[+i]]; draw(); });
    wrap.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{ const [k,i]=b.dataset.rm.split(':'); const x=work[k][+i]; if(k==='statuses'&&x.orig) work.retired.push({label:x.orig, cat:x.cat, aliases:x.aliases||[]}); work[k].splice(+i,1); draw(); });
    wrap.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{ work[b.dataset.add].push(b.dataset.add==='statuses'?{label:'',cat:'in_process'}:{label:''}); draw(); const ins=wrap.querySelectorAll(`[data-lbl^="${b.dataset.add}:"]`); ins[ins.length-1]?.focus(); });
@@ -12612,15 +12647,20 @@ const Onboarding=(()=>{
    wrap.querySelector('#olSave').onclick=async()=>{
     const err=t=>{ wrap.querySelector('#olErr').textContent=t; };
     const clean=a=>a.map(x=>({...x, label:String(x.label||'').trim()})).filter(x=>x.label);
-    const ct=clean(work.callTypes), ss=clean(work.statuses), at=clean(work.assignTypes);
+    const ct=clean(work.callTypes), ss=clean(work.statuses), at=clean(work.assignTypes), ob=clean(work.onboarders);
     if(!ct.length||!ss.length||!at.length) return err('Keep at least one call type, assignment type and status.');
     const dup=a=>a.find((x,i)=>a.findIndex(y=>y.label.toLowerCase()===x.label.toLowerCase())!==i);
-    if(dup(ct)||dup(ss)||dup(at)) return err('“'+(dup(ct)||dup(ss)||dup(at)).label+'” is listed twice.');
+    if(dup(ct)||dup(ss)||dup(at)||dup(ob)) return err('“'+(dup(ct)||dup(ss)||dup(at)||dup(ob)).label+'” is listed twice.');
     // renamed items remember their old names, so earlier calls still count under them
     const fin=a=>a.map(({orig,...x})=>({...x, aliases:[...new Set([...(x.aliases||[]), ...(orig&&orig!==x.label?[orig]:[])])].filter(Boolean)}));
-    const out={callTypes:fin(ct), assignTypes:fin(at), statuses:fin(ss), retired:work.retired.filter(r=>!ss.some(s=>s.label.toLowerCase()===r.label.toLowerCase()))};
+    const out={onboarders:fin(ob), callTypes:fin(ct), assignTypes:fin(at), statuses:fin(ss), retired:work.retired.filter(r=>!ss.some(s=>s.label.toLowerCase()===r.label.toLowerCase()))};
     const ok=await storageSet('onbLists', out); if(ok===null) return err('Not saved — the store did not accept the change.');
-    KV.set('onbLists', out); wrap.remove(); showToast('Dropdowns saved.'); render();
+    KV.set('onbLists', out);
+    // the database uses the same links, so a linked user's calls are saved under their onboarder name
+    const links={}; out.onboarders.forEach(o=>{ if(o.userId) links[String(o.userId)]=o.label; });
+    try{ await Server.rpc('dash_onb_links_set',{p_links:links}); }catch(e){ if(!missing(e)) showToast('Links not saved on the server: '+cleanErr(e)); }
+    (st.rows||[]).forEach(r=>{ const ln=linkedName(r.onboarder_id); if(ln) r.onboarder=ln; });
+    wrap.remove(); showToast('Dropdowns saved.'); render();
    };
   };
   draw(); document.body.appendChild(wrap);
