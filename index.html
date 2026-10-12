@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.48.0</title>
+<title>Performance Dashboard · v4.49.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -1099,6 +1099,9 @@ button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #183442
 #asCheck{color:#b45309;flex:1}
 .as-auto{display:inline-block;min-width:52px;padding:5px 8px;border-radius:5px;background:#eef6ff;color:#0b5cad;font-weight:700;text-align:right}.as-auto-key{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;background:#0b5cad;color:#fff;border-radius:3px;padding:1px 4px;vertical-align:1px}
 .as-top .hint{font-size:12.5px!important;align-self:center}.as-table td{vertical-align:middle!important}
+.onb-lock{margin:10px 0 0;padding:9px 12px;border-radius:8px;background:#fff4e5;border:1px solid #f3d29a;color:#7a4b00;font-size:13px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.onb-lock.ok{background:#e9f7ef;border-color:#b6e2c6;color:#14532d}.onb-lock.info{background:#eef3fe;border-color:#c7d4ee;color:#1e3a8a}
+.onb-reqs{border-top:3px solid #d97706}.onb-req-list{list-style:none;margin:0;padding:0}.onb-req-list li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-top:1px solid #f0f2f6;font-size:13px;flex-wrap:wrap}.onb-req-list li:first-child{border-top:0}.onb-req-list li>span:last-child{display:flex;gap:6px}.onb-req-list small{color:#64748b}
+.pill.bad{background:#fde8e8;color:#b91c1c}
 .onb-remark{grid-column:1 / -1}.onb-remark textarea{padding:8px 10px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:13.5px;text-transform:none;letter-spacing:0;font-weight:400;resize:vertical;min-height:40px}
 .onb-form-head>div{display:flex;gap:10px;align-items:center}
 .onb-rule{margin:0 0 8px;font-size:12px}
@@ -11542,7 +11545,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.48.0';   // shown only in the browser tab title
+const APP_VERSION = '4.49.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -12352,6 +12355,7 @@ const Onboarding=(()=>{
   catch(e){ if(missing(e)||!Server.token){ st.demo=true; const me=Server.user&&Server.user.id; st.rows=demoRows().filter(r=>r.call_date>=st.from&&r.call_date<=st.to&&(Server.isAdmin()||r.onboarder_id===me)); }
    else { st.rows=[]; st.err=cleanErr(e); } }
   (st.rows||[]).forEach(r=>{ const ln=linkedName(r.onboarder_id); if(ln) r.onboarder=ln; });
+  await loadRequests();
   try{ st.assign=await Server.rpc('dash_onb_assign_list',{p_from:st.from, p_to:st.to}) || []; }
   catch(e){ const d=demoAssign(); st.assign=Object.keys(d).filter(k=>k>=st.from&&k<=st.to).sort().map(k=>({day:k, ...d[k]})); }
  }
@@ -12364,11 +12368,63 @@ const Onboarding=(()=>{
   const d=demoAssign(); if(empty) delete d[day]; else d[day]={data, updated_by:Server.user.name, updated_at:new Date().toISOString()}; try{ localStorage.setItem(ADEMO, JSON.stringify(d)); }catch(e){}
  }
  async function save(row){
+  row={...row, cat:catOf(row.status)};
   if(!st.demo) return Server.rpc('dash_onb_save',{p_row:row});
+  if(!Server.isAdmin()){ const l=demoLock(row.eid, Server.user.id); if(l.locked) throw new Error(`LOCKED: ${l.owner} completed onboarding for this candidate on ${l.since} — locked until ${l.until}. Ask them to approve your request.`); }
   const list=demoRows(); const now=new Date().toISOString();
   if(row.id){ const i=list.findIndex(x=>String(x.id)===String(row.id)); if(i>=0) list[i]={...list[i], ...row, onboarder:(Server.isAdmin()&&row.onboarder)||list[i].onboarder, updated_at:now}; }
   else list.push({...row, id:Date.now(), onboarder_id:Server.user.id, onboarder:(Server.isAdmin()&&row.onboarder)||myName(), created_at:now, updated_at:now});
   demoSave(list); return true;
+ }
+ // ---- 30-day lock: after a candidate reaches an EB Complete stage, only that onboarder (or someone they approve) can log them ----
+ const LOCK_CATS=['complete','i9'], LOCK_DAYS=30, RQ='ipd_onb_req_demo';
+ const addDays=(d,n)=>{ const x=new Date(d+'T12:00:00'); x.setDate(x.getDate()+n); return toIsoDateOnly(x); };
+ const demoReq=()=>{ try{ return JSON.parse(localStorage.getItem(RQ)||'[]'); }catch(e){ return []; } };
+ const demoReqSave=l=>{ try{ localStorage.setItem(RQ, JSON.stringify(l)); }catch(e){} };
+ function demoLock(eid, uid){
+  const k=normEid(eid)||String(eid).trim(), since=addDays(today(),-LOCK_DAYS);
+  const l=demoRows().filter(r=>(normEid(r.eid)||r.eid)===k&&LOCK_CATS.includes(r.cat||catOf(r.status))&&r.call_date>=since).sort(order)[0];
+  if(!l||String(l.onboarder_id)===String(uid)) return {locked:false};
+  const req=demoReq().filter(q=>q.eid===k&&String(q.requester_id)===String(uid)&&String(q.owner_id)===String(l.onboarder_id)&&q.created_at.slice(0,10)>=l.call_date).sort((a,b)=>a.created_at.localeCompare(b.created_at)).pop();
+  return {locked:!(req&&req.status==='approved'), owner:l.onboarder, owner_id:l.onboarder_id, since:l.call_date, until:addDays(l.call_date,LOCK_DAYS), request:req?{id:req.id,status:req.status}:null};
+ }
+ async function lockFor(eid){
+  if(!st.demo){ try{ return await Server.rpc('dash_onb_lock',{p_eid:eid}); }catch(e){ if(!missing(e)) throw e; return {locked:false}; } }
+  if(Server.isAdmin()){ const l=demoLock(eid,''); return {...l, locked:false, admin:true}; }
+  return demoLock(eid, Server.user.id);
+ }
+ async function requestAccess(eid, note){
+  if(!st.demo) return Server.rpc('dash_onb_request',{p_eid:eid, p_note:note||''});
+  const l=demoLock(eid, Server.user.id); if(!l.locked||(l.request&&l.request.status==='pending')) return l;
+  const list=demoReq(); list.push({id:Date.now(), eid:normEid(eid)||eid, requester_id:Server.user.id, requester:myName(), owner_id:l.owner_id, owner:l.owner, status:'pending', note:note||'', created_at:new Date().toISOString()}); demoReqSave(list);
+  return demoLock(eid, Server.user.id);
+ }
+ async function loadRequests(){
+  try{ st.requests=st.demo?demoReq().filter(q=>Server.isAdmin()||String(q.owner_id)===String(Server.user.id)||String(q.requester_id)===String(Server.user.id)):(await Server.rpc('dash_onb_requests_list'))||[]; }
+  catch(e){ st.requests=[]; }
+ }
+ async function decide(id, ok){
+  if(!st.demo) return Server.rpc('dash_onb_request_decide',{p_id:id, p_approve:ok});
+  const list=demoReq(), q=list.find(x=>String(x.id)===String(id)); if(!q||q.status!=='pending') return;
+  if(!Server.isAdmin()&&String(q.owner_id)!==String(Server.user.id)) throw new Error('Only the original onboarder or an admin can answer this request.');
+  q.status=ok?'approved':'denied'; q.decided_at=new Date().toISOString(); q.decided_by=Server.user.name; demoReqSave(list);
+ }
+ function lockHtml(l, eid){
+  if(!l||!l.owner) return '';
+  const when=`completed onboarding with <b>${escapeHtml(l.owner)}</b> on ${fmtDate(l.since)}`;
+  if(l.admin) return `<div class="onb-lock info">🔒 This candidate ${when} — locked for other onboarders until ${fmtDate(l.until)}. Admins can still log.</div>`;
+  if(!l.locked) return `<div class="onb-lock ok">✓ ${escapeHtml(l.owner)} approved your request — you can log this candidate.</div>`;
+  const rq=l.request&&l.request.status;
+  return `<div class="onb-lock">🔒 This candidate ${when}. Nobody else can log them until <b>${fmtDate(l.until)}</b> unless ${escapeHtml(l.owner)} approves.
+   ${rq==='pending'?'<span class="pill warn">Request sent — waiting for approval</span>':rq==='denied'?`<span class="pill bad">Request declined</span> <button type="button" class="btn btn-secondary btn-sm" data-onb-req="${escapeHtml(eid)}">Ask again</button>`:`<button type="button" class="btn btn-primary btn-sm" data-onb-req="${escapeHtml(eid)}">Request access from ${escapeHtml(l.owner)}</button>`}</div>`;
+ }
+ function requestsHtml(){
+  const me=String(Server.user.id), adm=Server.isAdmin(), list=st.requests||[];
+  const toMe=list.filter(q=>q.status==='pending'&&(adm||String(q.owner_id)===me)), mine=list.filter(q=>String(q.requester_id)===me).slice(0,5);
+  if(!toMe.length&&!mine.length) return '';
+  return `<section class="panel onb-reqs"><div class="panel-head"><div><h3>🔒 Access requests${toMe.length?` <span class="al-count">${toMe.length}</span>`:''}</h3><span class="hint">Candidates locked for 30 days after reaching an EB Complete stage. The original onboarder${adm?' (or an admin)':''} decides who else may log them.</span></div></div>
+   ${toMe.length?`<ul class="onb-req-list">${toMe.map(q=>`<li><span><b>${escapeHtml(q.requester)}</b> asks to log EID <b>${escapeHtml(q.eid)}</b>${adm&&String(q.owner_id)!==me?` <small>(locked to ${escapeHtml(q.owner)})</small>`:''}${q.note?` — “${escapeHtml(q.note)}”`:''} <small>${new Date(q.created_at).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</small></span><span><button type="button" class="btn btn-primary btn-sm" data-onb-dec="${q.id}" data-ok="1">Approve</button><button type="button" class="btn btn-secondary btn-sm" data-onb-dec="${q.id}" data-ok="0">Decline</button></span></li>`).join('')}</ul>`:''}
+   ${mine.length?`<p class="hint" style="margin:8px 0 4px">Your requests</p><ul class="onb-req-list mine">${mine.map(q=>`<li><span>EID <b>${escapeHtml(q.eid)}</b> · asked ${escapeHtml(q.owner)}</span><span class="pill ${q.status==='approved'?'good':q.status==='denied'?'bad':'warn'}">${q.status==='approved'?'Approved':q.status==='denied'?'Declined':'Waiting'}</span></li>`).join('')}</ul>`:''}</section>`;
  }
  async function del(id){ if(!st.demo) return Server.rpc('dash_onb_delete',{p_id:id}); demoSave(demoRows().filter(x=>String(x.id)!==String(id))); return true; }
  // ---- EID → uploaded schedule / interview data ----
@@ -12427,14 +12483,14 @@ const Onboarding=(()=>{
     <label>Status *${sel('onbStatus',statuses(),e.status)}</label>
     <label class="onb-remark">Remarks<textarea id="onbNote" rows="2" maxlength="500" placeholder="What happened on this call, next step…">${escapeHtml(e.note||'')}</textarea></label>
    </div>
-   <div class="onb-form-foot"><span id="onbMatch"></span><span class="onb-err" id="onbErr" role="alert"></span><button type="submit" class="btn btn-primary" ${st.busy?'disabled':''}>${e.id?'Save changes':'＋ Add call'}</button></div>
+   <div id="onbLock"></div><div class="onb-form-foot"><span id="onbMatch"></span><span class="onb-err" id="onbErr" role="alert"></span><button type="submit" class="btn btn-primary" ${st.busy?'disabled':''}>${e.id?'Save changes':'＋ Add call'}</button></div>
   </form>`;
  }
  function matchHtml(eid){
   if(!eid) return '<span class="hint">Type the EID to see the matching schedule / interview and earlier calls.</span>';
   const prev=(st.rows||[]).filter(r=>(normEid(r.eid)||r.eid)===(normEid(eid)||eid)&&(!st.editing||String(r.id)!==String(st.editing.id))).sort(order);
   const last=prev[prev.length-1];
-  return linkHtml(linkOf(eid))+(prev.length?` <span class="onb-link prev">${prev.length} earlier call${prev.length===1?'':'s'} · last: <b>${escapeHtml(last.status)}</b> on ${fmtDate(last.call_date)} by ${escapeHtml(last.onboarder)}</span>`:' <span class="onb-link no">First call for this EID</span>');
+  return linkHtml(linkOf(eid))+(prev.length?` <span class="onb-link prev">${prev.length} earlier call${prev.length===1?'':'s'} · last: <b>${escapeHtml(last.status)}</b> on ${fmtDate(last.call_date)} by ${escapeHtml(last.onboarder)}</span>`:(canReport()||canAssign()?' <span class="onb-link no">First call for this EID</span>':''));
  }
  const catPill=c=>`<span class="onb-cat ${CAT_CLS[c]}">${CAT_LBL[c]}</span>`;
  const stPill=s=>`<span class="onb-st ${CAT_CLS[catOf(s)]}" title="${escapeHtml(CAT_LBL[catOf(s)])}">${escapeHtml(s)}</span>`;
@@ -12487,7 +12543,7 @@ const Onboarding=(()=>{
   const top=`${adm?`<div class="onb-admin"><span><strong>Admin</strong> · onboarder names, call types, statuses and assignment types</span><button type="button" class="btn btn-primary btn-sm" id="onbLists2">⚙ Manage dropdowns</button></div>`:''}${st.demo?'<div class="onb-demo"><strong>Demo mode</strong> — entries are saved in this browser only. Run <code>onboarding.sql</code> in Supabase to share them with everyone.</div>':''}${st.err?`<div class="onb-demo bad">Could not load: ${escapeHtml(st.err)}</div>`:''}${nav}`;
   let body='';
   if(st.page==='assign') body=assignHtml();
-  else if(st.page==='log') body=`${formHtml()}${filters(adm,onbs,true)}
+  else if(st.page==='log') body=`${requestsHtml()}${formHtml()}${filters(adm,onbs,true)}
    <section class="panel"><div class="panel-head"><div><div class="ua-filter onb-tabs" role="tablist"><button type="button" data-onb-tab="cand" class="${st.tab==='cand'?'on':''}">Candidates · ${fmtNum(cands.length)}</button><button type="button" data-onb-tab="calls" class="${st.tab==='calls'?'on':''}">All calls · ${fmtNum(shownCalls.length)}</button></div>
      <span class="hint">${st.tab==='cand'?'One row per EID — all calls combined, the latest status counts. Click “calls” to see every call and remark.':(adm?'Everyone’s calls, newest first.':'Your calls, newest first.')}</span></div>${(st.tab==='cand'?cands.length:shownCalls.length)?copyBtnHtml('onbTable')+(Server.can('export')?downloadBtnHtml('onbTable',st.tab==='cand'?'onboarding-candidates.xlsx':'onboarding-calls.xlsx'):''):''}</div>
     ${st.tab==='cand'?candTable(cands):callTable(shownCalls)}</section>`;
@@ -12623,8 +12679,17 @@ const Onboarding=(()=>{
   filt();
   if(st.page==='assign') return wireAssign(host);
   if(st.page!=='log') return;
-  const eidIn=$('#onbEid'), upd=()=>{ $('#onbMatch').innerHTML=matchHtml(eidIn.value.trim()); };
+  const sub=$('#onbForm button[type=submit]');
+  let lockSeq=0, lockT;
+  const showLock=async()=>{ const eid=normEid(eidIn.value)||eidIn.value.trim(), seq=++lockSeq, box=$('#onbLock');
+   if(!eid||(st.editing&&(normEid(st.editing.eid)||st.editing.eid)===eid&&st.editing.onboarder_id===Server.user.id)){ box.innerHTML=''; sub.disabled=st.busy; return; }
+   let l; try{ l=await lockFor(eid); }catch(e){ return; } if(seq!==lockSeq||!box.isConnected) return;
+   box.innerHTML=lockHtml(l, eid); sub.disabled=st.busy||!!(l&&l.locked);
+   box.querySelector('[data-onb-req]')?.addEventListener('click',async ()=>{ const note=prompt('Add a short note for '+l.owner+' (optional):','')??null; if(note===null) return;
+    try{ await requestAccess(eid, note); showToast('Request sent to '+l.owner+'.'); await loadRequests(); showLock(); }catch(e){ showToast('Could not send: '+cleanErr(e)); } }); };
+  const eidIn=$('#onbEid'), upd=()=>{ $('#onbMatch').innerHTML=matchHtml(eidIn.value.trim()); clearTimeout(lockT); lockT=setTimeout(showLock,300); };
   eidIn.addEventListener('input',upd); upd();
+  host.querySelectorAll('[data-onb-dec]').forEach(b=>b.onclick=async()=>{ b.disabled=true; try{ await decide(+b.dataset.onbDec, b.dataset.ok==='1'); showToast(b.dataset.ok==='1'?'Approved — they can log this candidate now.':'Request declined.'); await loadRequests(); render(); }catch(e){ b.disabled=false; showToast(cleanErr(e)); } });
   $('#onbCancel')?.addEventListener('click',()=>{ st.editing=null; render(); });
   $('#onbForm').addEventListener('submit',async ev=>{ ev.preventDefault();
    const err=t=>{ $('#onbErr').textContent=t; };
@@ -12633,7 +12698,7 @@ const Onboarding=(()=>{
    if(row.duration_min!==''&&!(Number(row.duration_min)>=0)) return err('Duration must be 0 or more minutes.');
    st.busy=true;
    try{ await save(row); showToast(row.id?'Call updated.':'Call logged for EID '+row.eid+'.'); st.editing=null; if(row.call_date<st.from) st.from=row.call_date; if(row.call_date>st.to) st.to=row.call_date; await load(); }
-   catch(e){ st.busy=false; return err('Not saved: '+cleanErr(e)); }
+   catch(e){ st.busy=false; if(/LOCKED/.test(e.message||'')){ showLock(); return err('This candidate is locked — see above.'); } return err('Not saved: '+cleanErr(e)); }
    st.busy=false; render(); setTimeout(()=>document.getElementById('onbEid')?.focus(),30);
   });
   host.querySelectorAll('[data-onb-tab]').forEach(b=>b.onclick=()=>{ st.tab=b.dataset.onbTab; render(); });
