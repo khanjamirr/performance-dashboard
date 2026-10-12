@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.47.0</title>
+<title>Performance Dashboard · v4.48.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -913,6 +913,13 @@ body.scrolled .topbar .header-search input{padding-top:6px!important;padding-bot
 .al-toolbar select{padding:8px 10px;border:1px solid #cfdde2;border-radius:8px;font:inherit;font-size:13px;background:#fff;min-width:260px}
 .al-basis{margin:0 0 4px!important;font-size:12.5px!important;max-width:620px}
 .al-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:6px}
+.al-tile strong .al-pct-of{font-size:13px;font-weight:700;margin-left:8px;opacity:.85;letter-spacing:0}
+.ld-brk-grid{display:flex;flex-direction:column;gap:6px}.ld-brk{border:1px solid #e3e8ef;border-radius:8px;background:#fff}.ld-brk>summary{display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;list-style:none;flex-wrap:wrap}.ld-brk>summary::-webkit-details-marker{display:none}
+.ld-brk-name{display:flex;flex-direction:column;min-width:180px;flex:1}.ld-brk-name small{font-size:11.5px;color:#64748b}
+.ld-brk-bar{width:140px;height:8px;border-radius:4px;background:#fdf0d5;overflow:hidden}.ld-brk-bar i{display:block;height:100%;background:#16a34a}
+.ld-brk-lists{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:4px 12px 12px}.ld-brk-lists h5{margin:6px 0;font-size:12px;color:#0a1f44}.ld-brk-lists ul{list-style:none;margin:0;padding:0}
+.ld-brk-lists li{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-top:1px solid #f0f2f6;font-size:12.5px}.ld-brk-lists li small{display:block;font-size:11px;color:#64748b;font-weight:400}.ld-brk-lists li>span:last-child{text-align:right;font-weight:700}.ld-brk-lists .ok{color:#15803d}.ld-brk-lists .no{color:#a16207}
+@media(max-width:760px){.ld-brk-lists{grid-template-columns:1fr}.ld-brk-bar{width:80px}}
 .al-multi-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 12px}.al-multi-hint{margin:0;font-size:11.5px}
 .al-hi-btn{background:#fff;border:1px solid #c7d4ee;color:#1d4ed8;font-weight:600;display:inline-flex;align-items:center;gap:6px}.al-hi-btn:hover{background:#eef3fe}.al-hi-btn.on{background:#1d4ed8;color:#fff;border-color:#1d4ed8}
 .al-hi-badge{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#c8102e;color:#fff;font-size:10.5px;font-weight:700}
@@ -1647,7 +1654,7 @@ body{background:var(--paper)!important}
 .dr-saved-item span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dr-saved-item small{display:block;color:#7b929b;font-size:10.5px}
 .dr-x{border:1px solid #f0d3d8;background:#fff5f6;color:#a92f42;border-radius:6px;min-width:26px;height:24px;cursor:pointer;font-size:14px;line-height:1}
 .dr-reset{margin-top:10px;font-size:12px}
-.dr-tools{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}.dr-grow{flex:1}
+.dr-selbtns{display:inline-flex;gap:6px}.dr-tools{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}.dr-grow{flex:1}
 .dr-panel{padding:0!important;overflow:hidden}
 .dr-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--line,#e2eaed)}.dr-head h3{margin:0;font-size:15px}
 .dr-scroll{overflow:auto;max-height:calc(100vh - var(--frozen-header-height,96px) - 140px)}
@@ -10234,9 +10241,9 @@ async function renderAlertsView(){
       <p class="hint al-basis">${today?`Week in progress — ${elapsed} of 5 working days so far. Each recruiter’s schedules are compared with their goal so far (daily goal × ${elapsed} day${elapsed===1?'':'s'}).`:inProgress?`Week in progress — ${elapsed} of 5 working days so far. Groups compare schedules with each recruiter’s full weekly goal; each card also shows where they should be by today. Recruiters with no schedules yet are included.`:`Completed week — schedules compared with each recruiter’s weekly goal (default ${DEFAULT_WEEKLY_GOAL}).`}</p>
     </div>
     <div class="al-tiles" data-section="alerts.summary">
-      <button type="button" class="al-tile bad ${on('below')?'sel':''}" data-band="below" aria-pressed="${on('below')}"><span>Below 50% of goal</span><strong>${below.length}</strong><em>${noRemark?noRemark+' without a remark':'all have remarks'}</em></button>
-      <button type="button" class="al-tile warn ${on('watch')?'sel':''}" data-band="watch" aria-pressed="${on('watch')}"><span>50–79% of goal</span><strong>${watch.length}</strong><em>keep an eye on</em></button>
-      <button type="button" class="al-tile good ${on('good')?'sel':''}" data-band="good" aria-pressed="${on('good')}"><span>On track (80%+)</span><strong>${onTrack.length}</strong><em>of ${rows.length} recruiters</em></button>
+      <button type="button" class="al-tile bad ${on('below')?'sel':''}" data-band="below" aria-pressed="${on('below')}"><span>Below 50% of goal</span><strong>${below.length}<small class="al-pct-of">${rows.length?Math.round(below.length/rows.length*100):0}% of ${rows.length}</small></strong><em>${noRemark?noRemark+' without a remark':'all have remarks'}</em></button>
+      <button type="button" class="al-tile warn ${on('watch')?'sel':''}" data-band="watch" aria-pressed="${on('watch')}"><span>50–79% of goal</span><strong>${watch.length}<small class="al-pct-of">${rows.length?Math.round(watch.length/rows.length*100):0}% of ${rows.length}</small></strong><em>keep an eye on</em></button>
+      <button type="button" class="al-tile good ${on('good')?'sel':''}" data-band="good" aria-pressed="${on('good')}"><span>On track (80%+)</span><strong>${onTrack.length}<small class="al-pct-of">${rows.length?Math.round(onTrack.length/rows.length*100):0}% of ${rows.length}</small></strong><em>of ${rows.length} recruiters</em></button>
     </div>
     <div class="al-multi-row"><p class="hint al-multi-hint">Click cards to show or hide them — pick as many as you like.</p><button type="button" class="btn btn-sm al-hi-btn ${st.hiOpen?'on':''}" id="alHiBtn" aria-expanded="${!!st.hiOpen}" data-section="alerts.highlights">✦ ${st.hiOpen?'Hide highlights':'Show highlights'}${hi.streak.length?` <span class="al-hi-badge" title="Below goal 3+ weeks running">${hi.streak.length}</span>`:''}</button></div>
     <div>
@@ -11281,9 +11288,31 @@ function ltLeadsHtml(p,cutoff,mode,today,division){
  if(!Server.isAdmin()) return '';
  const memoKey=[p.from,p.to,cutoff,mode,division,ltLeads.at,(ltLeads.teams||[]).length,weeksData.length,weeksData.map(w=>w.savedAt||'').join(),JSON.stringify(KV.get('branchMerges')||null),ltState.viewingId].join('|');
  if(ltLeads.teams&&ltLeadsMemo.key===memoKey) return ltLeadsMemo.html;
- const html=ltLeadsHtmlBuild(p,cutoff,mode,today,division);
+ const html=ltLeadsHtmlBuild(p,cutoff,mode,today,division)+ltLeadsBreakHtml(p,cutoff,mode,today,division);
  if(ltLeads.teams&&!ltLeads.loading) { ltLeadsMemo.key=memoKey; ltLeadsMemo.html=html; }
  return html;
+}
+// Third break for every team at once (admins, Team Leads page) — same rule as each team's My Team page.
+const ltLeadsBreak={};
+function ltLeadsBreakHtml(p,cutoff,mode,today,division){
+ if(!Server.isAdmin()||!ltLeads.teams||!ltLeads.teams.length||!canSeeSection('team.goals')) return '';
+ let checkDay=cutoff; if(mode!=='day'){ while(checkDay>p.from&&[0,6].includes(new Date(checkDay+'T12:00:00Z').getUTCDay())) checkDay=tgShift(checkDay,-1); }
+ if(checkDay<p.from) return '';
+ const weekTo=weekOfDate(checkDay).weekEnd<today?weekOfDate(checkDay).weekEnd:today, now=new Date();
+ const teams=ltLeads.teams.map(tm=>{ const g={...ltGroup(tm.a),division};
+   const names=[...new Set(g.memberships.filter(m=>m.from<=checkDay&&(!m.to||m.to>=checkDay)).map(m=>m.name))].filter(n=>!division||(getEffectiveRecruiterDivision(n,weekOfDate(checkDay).weekEnd)||'Unassigned')===division);
+   if(!names.length) return null;
+   const checks=names.map(n=>ltBreakCheck(n,checkDay,now,mode,weekTo)), br=n=>ltBranchOf(n,p.from,cutoff);
+   const lists={eligible:checks.filter(c=>c.eligible).map(c=>({...c,branch:br(c.name)})).sort((a,b)=>b.cum-a.cum), notyet:checks.filter(c=>c.known&&!c.eligible).map(c=>({...c,branch:br(c.name)})).sort((a,b)=>(b.cum/b.required)-(a.cum/a.required)), unknown:checks.filter(c=>!c.known), dayLabel:fmtDate(checkDay), day:checkDay};
+   ltLeadsBreak[tm.id]={lists, team:tm.a.team_name||tm.lead};
+   return {tm, lists, n:checks.length}; }).filter(Boolean).sort((a,b)=>b.lists.eligible.length/b.n-a.lists.eligible.length/a.n);
+ if(!teams.length) return '';
+ const E=teams.reduce((a,t)=>a+t.lists.eligible.length,0), N=teams.reduce((a,t)=>a+t.lists.notyet.length,0), U=teams.reduce((a,t)=>a+t.lists.unknown.length,0);
+ const person=(x,ok)=>`<li><span><b>${escapeHtml(x.name)}</b>${x.branch?`<small>${escapeHtml(x.branch)}</small>`:''}</span><span class="${ok?'ok':'no'}">${tgNumber(x.cum)} / ${tgNumber(x.required)}<small>${ok?(x.cum>x.required?tgNumber(x.cum-x.required)+' above':'on target'):tgNumber(Math.max(0,x.required-x.cum))+' more needed'}</small></span></li>`;
+ return `<section class="panel ta ld-break" data-section="team.goals"><div class="lt-section-head"><h3>☕ Third break · ${fmtDate(checkDay)}</h3><span class="hint">Eligible when schedules so far this week reach the daily goal × working days so far · ${E} eligible · ${N} not yet${U?' · '+U+' awaiting data':''}</span><button type="button" class="btn btn-secondary btn-sm" id="ldBrkAll" style="margin-left:auto">${ltLeadsBreak.__open?'Collapse all':'Expand all'}</button></div>
+  <div class="ld-brk-grid">${teams.map(t=>{ const e=t.lists.eligible.length, ny=t.lists.notyet.length, pc=Math.round(e/t.n*100);
+   return `<details class="ld-brk" ${ltLeadsBreak.__open?'open':''}><summary><span class="ld-brk-name"><b>${escapeHtml(t.tm.lead)}</b><small>${escapeHtml(t.tm.a.team_name||'')}</small></span><span class="ld-brk-bar" title="${e} of ${t.n} eligible"><i style="width:${pc}%"></i></span><span class="pill good">${e} eligible</span><span class="pill warn">${ny} not yet</span><button type="button" class="btn btn-secondary btn-sm" data-ld-brk-img="${escapeHtml(t.tm.id)}" title="Copy this team’s third-break list as an image">🖼 Copy</button></summary>
+    <div class="ld-brk-lists"><div><h5>✓ Eligible · ${e}</h5><ul>${t.lists.eligible.map(x=>person(x,true)).join('')||'<li class="hint">Nobody yet.</li>'}</ul></div><div><h5>⏳ Not yet · ${ny}</h5><ul>${t.lists.notyet.map(x=>person(x,false)).join('')||'<li class="hint">Everyone is eligible. 🎉</li>'}</ul></div></div></details>`; }).join('')}</div></section>`;
 }
 function ltLeadsHtmlBuild(p,cutoff,mode,today,division){
  if(!Server.isAdmin()) return '';
@@ -11372,6 +11401,8 @@ function renderLeadsView(){
  host.querySelector('#ldDiv').onchange=e=>{leadsState.division=e.target.value;go();};
  function bindLeadsBody(){
  host.querySelector('#ltLeadsRefresh')?.addEventListener('click',()=>{ltLoadLeads(true);});
+ host.querySelectorAll('[data-ld-brk-img]').forEach(b=>b.onclick=e=>{ e.preventDefault(); e.stopPropagation(); const x=ltLeadsBreak[b.dataset.ldBrkImg]; if(x) ltCopyBreakImage(x.lists,{team:x.team, dayLabel:x.lists.dayLabel, day:x.lists.day}); });
+ host.querySelector('#ldBrkAll')?.addEventListener('click',()=>{ ltLeadsBreak.__open=!ltLeadsBreak.__open; host.querySelectorAll('details.ld-brk').forEach(d=>d.open=ltLeadsBreak.__open); host.querySelector('#ldBrkAll').textContent=ltLeadsBreak.__open?'Collapse all':'Expand all'; });
  host.querySelectorAll('[data-lt-lead]').forEach(b=>b.onclick=()=>{
   Object.assign(ltState,{owner:String(Server.user.id),viewingId:b.dataset.ltLead,assignment:null,loaded:false,loading:false,error:'',division:leadsState.division,rangeMode:leadsState.mode,anchor:leadsState.anchor});ltState.requestSeq++;
   currentView='teams'; document.querySelectorAll('#navList button').forEach(x=>x.classList.toggle('active',x.dataset.view==='teams')); refreshUI(); window.scrollTo(0,0);
@@ -11511,7 +11542,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.47.0';   // shown only in the browser tab title
+const APP_VERSION = '4.48.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -12018,7 +12049,7 @@ const DivReport=(()=>{
        <tr><td>Branch schedule?</td><td>“Yes” for every Created On row</td></tr><tr><td>Recruiter</td><td>Created By</td></tr><tr><td>Candidate / EID</td><td>Candidate Name / Employee Number</td></tr>
        <tr><td>Onboarding stage</td><td>Onboarding Stage if present, otherwise complete when I-9 Completed = Yes</td></tr><tr><td>EB status reason (West pipeline)</td><td>Status Reason — Available / OAE and Unavailable / Inactive</td></tr><tr><td>Total schedules / pipeline</td><td>Every row created or with an appointment in the dates picked above</td></tr></tbody></table></details>
      </section>
-     <div class="dr-tools" id="dr-tools"><button type="button" class="btn btn-primary btn-sm" id="dr-merge-rows" disabled>Merge selected rows</button><span class="hint" id="dr-sel-count"></span><span class="dr-grow"></span><button type="button" class="btn btn-secondary btn-sm" id="dr-copy">📋 Copy</button><button type="button" class="btn btn-secondary btn-sm" id="dr-download">⬇ Excel</button></div>
+     <div class="dr-tools" id="dr-tools"><span class="dr-selbtns" id="dr-selbtns"><button type="button" class="btn btn-secondary btn-sm" id="dr-sel-all">☑ Select all</button><button type="button" class="btn btn-secondary btn-sm" id="dr-sel-none" disabled>Clear all</button></span><button type="button" class="btn btn-primary btn-sm" id="dr-merge-rows" disabled>Merge selected rows</button><button type="button" class="btn btn-secondary btn-sm" id="dr-hide-sel" disabled>Hide selected</button><button type="button" class="btn btn-secondary btn-sm" id="dr-rm-sel" disabled>Remove selected</button><span class="hint" id="dr-sel-count"></span><span class="dr-grow"></span><button type="button" class="btn btn-secondary btn-sm" id="dr-copy">📋 Copy</button><button type="button" class="btn btn-secondary btn-sm" id="dr-download">⬇ Excel</button></div>
      <section class="panel dr-panel" id="dr-report-panel"><div class="dr-head"><h3 id="dr-title"></h3><span class="hint" id="dr-meta"></span></div><div class="dr-divbar" id="dr-divbar"></div><div class="dr-scroll"><table class="dr-table" id="dr-table"><thead></thead><tbody></tbody><tfoot></tfoot></table></div></section>
      <section class="panel dr-panel" id="dr-flags-panel"><div class="dr-head"><h3>Red flags</h3><span class="dr-count" id="dr-flag-count">0</span><span class="hint">Branch schedule “Yes” with no appointment date, or an appointment date without “Yes”.</span></div><div class="dr-scroll"><table class="dr-table dr-flags" id="dr-flag-table"><thead></thead><tbody></tbody></table></div></section>
     </div></div>`;
@@ -12090,17 +12121,27 @@ const DivReport=(()=>{
   $('dr-source').hidden=!src; $('dr-tools').hidden=src; $('dr-report-panel').hidden=flagMode||src; $('dr-flags-panel').hidden=!flagMode;
   $('dr-dates').hidden=flagMode||src; $('dr-filters').hidden=flagMode||src; $('dr-flag-controls').hidden=!flagMode; $('dr-stats').hidden=src;
   $('dr-ns-dates').hidden=mod==='west'; $('dr-west-dates').hidden=mod!=='west';
-  $('dr-merge-rows').hidden=flagMode; $('dr-sel-count').hidden=flagMode; $('dr-merge-rows').disabled=true; $('dr-sel-count').textContent='';
+  ['dr-merge-rows','dr-sel-count','dr-selbtns','dr-hide-sel','dr-rm-sel'].forEach(id=>{ if($(id)) $(id).hidden=flagMode; }); $('dr-merge-rows').disabled=true; $('dr-sel-count').textContent='';
   ['dr-merge','dr-hide','dr-add'].forEach(id=>$(id).disabled=!data.length);
   // report table
   const H=headers(), t=$('dr-table');
-  t.querySelector('thead').innerHTML='<tr><th class="dr-act" aria-label="Select, remove or hide rows"></th>'+H.map(h=>`<th scope="col">${esc(h)}</th>`).join('')+'</tr>';
+  t.querySelector('thead').innerHTML='<tr><th class="dr-act" aria-label="Select, remove or hide rows"><input type="checkbox" id="dr-sel-head" title="Select all rows" aria-label="Select all rows"></th>'+H.map(h=>`<th scope="col">${esc(h)}</th>`).join('')+'</tr>';
   const empty=!data.length?(state.source==='upload'?'No file loaded — open <b>Data source</b> to upload a PowerApp export, or switch to dashboard data.':'No dashboard rows for these weeks — pick other weeks on <b>Data source</b>.'):(!state.clients.length||!state.locations.length)?'Pick at least one client and one location on the left (or use <b>Select all</b>).':'Nothing matches these filters.';
   t.querySelector('tbody').innerHTML=report.rows.length?report.rows.map((r,i)=>`<tr><td class="dr-act"><input type="checkbox" data-sel="${i}" aria-label="Select row ${i+1}"><button type="button" class="dr-x" data-rm="${i}" title="Remove row" aria-label="Remove row">×</button><button type="button" class="dr-hide-btn" data-hide="${i}" title="Hide row">Hide</button></td><td>${esc(r.client)}</td><td>${esc(r.location)}${r.pairs.size>1?'<span class="dr-badge">merged</span>':''}${[...r.pairs].some(p=>state.addedPairs.includes(p))?'<span class="dr-badge lock">added</span>':''}</td>${r.counts.map(n=>`<td class="num">${n.toLocaleString()}</td>`).join('')}</tr>`).join(''):`<tr><td class="dr-empty" colspan="${H.length+1}">${empty}</td></tr>`;
   t.querySelector('tfoot').innerHTML=report.rows.length?`<tr><td></td><td>Total</td><td></td>${report.totals.map(n=>`<td class="num">${n.toLocaleString()}</td>`).join('')}</tr>`:'';
   t.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>removePairs([...report.rows[+b.dataset.rm].pairs]));
   t.querySelectorAll('[data-hide]').forEach(b=>b.onclick=()=>{ state.hiddenPairs=[...new Set([...state.hiddenPairs,...report.rows[+b.dataset.hide].pairs])]; refresh(); status('Row hidden — find it under Hidden to bring it back.'); });
-  t.querySelectorAll('[data-sel]').forEach(cb=>cb.onchange=()=>{ const n=t.querySelectorAll('[data-sel]:checked').length; $('dr-merge-rows').disabled=n<2; $('dr-sel-count').textContent=n?n+' selected':''; });
+  const selSync=()=>{ const all=t.querySelectorAll('[data-sel]'), n=t.querySelectorAll('[data-sel]:checked').length;
+   $('dr-merge-rows').disabled=n<2; $('dr-hide-sel').disabled=!n; $('dr-rm-sel').disabled=!n; $('dr-sel-none').disabled=!n; $('dr-sel-all').disabled=!all.length||n===all.length;
+   $('dr-sel-count').textContent=n?n+' of '+all.length+' selected':''; const h=$('dr-sel-head'); if(h){ h.checked=!!all.length&&n===all.length; h.indeterminate=n>0&&n<all.length; h.disabled=!all.length; } };
+  const selSet=on=>{ t.querySelectorAll('[data-sel]').forEach(cb=>cb.checked=on); selSync(); };
+  const selPairs=()=>[...t.querySelectorAll('[data-sel]:checked')].flatMap(cb=>[...report.rows[+cb.dataset.sel].pairs]);
+  t.querySelectorAll('[data-sel]').forEach(cb=>cb.onchange=selSync);
+  $('dr-sel-head').onchange=e=>selSet(e.target.checked);
+  $('dr-sel-all').onclick=()=>selSet(true); $('dr-sel-none').onclick=()=>selSet(false);
+  $('dr-hide-sel').onclick=()=>{ const k=selPairs(); if(!k.length) return; state.hiddenPairs=[...new Set([...state.hiddenPairs,...k])]; refresh(); status(k.length+' row(s) hidden — find them under Hidden to bring them back.'); };
+  $('dr-rm-sel').onclick=()=>{ const k=selPairs(); if(!k.length) return; if(!confirm('Remove the selected rows from this report?')) return; removePairs(k); };
+  selSync();
   $('dr-title').textContent=mod==='west'?'West · weekly report':'North / SE / SC';
   { const bar=$('dr-divbar'), cnt=d=>data.filter(r=>divOf(r)===d).length;
     bar.innerHTML=(mod==='ns'?`<span class="hint">Divisions</span>${NS_DIVS.map(d=>`<button type="button" class="dr-chip ${(state.nsOff||[]).includes(d)?'':'on'}" data-div="${d}" aria-pressed="${!(state.nsOff||[]).includes(d)}">${d} <b>${cnt(d).toLocaleString()}</b></button>`).join('')}`:mod==='west'?`<span class="hint">Division</span><span class="dr-chip on">West <b>${cnt('West').toLocaleString()}</b></span>`:'')
