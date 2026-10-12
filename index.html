@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.52.0</title>
+<title>Performance Dashboard · v4.54.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -1100,6 +1100,7 @@ button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #183442
 .as-in{width:64px;padding:5px 6px;border:1px solid #cfd6df;border-radius:5px;font:inherit;font-size:13px;text-align:right}.as-in::-webkit-inner-spin-button{opacity:.4}.as-pool{background:#fbfcfe}
 .as-add input{width:260px;padding:6px 9px;border:1px dashed #b8c4d6;border-radius:6px;font:inherit;font-size:13px}
 #asCheck{color:#b45309;flex:1}
+.as-auto.as-calc{background:#f3effe;color:#5b21b6}.as-auto-key.calc{background:#6d28d9}.as-totcol{background:#fffbea}.as-tot{border-color:#e9cf7a!important;font-weight:700}
 .as-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:0 0 6px}.as-tile{border:1px solid #e1e7ef;border-radius:8px;padding:10px 12px;background:#fff;display:flex;flex-direction:column;gap:2px}.as-tile span{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#64748b}.as-tile strong{font-size:22px;color:#0a1f44}.as-tile em{font-style:normal;font-size:11.5px;color:#64748b}.as-tile em b{color:#0a1f44}.as-tile.all{background:#f4f8ff;border-color:#cfdcf5}.as-tile-note{margin:0 0 10px;font-size:12px}
 .as-poolrow td{background:#fffbea!important}
 .as-auto{display:inline-block;min-width:52px;padding:5px 8px;border-radius:5px;background:#eef6ff;color:#0b5cad;font-weight:700;text-align:right}.as-auto-key{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;background:#0b5cad;color:#fff;border-radius:3px;padding:1px 4px;vertical-align:1px}
@@ -1107,6 +1108,12 @@ button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #183442
 .onb-lock{margin:10px 0 0;padding:9px 12px;border-radius:8px;background:#fff4e5;border:1px solid #f3d29a;color:#7a4b00;font-size:13px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.onb-lock.ok{background:#e9f7ef;border-color:#b6e2c6;color:#14532d}.onb-lock.info{background:#eef3fe;border-color:#c7d4ee;color:#1e3a8a}
 .onb-reqs{border-top:3px solid #d97706}.onb-req-list{list-style:none;margin:0;padding:0}.onb-req-list li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-top:1px solid #f0f2f6;font-size:13px;flex-wrap:wrap}.onb-req-list li:first-child{border-top:0}.onb-req-list li>span:last-child{display:flex;gap:6px}.onb-req-list small{color:#64748b}
 .pill.bad{background:#fde8e8;color:#b91c1c}
+.onb-quick{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}.onb-quick button{display:inline-flex;align-items:center;gap:8px;border:1px solid #d6dde8;background:#fff;border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;font-weight:600;color:#1f2a37;cursor:pointer}
+.onb-quick button b{font-size:12px;min-width:22px;text-align:center;padding:1px 7px;border-radius:999px;background:#eef1f6;color:#334155}
+.onb-quick button:hover{border-color:#94a3b8}.onb-quick button.on{background:#0a1f44;border-color:#0a1f44;color:#fff}.onb-quick button.on b{background:#ffffff2e;color:#fff}
+.onb-quick button.c-complete,.onb-quick button.c-i9,.onb-quick button.c-ip,.onb-quick button.c-lvm,.onb-quick button.c-nr,.onb-quick button.q-pending{background:#fff}
+.onb-quick button.c-complete b{background:#dcfce7;color:#166534}.onb-quick button.c-i9 b{background:#dbeafe;color:#1e40af}.onb-quick button.c-lvm b{background:#fef3c7;color:#92400e}.onb-quick button.c-nr b{background:#fde2e2;color:#991b1b}.onb-quick button.q-pending b{background:#ffedd5;color:#9a3412}
+.onb-quick button.on.c-complete,.onb-quick button.on.c-i9,.onb-quick button.on.c-ip,.onb-quick button.on.c-lvm,.onb-quick button.on.c-nr,.onb-quick button.on.q-pending{background:#0a1f44;color:#fff}
 .onb-remark{grid-column:1 / -1}.onb-remark textarea{padding:8px 10px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:13.5px;text-transform:none;letter-spacing:0;font-weight:400;resize:vertical;min-height:40px}
 .onb-form-head>div{display:flex;gap:10px;align-items:center}
 .onb-rule{margin:0 0 8px;font-size:12px}
@@ -8592,12 +8599,21 @@ function showAuthGate(mode, message){
   });
   setTimeout(()=>gate.querySelector('input')?.focus(), 30);
 }
+// Onboarding-only accounts (onboarders) never need the weekly recruiting data, so they skip downloading it:
+// the page opens with just the onboarding settings and their calls.
+function isOnboardingOnlyUser(u){
+  if(!u || u.role!=='user') return false;
+  const hs=u.hidden_sections||[], mods=(u.modules||[]).filter(m=>!['onboarding','remarks','export'].includes(m));
+  return (hs.includes('grant.onboarding')||(u.modules||[]).includes('onboarding')) && !mods.length && hs.includes('grant.no_team') && !hs.includes('grant.divreport');
+}
 async function startAuthFlow(){
   // Fast path on refresh: a saved session opens the dashboard with a single server call.
   const savedToken = lsGet(TOKEN_LS_KEY);
   if(savedToken && !startAuthFlow.triedFast){
     startAuthFlow.triedFast = true;
     Server.token = savedToken;
+    // onboarders: one small call instead of the full data download
+    if(lsGet('ipd_light_user')==='1'){ try{ Server.user = await Server.rpc('dash_me'); await Server.mergeGrants(); if(isOnboardingOnlyUser(Server.user)){ await afterLogin(null, true); return; } }catch(e){ if(/SESSION_EXPIRED/.test(e.message)){ Server.token=null; lsDel(TOKEN_LS_KEY); } } }
     try{ const boot = await Server.rpc('dash_bootstrap'); await afterLogin(boot); return; }
     catch(e){
       document.getElementById('authGate')?.remove(); setLocked(true);
@@ -8631,14 +8647,32 @@ function setLoading(text){
   if(!el){ el=document.createElement('div'); el.id='appLoading'; el.className='app-loading'; el.innerHTML='<div class="spinner" aria-hidden="true"></div><p></p>'; document.body.appendChild(el); }
   el.querySelector('p').textContent = text;
 }
-async function afterLogin(boot){
+async function afterLogin(boot, lightReady){
   setLocked(false);
-  if(!boot && Server.user) await Server.mergeGrants();
+  if(!boot && Server.user && !lightReady) await Server.mergeGrants();
   setLoading('Loading dashboard…');
+  // light mode: onboarding-only users load just what the Onboarding page needs
+  if(!boot && Server.user && isOnboardingOnlyUser(Server.user)){
+    lsSet('ipd_light_user','1');
+    try{
+      KV.clear();
+      try{ const got=await Server.rpc('dash_kv_get',{p_keys:['onbLists','divisionNames','branchMerges']}); for(const r of (got||[])) KV.set(r.key, await decodeKvValue(r.key, r.value)); }
+      catch(e){ await Server.loadKv(t=>setLoading(t)); }
+      weeksData=[]; window.__lightMode=true;
+      currentView='onboarding';
+      applyPermissions(); currentView='onboarding';
+      document.getElementById('storageModeNote').textContent = 'Signed in as '+Server.user.name+' · data is stored securely on the server.';
+      refreshUI();
+    }catch(e){ console.error(e); showToast('Could not load: '+cleanErr(e)); }
+    finally{ setLoading(null); }
+    return;
+  }
+  if(!boot) lsDel('ipd_light_user');
   try{
     if(!boot){ try{ boot = await Server.rpc('dash_bootstrap'); }catch(e){ if(!/Could not find|schema cache|does not exist/i.test(e.message+' '+(e.code||''))) throw e; } }
     if(boot){
       Server.user = boot.me; await Server.mergeGrants();
+      if(isOnboardingOnlyUser(Server.user)) lsSet('ipd_light_user','1'); else lsDel('ipd_light_user');
       KV.clear();
       await Promise.all((boot.kv||[]).map(async r=>{ KV.set(r.key, await decodeKvValue(r.key, r.value)); }));
       Remarks.list = boot.remarks || [];
@@ -8656,7 +8690,9 @@ async function afterLogin(boot){
     refreshUI();
     setLoading(null);
     if(boot) Server.startPollingFrom(Server.since); else await Server.startPolling();
-    setTimeout(async ()=>{ await Server.loadListsInBackground(); setTimeout(()=>autoVerifyWeeks(true), 500); }, 300);
+    // background jobs wait until the page is shown and the browser is idle, so the first screen appears sooner
+    const idle=f=>('requestIdleCallback' in window)?requestIdleCallback(f,{timeout:4000}):setTimeout(f,1200);
+    idle(async ()=>{ await Server.loadListsInBackground(); if(Server.can('upload')||Server.can('master_edit')) setTimeout(()=>autoVerifyWeeks(true), 1500); });
     if(Server.isAdmin() && Server.user.default_password) showToast('You are still using the setup password. Change it in Settings → My account.');
     if(Server.isAdmin()){ checkDatabaseSchema(); loadUploadAlerts(true); ltLeadsFromCache(); setTimeout(()=>ltLoadLeads(),1500); }
   }catch(e){
@@ -11614,7 +11650,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.52.0';   // shown only in the browser tab title
+const APP_VERSION = '4.54.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -12380,6 +12416,12 @@ const Onboarding=(()=>{
  // Types with no matching call type (Local Branch, Self, …) stay typed in by hand, as do the pool and inactive rows.
  const anorm=s=>String(s||'').toLowerCase().replace(/scheduled/g,'schedule').replace(/completed/g,'complete').replace(/[^a-z]/g,'');
  const alreadyType=()=>assignTypes().find(t=>/already/i.test(t))||null;
+ // Total calls (typed per onboarder) = Live Transfers + Self calls + Schedule Later  →  Self = Total − Live Transfers − Schedule Later
+ const selfType=()=>assignTypes().find(t=>/^self\b/i.test(t))||null;
+ const ltType=()=>assignTypes().find(t=>anorm(t)==='livetransfer')||null;
+ const slType=()=>assignTypes().find(t=>anorm(t)==='schedulelater')||null;
+ const hasTot=r=>r&&r.__total!==''&&r.__total!=null;
+ function selfFrom(r, lt, sl){ return hasTot(r)?Math.max(0, Number(r.__total)-(Number(lt)||0)-(Number(sl)||0)):null; }
  const isAuto=t=>t===alreadyType()||callTypes().some(c=>anorm(c)===anorm(t));
  let autoCache=null, autoKey=null;
  function autoAssign(){
@@ -12398,6 +12440,8 @@ const Onboarding=(()=>{
   return [...days].filter(d=>d>=st.from&&d<=st.to).sort().map(day=>{ const sv=saved.get(day), sd=(sv&&sv.data)||{}, rows={};
    Object.entries(sd.rows||{}).forEach(([n,r])=>{ rows[n]={}; Object.entries(r||{}).forEach(([t,v])=>{ if(!isAuto(t)) rows[n][t]=v; }); });
    Object.entries((auto[day]||{}).rows||{}).forEach(([n,r])=>{ rows[n]={...(rows[n]||{}), ...r}; });
+   const sf=selfType(), lt=ltType(), sl=slType();
+   if(sf) Object.entries(rows).forEach(([n,r])=>{ const v=selfFrom(r, lt&&r[lt], sl&&r[sl]); if(v!=null) r[sf]=v; });
    return {day, data:{rows, pool:sd.pool||{}, inactive:sd.inactive||{}}, updated_by:sv&&sv.updated_by, updated_at:sv&&sv.updated_at}; });
  }
  // "Henry" → "Henry Smith": exact name first, then a unique first-name match
@@ -12582,11 +12626,12 @@ const Onboarding=(()=>{
    const mine=rows.filter(r=>r.onboarder===o), by=new Map(); mine.forEach(r=>{ const k=normEid(r.eid)||r.eid; if(!by.has(k)) by.set(k,[]); by.get(k).push(r); });
    const people=by.size, reached=[...by.values()].filter(cs=>cs.some(c=>REACHED(catOf(c.status)))).length, completed=[...by.values()].filter(cs=>cs.some(c=>catOf(c.status)==='complete')).length;
    const assigned={}; let aTot=0; const aDays=new Set();
-   assign.forEach(d=>{ const r=((d.data&&d.data.rows)||{})[o]; if(!r) return; let any=0; types.forEach(t=>{ const n=Number(r[t])||0; assigned[t]=(assigned[t]||0)+n; aTot+=n; any+=n; }); if(any) aDays.add(d.day); });
+   let calls_typed=0;
+   assign.forEach(d=>{ const r=((d.data&&d.data.rows)||{})[o]; if(!r) return; let any=0; types.forEach(t=>{ const n=Number(r[t])||0; assigned[t]=(assigned[t]||0)+n; aTot+=n; any+=n; }); if(hasTot(r)) calls_typed+=Number(r.__total); if(any) aDays.add(d.day); });
    const days=new Set([...mine.map(r=>r.call_date), ...aDays]).size||0, callDays=new Set(mine.map(r=>r.call_date)).size;
-   return {o, calls:mine.length, people, reached, notReached:people-reached, completed, assigned, aTot, days, callDays,
+   return {o, calls_typed, calls:mine.length, people, reached, notReached:people-reached, completed, assigned, aTot, days, callDays,
     perDay:callDays?mine.length/callDays:null, peoplePerDay:callDays?people/callDays:null, callsPerPerson:people?mine.length/people:null};
-  }).filter(x=>x.calls||x.aTot);
+  }).filter(x=>x.calls||x.aTot||x.calls_typed);
  }
  function explain(v){
   const p=(n,d)=>d?Math.round(n/d*100)+'%':'0%', f=x=>x==null?'–':(Math.round(x*10)/10);
@@ -12601,7 +12646,7 @@ const Onboarding=(()=>{
     <div class="onb-range"><label>From<input type="date" id="onbFrom" value="${st.from}"></label><label>To<input type="date" id="onbTo" value="${st.to}"></label></div>
     ${adm?`<label class="cand-field"><span>Onboarder</span><select id="onbFOnb"><option value="">Everyone</option>${onbs.map(o=>`<option ${st.fOnb===o?'selected':''}>${escapeHtml(o)}</option>`).join('')}</select></label>`:''}
     <label class="cand-field"><span>Call type</span><select id="onbFType"><option value="">All</option>${callTypes().map(c=>`<option ${st.fType===c?'selected':''}>${escapeHtml(c)}</option>`).join('')}</select></label>
-    ${withCat?`<label class="cand-field"><span>Latest status</span><select id="onbFCat"><option value="">All</option>${CATS.map(([k,l])=>`<option value="${k}" ${st.fCat===k?'selected':''}>${l}</option>`).join('')}</select></label>
+    ${withCat?`<label class="cand-field"><span>Latest status</span><select id="onbFCat"><option value="">All</option><option value="pending" ${st.fCat==='pending'?'selected':''}>Pending (not complete yet)</option>${CATS.map(([k,l])=>`<option value="${k}" ${st.fCat===k?'selected':''}>${l}</option>`).join('')}</select></label>
     <label class="cand-field onb-q"><span>Search</span><input type="search" id="onbQ" value="${escapeHtml(st.q)}" placeholder="EID, onboarder, recruiter or remark"></label>`:''}
    </div>`;
  }
@@ -12614,7 +12659,8 @@ const Onboarding=(()=>{
   const rows=all.filter(r=>(!st.fOnb||r.onboarder===st.fOnb)&&(!st.fType||r.call_type===st.fType));
   const assign=mergedAssign().map(d=>st.fOnb?{...d, data:{...d.data, rows:Object.fromEntries(Object.entries((d.data&&d.data.rows)||{}).filter(([n])=>n===st.fOnb))}}:d);
   let cands=candidates(rows);
-  if(st.fCat) cands=cands.filter(c=>c.cat===st.fCat);
+  const allCands=cands;   // before the status filter — used for the quick-filter counts
+  if(st.fCat) cands=cands.filter(c=>st.fCat==='pending'?c.cat!=='complete':c.cat===st.fCat);
   if(q) cands=cands.filter(c=>String(c.eid).toLowerCase().includes(q)||c.onboarders.some(o=>o.toLowerCase().includes(q))||String((linkOf(c.eid)||{}).recruiter||'').toLowerCase().includes(q)||c.calls.some(x=>String(x.note||'').toLowerCase().includes(q)));
   const shownCalls=cands.flatMap(c=>c.calls).sort((a,b)=>order(b,a));
   const onbs=[...new Set([...all.map(r=>r.onboarder), ...(st.assign||[]).flatMap(d=>Object.keys((d.data&&d.data.rows)||{}))])].filter(Boolean).sort();
@@ -12623,6 +12669,9 @@ const Onboarding=(()=>{
   let body='';
   if(st.page==='assign') body=assignHtml();
   else if(st.page==='log') body=`${requestsHtml()}${formHtml()}${filters(adm,onbs,true)}
+   ${(()=>{ const cnt=k=>k===''?allCands.length:k==='pending'?allCands.filter(c=>c.cat!=='complete').length:allCands.filter(c=>c.cat===k).length;
+     const chips=[['','All'],['pending','Pending'],['complete','Completed'],['i9','Between I9'],['in_process','In process'],['lvm','LVM / No answer'],['no_response','Never responded']];
+     return `<div class="onb-quick" role="tablist" aria-label="Show candidates">${chips.map(([k,l])=>`<button type="button" data-onb-q="${k}" class="${(st.fCat||'')===k?'on':''} ${k?CAT_CLS[k]||'q-pending':''}" aria-pressed="${(st.fCat||'')===k}"><span>${l}</span><b>${fmtNum(cnt(k))}</b></button>`).join('')}</div>`; })()}
    <section class="panel"><div class="panel-head"><div><div class="ua-filter onb-tabs" role="tablist"><button type="button" data-onb-tab="cand" class="${st.tab==='cand'?'on':''}">Candidates · ${fmtNum(cands.length)}</button><button type="button" data-onb-tab="calls" class="${st.tab==='calls'?'on':''}">All calls · ${fmtNum(shownCalls.length)}</button></div>
      <span class="hint">${st.tab==='cand'?'One row per EID — all calls combined, the latest status counts. Click “calls” to see every call and remark.':(adm?'Everyone’s calls, newest first.':'Your calls, newest first.')}</span></div>${(st.tab==='cand'?cands.length:shownCalls.length)?copyBtnHtml('onbTable')+(Server.can('export')?downloadBtnHtml('onbTable',st.tab==='cand'?'onboarding-candidates.xlsx':'onboarding-calls.xlsx'):''):''}</div>
     ${st.tab==='cand'?candTable(cands):callTable(shownCalls)}</section>`;
@@ -12659,8 +12708,8 @@ const Onboarding=(()=>{
     <tr class="onb-total"><td><strong>All onboarders</strong></td>${assign.length?`<td class="num">${fmtNum(vol.reduce((a,v)=>a+v.aTot,0))}</td>`:''}<td class="num">${fmtNum(totCalls)}</td><td class="num">${fmtNum(totPeople)}</td><td class="num">${fmtNum(vol.reduce((a,v)=>a+v.reached,0))}</td><td class="num">${fmtNum(vol.reduce((a,v)=>a+v.notReached,0))}</td><td class="num">${fmtNum(vol.reduce((a,v)=>a+v.completed,0))}</td><td class="num">${pct(vol.reduce((a,v)=>a+v.completed,0),vol.reduce((a,v)=>a+v.reached,0))}</td><td></td><td></td><td></td><td class="num">${totPeople?fmt1(totCalls/totPeople):'–'}</td><td></td></tr>
     </tbody></table></div></section>`:''}
    ${assign.length?`<section class="panel"><div class="panel-head"><div><h3>Assignments in these dates</h3><span class="hint">From the daily assignment sheets — how many of each type were in the pool and how many went to onboarders.</span></div>${copyBtnHtml('onbAsgTot')}</div>
-    <div class="onb-scroll"><table class="users-table onb-table" id="onbAsgTot"><thead><tr><th>Onboarder</th>${types.map(t=>`<th class="num">${escapeHtml(t)}</th>`).join('')}<th class="num">Total</th></tr></thead><tbody>
-    ${vol.filter(v=>v.aTot).map(v=>`<tr><td>${escapeHtml(v.o)}</td>${types.map(t=>`<td class="num">${v.assigned[t]||'–'}</td>`).join('')}<td class="num"><strong>${v.aTot}</strong></td></tr>`).join('')}
+    <div class="onb-scroll"><table class="users-table onb-table" id="onbAsgTot"><thead><tr><th>Onboarder</th>${types.map(t=>`<th class="num">${escapeHtml(t)}</th>`).join('')}<th class="num">Total</th><th class="num">Total calls</th></tr></thead><tbody>
+    ${vol.filter(v=>v.aTot||v.calls_typed).map(v=>`<tr><td>${escapeHtml(v.o)}</td>${types.map(t=>`<td class="num">${v.assigned[t]||'–'}</td>`).join('')}<td class="num"><strong>${v.aTot}</strong></td><td class="num">${v.calls_typed||'–'}</td></tr>`).join('')}
     <tr class="onb-total"><td><strong>Assigned to onboarders</strong></td>${types.map(t=>`<td class="num">${aTot[t]||0}</td>`).join('')}<td class="num">${types.reduce((a,t)=>a+(aTot[t]||0),0)}</td></tr>
     <tr class="onb-total"><td><strong>Total (typed)</strong></td>${types.map(t=>`<td class="num">${pool[t]||'–'}${pool[t]&&aTot[t]!==pool[t]?`<small>${pool[t]-(aTot[t]||0)} not assigned</small>`:''}</td>`).join('')}<td class="num">${types.reduce((a,t)=>a+(pool[t]||0),0)||'–'}</td></tr>
     </tbody></table></div></section>`:''}
@@ -12677,9 +12726,13 @@ const Onboarding=(()=>{
   st.aDraft={day, data}; data.rows=data.rows||{}; data.pool=data.pool||{}; data.inactive=data.inactive||{};
   const A=autoAssign()[day]||{rows:{},other:0}; st.autoDay=A;
   const adm=Server.isAdmin(), names=[...new Set([...roster(), ...Object.keys(data.rows), ...Object.keys(A.rows)])].sort((a,b)=>a.localeCompare(b));
-  const val=(n,t)=>isAuto(t)?((A.rows[n]||{})[t]||0):(Number((data.rows[n]||{})[t])||0);
-  const colTot=t=>names.reduce((a,n)=>a+val(n,t),0), rowTot=n=>types.reduce((a,t)=>a+val(n,t),0);
-  const cell=(n,t)=>isAuto(t)?`<span class="as-auto" title="From the call log">${val(n,t)||'–'}</span>`:`<input type="number" min="0" step="1" class="as-in" data-as="${escapeHtml(n)}" data-t="${escapeHtml(t)}" value="${(data.rows[n]||{})[t]??''}" placeholder="0">`;
+  const SF=selfType(), LT=ltType(), SL=slType();
+  const raw=(n,t)=>isAuto(t)?((A.rows[n]||{})[t]||0):(Number((data.rows[n]||{})[t])||0);
+  const val=(n,t)=>{ if(t===SF){ const v=selfFrom(data.rows[n], LT&&raw(n,LT), SL&&raw(n,SL)); if(v!=null) return v; } return raw(n,t); };
+  const colTot=t=>names.reduce((a,n)=>a+val(n,t),0), callsTot=()=>names.reduce((a,n)=>a+(hasTot(data.rows[n])?Number(data.rows[n].__total):0),0);
+  const cell=(n,t)=>isAuto(t)?`<span class="as-auto" title="From the call log">${val(n,t)||'–'}</span>`
+    :t===SF&&hasTot(data.rows[n])?`<span class="as-auto as-calc" data-self="${escapeHtml(n)}" title="Total calls − ${escapeHtml(LT||'Live Transfer')} − ${escapeHtml(SL||'Schedule Later')}">${val(n,t)}</span>`
+    :`<input type="number" min="0" step="1" class="as-in" data-as="${escapeHtml(n)}" data-t="${escapeHtml(t)}" value="${(data.rows[n]||{})[t]??''}" placeholder="0">`;
   const recent=mergedAssign().filter(d=>Object.keys(d.data.rows).length).sort((a,b)=>b.day.localeCompare(a.day)).slice(0,10);
   const autoList=types.filter(isAuto), manualList=types.filter(t=>!isAuto(t));
   return `<section class="panel onb-asg">
@@ -12689,14 +12742,14 @@ const Onboarding=(()=>{
    <div class="as-tiles">${types.map(t=>{ const pool=data.pool[t], asg=colTot(t), ina=data.inactive[t];
      return `<div class="as-tile" data-tile="${escapeHtml(t)}"><span>${escapeHtml(t)}</span><strong data-tile-total>${pool!==''&&pool!=null?fmtNum(Number(pool)):'–'}</strong><em><b data-tile-asg>${fmtNum(asg)}</b> assigned · <b data-tile-left>${pool!==''&&pool!=null?fmtNum(Math.max(0,Number(pool)-asg)):'–'}</b> not assigned${ina?` · ${fmtNum(Number(ina))} inactive`:''}</em></div>`; }).join('')}
     <div class="as-tile all"><span>All types</span><strong data-tile-total-all>${fmtNum(types.reduce((a,t)=>a+(Number(data.pool[t])||0),0))||'–'}</strong><em><b data-tile-asg-all>${fmtNum(types.reduce((a,t)=>a+colTot(t),0))}</b> assigned to onboarders</em></div></div>
-   <p class="hint as-tile-note">Big numbers are the day’s <b>totals</b> typed in the “Total” row below; “assigned” adds up the onboarders’ rows.</p>
+   <p class="hint as-tile-note">Big numbers are the day’s <b>totals</b> typed in the “Total” row below; “assigned” adds up the onboarders’ rows. Type each onboarder’s <b>Total calls</b> — <b>${escapeHtml(SF||'Self')} = Total calls − ${escapeHtml(LT||'Live Transfer')} − ${escapeHtml(SL||'Schedule Later')}</b> (so Total calls = ${escapeHtml(LT||'Live Transfer')} + ${escapeHtml(SF||'Self')} + ${escapeHtml(SL||'Schedule Later')}).</p>
    <details class="as-paste" ${names.length?'':'open'}><summary>📋 Paste the daily message</summary>
     <textarea id="asText" rows="8" placeholder="Henry&#10;02 - live transfer&#10;23 - schedule later&#10;01 - already completed&#10;32 - local branch&#10;01 - Self&#10;&#10;Total Live transfer - 20&#10;…&#10;Inactive&#10;Scheduled later - 0"></textarea>
     <div class="as-paste-foot"><span class="hint">Each onboarder’s name (first name is enough), then “number - type” lines — numbers for Auto columns are ignored (they come from the call log). “Total … - n” lines fill the Total row; lines under “Inactive” fill the inactive row.</span><button type="button" class="btn btn-primary btn-sm" id="asParse">Fill the table</button></div><p class="me-err" id="asMsg"></p></details>
-   <div class="onb-scroll"><table class="users-table onb-table as-table"><thead><tr><th>Onboarder</th>${types.map(t=>`<th class="num">${escapeHtml(t)}${isAuto(t)?' <b class="as-auto-key">Auto</b>':''}</th>`).join('')}<th class="num">Total</th><th></th></tr></thead><tbody>
-    ${names.map(n=>`<tr><td>${escapeHtml(n)}</td>${types.map(t=>`<td class="num">${cell(n,t)}</td>`).join('')}<td class="num"><strong data-rt="${escapeHtml(n)}">${rowTot(n)}</strong></td><td>${adm&&!roster().includes(n)?`<button type="button" class="link-btn danger" data-as-rm="${escapeHtml(n)}" title="Not on the onboarder list — remove from this day">✕</button>`:''}</td></tr>`).join('')||`<tr><td colspan="${types.length+3}" class="hint" style="padding:12px">${adm?'No onboarders yet — add them below.':'No onboarders set up yet — ask an admin to add them.'}</td></tr>`}
+   <div class="onb-scroll"><table class="users-table onb-table as-table"><thead><tr><th>Onboarder</th>${types.map(t=>`<th class="num">${escapeHtml(t)}${isAuto(t)?' <b class="as-auto-key">Auto</b>':t===SF?' <b class="as-auto-key calc">= Total − LT − SL</b>':''}</th>`).join('')}<th class="num as-totcol">Total calls ✎</th><th></th></tr></thead><tbody>
+    ${names.map(n=>`<tr><td>${escapeHtml(n)}</td>${types.map(t=>`<td class="num">${cell(n,t)}</td>`).join('')}<td class="num as-totcol"><input type="number" min="0" step="1" class="as-in as-tot" data-astot="${escapeHtml(n)}" value="${(data.rows[n]||{}).__total??''}" placeholder="–" title="Total calls for ${escapeHtml(n)} = ${escapeHtml(LT||'Live Transfer')} + ${escapeHtml(SF||'Self')} + ${escapeHtml(SL||'Schedule Later')}"></td><td>${adm&&!roster().includes(n)?`<button type="button" class="link-btn danger" data-as-rm="${escapeHtml(n)}" title="Not on the onboarder list — remove from this day">✕</button>`:''}</td></tr>`).join('')||`<tr><td colspan="${types.length+3}" class="hint" style="padding:12px">${adm?'No onboarders yet — add them below.':'No onboarders set up yet — ask an admin to add them.'}</td></tr>`}
     ${adm?`<tr class="as-add"><td colspan="${types.length+3}"><input id="asNew" placeholder="＋ Add an onboarder to the list (full name)…" autocomplete="off"> <span class="hint">Admins only · saved to the onboarder list</span></td></tr>`:''}
-    <tr class="onb-total"><td><strong>Assigned to onboarders</strong></td>${types.map(t=>`<td class="num" data-ct="${escapeHtml(t)}">${colTot(t)}</td>`).join('')}<td class="num" data-ct="__all">${types.reduce((a,t)=>a+colTot(t),0)}</td><td></td></tr>
+    <tr class="onb-total"><td><strong>Assigned to onboarders</strong></td>${types.map(t=>`<td class="num" data-ct="${escapeHtml(t)}">${colTot(t)}</td>`).join('')}<td class="num as-totcol" data-ct="__calls">${callsTot()||'–'}</td><td></td></tr>
     <tr class="onb-total as-poolrow"><td><strong>Total</strong> <small class="hint">✎ type the day’s total for each type</small></td>${types.map(t=>`<td class="num"><input type="number" min="0" class="as-in as-pool" data-pool="${escapeHtml(t)}" value="${data.pool[t]??''}" placeholder="–"></td>`).join('')}<td></td><td></td></tr>
     <tr class="onb-total"><td><strong>Inactive</strong></td>${types.map(t=>`<td class="num"><input type="number" min="0" class="as-in as-pool" data-inact="${escapeHtml(t)}" value="${data.inactive[t]??''}" placeholder="–"></td>`).join('')}<td></td><td></td></tr>
    </tbody></table></div>
@@ -12721,7 +12774,7 @@ const Onboarding=(()=>{
    if(m){ const label=m[1], n=Number(m[2]);
     if(/assigned to onboarder/i.test(label)) return;   // the dashboard works this out itself
     if(mode==='inactive'){ const t=typeOf(label); if(t) out.inactive[t]=n; else unknown.push(label); return; }
-    if(mode==='totals') return;                         // per-onboarder totals are calculated
+    if(mode==='totals'){ (out.rows[label.trim()] ||= {}).__total=n; return; }   // per-onboarder Total calls
     if(/^total\b/i.test(label)){ const t=typeOf(label.replace(/^total\s*/i,'')); if(t) out.pool[t]=n; else unknown.push(label); return; }
    }
    if(!/\d/.test(l) && mode==='people'){ who=l.replace(/[:\-–]+$/,'').trim(); out.rows[who]=out.rows[who]||{}; return; }
@@ -12788,6 +12841,7 @@ const Onboarding=(()=>{
    st.busy=false; render(); setTimeout(()=>document.getElementById('onbEid')?.focus(),30);
   });
   host.querySelectorAll('[data-onb-tab]').forEach(b=>b.onclick=()=>{ st.tab=b.dataset.onbTab; render(); });
+  host.querySelectorAll('[data-onb-q]').forEach(b=>b.onclick=()=>{ st.fCat=b.dataset.onbQ; st.tab='cand'; render(); });
   host.querySelectorAll('[data-onb-open]').forEach(b=>b.onclick=()=>{ const k=b.dataset.onbOpen; st.open.has(k)?st.open.delete(k):st.open.add(k); render(); });
   host.querySelectorAll('[data-onb-new]').forEach(b=>b.onclick=()=>{ st.editing=null; render(); const i=document.getElementById('onbEid'); i.value=b.dataset.onbNew; i.dispatchEvent(new Event('input')); window.scrollTo({top:0,behavior:'smooth'}); document.getElementById('onbType')?.focus(); });
   host.querySelectorAll('[data-onb-edit]').forEach(b=>b.onclick=()=>{ st.editing=(st.rows||[]).find(r=>String(r.id)===b.dataset.onbEdit)||null; render(); window.scrollTo({top:0,behavior:'smooth'}); });
@@ -12796,9 +12850,12 @@ const Onboarding=(()=>{
  }
  function wireAssign(host){
   const $=s=>host.querySelector(s), d=st.aDraft, types=assignTypes();
-  const A=st.autoDay||{rows:{}}, v=(n,t)=>isAuto(t)?((A.rows[n]||{})[t]||0):(Number((d.data.rows[n]||{})[t])||0);
+  const A=st.autoDay||{rows:{}}, SF=selfType(), LT=ltType(), SL=slType();
+  const raw=(n,t)=>isAuto(t)?((A.rows[n]||{})[t]||0):(Number((d.data.rows[n]||{})[t])||0);
+  const v=(n,t)=>{ if(t===SF){ const x=selfFrom(d.data.rows[n], LT&&raw(n,LT), SL&&raw(n,SL)); if(x!=null) return x; } return raw(n,t); };
   const totals=()=>{ const names=[...new Set([...Object.keys(d.data.rows), ...Object.keys(A.rows)])]; types.forEach(t=>{ const el=host.querySelector(`[data-ct="${CSS.escape(t)}"]`); if(el) el.textContent=names.reduce((a,n)=>a+v(n,t),0); });
-   const all=host.querySelector('[data-ct="__all"]'); if(all) all.textContent=names.reduce((a,n)=>a+types.reduce((b,t)=>b+v(n,t),0),0);
+   const ct=host.querySelector('[data-ct="__calls"]'); if(ct) ct.textContent=names.reduce((a,n)=>a+(hasTot(d.data.rows[n])?Number(d.data.rows[n].__total):0),0)||'–';
+   names.forEach(n=>{ const el=host.querySelector(`[data-self="${CSS.escape(n)}"]`); if(el) el.textContent=v(n,SF); });
    names.forEach(n=>{ const el=host.querySelector(`[data-rt="${CSS.escape(n)}"]`); if(el) el.textContent=types.reduce((a,t)=>a+v(n,t),0); });
    const off=types.filter(t=>{ const p=d.data.pool[t]; return p!==''&&p!=null&&Number(p)!==names.reduce((a,n)=>a+v(n,t),0); });
    $('#asCheck').innerHTML=off.length?`⚠ Assigned ≠ total for ${off.map(escapeHtml).join(', ')}`:'';
@@ -12808,6 +12865,8 @@ const Onboarding=(()=>{
    const ta=host.querySelector('[data-tile-total-all]'); if(ta) ta.textContent=pAll?fmtNum(pAll):'–'; const aa=host.querySelector('[data-tile-asg-all]'); if(aa) aa.textContent=fmtNum(aAll); };
   const num=v=>v===''?'':Math.max(0,Math.round(Number(v)||0));
   host.querySelectorAll('[data-as]').forEach(i=>i.oninput=()=>{ (d.data.rows[i.dataset.as] ||= {})[i.dataset.t]=num(i.value); totals(); });
+  host.querySelectorAll('[data-astot]').forEach(i=>{ i.oninput=()=>{ const r=(d.data.rows[i.dataset.astot] ||= {}); r.__total=num(i.value); totals(); };
+   i.onchange=()=>{ const had=!!host.querySelector(`[data-self="${CSS.escape(i.dataset.astot)}"]`); if(had!==hasTot(d.data.rows[i.dataset.astot])) { const id=i.dataset.astot; render(); host.querySelector(`[data-astot="${CSS.escape(id)}"]`)?.focus(); } }; });
   host.querySelectorAll('[data-pool]').forEach(i=>i.oninput=()=>{ d.data.pool[i.dataset.pool]=num(i.value); totals(); });
   host.querySelectorAll('[data-inact]').forEach(i=>i.oninput=()=>{ d.data.inactive[i.dataset.inact]=num(i.value); });
   host.querySelectorAll('[data-as-rm]').forEach(b=>b.onclick=()=>{ delete d.data.rows[b.dataset.asRm]; render(); });
@@ -12831,7 +12890,7 @@ const Onboarding=(()=>{
    $('#asAddMissing')?.addEventListener('click',async()=>{ if(await addToRoster(m.missingN)){ st.asMsg=null; render(); const t=document.getElementById('asText'); t.value=m.txt; document.getElementById('asParse').click(); } }); }
   $('#asClear').onclick=()=>{ if(!confirm('Clear every number for '+fmtDate(st.aDay)+'?')) return; d.data={rows:{},pool:{},inactive:{}}; render(); };
   $('#asSave').onclick=async()=>{ const b=$('#asSave'); b.disabled=true; st.asMsg=null;
-   Object.keys(d.data.rows).forEach(n=>{ if(!n.trim()) { delete d.data.rows[n]; return; } Object.keys(d.data.rows[n]).forEach(t=>{ if(isAuto(t)) delete d.data.rows[n][t]; }); });
+   Object.keys(d.data.rows).forEach(n=>{ if(!n.trim()) { delete d.data.rows[n]; return; } Object.keys(d.data.rows[n]).forEach(t=>{ if(isAuto(t)||(t===selfType()&&hasTot(d.data.rows[n]))) delete d.data.rows[n][t]; }); });
    try{ await saveAssign(st.aDay, {...d.data, types}); showToast('Assignments saved for '+fmtDate(st.aDay)+'.'); st.aDraft=null; if(st.aDay<st.from) st.from=st.aDay; await load(); render(); }
    catch(e){ b.disabled=false; showToast('Not saved: '+cleanErr(e)); } };
   totals();
