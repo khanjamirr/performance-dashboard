@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.58.0</title>
+<title>Performance Dashboard · v4.60.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -1115,7 +1115,9 @@ button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #183442
 .onb-quick button.c-complete b{background:#dcfce7;color:#166534}.onb-quick button.c-i9 b{background:#dbeafe;color:#1e40af}.onb-quick button.c-lvm b{background:#fef3c7;color:#92400e}.onb-quick button.c-nr b{background:#fde2e2;color:#991b1b}.onb-quick button.q-pending b{background:#ffedd5;color:#9a3412}
 .onb-quick button.on.c-complete,.onb-quick button.on.c-i9,.onb-quick button.on.c-ip,.onb-quick button.on.c-lvm,.onb-quick button.on.c-nr,.onb-quick button.on.q-pending{background:#0a1f44;color:#fff}
 .onb-navbar{display:flex;align-items:center;gap:10px;margin:0 0 14px}.onb-navbar .onb-nav{margin:0}.onb-navbar>span:first-child{flex:1}.onb-updated{margin-left:auto;font-size:11.5px;color:#64748b}.onb-refresh{white-space:nowrap}
+.onb-aq{margin:4px 0 8px}.onb-aq-note{margin:0 0 8px;font-size:12px;color:#5b6b82}
 .onb-quick .q-ever{font-size:11px;font-weight:500;color:#92400e}.onb-quick button.on .q-ever{color:#fde68a}
+.onb-nr-note{display:block;font-size:10.5px;color:#991b1b;margin-top:2px}.onb-nr-note.lvm{color:#92400e}
 .onb-remark{grid-column:1 / -1}.onb-remark textarea{padding:8px 10px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:13.5px;text-transform:none;letter-spacing:0;font-weight:400;resize:vertical;min-height:40px}
 .onb-form-head>div{display:flex;gap:10px;align-items:center}
 .onb-rule{margin:0 0 8px;font-size:12px}
@@ -11652,7 +11654,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.58.0';   // shown only in the browser tab title
+const APP_VERSION = '4.60.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -12433,19 +12435,27 @@ const Onboarding=(()=>{
   const out={}, al=alreadyType(), types=assignTypes();
   candidates(st.rows||[]).forEach(c=>{ const f=c.first, day=f.call_date, o=f.onboarder;
    const t=catOf(f.status,f.call_type)==='complete'&&al?al:types.find(x=>x!==al&&anorm(x)===anorm(f.call_type));
-   const d=out[day]||(out[day]={rows:{}, other:0});
-   if(!t){ d.other++; if(anorm(f.call_type)==='outbound'){ const r=d.rows[o]||(d.rows[o]={}); r.__outbound=(r.__outbound||0)+1; } return; }
-   const r=d.rows[o]||(d.rows[o]={}); r[t]=(r[t]||0)+1; });
+   const d=out[day]||(out[day]={rows:{}, other:0, list:[]});
+   // no matching assignment type: outbound-style calls (Outbound, LVM / No answer, …) are self calls; Inbound goes to "Other"
+   const k=t||(/inbound/i.test(f.call_type||'')?'__other':'__outbound'); if(!t) d.other++;
+   d.list.push({o, k, cat:c.cat, eid:c.eid});
+   const r=d.rows[o]||(d.rows[o]={}); r[k]=(r[k]||0)+1; });
   return autoCache=out;
  }
+ const catMatch=(cat,f)=>!f||(f==='pending'?cat!=='complete':cat===f);
+ // first-call rows for one stage only (latest status) — typed numbers can't be split by stage, so only the call log counts
+ function autoRowsFor(day, f){ const a=autoAssign()[day]; if(!a) return {}; if(!f) return a.rows; const rows={};
+  a.list.forEach(x=>{ if(!catMatch(x.cat,f)) return; const r=rows[x.o]||(rows[x.o]={}); r[x.k]=(r[x.k]||0)+1; }); return rows; }
  // saved (typed) days + call-log days combined; typed numbers only for the types that aren't automatic
- function mergedAssign(){
+ function mergedAssign(f){
   const auto=autoAssign(), saved=new Map((st.assign||[]).map(d=>[d.day,d])), days=new Set([...saved.keys(), ...Object.keys(auto)]);
-  return [...days].filter(d=>d>=st.from&&d<=st.to).sort().map(day=>{ const sv=saved.get(day), sd=(sv&&sv.data)||{}, rows={};
+  return [...days].filter(d=>d>=st.from&&d<=st.to).sort().map(day=>{ const sv=saved.get(day), sd=(!f&&sv&&sv.data)||{}, rows={};
    Object.entries(sd.rows||{}).forEach(([n,r])=>{ rows[n]={}; Object.entries(r||{}).forEach(([t,v])=>{ if(!isAuto(t)) rows[n][t]=v; }); });
-   Object.entries((auto[day]||{}).rows||{}).forEach(([n,r])=>{ rows[n]={...(rows[n]||{}), ...r}; });
+   Object.entries(autoRowsFor(day, f)).forEach(([n,r])=>{ rows[n]={...(rows[n]||{}), ...r}; });
    const sf=selfType(), lt=ltType(), sl=slType();
-   if(sf) Object.entries(rows).forEach(([n,r])=>{ const v=selfFrom(r, lt&&r[lt]); if(v!=null) r[sf]=v; else if(r[sf]===undefined||r[sf]===''){ const a=(Number(sl&&r[sl])||0)+(Number(r.__outbound)||0); if(a) r[sf]=a; } });
+   // Self = Total − Live Transfers when a total was typed; otherwise from the log: Self-type first calls + Schedule Later + Outbound / LVM / other outbound calls
+   if(sf) Object.entries(rows).forEach(([n,r])=>{ const v=selfFrom(r, lt&&r[lt]); if(v!=null) r[sf]=v; else { const a=(Number(r[sf])||0)+(Number(sl&&r[sl])||0)+(Number(r.__outbound)||0); if(a) r[sf]=a; } });
+   else Object.values(rows).forEach(r=>{ if(r.__outbound) r.__other=(r.__other||0)+r.__outbound; });
    return {day, data:{rows, pool:sd.pool||{}, inactive:sd.inactive||{}}, updated_by:sv&&sv.updated_by, updated_at:sv&&sv.updated_at}; });
  }
  // "Henry" → "Henry Smith": exact name first, then a unique first-name match
@@ -12474,7 +12484,7 @@ const Onboarding=(()=>{
  const typeIdx=t=>{ const i=callTypes().indexOf(t); return i<0?9:i%8; };
  const DEMO_KEY='ipd_onb_demo';
  const today=()=>ltToday(), back=n=>{ const d=new Date(); d.setDate(d.getDate()-n); return toIsoDateOnly(d); };
- const st={from:back(29), to:today(), rows:null, demo:false, err:'', fOnb:'', fType:'', fCat:'', q:'', editing:null, busy:false, tab:'cand', open:new Set(), page:'', assign:[], aDay:ltToday(), aDraft:null, explain:''};
+ const st={from:back(29), to:today(), rows:null, demo:false, err:'', fOnb:'', fType:'', fCat:'', q:'', editing:null, busy:false, tab:'cand', open:new Set(), page:'', assign:[], aDay:ltToday(), aDraft:null, explain:'', aCat:''};
  const normEid=v=>normalizeEmployeeNumber(String(v||'').trim());
  const demoRows=()=>{ try{ return JSON.parse(localStorage.getItem(DEMO_KEY)||'[]'); }catch(e){ return []; } };
  const demoSave=list=>{ try{ localStorage.setItem(DEMO_KEY, JSON.stringify(list)); }catch(e){} };
@@ -12584,12 +12594,16 @@ const Onboarding=(()=>{
  async function lookupEid(eid){ const k=normEid(eid); if(!k||eidSrv.has(k)) return; try{ const r=await Server.rpc('dash_onb_eid',{p_eid:k}); eidSrv.set(k, r||{}); }catch(e){ eidSrv.set(k,{}); } }
  const linkHtml=l=>l&&l.recruiter?`<span class="onb-link ok" title="Most recent recruiter for this EID${l.others&&l.others.length?' — earlier: '+escapeHtml(l.others.join(', ')):''}">✓ <b>${escapeHtml(l.recruiter)}</b>’s candidate${l.branch?' · '+escapeHtml(l.branch):''}${l.interview?' · interview '+fmtDate(l.interview):l.scheduled?' · scheduled '+fmtDate(l.scheduled):l.last?' · last seen '+fmtDate(String(l.last).slice(0,10)):''}${l.showed?' · showed':l.noShow?' · no-show':''}${l.hired?' · hired':''}${l.others&&l.others.length?` <small>(earlier: ${escapeHtml(l.others.join(', '))})</small>`:''}</span>`:'<span class="onb-link no" title="This EID isn’t in the uploaded schedules / interviews">Not matched yet</span>';
  // ---- one candidate per EID: every call combined, the LATEST call's status counts ----
+ const NR_LVM_DAYS=3;   // LVM on this many different days in a row = Never responded
  const order=(a,b)=>String(a.call_date).localeCompare(String(b.call_date))||String(a.created_at||'').localeCompare(String(b.created_at||''))||(Number(a.id)||0)-(Number(b.id)||0);
  function candidates(rows){
   const m=new Map(); rows.forEach(r=>{ const k=normEid(r.eid)||String(r.eid); if(!m.has(k)) m.set(k,[]); m.get(k).push(r); });
   return [...m.entries()].map(([eid,calls])=>{ calls.sort(order); const last=calls[calls.length-1], first=calls[0];
    const done=calls.find(c=>catOf(c.status,c.call_type)==='complete');
-   return {eid, calls, last, first, cat:catOf(last.status,last.call_type), status:last.status, onboarder:last.onboarder, onboarders:[...new Set(calls.map(c=>c.onboarder))],
+   // LVM / no answer on 3 or more different days in a row (nothing in between) → Never responded
+   let cat=catOf(last.status,last.call_type), lvmDays=0;
+   if(cat==='lvm'){ const days=new Set(); for(let i=calls.length-1;i>=0;i--){ if(catOf(calls[i].status,calls[i].call_type)!=='lvm') break; days.add(calls[i].call_date); } lvmDays=days.size; if(lvmDays>=NR_LVM_DAYS) cat='no_response'; }
+   return {eid, calls, last, first, cat, lvmDays, status:last.status, onboarder:last.onboarder, onboarders:[...new Set(calls.map(c=>c.onboarder))],
     days:done?Math.round((new Date(done.call_date)-new Date(first.call_date))/864e5):null, remark:[...calls].reverse().find(c=>c.note)?.note||''}; })
    .sort((a,b)=>order(b.last,a.last));
  }
@@ -12644,7 +12658,7 @@ const Onboarding=(()=>{
    const people=by.size, reached=[...by.values()].filter(cs=>cs.some(c=>REACHED(catOf(c.status,c.call_type)))).length, completed=[...by.values()].filter(cs=>cs.some(c=>catOf(c.status,c.call_type)==='complete')).length;
    const assigned={}; let aTot=0; const aDays=new Set();
    let calls_typed=0;
-   assign.forEach(d=>{ const r=((d.data&&d.data.rows)||{})[o]; if(!r) return; let any=0; types.forEach(t=>{ const n=Number(r[t])||0; assigned[t]=(assigned[t]||0)+n; if(inSum(t)) aTot+=n; any+=n; }); if(hasTot(r)) calls_typed+=Number(r.__total); if(any) aDays.add(d.day); });
+   assign.forEach(d=>{ const r=((d.data&&d.data.rows)||{})[o]; if(!r) return; let any=0; [...types,'__other'].forEach(t=>{ const n=Number(r[t])||0; assigned[t]=(assigned[t]||0)+n; if(inSum(t)) aTot+=n; any+=n; }); if(hasTot(r)) calls_typed+=Number(r.__total); if(any) aDays.add(d.day); });
    const days=new Set([...mine.map(r=>r.call_date), ...aDays]).size||0, callDays=new Set(mine.map(r=>r.call_date)).size;
    return {o, calls_typed, calls:mine.length, people, reached, notReached:people-reached, completed, assigned, aTot, days, callDays,
     perDay:callDays?mine.length/callDays:null, peoplePerDay:callDays?people/callDays:null, callsPerPerson:people?mine.length/people:null};
@@ -12690,8 +12704,9 @@ const Onboarding=(()=>{
   else if(st.page==='log') body=`${requestsHtml()}${formHtml()}${filters(adm,onbs,true)}
    ${(()=>{ const cnt=k=>k===''?allCands.length:k==='pending'?allCands.filter(c=>c.cat!=='complete').length:allCands.filter(c=>c.cat===k).length;
      const ever=allCands.filter(c=>c.calls.some(x=>catOf(x.status,x.call_type)==='lvm')).length;
+     const nrAuto=allCands.filter(c=>c.cat==='no_response'&&c.lvmDays>=NR_LVM_DAYS).length;
      const chips=[['','All'],['pending','Pending'],['complete','Completed'],['i9','Between I9'],['in_process','In process'],['lvm','LVM / No answer'],['no_response','Never responded']];
-     return `<div class="onb-quick" role="tablist" aria-label="Show candidates">${chips.map(([k,l])=>`<button type="button" data-onb-q="${k}" class="${(st.fCat||'')===k?'on':''} ${k?CAT_CLS[k]||'q-pending':''}" aria-pressed="${(st.fCat||'')===k}" ${k==='lvm'?`title="${ever} candidate${ever===1?'':'s'} had an LVM / no answer at some point; ${fmtNum(cnt(k))} still ${cnt(k)===1?'is':'are'} at LVM on their latest call"`:''}><span>${l}</span><b>${fmtNum(cnt(k))}</b>${k==='lvm'&&ever>cnt(k)?`<small class="q-ever">${fmtNum(ever)} ever</small>`:''}</button>`).join('')}</div>`; })()}
+     return `<div class="onb-quick" role="tablist" aria-label="Show candidates">${chips.map(([k,l])=>`<button type="button" data-onb-q="${k}" class="${(st.fCat||'')===k?'on':''} ${k?CAT_CLS[k]||'q-pending':''}" aria-pressed="${(st.fCat||'')===k}" ${k==='lvm'?`title="${ever} candidate${ever===1?'':'s'} had an LVM / no answer at some point; ${fmtNum(cnt(k))} still ${cnt(k)===1?'is':'are'} at LVM on their latest call"`:''}><span>${l}</span><b>${fmtNum(cnt(k))}</b>${k==='lvm'&&ever>cnt(k)?`<small class="q-ever">${fmtNum(ever)} ever</small>`:''}${k==='no_response'&&nrAuto?`<small class="q-ever" title="${nrAuto} with LVM / no answer on ${NR_LVM_DAYS}+ days in a row">${nrAuto} from LVM</small>`:''}</button>`).join('')}</div>`; })()}
    <section class="panel"><div class="panel-head"><div><div class="ua-filter onb-tabs" role="tablist"><button type="button" data-onb-tab="cand" class="${st.tab==='cand'?'on':''}">Candidates · ${fmtNum(cands.length)}</button><button type="button" data-onb-tab="calls" class="${st.tab==='calls'?'on':''}">All calls · ${fmtNum(shownCalls.length)}</button></div>
      <span class="hint">${st.tab==='cand'?'One row per EID — all calls combined, the latest status counts. Click “calls” to see every call and remark.':(adm?'Everyone’s calls, newest first.':'Your calls, newest first.')}</span></div>${(st.tab==='cand'?cands.length:shownCalls.length)?copyBtnHtml('onbTable')+(Server.can('export')?downloadBtnHtml('onbTable',st.tab==='cand'?'onboarding-candidates.xlsx':'onboarding-calls.xlsx'):''):''}</div>
     ${st.tab==='cand'?candTable(cands):callTable(shownCalls)}</section>`;
@@ -12704,7 +12719,12 @@ const Onboarding=(()=>{
   const tile=(lbl,val,sub,cls,cat)=>`<button type="button" class="onb-tile ${cls||''} ${cat&&st.fCat===cat?'sel':''}" ${cat?`data-onb-cat="${cat}"`:'disabled'}><span>${lbl}</span><strong>${val}</strong>${sub?`<em>${sub}</em>`:''}</button>`;
   const fmt1=v=>v==null?'–':v.toFixed(1);
   const barKeys=CATS.map(([k])=>k).filter(k=>k!=='other'||S.by.other);
-  const types=assignTypes(), aTot={}; assign.forEach(d=>Object.values((d.data&&d.data.rows)||{}).forEach(r=>types.forEach(t=>{ aTot[t]=(aTot[t]||0)+(Number(r[t])||0); })));
+  const aCat=st.aCat||'', assignF=aCat?mergedAssign(aCat).map(d=>st.fOnb?{...d, data:{...d.data, rows:Object.fromEntries(Object.entries(d.data.rows).filter(([n])=>n===st.fOnb))}}:d):assign;
+  const volA=aCat?volume(rows, assignF):vol;
+  const aList=Object.entries(autoAssign()).filter(([d])=>d>=st.from&&d<=st.to).flatMap(([,a])=>a.list).filter(x=>!st.fOnb||x.o===st.fOnb);
+  const aCnt=k=>aList.filter(x=>catMatch(x.cat,k)).length;
+  const types0=assignTypes(), aTot={}; assignF.forEach(d=>Object.values((d.data&&d.data.rows)||{}).forEach(r=>[...types0,'__other'].forEach(t=>{ aTot[t]=(aTot[t]||0)+(Number(r[t])||0); })));
+  const types=aTot.__other?[...types0,'__other']:types0, tLbl=t=>t==='__other'?'Other (Inbound…)':t;
   const pool={}; assign.forEach(d=>types.forEach(t=>{ pool[t]=(pool[t]||0)+(Number(((d.data&&d.data.pool)||{})[t])||0); }));
   const totPeople=vol.reduce((a,v)=>a+v.people,0), totCalls=vol.reduce((a,v)=>a+v.calls,0);
   const ex=st.explain&&vol.find(v=>v.o===st.explain);
@@ -12727,11 +12747,14 @@ const Onboarding=(()=>{
     ${vol.map(v=>`<tr><td><button type="button" class="link-btn" data-onb-pick="${escapeHtml(v.o)}">${escapeHtml(v.o)}</button></td>${assign.length?`<td class="num" title="${escapeHtml(Object.entries(v.assigned).filter(([,n])=>n).map(([t,n])=>t+': '+n).join(' · '))}">${v.aTot||'–'}</td>`:''}<td class="num"><strong>${fmtNum(v.calls)}</strong></td><td class="num">${fmtNum(v.people)}</td><td class="num">${fmtNum(v.reached)}<small>${pct(v.reached,v.people)}</small></td><td class="num">${fmtNum(v.notReached)}<small>${pct(v.notReached,v.people)}</small></td><td class="num"><strong>${fmtNum(v.completed)}</strong></td><td class="num">${pct(v.completed,v.reached)}</td><td class="num">${v.callDays||'–'}</td><td class="num">${fmt1(v.perDay)}</td><td class="num">${fmt1(v.peoplePerDay)}</td><td class="num">${fmt1(v.callsPerPerson)}</td><td><button type="button" class="link-btn" data-onb-explain="${escapeHtml(v.o)}">Explain</button></td></tr>`).join('')}
     <tr class="onb-total"><td><strong>All onboarders</strong></td>${assign.length?`<td class="num">${fmtNum(vol.reduce((a,v)=>a+v.aTot,0))}</td>`:''}<td class="num">${fmtNum(totCalls)}</td><td class="num">${fmtNum(totPeople)}</td><td class="num">${fmtNum(vol.reduce((a,v)=>a+v.reached,0))}</td><td class="num">${fmtNum(vol.reduce((a,v)=>a+v.notReached,0))}</td><td class="num">${fmtNum(vol.reduce((a,v)=>a+v.completed,0))}</td><td class="num">${pct(vol.reduce((a,v)=>a+v.completed,0),vol.reduce((a,v)=>a+v.reached,0))}</td><td></td><td></td><td></td><td class="num">${totPeople?fmt1(totCalls/totPeople):'–'}</td><td></td></tr>
     </tbody></table></div></section>`:''}
-   ${assign.length?`<section class="panel"><div class="panel-head"><div><h3>Assignments in these dates</h3><span class="hint">From Log calls — each candidate counts once, on their first call, for the onboarder who made it.</span></div>${copyBtnHtml('onbAsgTot')}</div>
-    <div class="onb-scroll"><table class="users-table onb-table" id="onbAsgTot"><thead><tr><th>Onboarder</th>${types.map(t=>`<th class="num">${escapeHtml(t)}</th>`).join('')}<th class="num">Total</th></tr></thead><tbody>
-    ${vol.filter(v=>v.aTot).map(v=>`<tr><td>${escapeHtml(v.o)}</td>${types.map(t=>`<td class="num">${v.assigned[t]||'–'}</td>`).join('')}<td class="num"><strong>${v.aTot}</strong></td></tr>`).join('')}
+   ${assign.length?`<section class="panel"><div class="panel-head"><div><h3>Assignments in these dates</h3><span class="hint">From Log calls — each candidate counts once, on their first call, for the onboarder who made it. Pick a stage to see only candidates whose latest status is in it.</span></div>${copyBtnHtml('onbAsgTot')}</div>
+    <div class="onb-quick onb-aq" role="tablist" aria-label="Filter assignments by stage">${[['','All'],['pending','Pending'],['complete','Completed'],['i9','Between I9'],['in_process','In process'],['lvm','LVM / No answer'],['no_response','Never responded']].map(([k,l])=>`<button type="button" data-onb-aq="${k}" class="${aCat===k?'on':''} ${k?CAT_CLS[k]||'q-pending':''}" aria-pressed="${aCat===k}"><span>${l}</span><b>${fmtNum(aCnt(k))}</b></button>`).join('')}</div>
+    ${aCat?`<p class="hint onb-aq-note">Showing only <strong>${aCat==='pending'?'Pending':escapeHtml(CAT_LBL[aCat])}</strong> candidates (latest status), counted from Log calls. Typed totals are left out while a stage is picked.</p>`:''}
+    <div class="onb-scroll"><table class="users-table onb-table" id="onbAsgTot"><thead><tr><th>Onboarder</th>${types.map(t=>`<th class="num">${escapeHtml(tLbl(t))}</th>`).join('')}<th class="num">Total</th></tr></thead><tbody>
+    ${volA.filter(v=>v.aTot).length?'':`<tr><td colspan="${types.length+2}" class="hint">No candidates in this stage for these dates.</td></tr>`}
+    ${volA.filter(v=>v.aTot).map(v=>`<tr><td>${escapeHtml(v.o)}</td>${types.map(t=>`<td class="num">${v.assigned[t]||'–'}</td>`).join('')}<td class="num"><strong>${v.aTot}</strong></td></tr>`).join('')}
     <tr class="onb-total"><td><strong>Assigned to onboarders</strong></td>${types.map(t=>`<td class="num">${aTot[t]||0}</td>`).join('')}<td class="num">${types.filter(inSum).reduce((a,t)=>a+(aTot[t]||0),0)}</td></tr>
-    ${types.some(t=>pool[t])?`<tr class="onb-total"><td><strong>Total (typed)</strong></td>${types.map(t=>`<td class="num">${pool[t]||'–'}${pool[t]&&aTot[t]!==pool[t]?`<small>${pool[t]-(aTot[t]||0)} not assigned</small>`:''}</td>`).join('')}<td class="num">${types.reduce((a,t)=>a+(pool[t]||0),0)||'–'}</td></tr>`:''}
+    ${!aCat&&types.some(t=>pool[t])?`<tr class="onb-total"><td><strong>Total (typed)</strong></td>${types.map(t=>`<td class="num">${pool[t]||'–'}${pool[t]&&aTot[t]!==pool[t]?`<small>${pool[t]-(aTot[t]||0)} not assigned</small>`:''}</td>`).join('')}<td class="num">${types.reduce((a,t)=>a+(pool[t]||0),0)||'–'}</td></tr>`:''}
     </tbody></table></div></section>`:''}
    ${per.length?`<section class="panel"><div class="panel-head"><div><h3>Where each onboarder’s candidates stand</h3><span class="hint">Candidates are credited to whoever made their latest call. % = share of that onboarder’s candidates.</span></div>${copyBtnHtml('onbPerf')}</div>
     <div class="onb-scroll"><table class="users-table onb-table" id="onbPerf"><thead><tr><th>Onboarder</th><th class="num">Candidates</th><th class="num">Complete</th><th class="num">Between I9</th><th class="num">In process</th><th class="num">LVM / No ans.</th><th class="num">Never resp.</th><th class="num">Calls / cand.</th><th class="num">Avg. min</th><th class="num">Days to complete</th></tr></thead><tbody>
@@ -12810,7 +12833,7 @@ const Onboarding=(()=>{
   if(!cands.length) return `<p class="hint" style="margin:0">${(st.rows||[]).length?'No candidates match these filters.':'No calls logged in these dates yet — use “Log a call” above.'}</p>`;
   return `<div class="onb-scroll"><table class="users-table onb-table" id="onbTable"><thead><tr><th>EID</th><th>Latest status</th><th>Result</th><th class="num">Calls</th><th>First call</th><th>Last call</th><th>Onboarder</th><th>Latest remark</th><th>Schedule / interview (by EID)</th><th></th></tr></thead><tbody>
    ${cands.map(c=>{ const open=st.open.has(c.eid);
-    return `<tr class="onb-cand"><td><strong>${escapeHtml(c.eid)}</strong></td><td>${stPill(c.status)}</td><td>${catPill(c.cat)}</td><td class="num">${c.calls.length}</td><td>${fmtDate(c.first.call_date)}</td><td>${fmtDate(c.last.call_date)}</td><td>${escapeHtml(c.onboarder)}${c.onboarders.length>1?` <small class="hint">+${c.onboarders.length-1}</small>`:''}</td><td class="onb-note">${escapeHtml(c.remark||'')}</td><td>${linkHtml(linkOf(c.eid))}</td><td class="onb-act"><button class="link-btn" data-onb-open="${escapeHtml(c.eid)}">${open?'Hide':'Calls ('+c.calls.length+')'}</button><button class="link-btn" data-onb-new="${escapeHtml(c.eid)}" title="Log another call for this EID">＋ Call</button></td></tr>
+    return `<tr class="onb-cand"><td><strong>${escapeHtml(c.eid)}</strong></td><td>${stPill(c.status)}</td><td>${catPill(c.cat)}${c.lvmDays>=NR_LVM_DAYS?`<small class="onb-nr-note" title="LVM / no answer on ${c.lvmDays} different days in a row">LVM ${c.lvmDays} days</small>`:c.cat==='lvm'&&c.lvmDays?`<small class="onb-nr-note lvm" title="Becomes Never responded after ${NR_LVM_DAYS} days of LVM">day ${c.lvmDays} of ${NR_LVM_DAYS}</small>`:''}</td><td class="num">${c.calls.length}</td><td>${fmtDate(c.first.call_date)}</td><td>${fmtDate(c.last.call_date)}</td><td>${escapeHtml(c.onboarder)}${c.onboarders.length>1?` <small class="hint">+${c.onboarders.length-1}</small>`:''}</td><td class="onb-note">${escapeHtml(c.remark||'')}</td><td>${linkHtml(linkOf(c.eid))}</td><td class="onb-act"><button class="link-btn" data-onb-open="${escapeHtml(c.eid)}">${open?'Hide':'Calls ('+c.calls.length+')'}</button><button class="link-btn" data-onb-new="${escapeHtml(c.eid)}" title="Log another call for this EID">＋ Call</button></td></tr>
     ${open?[...c.calls].reverse().map(r=>`<tr class="onb-sub"><td></td><td colspan="2">${stPill(r.status)}</td><td class="num">${escapeHtml(r.call_type)}</td><td>${fmtDate(r.call_date)}</td><td>${durTxt(r)}</td><td>${escapeHtml(r.onboarder)}</td><td class="onb-note" colspan="2">${escapeHtml(r.note||'')}</td><td class="onb-act">${actions(r)}</td></tr>`).join(''):''}`; }).join('')}
    </tbody></table></div>`;
  }
@@ -12833,6 +12856,7 @@ const Onboarding=(()=>{
    $('#onbFType')?.addEventListener('change',e=>{ st.fType=e.target.value; render(); });
    $('#onbFCat')?.addEventListener('change',e=>{ st.fCat=e.target.value; render(); });
    let t; $('#onbQ')?.addEventListener('input',e=>{ clearTimeout(t); t=setTimeout(()=>{ st.q=e.target.value; render(); const q=document.getElementById('onbQ'); if(q){ q.focus(); q.setSelectionRange(q.value.length,q.value.length); } },250); });
+   host.querySelectorAll('[data-onb-aq]').forEach(b=>b.onclick=()=>{ st.aCat=b.dataset.onbAq; render(); });
    host.querySelectorAll('[data-onb-cat]').forEach(b=>b.onclick=()=>{ st.fCat=st.fCat===b.dataset.onbCat?'':b.dataset.onbCat; render(); });
    host.querySelectorAll('[data-onb-pick]').forEach(b=>b.onclick=()=>{ st.fOnb=b.dataset.onbPick; render(); }); };
   filt();
