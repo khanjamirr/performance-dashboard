@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.62.0</title>
+<title>Performance Dashboard · v4.62.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -11690,7 +11690,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.62.0';   // shown only in the browser tab title
+const APP_VERSION = '4.62.1';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -13324,11 +13324,14 @@ const OrderEntry=(()=>{
   if((m=/^(\d{1,2})[\s-]+([a-z]{3,9})\.?,?[\s-]+(\d{2,4})$/.exec(w))&&MONTHS[m[2].slice(0,3)]) return ymd(m[3],MONTHS[m[2].slice(0,3)],m[1]);
   return null;
  }
- const cnt=v=>{ if(v==null) return {v:null}; const s=String(v).trim().replace(/,/g,''); if(s===''||s==='-'||s==='–') return {v:null}; if(!/^\d+(\.0+)?$/.test(s)) return {bad:true}; const n=Number(s); return n>100000?{bad:true}:{v:n}; };
+ // AB / absent / leave / off / PTO / holiday / N/A = the agent wasn't working that day → not imported, not an error
+ const ABSENT=/^(ab|a|abs|absent|leave|onleave|off|dayoff|pto|holiday|hol|sick|na|n\/a|wo|weekoff|x)$/i;
+ const cnt=v=>{ if(v==null) return {v:null}; const s=String(v).trim().replace(/,/g,''); if(s===''||s==='-'||s==='–') return {v:null}; if(ABSENT.test(s.replace(/[\s.]/g,''))) return {v:null, absent:true}; if(!/^\d+(\.0+)?$/.test(s)) return {bad:true}; const n=Number(s); return n>100000?{bad:true}:{v:n}; };
  const isDateH=h=>/^(date|day|entrydate|workdate|orderdate|dt)$/.test(h)||h.endsWith('date');
- const isAgentH=h=>/^(agent|agentname|name|orderentryagent|oeagent|user|username|employee|employeename|member|teammember|person|enteredby)$/.test(h);
- const isRcH=h=>h==='rc'||h.startsWith('recruitmentcloud')||h==='rcorders'||h==='rccount'||h==='rcentries'||h==='recruitment';
- const isCrmH=h=>h==='crm'||h.startsWith('crm');
+ const isRcH=h=>h==='rc'||/^rc(entries|entry|orders?|count|total|s)?$/.test(h)||h.includes('recruitmentcloud')||h==='recruitment';
+ const isCrmH=h=>h.includes('crm');
+ // "Agent", "Name", "VMS Coordinator name", "Coordinator", "Order entry agent", "Employee", …
+ const isAgentH=h=>!isDateH(h)&&!isRcH(h)&&!isCrmH(h)&&!h.startsWith('total')&&(/^(name|user|username|person|enteredby|member|teammember)$/.test(h)||/(agent|coordinator|name|employee|associate|executive|specialist|processor|recruiter)/.test(h));
  const isTotH=h=>h==='total'||h.startsWith('total');
  const isNoteH=h=>/^(note|notes|remark|remarks|comment|comments)$/.test(h);
  // "Priya RC", "Priya Shah - Recruitment Cloud", "CRM (Mark)" → {agent, src}
@@ -13358,7 +13361,7 @@ const OrderEntry=(()=>{
    x.day=toDay(day); if(!x.day) iss.push('date not recognised'); else if(x.day>today()) iss.push('date is in the future');
    const a=resolveAgent(agentRaw); x.agent=a.name; x.unknown=a.unknown; x.guessed=a.guessed; if(!a.name) iss.push('no agent name');
    const R=cnt(rc), C=cnt(crm); if(R.bad) iss.push('RC is not a whole number'); if(C.bad) iss.push('CRM is not a whole number');
-   x.rc=R.v; x.crm=C.v; if(!R.bad&&!C.bad&&x.rc==null&&x.crm==null) iss.push('no RC or CRM count');
+   x.rc=R.v; x.crm=C.v; if(!R.bad&&!C.bad&&x.rc==null&&x.crm==null){ if(R.absent||C.absent) x.absent=true; else iss.push('no RC or CRM count'); }
    if(tot!=null&&!iss.length){ const T=cnt(tot); if(T.v!=null&&T.v!==(x.rc||0)+(x.crm||0)) x.totWarn=`Total column says ${fmtNum(T.v)}, RC + CRM = ${fmtNum((x.rc||0)+(x.crm||0))}`; }
    x.issues=iss; out.push(x); };
   if(cA>=0&&(cR>=0||cC>=0)){ body.forEach((r,i)=>push(hi+i+2, r[cD], r[cA], cR>=0?r[cR]:null, cC>=0?r[cC]:null, cT>=0?r[cT]:null, cN>=0?r[cN]:''));
@@ -13375,10 +13378,10 @@ const OrderEntry=(()=>{
  // combine duplicates (same agent + day inside the file: the last one wins) and compare with what is saved
  function finish(parsed){
   if(parsed.error) return parsed;
-  const ok=parsed.rows.filter(x=>!x.issues.length), seen=new Map();
+  const ok=parsed.rows.filter(x=>!x.issues.length&&!x.absent), seen=new Map();
   ok.forEach(x=>{ const k=x.day+'|'+x.agent; if(seen.has(k)){ seen.get(k).dupOf=x.line; } seen.set(k,x); });
   const keep=[...seen.values()];
-  parsed.rows.forEach(x=>{ if(!x.issues.length&&seen.get(x.day+'|'+x.agent)!==x) x.dup=true; });
+  parsed.rows.forEach(x=>{ if(!x.issues.length&&!x.absent&&seen.get(x.day+'|'+x.agent)!==x) x.dup=true; });
   const days=keep.map(x=>x.day).sort();
   return {...parsed, keep, from:days[0]||null, to:days[days.length-1]||null, newAgents:[...new Set(keep.filter(x=>x.unknown).map(x=>x.agent))].sort()};
  }
@@ -13396,18 +13399,19 @@ const OrderEntry=(()=>{
   let preview='';
   if(R&&R.error) preview=`<div class="onb-demo bad">${escapeHtml(R.error)}</div>`;
   else if(R){
-   const bad=R.rows.filter(x=>x.issues.length), dup=R.rows.filter(x=>x.dup), k=R.keep;
+   const bad=R.rows.filter(x=>x.issues.length), dup=R.rows.filter(x=>x.dup), abs=R.rows.filter(x=>x.absent), k=R.keep;
    const skipNew=!b.addAgents?k.filter(x=>x.unknown):[], go=k.filter(x=>!skipNew.includes(x)&&(b.mode==='replace'?x.state!=='same':x.state==='new'));
    const n=s=>k.filter(x=>x.state===s&&!skipNew.includes(x)).length;
    st.bulkGo=go;
-   const shown=[...bad, ...k].slice(0,300);
-   const stTag=x=>x.issues.length?`<span class="oe-tag bad">${escapeHtml(x.issues.join(', '))}</span>`:skipNew.includes(x)?'<span class="oe-tag skip">skipped — agent not on the list</span>':x.state==='new'?'<span class="oe-tag new">new</span>':x.state==='same'?'<span class="oe-tag same">already saved</span>':b.mode==='replace'?`<span class="oe-tag chg">replaces RC ${x.old.rc??'–'} · CRM ${x.old.crm??'–'}</span>`:'<span class="oe-tag skip">kept existing</span>';
+   const shown=[...bad, ...k, ...abs].slice(0,300);
+   const stTag=x=>x.absent?'<span class="oe-tag skip">absent — not imported</span>':x.issues.length?`<span class="oe-tag bad">${escapeHtml(x.issues.join(', '))}</span>`:skipNew.includes(x)?'<span class="oe-tag skip">skipped — agent not on the list</span>':x.state==='new'?'<span class="oe-tag new">new</span>':x.state==='same'?'<span class="oe-tag same">already saved</span>':b.mode==='replace'?`<span class="oe-tag chg">replaces RC ${x.old.rc??'–'} · CRM ${x.old.crm??'–'}</span>`:'<span class="oe-tag skip">kept existing</span>';
    preview=`<div class="oe-bulk-sum">
      <div><b>${fmtNum(R.rows.length)}</b><span>rows read</span></div>
      <div class="new"><b>${fmtNum(n('new'))}</b><span>new</span></div>
      <div class="chg"><b>${fmtNum(n('change'))}</b><span>different from saved</span></div>
      <div><b>${fmtNum(n('same'))}</b><span>already saved</span></div>
      <div class="${bad.length?'bad':''}"><b>${fmtNum(bad.length)}</b><span>with problems (skipped)</span></div>
+     ${abs.length?`<div><b>${fmtNum(abs.length)}</b><span>absent (AB) — not imported</span></div>`:''}
      ${dup.length?`<div class="warn"><b>${fmtNum(dup.length)}</b><span>repeated — last one used</span></div>`:''}
     </div>
     <p class="hint">${escapeHtml(R.layout)} · ${R.from?`${escapeHtml(dayName(R.from))} → ${escapeHtml(dayName(R.to))}`:'no valid dates'} · ${new Set(k.map(x=>x.agent)).size} agents · RC ${fmtNum(k.reduce((a,x)=>a+(x.rc||0),0))} · CRM ${fmtNum(k.reduce((a,x)=>a+(x.crm||0),0))}</p>
@@ -13417,7 +13421,7 @@ const OrderEntry=(()=>{
      <label><input type="radio" name="oeMode" value="replace" ${b.mode==='replace'?'checked':''}> Replace it with the file</label>
      <label><input type="radio" name="oeMode" value="skip" ${b.mode==='skip'?'checked':''}> Keep what’s saved</label></div>
     <div class="onb-scroll oe-prev"><table class="users-table onb-table" id="oeBulkPrev"><thead><tr><th class="num">Line</th><th>Date</th><th>Agent</th><th class="num">RC</th><th class="num">CRM</th><th class="num">Total</th><th>Result</th></tr></thead><tbody>
-     ${shown.map(x=>`<tr class="${x.issues.length?'oe-bad':''}"><td class="num">${x.line}</td><td>${x.day?escapeHtml(dayName(x.day)):escapeHtml(String(x.rawDay??''))}</td><td>${escapeHtml(x.agent||String(x.rawAgent||''))}${x.unknown?' <span class="oe-off">new name</span>':''}</td><td class="num">${x.rc??'–'}</td><td class="num">${x.crm??'–'}</td><td class="num">${x.issues.length?'':fmtNum((x.rc||0)+(x.crm||0))}${x.totWarn?` <span class="oe-tag warn" title="${escapeHtml(x.totWarn)}">check total</span>`:''}</td><td>${stTag(x)}</td></tr>`).join('')}
+     ${shown.map(x=>`<tr class="${x.issues.length?'oe-bad':''}"><td class="num">${x.line}</td><td>${x.day?escapeHtml(dayName(x.day)):escapeHtml(String(x.rawDay??''))}</td><td>${escapeHtml(x.agent||String(x.rawAgent||''))}${x.unknown?' <span class="oe-off">new name</span>':''}</td><td class="num">${x.absent?'AB':x.rc??'–'}</td><td class="num">${x.absent?'AB':x.crm??'–'}</td><td class="num">${x.issues.length||x.absent?'':fmtNum((x.rc||0)+(x.crm||0))}${x.totWarn?` <span class="oe-tag warn" title="${escapeHtml(x.totWarn)}">check total</span>`:''}</td><td>${stTag(x)}</td></tr>`).join('')}
      ${R.rows.length>shown.length?`<tr><td colspan="7" class="hint">…and ${fmtNum(R.rows.length-shown.length)} more rows</td></tr>`:''}
     </tbody></table></div>
     <div class="oe-foot"><span class="onb-err" id="oeBErr" role="alert"></span><button type="button" class="btn btn-secondary" id="oeBClear">Clear</button><button type="button" class="btn btn-primary" id="oeBGo" ${go.length&&!st.busy?'':'disabled'}>${st.busy?'Importing…':`Import ${fmtNum(go.length)} row${go.length===1?'':'s'}`}</button></div>`;
