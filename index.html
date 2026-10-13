@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.73.1</title>
+<title>Performance Dashboard · v4.73.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -11822,7 +11822,9 @@ function ltLeadsHtmlBuild(p,cutoff,mode,today,division){
  const work=cutoff>=p.from?(p.from===cutoff?[p.from]:ltWorkdays(p.from,cutoff)):[];
  const rate=(n,d,min=1)=>n==null||d==null||d<min?null:n/d*100;
  const stat=g=>{
-  const r=ltReport(g,p.from,p.to,today), T=r.total;
+  const r=ltReport(g,p.from,p.to,today), T={...r.total};
+  // a recruiter without a day-by-day breakdown makes the group total “unavailable” — add up the people that do have it instead
+  TG_METRICS.forEach(([k])=>{ if(T[k]===null) T[k]=r.members.reduce((a,m)=>a+(m[k]||0),0); });
   const pace=r.members.reduce((a,x)=>a+work.filter(d=>tgActive(g,x.label,d)).reduce((s2,d)=>s2+ltDailyGoal(x.label,d),0),0);
   const people=r.members.length; if(!people) return null;
   const hprDen=r.hprDenominator||0;
@@ -11870,7 +11872,7 @@ function ltLeadsHtmlBuild(p,cutoff,mode,today,division){
  <div class="hp-table-wrap"><table class="ep-table ta-matrix" id="ltLeadsTable"><thead><tr><th rowspan="2">#</th><th rowspan="2">Team lead</th><th rowspan="2">Recruiters</th><th class="ta-grp">Schedules</th><th class="ta-grp" colspan="3">Interviews</th><th class="ta-grp" colspan="2">Hires</th></tr>
  <tr><th>vs goal<small>so far · min 90%</small></th><th>Interviews</th><th>Shows<small>show rate · min 70%</small></th><th>No shows<small>no-show rate · under 20%</small></th><th>Hires<small>of shows · avg ${pc(avg.hire)}</small></th><th>Per recruiter<small>min 15 a week</small></th></tr></thead>
  <tbody>${sorted.map((r,i)=>`<tr${r.tm.id===String(ltState.viewingId||Server.user.id)?' class="lt-mine"':''}><td>${i+1}</td><td>${lead(r)}</td><td>${r.people}${r.behind?`<small class="ta-behind">${r.behind} behind</small>`:''}</td>${cell('goal',r.goal,`${fmtNum(r.T.schedules||0)} / ${tgNumber(r.pace)}`)}<td class="ta-cell ta-n ta-plain">${r.T.scheduledDateOf==null?'–':fmtNum(r.T.scheduledDateOf)}</td>${cell('show',r.show,r.T.scheduledDateOf?`${fmtNum(r.T.shows||0)} shows`:'')}${cell('noshow',r.noshow,r.T.scheduledDateOf?`${fmtNum(r.T.noShows||0)} no shows`:'')}<td class="ta-cell ta-${band.hire(r.hire)||'n'}">${r.T.i9==null?'–':fmtNum(r.T.i9)}<small>${r.hire==null?'':pc(r.hire)+' of shows'}</small></td>${cell('hpr',r.hpr,'')}</tr>`).join('')}</tbody>
- <tfoot><tr><td></td><td>All teams</td><td>${rows.reduce((a,r)=>a+r.people,0)}</td><td>${pc(rate(all.schedules,all.pace))}<small class="hint"> ${fmtNum(all.schedules)} / ${tgNumber(all.pace)}</small></td><td>${fmtNum(all.scheduledDateOf)}</td><td>${pc(rate(all.shows,all.scheduledDateOf,3))}<small class="hint"> ${fmtNum(all.shows)}</small></td><td>${pc(rate(all.noShows,all.scheduledDateOf,3))}<small class="hint"> ${fmtNum(all.noShows)}</small></td><td>${fmtNum(all.i9)}<small class="hint"> ${pc(avg.hire)}</small></td><td></td></tr>${[offTeam&&['Not on a team',offTeam,'ta-off'],overall&&['All recruiters',overall,'ta-overall']].filter(Boolean).map(([l,x,cls])=>`<tr class="${cls}"><td></td><td>${l}${cls==='ta-overall'?'<small class="ta-team">same people as Performance Overview</small>':'<small class="ta-team">activity on days they had no team</small>'}</td><td>${x.people}</td><td>${pc(x.goal)}<small class="hint"> ${fmtNum(x.T.schedules||0)} / ${tgNumber(x.pace)}</small></td><td>${x.T.scheduledDateOf==null?'–':fmtNum(x.T.scheduledDateOf)}</td><td>${pc(x.show)}<small class="hint"> ${fmtNum(x.T.shows||0)}</small></td><td>${pc(x.noshow)}<small class="hint"> ${fmtNum(x.T.noShows||0)}</small></td><td>${x.T.i9==null?'–':fmtNum(x.T.i9)}<small class="hint"> ${pc(x.hire)}</small></td><td>${x.hpr==null?'–':x.hpr.toFixed(1)}</td></tr>`).join('')}</tfoot></table></div>
+ <tfoot><tr><td></td><td>All teams</td><td>${rows.reduce((a,r)=>a+r.people,0)}</td><td>${pc(rate(all.schedules,all.pace))}<small class="hint"> ${fmtNum(all.schedules)} / ${tgNumber(all.pace)}</small></td><td>${fmtNum(all.scheduledDateOf)}</td><td>${pc(rate(all.shows,all.scheduledDateOf,3))}<small class="hint"> ${fmtNum(all.shows)}</small></td><td>${pc(rate(all.noShows,all.scheduledDateOf,3))}<small class="hint"> ${fmtNum(all.noShows)}</small></td><td>${fmtNum(all.i9)}<small class="hint"> ${pc(avg.hire)}</small></td><td></td></tr>${[offTeam&&['Not on a team',offTeam,'ta-off'],overall&&['All recruiters',overall,'ta-overall']].filter(Boolean).map(([l,x,cls])=>`<tr class="${cls}"><td></td><td>${l}${cls==='ta-overall'?'<small class="ta-team">everyone — all teams + not on a team</small>':'<small class="ta-team">recruiters who aren’t on any lead’s team</small>'}</td><td>${x.people}</td><td>${pc(x.goal)}<small class="hint"> ${fmtNum(x.T.schedules||0)} / ${tgNumber(x.pace)}</small></td><td>${x.T.scheduledDateOf==null?'–':fmtNum(x.T.scheduledDateOf)}</td><td>${pc(x.show)}<small class="hint"> ${fmtNum(x.T.shows||0)}</small></td><td>${pc(x.noshow)}<small class="hint"> ${fmtNum(x.T.noShows||0)}</small></td><td>${x.T.i9==null?'–':fmtNum(x.T.i9)}<small class="hint"> ${pc(x.hire)}</small></td><td>${x.hpr==null?'–':x.hpr.toFixed(1)}</td></tr>`).join('')}</tfoot></table></div>
  <p class="hint">“All teams” covers only recruiters on a team; “All recruiters” adds everyone else and matches Performance Overview${p.to>today?' (Overview compares this week against the full-week goal, so its goal % is lower mid-week; here goals count only the working days so far)':''}. Click a team lead to open their team on My Team. Hires per recruiter is per recruiter per week, the same as on Performance Overview.</p></section>`;
 }
 const leadsState={mode:null,anchor:null,division:''};
@@ -12039,7 +12041,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.73.1';   // shown only in the browser tab title
+const APP_VERSION = '4.73.2';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
