@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.64.0</title>
+<title>Performance Dashboard · v4.64.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -1154,8 +1154,10 @@ button.onb-tile{font:inherit;text-align:left;cursor:pointer}button.onb-tile:disa
 .oe-d{font-size:12px;color:#64748b}.oe-d.up{color:#15803d}.oe-d.down{color:#c8102e}
 .oe-grid th.oe-sep,.oe-grid td.oe-sep{border-right:1px solid #e2e8f0}
 #view-orderentry p.hint{font-size:12.5px;margin:4px 0 8px}#view-orderentry .onb-demo .hint{display:block;font-size:12px}
-.rtl{margin-top:14px}.rtl .panel-head{display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap}.rtl .panel-head>div:first-child{flex:1}
-.rtl-tools{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 14px;margin:2px 0 10px}.rtl-chk{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#334155;padding-bottom:8px}
+.rtl-open .rtl-hide{display:none!important}.rtl-switch{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#0a1f44;cursor:pointer;white-space:nowrap;user-select:none}
+.rtl-head{display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap;margin:2px 0 8px}.rtl-head>div:first-child{flex:1}.rtl-head h4{margin:0 0 2px;font-size:14px;color:#0a1f44}.rtl-head .hint{display:block;font-size:12px;line-height:1.5;color:#64748b}
+.rtl-chk .switch{flex:0 0 36px;width:36px;height:20px}.rtl-chk .switch i{width:14px;height:14px}.rtl-chk .switch[aria-checked="true"] i{left:19px}.rtl-chk .switch:disabled{opacity:.5;cursor:not-allowed}
+.rtl-tools{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 14px;margin:2px 0 10px}.rtl-chk{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:600;color:#334155;padding-bottom:8px}
 .rtl-scroll{overflow:auto;max-height:620px;border:1px solid #e6ebf2;border-radius:10px}.rtl-table{width:max-content;min-width:100%;margin:0;border-collapse:separate;border-spacing:0}
 .rtl-table th,.rtl-table td{white-space:nowrap;padding:7px 9px;font-size:12.5px;border-bottom:1px solid #eef2f6}.rtl-table thead th{position:sticky;top:0;background:#f6f8fb;z-index:2;font-size:11px}
 .rtl-table .rtl-name{position:sticky;left:0;background:#fff;z-index:1;min-width:150px;font-weight:600;border-right:1px solid #e6ebf2}.rtl-table thead .rtl-name{z-index:3;background:#f6f8fb}
@@ -6576,10 +6578,10 @@ async function renderPeopleView(mode){
     <div class="people-layout-grid">
       <div>
         <div class="panel" data-section="${mode==='recruiters'?'rec.table':'br.table'}">
-          <div class="panel-head"><h3>${mode==='recruiters'?'Recruiter':'Branch'} Detail</h3><div style="display:flex;align-items:center;gap:10px;"><span class="hint">Click a row for its trend · Ctrl/Cmd-click to compare · click a column to sort · &#9660; to filter${mode==='recruiters'?' · Remarks are saved per week':''}</span>${mode==='recruiters'&&canManualEdit()?`<button type="button" class="btn btn-secondary btn-sm" onclick="openManualEntryDialog({})" title="Add or take away schedules, interviews, shows or hires by hand">＋ Adjust numbers</button>`:''}${mode==='branches'&&canMergeBranches()?`<button type="button" class="btn btn-secondary btn-sm" data-merge-open onclick="openBranchMergeFromTable()">${(selectedPieTargets.branches||[]).length>=2?`⇄ Merge ${(selectedPieTargets.branches||[]).length} selected`:`⇄ Merge branches${branchMergeList().length?' · '+branchMergeList().length:''}`}</button>`:''}${copyBtnHtml('peopleTable_'+mode)}${downloadBtnHtml('peopleTable_'+mode, (mode==='recruiters'?'recruiter':'branch')+'-performance.xlsx')}</div></div>
-          <table id="peopleTable_${mode}"></table>
+          <div class="panel-head"><h3>${mode==='recruiters'?'Recruiter':'Branch'} Detail</h3><div style="display:flex;align-items:center;gap:10px;">${mode==='recruiters'?`<label class="rtl-switch" title="Swap the table for schedules by day or by week, recruiter against recruiter"><button type="button" class="switch" role="switch" id="rtlToggle" aria-checked="${recTl.open}"><i></i></button><span>Day / week view</span></label>`:''}<span class="hint rtl-hide">Click a row for its trend · Ctrl/Cmd-click to compare · click a column to sort · &#9660; to filter${mode==='recruiters'?' · Remarks are saved per week':''}</span>${mode==='recruiters'&&canManualEdit()?`<button type="button" class="btn btn-secondary btn-sm" onclick="openManualEntryDialog({})" title="Add or take away schedules, interviews, shows or hires by hand">＋ Adjust numbers</button>`:''}${mode==='branches'&&canMergeBranches()?`<button type="button" class="btn btn-secondary btn-sm" data-merge-open onclick="openBranchMergeFromTable()">${(selectedPieTargets.branches||[]).length>=2?`⇄ Merge ${(selectedPieTargets.branches||[]).length} selected`:`⇄ Merge branches${branchMergeList().length?' · '+branchMergeList().length:''}`}</button>`:''}<span class="rtl-hide" style="display:contents">${copyBtnHtml('peopleTable_'+mode)}${downloadBtnHtml('peopleTable_'+mode, (mode==='recruiters'?'recruiter':'branch')+'-performance.xlsx')}</span></div></div>
+          <table id="peopleTable_${mode}" class="rtl-hide"></table>
+          ${mode==='recruiters'?'<div id="recTimeline"></div>':''}
         </div>
-        ${mode==='recruiters'?'<div id="recTimeline"></div>':''}
       </div>
 
     </div>
@@ -6629,6 +6631,7 @@ async function renderPeopleView(mode){
     if(mode==='recruiters'){ clearTimeout(applyFilterAndRender.t); applyFilterAndRender.t=setTimeout(()=>renderRecruiterTimeline(displayRows.map(r=>r.name)),120); }
   }
   peopleRerender[mode] = applyFilterAndRender;
+  if(mode==='recruiters') wireRecTimelineToggle();
   if(mode==='recruiters' && latestWeekInPeriod) renderSmartAlerts(document.getElementById('smartAlertsHost'), latestWeekInPeriod, rows.map(r=>r.name));
   document.getElementById('peopleSearch_'+mode).addEventListener('input', applyFilterAndRender);
 
@@ -6639,9 +6642,17 @@ async function renderPeopleView(mode){
 /* ============== Recruiters page: schedules by day / by week, recruiter against recruiter ============== */
 // Uses the name-free daily counts saved with each week (branchDays), or the candidate lists when those
 // aren't there yet. Rows follow the Recruiter Detail table's search, division and column filters.
-const recTl={grain:'day', from:null, to:null, key:'', vsGoal:true, sort:'total', busy:0};
+const recTl={grain:'day', from:null, to:null, key:'', vsGoal:true, sort:'total', busy:0, open:lsGet('ipd_rtl_open')==='1'};
+// the switch in the Recruiter Detail header swaps the table for the day / week comparison
+function wireRecTimelineToggle(){
+  const sw=document.getElementById('rtlToggle'); if(!sw) return;
+  const panel=sw.closest('.panel'); panel.classList.toggle('rtl-open',recTl.open);
+  sw.onclick=()=>{ recTl.open=!recTl.open; sw.setAttribute('aria-checked',recTl.open); panel.classList.toggle('rtl-open',recTl.open); try{ localStorage.setItem('ipd_rtl_open',recTl.open?'1':'0'); }catch(e){}
+   peopleRerender.recruiters&&peopleRerender.recruiters(); };
+}
 async function renderRecruiterTimeline(names){
   const host=document.getElementById('recTimeline'); if(!host) return;
+  if(!recTl.open){ recTl.busy++; host.innerHTML=''; return; }
   const weeks=selectedPeriodWeeks(), today=ltToday();
   if(!weeks.length){ host.innerHTML=''; return; }
   const pFrom=tgShift(weeks[0].weekEndDate,-6), pTo=weeks[weeks.length-1].weekEndDate, key=pFrom+'|'+pTo;
@@ -6649,7 +6660,7 @@ async function renderRecruiterTimeline(names){
   let from=recTl.from, to=recTl.to>today?today:recTl.to; if(to<from) to=from;
   const span=tgDays(from,to).length, grain=recTl.grain==='day'&&span>62?'week':recTl.grain;
   const token=++recTl.busy;
-  host.innerHTML=`<div class="panel rtl"><p class="hint" style="margin:0">Loading schedules by ${grain}…</p></div>`;
+  host.innerHTML=`<div class="rtl"><p class="hint" style="margin:0">Loading schedules by ${grain}…</p></div>`;
   const wFrom=weekOfDate(from).weekStart, wTo=weekOfDate(to).weekEnd;
   let src=null, note='';
   try{ const c=scheduleCountsBetween(wFrom,wTo); src=c.have?c.rows:(canSeeCandidates()?await scheduleRowsBetween(wFrom,wTo):scheduleRowsFromSummary(wFrom,wTo)); if(src&&src.missingWeeks) note=`Day counts for ${src.missingWeeks} week${src.missingWeeks===1?'':'s'} aren’t ready yet — they appear after the next upload.`; }
@@ -6679,13 +6690,13 @@ async function renderRecruiterTimeline(names){
    const best=v&&v===p.best&&p.active>1?' rtl-best':'';
    return `<td class="rtl-c ${cls}${best}${we?' rtl-we':''}" ${style} title="${escapeHtml(p.n)} · ${grain==='day'?fmtDate(c):'Week ending '+fmtDate(c)}: ${fmtNum(v)} schedule${v===1?'':'s'}${t?` · target ${one(t)}`:''}">${v?fmtNum(v):'<span class="ta-n">·</span>'}</td>`; };
   const unit=grain==='day'?'day':'week';
-  host.innerHTML=`<div class="panel rtl" data-section="rec.timeline"><div class="panel-head"><div><h3>Schedules by ${unit} — recruiter comparison</h3><span class="hint">${fmtNum(people.length)} recruiter${people.length===1?'':'s'} from the table above (search, division and filters apply). ${recTl.vsGoal?`Colours compare with each recruiter’s weekly goal${grain==='day'?' ÷ 5 per weekday':''}: <b class="rtl-k g">at goal</b> <b class="rtl-k a">half way</b> <b class="rtl-k r">under half</b>.`:'Darker = more schedules.'} Bold = their best ${unit}.</span></div>${copyBtnHtml('recTlTable')}${Server.can('export')?downloadBtnHtml('recTlTable','recruiter-schedules-by-'+unit+'.xlsx'):''}</div>
+  host.innerHTML=`<div class="rtl" data-section="rec.timeline"><div class="rtl-head"><div><h4>Schedules by ${unit} — recruiter comparison</h4><span class="hint">${fmtNum(people.length)} recruiter${people.length===1?'':'s'} — the search, division and column filters of the detail table apply. ${recTl.vsGoal?`Colours compare with each recruiter’s weekly goal${grain==='day'?' ÷ 5 per weekday':''}: <b class="rtl-k g">at goal</b> <b class="rtl-k a">half way</b> <b class="rtl-k r">under half</b>.`:'Darker = more schedules.'} Bold = their best ${unit}.</span></div>${copyBtnHtml('recTlTable')}${Server.can('export')?downloadBtnHtml('recTlTable','recruiter-schedules-by-'+unit+'.xlsx'):''}</div>
    <div class="rtl-tools">
-    <div class="oe-group" role="tablist" aria-label="By"><button type="button" data-rtl-g="day" class="${grain==='day'?'on':''}" ${span>62?'disabled title="Pick 62 days or fewer to see days"':''}>Day</button><button type="button" data-rtl-g="week" class="${grain==='week'?'on':''}">Week</button></div>
+    <label class="rtl-chk" title="${span>62?'More than 62 days picked — weeks only':'Off = one column per day · On = one column per week'}"><button type="button" class="switch" role="switch" id="rtlWeek" aria-checked="${grain==='week'}" ${span>62?'disabled':''}><i></i></button>By week</label>
     <div class="onb-range"><label>From<input type="date" id="rtlFrom" value="${from}" max="${today}"></label><label>To<input type="date" id="rtlTo" value="${to}" max="${today}"></label></div>
     ${from!==pFrom||to!==(pTo>today?today:pTo)?'<button type="button" class="link-btn" id="rtlReset">Back to the selected period</button>':''}
     <label class="cand-field"><span>Sort</span><select id="rtlSort">${[['total','Most schedules'],['goal','% of goal'],['avg','Per active '+unit],['name','Name']].map(([k,l])=>`<option value="${k}" ${recTl.sort===k?'selected':''}>${l}</option>`).join('')}</select></label>
-    <label class="rtl-chk"><input type="checkbox" id="rtlGoal" ${recTl.vsGoal?'checked':''}> Compare with goal</label>
+    <label class="rtl-chk"><button type="button" class="switch" role="switch" id="rtlGoal" aria-checked="${recTl.vsGoal}"><i></i></button>Compare with goal</label>
    </div>
    ${note?`<p class="hint">${escapeHtml(note)}</p>`:''}${recTl.grain==='day'&&grain==='week'?'<p class="hint">More than 62 days picked — showing weeks.</p>':''}
    ${!src?'<div class="lt-empty"><strong>Daily schedule counts aren’t available for these weeks yet.</strong><span>They’re added after the next upload, or when an admin opens the dashboard.</span></div>':people.length?`<div class="rtl-scroll"><table class="users-table rtl-table" id="recTlTable"><thead><tr><th class="rtl-name">Recruiter</th>${cols.map(c=>`<th class="rtl-h">${head(c)}</th>`).join('')}<th class="rtl-sum">Total</th>${recTl.vsGoal?'<th class="rtl-sum">Goal</th><th class="rtl-sum">% of goal</th>':''}<th class="rtl-sum">Per active ${unit}</th><th class="rtl-sum">Active ${unit}s</th></tr></thead><tbody>
@@ -6695,11 +6706,11 @@ async function renderRecruiterTimeline(names){
    </tbody></table></div>`:'<p class="hint">No schedules for these recruiters in these dates.</p>'}
   </div>`;
   const $=s=>host.querySelector(s);
-  host.querySelectorAll('[data-rtl-g]').forEach(b=>b.onclick=()=>{ recTl.grain=b.dataset.rtlG; renderRecruiterTimeline(names); });
+  $('#rtlWeek')?.addEventListener('click',()=>{ recTl.grain=grain==='week'?'day':'week'; renderRecruiterTimeline(names); });
   let t; ['#rtlFrom','#rtlTo'].forEach(s=>$(s)?.addEventListener('change',()=>{ clearTimeout(t); t=setTimeout(()=>{ const a=$('#rtlFrom').value, b=$('#rtlTo').value; if(!a||!b) return; recTl.from=a<b?a:b; recTl.to=a<b?b:a; renderRecruiterTimeline(names); },30); }));
   $('#rtlReset')?.addEventListener('click',()=>{ recTl.key=''; renderRecruiterTimeline(names); });
   $('#rtlSort')?.addEventListener('change',e=>{ recTl.sort=e.target.value; renderRecruiterTimeline(names); });
-  $('#rtlGoal')?.addEventListener('change',e=>{ recTl.vsGoal=e.target.checked; renderRecruiterTimeline(names); });
+  $('#rtlGoal')?.addEventListener('click',()=>{ recTl.vsGoal=!recTl.vsGoal; renderRecruiterTimeline(names); });
 }
 let entityPopoverRevision=0;
 let entityPopoverAnchor=null;
@@ -11790,7 +11801,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.64.0';   // shown only in the browser tab title
+const APP_VERSION = '4.64.1';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
