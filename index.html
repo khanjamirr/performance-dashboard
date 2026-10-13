@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.64.1</title>
+<title>Performance Dashboard · v4.66.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -1170,6 +1170,7 @@ button.onb-tile{font:inherit;text-align:left;cursor:pointer}button.onb-tile:disa
 #ovModeBar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin:0 0 14px}
 .ovx-switch{display:inline-flex;gap:3px;padding:4px;background:#e9edf4;border-radius:10px}.ovx-switch button{border:0;background:transparent;padding:8px 18px;border-radius:7px;font:inherit;font-size:13.5px;font-weight:600;color:#475569;cursor:pointer;white-space:nowrap}.ovx-switch button.on{background:#fff;color:#0a1f44;box-shadow:0 1px 2px #0f172a24}
 .ovx-quick{display:flex;flex-wrap:wrap;gap:4px;align-items:center}.ovx-quick button{border:1px solid #d6dde8;background:#fff;border-radius:999px;padding:5px 11px;font:inherit;font-size:12px;font-weight:600;color:#334155;cursor:pointer}.ovx-quick button.on{background:#0a1f44;border-color:#0a1f44;color:#fff}.ovx-quick .ovx-refresh{padding:5px 9px}
+.ovx-dates{display:inline-flex;align-items:center;gap:6px;border:1px solid #d6dde8;border-radius:999px;padding:2px 10px;background:#fff}.ovx-dates.on{border-color:#0a1f44;box-shadow:0 0 0 1px #0a1f44}.ovx-dates label{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em}.ovx-dates input{border:0;font:inherit;font-size:12px;font-weight:600;color:#0a1f44;padding:3px 0;background:transparent;text-transform:none;width:118px}
 .ovx-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:8px}
 .ovx-card{background:#fff;border:1px solid #e1e7ef;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:2px;border-top:3px solid #2563eb}.ovx-card>span{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#64748b}.ovx-card strong{font-size:26px;line-height:1.15;color:#0a1f44}.ovx-card small{font-size:12px;color:#64748b}
 .ovx-card.good{border-top-color:#16a34a}.ovx-card.good strong{color:#15803d}.ovx-card.i9{border-top-color:#2563eb}.ovx-card.warn{border-top-color:#d97706}.ovx-card.warn strong{color:#b45309}.ovx-card.bad{border-top-color:#c8102e}.ovx-card.bad strong{color:#c8102e}.ovx-card.rc{border-top-color:#2563eb}.ovx-card.rc strong{color:#2563eb}.ovx-card.crm{border-top-color:#0f9488}.ovx-card.crm strong{color:#0f766e}
@@ -1178,6 +1179,7 @@ button.onb-tile{font:inherit;text-align:left;cursor:pointer}button.onb-tile:disa
 .ovx-two{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:12px}.ovx-two>.panel{margin:0}.ovx-two.ovx-stack{grid-template-columns:minmax(0,1fr)}@media (max-width:1100px){.ovx-two{grid-template-columns:1fr}}
 #view-ovx .panel-head{display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap}#view-ovx .panel-head>div:first-child{flex:1}#view-ovx .panel{margin-bottom:12px}
 .ovx-sel td{background:#f3f7ff;font-weight:600}.ovx-chart{position:relative;height:260px}.ovx-go{display:flex;justify-content:flex-end;margin:12px 0 0}
+.ua-email{display:block;font-size:11.5px;color:#64748b;font-weight:400}
 .oe-bulk-help{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px 14px;margin:0 0 12px}.oe-bulk-help h4{margin:0 0 6px;font-size:13px;color:#0a1f44}.oe-bulk-help p{margin:4px 0;font-size:12.5px}
 .oe-sample{border-collapse:collapse;font-size:12px;margin:6px 0}.oe-sample th,.oe-sample td{border:1px solid #d6dde8;padding:3px 8px;text-align:left;background:#fff}.oe-sample th{background:#eef2f7;font-weight:600}.oe-sample i{font-weight:400;color:#64748b}
 .oe-bulk-in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:12px;margin-bottom:12px}@media (max-width:760px){.oe-bulk-in{grid-template-columns:1fr}.oe-bulk-help{flex-direction:column}}
@@ -2342,6 +2344,11 @@ function allRawBranches(){
   return [...s].filter(b=>b&&b!=='Unassigned').sort((a,b)=>a.localeCompare(b));
 }
 // Who may merge: admins, or users given "Merge branches" in Settings → Users (grant.branch_merge).
+// admins, or a user given that right (Settings → Users)
+function canUploadRange(){ return !!(Server.user && (Server.isSuperAdmin() || (Server.user.hidden_sections||[]).includes('grant.upload_range'))); }
+// Team Leads page: admins, or users given “Team Leads” (read-only) in Settings → Users
+function canViewLeads(){ return hasRight('grant.leads'); }
+function hasRight(g){ return !!(Server.user && (Server.isAdmin() || (Server.user.hidden_sections||[]).includes(g))); }
 function canMergeBranches(){ return !!(Server.user && (Server.isAdmin() || (Server.user.hidden_sections||[]).includes('grant.branch_merge'))); }
 // Merges are also kept in dash_branch_merges (branch_merges.sql) so granted users can save them.
 let _bmSyncAt=0;
@@ -2512,7 +2519,20 @@ async function storageGet(key){
   if(isLocalOnlyKey(key)){ try{ return JSON.parse(localStorage.getItem('ipd_local_'+key)); }catch(e){ return null; } }
   return KV.has(key) ? KV.get(key) : null;
 }
+// Agent names, onboarding dropdowns and manual adjustments can be changed by users given that right:
+// they are saved in dash_granted_kv (access_rights.sql) — admins write both places — and that copy wins on load.
+const GKV_KEYS=['oeLists','onbLists','manualAdjust'];
+async function loadGrantedKv(){
+  try{ const r=await Server.rpc('dash_granted_kv_get',{p_keys:GKV_KEYS}); (r||[]).forEach(x=>{ if(x&&x.key&&x.value!=null) KV.set(x.key, x.value); }); }catch(e){}
+}
 async function storageSet(key, val){
+  if(GKV_KEYS.includes(key)&&typeof Server!=='undefined'&&Server.user){
+   let ok=false, err=null;
+   try{ await Server.rpc('dash_granted_kv_set',{p_key:key, p_value:val}); ok=true; }catch(e){ err=e; }
+   if(Server.isAdmin()||!ok&&/Could not find|does not exist|schema cache|PGRST202/i.test(String(err&&err.message||''))){ try{ await Server.kvSet(key, val); ok=true; }catch(e){ if(!ok) err=e; } }
+   if(ok) return true;
+   console.error('save failed', key, err); showToast('Could not save to the server: '+cleanErr(err)+(/Could not find|does not exist|schema cache/i.test(String(err&&err.message||''))?' — run access_rights.sql in Supabase.':'')); return null;
+  }
   if(isLocalOnlyKey(key)){ try{ localStorage.setItem('ipd_local_'+key, JSON.stringify(val)); }catch(e){} return true; }
   try{ await Server.kvSet(key, val); return true; }
   catch(e){ console.error('save failed', key, e); showToast('Could not save to the server: '+cleanErr(e)); return null; }
@@ -6578,7 +6598,7 @@ async function renderPeopleView(mode){
     <div class="people-layout-grid">
       <div>
         <div class="panel" data-section="${mode==='recruiters'?'rec.table':'br.table'}">
-          <div class="panel-head"><h3>${mode==='recruiters'?'Recruiter':'Branch'} Detail</h3><div style="display:flex;align-items:center;gap:10px;">${mode==='recruiters'?`<label class="rtl-switch" title="Swap the table for schedules by day or by week, recruiter against recruiter"><button type="button" class="switch" role="switch" id="rtlToggle" aria-checked="${recTl.open}"><i></i></button><span>Day / week view</span></label>`:''}<span class="hint rtl-hide">Click a row for its trend · Ctrl/Cmd-click to compare · click a column to sort · &#9660; to filter${mode==='recruiters'?' · Remarks are saved per week':''}</span>${mode==='recruiters'&&canManualEdit()?`<button type="button" class="btn btn-secondary btn-sm" onclick="openManualEntryDialog({})" title="Add or take away schedules, interviews, shows or hires by hand">＋ Adjust numbers</button>`:''}${mode==='branches'&&canMergeBranches()?`<button type="button" class="btn btn-secondary btn-sm" data-merge-open onclick="openBranchMergeFromTable()">${(selectedPieTargets.branches||[]).length>=2?`⇄ Merge ${(selectedPieTargets.branches||[]).length} selected`:`⇄ Merge branches${branchMergeList().length?' · '+branchMergeList().length:''}`}</button>`:''}<span class="rtl-hide" style="display:contents">${copyBtnHtml('peopleTable_'+mode)}${downloadBtnHtml('peopleTable_'+mode, (mode==='recruiters'?'recruiter':'branch')+'-performance.xlsx')}</span></div></div>
+          <div class="panel-head"><h3>${mode==='recruiters'?'Recruiter':'Branch'} Detail</h3><div style="display:flex;align-items:center;gap:10px;">${mode==='recruiters'?`<label class="rtl-switch" data-section="rec.timeline" title="Swap the table for schedules by day or by week, recruiter against recruiter"><button type="button" class="switch" role="switch" id="rtlToggle" aria-checked="${recTl.open}"><i></i></button><span>Day / week view</span></label>`:''}<span class="hint rtl-hide">Click a row for its trend · Ctrl/Cmd-click to compare · click a column to sort · &#9660; to filter${mode==='recruiters'?' · Remarks are saved per week':''}</span>${mode==='recruiters'&&canManualEdit()?`<button type="button" class="btn btn-secondary btn-sm" data-open-manual title="Add or take away schedules, interviews, shows or hires by hand">＋ Adjust numbers</button>`:''}${mode==='branches'&&canMergeBranches()?`<button type="button" class="btn btn-secondary btn-sm" data-merge-open data-merge-table>${(selectedPieTargets.branches||[]).length>=2?`⇄ Merge ${(selectedPieTargets.branches||[]).length} selected`:`⇄ Merge branches${branchMergeList().length?' · '+branchMergeList().length:''}`}</button>`:''}<span class="rtl-hide" style="display:contents">${copyBtnHtml('peopleTable_'+mode)}${downloadBtnHtml('peopleTable_'+mode, (mode==='recruiters'?'recruiter':'branch')+'-performance.xlsx')}</span></div></div>
           <table id="peopleTable_${mode}" class="rtl-hide"></table>
           ${mode==='recruiters'?'<div id="recTimeline"></div>':''}
         </div>
@@ -6646,13 +6666,14 @@ const recTl={grain:'day', from:null, to:null, key:'', vsGoal:true, sort:'total',
 // the switch in the Recruiter Detail header swaps the table for the day / week comparison
 function wireRecTimelineToggle(){
   const sw=document.getElementById('rtlToggle'); if(!sw) return;
+  if(!canSeeSection('rec.timeline')) recTl.open=false;
   const panel=sw.closest('.panel'); panel.classList.toggle('rtl-open',recTl.open);
   sw.onclick=()=>{ recTl.open=!recTl.open; sw.setAttribute('aria-checked',recTl.open); panel.classList.toggle('rtl-open',recTl.open); try{ localStorage.setItem('ipd_rtl_open',recTl.open?'1':'0'); }catch(e){}
    peopleRerender.recruiters&&peopleRerender.recruiters(); };
 }
 async function renderRecruiterTimeline(names){
   const host=document.getElementById('recTimeline'); if(!host) return;
-  if(!recTl.open){ recTl.busy++; host.innerHTML=''; return; }
+  if(!recTl.open||!canSeeSection('rec.timeline')){ recTl.busy++; host.innerHTML=''; return; }
   const weeks=selectedPeriodWeeks(), today=ltToday();
   if(!weeks.length){ host.innerHTML=''; return; }
   const pFrom=tgShift(weeks[0].weekEndDate,-6), pTo=weeks[weeks.length-1].weekEndDate, key=pFrom+'|'+pTo;
@@ -8210,7 +8231,7 @@ const SUPABASE_FALLBACK_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJz
 
 const CONN_LS_KEY = 'ipd_conn_v4';
 const TOKEN_LS_KEY = 'ipd_session_v4';
-const LIVE_POLL_MS = 4000;
+const LIVE_POLL_MS = window.DV_MODE ? 15000 : 4000;   // Dataverse: every 15 s
 const MODULES = [
   {key:'performance', label:'Performance Overview', hint:'Weekly, monthly and quarterly overview'},
   {key:'recruiters',  label:'Recruiter Scorecards', hint:'Recruiter table, trends, reading remarks'},
@@ -8248,7 +8269,7 @@ function saveNav(){
 async function restoreNav(){
   let nav=null; try{ nav=JSON.parse(sessionStorage.getItem(NAV_KEY())||'null'); }catch(e){}
   if(!nav||!nav.view) return false;
-  const ok=v=>v==='settings'?false:v==='history'?true:v==='leads'?Server.isAdmin():VIEW_MODULE[v]&&Server.can(VIEW_MODULE[v]);
+  const ok=v=>v==='settings'?false:v==='history'?true:v==='leads'?canViewLeads():VIEW_MODULE[v]&&Server.can(VIEW_MODULE[v]);
   if(!ok(nav.view)) return false;
   if(nav.perf){ if(nav.perf.week) currentWeekEndDate=nav.perf.week; if(Array.isArray(nav.perf.sel)) selectedWeekEndDates=nav.perf.sel.filter(d=>weeksData.some(w=>w.weekEndDate===d)); if(typeof nav.perf.div==='string') universalDivision=nav.perf.div; }
   if(nav.lt){ Object.assign(ltState,{owner:String(Server.user.id),viewingId:Server.isAdmin()?(nav.lt.viewingId||String(Server.user.id)):String(Server.user.id),rangeMode:nav.lt.rangeMode||null,anchor:nav.lt.anchor||null,division:nav.lt.division||'',tab:nav.lt.tab,brTab:nav.lt.brTab}); }
@@ -8270,10 +8291,10 @@ window.addEventListener('beforeunload',()=>saveNav());
 // Default page: the person's own choice (this browser) → the one an admin set for them → first page they can open.
 const DEFAULT_VIEW_LABELS = {performance:'Performance Overview', teams:'My Team', leads:'Team Leads (admins)', recruiters:'Recruiter Scorecards', branches:'Branch Results', alerts:'Action Center', candidates:'Candidates', master:'Candidates — master sheet', pivot:'Report Builder', divreport:'Division Report', onboarding:'Onboarding', orderentry:'Order Entry'};
 function adminDefaultViews(){ return KV.get('userDefaultViews')||{}; }
-function defaultViewOptions(u){ const can=v=>v==='teams'&&(u?u.role!=='user':Server.isAdmin())?false:v==='leads'?(u?u.role!=='user':Server.isAdmin()):(!u||u.role!=='user'||v==='teams'||(u.modules||[]).includes(VIEW_MODULE[v])); return Object.keys(DEFAULT_VIEW_LABELS).filter(v=>VIEW_MODULE[v]&&can(v)).map(v=>[v,DEFAULT_VIEW_LABELS[v]]); }
+function defaultViewOptions(u){ const can=v=>v==='teams'&&(u?u.role!=='user':Server.isAdmin())?false:v==='leads'?(u?(u.role!=='user'||(u.hidden_sections||[]).includes('grant.leads')):canViewLeads()):(!u||u.role!=='user'||v==='teams'||(u.modules||[]).includes(VIEW_MODULE[v])); return Object.keys(DEFAULT_VIEW_LABELS).filter(v=>VIEW_MODULE[v]&&can(v)).map(v=>[v,DEFAULT_VIEW_LABELS[v]]); }
 function myDefaultViewKey(){ return 'ipd_default_view:'+(Server.user?.id||''); }
 function resolveDefaultView(){
-  const allowed=v=>v && VIEW_MODULE[v] && (v==='leads'?Server.isAdmin():Server.can(VIEW_MODULE[v]));
+  const allowed=v=>v && VIEW_MODULE[v] && (v==='leads'?canViewLeads():Server.can(VIEW_MODULE[v]));
   const mine=lsGet(myDefaultViewKey()), admin=adminDefaultViews()[Server.user?.id];
   return allowed(mine)?mine:allowed(admin)?admin:null;
 }
@@ -8283,7 +8304,7 @@ function applyDefaultView(){
 }
 function renderDefaultViewPref(){
   const sel=document.getElementById('defaultViewSelect'); if(!sel||!Server.user) return;
-  const opts=defaultViewOptions(null).filter(([v])=>v==='leads'?Server.isAdmin():Server.can(VIEW_MODULE[v])), admin=adminDefaultViews()[Server.user.id], mine=lsGet(myDefaultViewKey())||'';
+  const opts=defaultViewOptions(null).filter(([v])=>v==='leads'?canViewLeads():Server.can(VIEW_MODULE[v])), admin=adminDefaultViews()[Server.user.id], mine=lsGet(myDefaultViewKey())||'';
   sel.innerHTML=`<option value="">${admin&&DEFAULT_VIEW_LABELS[admin]?'Set by admin: '+DEFAULT_VIEW_LABELS[admin]:'First page I can open'}</option>`+opts.map(([v,l])=>`<option value="${v}" ${mine===v?'selected':''}>${escapeHtml(l)}</option>`).join('');
   sel.onchange=()=>{ try{ sel.value?localStorage.setItem(myDefaultViewKey(),sel.value):localStorage.removeItem(myDefaultViewKey()); }catch(e){} showToast(sel.value?'You’ll start on '+DEFAULT_VIEW_LABELS[sel.value]+' next time.':'Default page reset.'); };
 }
@@ -8378,6 +8399,14 @@ const Server = {
     });
   },
   async connect(){
+    // Power Apps build: the Dataverse backend (src/backend.js) answers the same calls as the Supabase functions
+    if(window.DV_MODE){
+      if(window.DVReady) await window.DVReady;
+      if(!window.DVBackend) return 'nolib';
+      this.cfg={builtIn:true, dataverse:true};
+      this.client={ rpc: async (fn,args)=>{ try{ return {data: await window.DVBackend.rpc(fn,args||{}), error:null}; }catch(e){ console.warn(fn, e); return {data:null, error:{message:e&&e.message||String(e)}}; } } };
+      return 'ok';
+    }
     const c = this.cfg || await this.resolveConn(); if(!c) return 'noconfig';
     if(!(await this.loadLibrary())) return 'nolib';
     this.client = window.supabase.createClient(this.cleanUrl(c.url), c.key.trim(), {auth:{persistSession:false, autoRefreshToken:false, detectSessionInUrl:false}});
@@ -8402,7 +8431,9 @@ const Server = {
     // Newer page rights (Division Reporting) are saved as opt-in grants, because the users table only
     // accepts the module names it already knows.
     if(fn==='dash_user_save' && args && args.p){ const p={...args.p}, mods=[...(p.modules||[])], hs=[...(p.hidden_sections||[])];
-      GRANT_MODULES.forEach(m=>{ const g='grant.'+m, on=mods.includes(m)||hs.includes(g); p.modules=mods.filter(x=>!GRANT_MODULES.includes(x)); p.hidden_sections=hs.filter(x=>x!==g); if(on) p.hidden_sections.push(g); });
+      // every page right in GRANT_MODULES becomes grant.<page> (cumulative — earlier versions kept only the last one)
+      p.modules=mods.filter(x=>!GRANT_MODULES.includes(x)); p.hidden_sections=hs.filter(x=>!GRANT_MODULES.some(m=>x==='grant.'+m));
+      GRANT_MODULES.forEach(m=>{ const g='grant.'+m; if(mods.includes(m)||hs.includes(g)) p.hidden_sections.push(g); });
       if(GRANT_MODULES.length) args={...args,p}; }
     let r=this.call(fn, {p_token:this.token, ...(args||{})});
     // Opt-in rights (grant.*) are also kept in dash_user_grants, which the database checks itself —
@@ -8643,10 +8674,13 @@ const PAGE_SECTIONS = {
                 ['perf.detail.part.trend','Card details — 12-week trend'],['perf.detail.part.divisions','Card details — division split'],['perf.detail.part.recruiters','Card details — recruiter ranking'],['perf.detail.part.branches','Card details — branch ranking'],['perf.detail.all_people','Card details — all recruiters & branches (untick = only their assigned team)'],
                 ['perf.trends','Trends charts'],['perf.leaderboards','Leaderboards (recruiter & branch snapshots)'],['perf.divisions','Division breakdown'],['perf.history','Previous 6 weeks table'],['perf.insights','Insights'],['perf.composition','Composition pies (monthly / quarterly)']],
   teams:[['team.summary','Team — summary cards'],['team.analytics','Team highlights'],['team.analytics.wins','· Winning list'],['team.analytics.attention','· Needs attention list'],['team.analytics.branches','Team — Branches: team vs other recruiters'],['team.leads','Team Leads page — comparison table (admins)'],['team.recruiters','Team — recruiter table'],['team.goals','· Today & third-break columns (they can also hide these themselves)'],['team.daily','Team — Daily tab'],['team.charts','· Daily chart'],['team.candidates','Team — Candidates tab'],['team.multibranch','Team — Branches: recruiters at several branches'],['team.kpi.schedules','· Schedules vs goal card'],['team.kpi.goal_reach','·· Goal reach % line'],['team.kpi.interviews','· Interviews card'],['team.kpi.shows','·· Shows + show rate line'],['team.kpi.no_shows','·· No shows + no-show rate line'],['team.kpi.hires','· Hires per recruiter card'],['team.kpi.hire_rate','·· Hire rate line'],['team.kpi.placed','· Placed card']],
-  recruiters:[['rec.table','Recruiter table'],['hist.kpis','History page — summary tiles (recruiter & branch)'],['hist.trend','History page — week-by-week chart'],['hist.goal','History page — schedules vs goal chart'],['hist.weeks','History page — every-week table'],['hist.remarks','History page — remarks'],['hist.candidates','History page — candidates']],
+  recruiters:[['rec.table','Recruiter table'],['rec.timeline','Day / week comparison switch'],['hist.kpis','History page — summary tiles (recruiter & branch)'],['hist.trend','History page — week-by-week chart'],['hist.goal','History page — schedules vs goal chart'],['hist.weeks','History page — every-week table'],['hist.remarks','History page — remarks'],['hist.candidates','History page — candidates']],
   branches:[['br.table','Branch table'],['hist.team','History page — recruiters in the branch']],
   candidates:[['cand.list','Category boxes and candidate list'],['cand.explain','“How are these counted?” breakdown']],
   pivot:[['pivot.chart','Chart'],['pivot.table','Pivot table']],
+  settings:[['set.sync','Uploads tab'],['set.fetched','Saved weeks tab'],['set.candidates','Candidates tab'],['set.goals','Goals tab'],['set.recruiters','Recruiters tab'],['set.divisions','Divisions tab'],['set.branches','Branches tab']],
+  orderentry:[['oe.entry','Daily entry tab'],['oe.report','Report tab']],
+  onboarding:[['onb.log','Log calls tab'],['onb.report','Report tab (with the report right)']],
   alerts:[['alerts.summary','Summary tiles'],['alerts.highlights','Highlights (streaks, top performers, consistency)'],['alerts.below','Below 50% of goal'],['alerts.watch','50–79% of goal'],['alerts.approvals','Remarks awaiting approval (approvers only)']],
 };
 function applySectionAccess(){
@@ -8662,7 +8696,7 @@ function applyPermissions(){
   if(!(Server.user&&Server.isSuperAdmin())) setAccessMode(false);
   setupAccessHelpers();
   const u = Server.user; if(!u) return;
-  const viewOk = v=>v==='leads' ? Server.isAdmin() : Server.can(VIEW_MODULE[v]);
+  const viewOk = v=>v==='leads' ? canViewLeads() : Server.can(VIEW_MODULE[v]);
   // Admins reach every team through Team Leads, so they don't need a separate My Team entry.
   document.querySelectorAll('#navList button[data-view]').forEach(b=>{ b.classList.toggle('hidden', !viewOk(b.dataset.view) || (b.dataset.view==='teams' && Server.isAdmin())); });
   layoutNav();
@@ -8678,7 +8712,7 @@ function applyPermissions(){
   document.body.classList.toggle('no-settings', !Server.can('settings'));
   document.body.classList.toggle('no-views', !allowedViews.length);
   const tabs = {candidates: Server.can('candidates')||Server.can('master'), sync: Server.can('upload')||Server.can('settings'), fetched: Server.can('settings'), divisions: Server.can('settings'), branches: Server.can('settings'), recruiters: Server.can('settings'), goals: Server.can('settings')||Server.can('upload'), users: Server.isAdmin(), activity: Server.isAdmin(), account: true};
-  document.querySelectorAll('#settingsTabs .settings-tab').forEach(t=>t.classList.toggle('hidden', tabs[t.dataset.tab]===false));
+  document.querySelectorAll('#settingsTabs .settings-tab').forEach(t=>t.classList.toggle('hidden', tabs[t.dataset.tab]===false || (!['account','users','activity'].includes(t.dataset.tab) && !canSeeSection('set.'+t.dataset.tab))));
   document.querySelectorAll('#settingsTabs .settings-group').forEach(g=>{ let n=g.nextElementSibling, any=false; while(n && !n.classList.contains('settings-group')){ if(!n.classList.contains('hidden')) any=true; n=n.nextElementSibling; } g.classList.toggle('hidden', !any); });
   const chip = document.getElementById('userChip');
   if(chip) chip.innerHTML = `<span class="user-dot" aria-hidden="true">${escapeHtml((u.name||'?').trim().charAt(0).toUpperCase())}</span><span class="user-name"><b>${escapeHtml(u.name)}</b><small>${u.role==='super_admin'?'Super admin':u.role==='admin'?'Admin':'Member'}</small></span><svg class="user-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>`;
@@ -8752,9 +8786,10 @@ function isOnboardingOnlyUser(u){
   if(!u || u.role!=='user') return false;
   const hs=u.hidden_sections||[], mods=(u.modules||[]).filter(m=>!['onboarding','orderentry','remarks','export'].includes(m));
   const has=m=>hs.includes('grant.'+m)||(u.modules||[]).includes(m);
-  return (has('onboarding')||has('orderentry')) && !mods.length && hs.includes('grant.no_team') && !hs.includes('grant.divreport');
+  return (has('onboarding')||has('orderentry')) && !mods.length && hs.includes('grant.no_team') && !hs.includes('grant.divreport') && !hs.includes('grant.leads');
 }
 async function startAuthFlow(){
+  if(window.DV_MODE) return dvStartAuth();
   // Fast path on refresh: a saved session opens the dashboard with a single server call.
   const savedToken = lsGet(TOKEN_LS_KEY);
   if(savedToken && !startAuthFlow.triedFast){
@@ -8789,6 +8824,26 @@ async function startAuthFlow(){
   }
   showAuthGate(status.setup_pending ? 'setup' : 'login');
 }
+// Power Apps: people are already signed in with Microsoft 365 — the dashboard only checks they were added in Settings → Users.
+async function dvStartAuth(){
+  Server.token='entra'; setLoading('Signing in…');
+  try{
+    if(lsGet('ipd_light_user')==='1'){ try{ Server.user = await Server.rpc('dash_me'); if(isOnboardingOnlyUser(Server.user)){ await afterLogin(null, true); return; } }catch(e){} }
+    const boot = await Server.rpc('dash_bootstrap'); await afterLogin(boot);
+    if(window.DVMode==='preview') setTimeout(()=>showToast('Preview mode — the data stays in this browser. Publish to Power Apps to use Dataverse.'), 1500);
+  }catch(e){ setLoading(null); showDvGate(e); }
+}
+function showDvGate(err){
+  setLocked(true); document.getElementById('authGate')?.remove();
+  const m=String(err&&err.message||err||''), notInvited=/NOT_INVITED/.test(m), off=/ACCOUNT_DISABLED/.test(m);
+  const gate=document.createElement('div'); gate.id='authGate'; gate.className='auth-gate';
+  gate.innerHTML=`<div class="auth-card"><div class="auth-brand"><span class="auth-mark" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V11M10 19V5M16 19V9M22 19V2"/></svg></span><div><strong>Performance Dashboard</strong><span>Power Apps</span></div></div>
+    <h1>${notInvited?'You don’t have access yet':off?'Your account is switched off':'Could not open the dashboard'}</h1>
+    <p class="auth-intro">${escapeHtml(cleanErr(m).replace(/^(NOT_INVITED|ACCOUNT_DISABLED):\s*/,''))}</p>
+    <button class="btn btn-primary auth-submit" type="button" id="dvRetry">Try again</button></div>`;
+  document.body.appendChild(gate);
+  gate.querySelector('#dvRetry').onclick=()=>{ gate.remove(); dvStartAuth(); };
+}
 function setLoading(text){
   let el = document.getElementById('appLoading');
   if(!text){ el?.remove(); return; }
@@ -8806,6 +8861,7 @@ async function afterLogin(boot, lightReady){
       KV.clear();
       try{ const got=await Server.rpc('dash_kv_get',{p_keys:['onbLists','oeLists','divisionNames','branchMerges']}); for(const r of (got||[])) KV.set(r.key, await decodeKvValue(r.key, r.value)); }
       catch(e){ await Server.loadKv(t=>setLoading(t)); }
+      await loadGrantedKv();
       weeksData=[]; window.__lightMode=true;
       const lv=Server.can('onboarding')?((()=>{ try{ return JSON.parse(sessionStorage.getItem(NAV_KEY())||'{}').view; }catch(e){ return null; } })()==='orderentry'&&Server.can('orderentry')?'orderentry':'onboarding'):'orderentry';
       currentView=lv;
@@ -8830,6 +8886,7 @@ async function afterLogin(boot, lightReady){
       await Server.loadKv(t=>setLoading(t));
       await Remarks.load().catch(()=>{});
     }
+    await loadGrantedKv();
     await loadDivisionNames(); await loadDedupeSetting(); await loadAllWeeks(); await loadExcludedRecruiters(); await loadExcludedBranches();
     await loadRecruiterDivisions(); await loadBranchDivisions(); await loadDedupeSetting(); await loadPerformerHighlightSetting();
     deleteSourceFilesAfterImport = lsGet('ipd_delete_sources')!=='0';
@@ -9055,7 +9112,7 @@ async function ingestFiles(entries, {interactive=true, week=null}={}){
   if(!week){ showToast('Choose which week this data is for first.'); return; }
   // Past data (super admin): week = {from: Sunday, to: Saturday}; rows are split into their own weeks.
   const range = (week && typeof week==='object') ? week : null;
-  if(range){ if(!Server.isSuperAdmin()){ showToast('Only the super admin can upload past data for many weeks.'); return; } week = range.to; }
+  if(range){ if(!canUploadRange()){ showToast('Only the super admin (or someone given “Upload past data for many weeks”) can do this.'); return; } week = range.to; }
   const weekStart = range ? range.from : toIsoDateOnly(new Date(new Date(week+'T00:00:00').getTime()-6*86400000));
   const weekLabel = range ? 'Past data ('+fmtDate(weekStart)+' – '+fmtDate(week)+')' : 'Week '+isoWeekNumber(new Date(week+'T00:00:00'))+' ('+fmtDate(weekStart)+' – '+fmtDate(week)+')';
   const prepared = [];
@@ -9364,10 +9421,10 @@ function chooseUploadWeekDialog(presetWeekEnd, onChoose){
   wrap.innerHTML = `<div class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="uwTitle">
     <div class="modal-header"><h3 id="uwTitle">Which week are you uploading?</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div>
     <div class="modal-body">
-      ${Server.isSuperAdmin()?`<div class="uw-mode" role="tablist"><button type="button" data-uwm="week" class="on">One week</button><button type="button" data-uwm="range">Past data<span class="uw-sa">Super admin</span></button></div>`:''}
+      ${canUploadRange()?`<div class="uw-mode" role="tablist"><button type="button" data-uwm="week" class="on">One week</button><button type="button" data-uwm="range">Past data<span class="uw-sa">Super admin</span></button></div>`:''}
       <div id="uwOne"><label class="uw-label" for="uwDate">Week ending (Saturday)</label>
       <select id="uwDate">${sats.map(d=>{ const w=weekOfDate(d); return `<option value="${d}" ${d===initial?'selected':''}>Sat ${fmtDate(d)} · Week ${w.number}${d===thisSat?' (this week)':''}</option>`; }).join('')}</select></div>
-      ${Server.isSuperAdmin()?`<div id="uwMany" class="hidden"><div class="uw-range"><label><span class="uw-label">From</span><input type="date" id="uwFrom"></label><label><span class="uw-label">To</span><input type="date" id="uwTo"></label></div>
+      ${canUploadRange()?`<div id="uwMany" class="hidden"><div class="uw-range"><label><span class="uw-label">From</span><input type="date" id="uwFrom"></label><label><span class="uw-label">To</span><input type="date" id="uwTo"></label></div>
        <div class="uw-quick"><button type="button" data-uwq="ly">Last year (${new Date().getFullYear()-1})</button><button type="button" data-uwq="ytd">This year to date</button><button type="button" data-uwq="12m">Last 12 months</button><button type="button" data-uwq="2y">Last 2 years</button></div></div>`:''}
       <div class="uw-week" id="uwWeek" aria-live="polite"></div>
       <ul class="uw-rules" id="uwRulesOne">
@@ -9775,7 +9832,7 @@ async function masterSelectionAction(act){
    uploaded rows. Editing an uploaded row excludes the original and adds a corrected copy, so
    deleting the manual entry brings the original back. Removing = "Exclude from metrics". */
 function manualRowsList(){ const v=KV.get('manualRows'); return Array.isArray(v)?v.filter(m=>m&&m.data):[]; }
-function canManualEdit(){ return !!Server.user && (Server.isAdmin() || Server.can('master_edit')); }
+function canManualEdit(){ return !!Server.user && (Server.isAdmin() || Server.can('master_edit') || hasRight('grant.manual_edit')); }
 function manualWeeksOf(m){ const d=(m&&m.data)||{}, w=[]; if(m.s&&d['Created On']) w.push(weekOfDate(String(d['Created On']).slice(0,10)).weekEnd); if(m.v&&d['Date Of']) w.push(weekOfDate(String(d['Date Of']).slice(0,10)).weekEnd); return w; }
 async function commitManualRows(list, weeks, msg){
   Server.ownMasterUntil = Date.now()+10*60*1000;
@@ -10619,12 +10676,12 @@ async function renderUsersAdmin(){
   const ini=nm=>String(nm||'?').trim().split(/\s+/).map(x=>x[0]).slice(0,2).join('').toUpperCase();
   const counts={all:usersCache.length, admin:usersCache.filter(u=>u.role!=='user').length, user:usersCache.filter(u=>u.role==='user').length, off:usersCache.filter(u=>!u.active).length};
   host.innerHTML = `<div class="panel ua-panel">
-    <div class="ua-head"><div><h3>Users &amp; access</h3><span class="hint">Add people, set their passwords and choose what they can open.</span></div><button class="btn btn-primary" id="addUserBtn">+ Add user</button></div>
+    <div class="ua-head"><div><h3>Users &amp; access</h3><span class="hint">${window.DV_MODE?'Add people by their work email and choose what they can open. They sign in with Microsoft 365.':'Add people, set their passwords and choose what they can open.'}</span></div><button class="btn btn-primary" id="addUserBtn">+ Add user</button></div>
     <div class="ua-bar"><input type="search" id="uaSearch" placeholder="Search people" aria-label="Search people"><div class="ua-filter" role="tablist">${[['all','Everyone'],['admin','Admins'],['user','Users'],['off','Disabled']].map(([k,l])=>`<button type="button" data-ua-f="${k}" class="${(window.__uaF||'all')===k?'on':''}">${l} <b>${counts[k]}</b></button>`).join('')}</div></div>
     <div id="userForm"></div>
     <div style="overflow-x:auto"><table class="users-table ua-table"><thead><tr><th>Person</th><th>Can open</th><th>Status</th><th>Last sign-in</th><th></th></tr></thead><tbody>
     ${usersCache.map(u=>`<tr data-ua-name="${escapeHtml(String(u.name||'').toLowerCase())}" data-ua-role="${u.role==='user'?'user':'admin'}" data-ua-off="${u.active?0:1}">
-      <td><div class="ua-person"><span class="ua-av ${u.role!=='user'?'adm':''}">${escapeHtml(ini(u.name))}</span><div><strong>${escapeHtml(u.name)}</strong>${u.online?' <span class="online-dot" title="Online now"></span>':''}<span class="ua-role">${u.role==='super_admin'?'Super admin':u.role==='admin'?'Admin':'User'}</span></div></div></td>
+      <td><div class="ua-person"><span class="ua-av ${u.role!=='user'?'adm':''}">${escapeHtml(ini(u.name))}</span><div><strong>${escapeHtml(u.name)}</strong>${window.DV_MODE&&u.email?`<span class="ua-email">${escapeHtml(u.email)}</span>`:''}${u.online?' <span class="online-dot" title="Online now"></span>':''}<span class="ua-role">${u.role==='super_admin'?'Super admin':u.role==='admin'?'Admin':'User'}</span></div></div></td>
       <td class="mod-chips">${summary(u)}</td>
       <td>${u.active?'<span class="ua-status on">Active</span>':'<span class="ua-status">Disabled</span>'}</td>
       <td class="ua-when" title="${u.last_login_at?escapeHtml(new Date(u.last_login_at).toLocaleString()):''}">${when(u.last_login_at)}</td>
@@ -10654,19 +10711,20 @@ async function renderUsersAdmin(){
 let userFormPreset = null;
 // The user editor groups rights by page: switch the page on, then its extras and visible sections.
 const UF_PAGES = [
-  {mod:'performance', label:'Overview', desc:'Weekly, monthly and quarterly results', sec:'performance'},
+  {mod:'performance', label:'Overview', desc:'Weekly, monthly and quarterly results', sec:'performance', extras:['grant.ov_onb','grant.ov_oe']},
   {mod:null, offGrant:'grant.no_team', label:'My Team', desc:'Their own team, day by day — for team leads with a team assigned', sec:'teams', extras:['grant.team_names','grant.break_image']},
-  {mod:'recruiters', label:'Recruiters', desc:'Recruiter table, trends and history', sec:'recruiters', extras:['remarks']},
+  {mod:null, grant:'grant.leads', label:'Team Leads', desc:'Every team lead’s team side by side (read-only); they can open any team. Changing teams stays with admins.'},
+  {mod:'recruiters', label:'Recruiters', desc:'Recruiter table, day / week comparison, trends and history', sec:'recruiters', extras:['remarks','grant.manual_edit']},
   {mod:'branches', label:'Branches', desc:'Branch table, trends and history', sec:'branches', extras:['grant.branch_merge']},
   {mod:'alerts', label:'Action Center', desc:'Who is below goal and other signals', sec:'alerts', extras:['remarks_approve']},
   {mod:'divreport', label:'Division Report', desc:'Pipeline by client and location, per division'},
-  {mod:'onboarding', label:'Onboarding', desc:'Log calls — they see and edit their own entries. Tick below for more.', extras:['grant.onb_report']},
-  {mod:'orderentry', label:'Order Entry', desc:'Enter the daily Recruitment Cloud and CRM order counts and see the team’s reports'},
+  {mod:'onboarding', label:'Onboarding', desc:'Log calls — they see and edit their own entries. Tick below for more.', sec:'onboarding', extras:['grant.onb_report','grant.onb_all','grant.onb_lists']},
+  {mod:'orderentry', label:'Order Entry', desc:'Enter the daily Recruitment Cloud and CRM order counts and see the team’s reports', sec:'orderentry', extras:['grant.oe_bulk','grant.oe_agents']},
   {mod:'pivot', label:'Report Builder', desc:'Build their own tables and charts', sec:'pivot'},
   {mod:'candidates', label:'Candidates', desc:'Settings → Candidates, plus candidate names and Employee Numbers everywhere', sec:'candidates', extras:['master','master_edit']},
 ];
 const UF_TOOLS = ['upload','export','settings'];
-const UF_EXTRA_LABEL = {'grant.onb_assign':'Fill in daily assignments', 'grant.onb_report':'See the onboarding report (everyone’s numbers)', remarks:'Can add remarks', remarks_approve:'Can approve and edit remarks', 'grant.team_names':'See their team’s candidate names', 'grant.break_image':'Copy third-break lists as images', 'grant.branch_merge':'Merge branches (applies for everyone)',
+const UF_EXTRA_LABEL = {'grant.onb_all':'Manage everyone’s calls — log for any onboarder, edit / delete any call, answer lock requests', 'grant.onb_lists':'Manage the onboarding dropdowns and onboarder names', 'grant.oe_bulk':'Bulk upload past days', 'grant.oe_agents':'Manage the order entry agent names', 'grant.manual_edit':'Adjust numbers by hand (＋ Adjust numbers)', 'grant.upload_range':'Upload past data for many weeks at once', 'grant.leads':'Team Leads page (read-only)', 'grant.ov_onb':'Overview → Onboarding tab (everyone’s onboarding numbers, read-only)', 'grant.ov_oe':'Overview → Order Entry tab (order entry numbers, read-only)', 'grant.onb_assign':'Fill in daily assignments', 'grant.onb_report':'See the onboarding report (everyone’s numbers)', remarks:'Can add remarks', remarks_approve:'Can approve and edit remarks', 'grant.team_names':'See their team’s candidate names', 'grant.break_image':'Copy third-break lists as images', 'grant.branch_merge':'Merge branches (applies for everyone)',
   master:'Browse all candidate records', master_edit:'Exclude or include candidates', upload:'Upload spreadsheets', export:'Download and share', settings:'Settings — divisions, branches, goals'};
 const UF_PRESETS = [
   {name:'Viewer', desc:'Overview, recruiters and branches', modules:['performance','recruiters','branches']},
@@ -10735,13 +10793,13 @@ function drawUserForm(){
   const secBox=key=>PAGE_SECTIONS[key]?`<details class="sec-page" data-sec-mod="${key}"><summary>Choose what they see on this page <span class="sec-count"></span></summary><div class="sec-list">${PAGE_SECTIONS[key].map(([k,l])=>`<label class="sec-opt${l.startsWith('··')?' sub sub2':l.startsWith('·')?' sub':''}"><input type="checkbox" data-sec="${k}" ${hidden(k)?'':'checked'}> ${escapeHtml(l.replace(/^·+ /,''))}</label>`).join('')}</div></details>`:'';
   const pageRow=pg=>{ if(pg.mod) used.add(pg.mod);
     return `<div class="uf-page${pg.mod==='candidates'?' keep-extras':''}">
-      <div class="uf-page-main">${pg.mod?`<label class="uf-switch"><input type="checkbox" data-mod value="${pg.mod}" ${has(pg.mod)?'checked':''}><i aria-hidden="true"></i></label>`:pg.offGrant?`<label class="uf-switch"><input type="checkbox" data-grant-off="${pg.offGrant}" ${hidden(pg.offGrant)?'':'checked'}><i aria-hidden="true"></i></label>`:'<span class="uf-always">Always</span>'}
+      <div class="uf-page-main">${pg.mod?`<label class="uf-switch"><input type="checkbox" data-mod value="${pg.mod}" ${has(pg.mod)?'checked':''}><i aria-hidden="true"></i></label>`:pg.grant?`<label class="uf-switch"><input type="checkbox" data-grant="${pg.grant}" ${hidden(pg.grant)?'checked':''}><i aria-hidden="true"></i></label>`:pg.offGrant?`<label class="uf-switch"><input type="checkbox" data-grant-off="${pg.offGrant}" ${hidden(pg.offGrant)?'':'checked'}><i aria-hidden="true"></i></label>`:'<span class="uf-always">Always</span>'}
         <div class="uf-page-txt"><strong>${escapeHtml(pg.label)}</strong><span>${escapeHtml(pg.desc)}</span></div></div>
       ${(pg.extras||[]).length?`<div class="uf-extras">${pg.extras.map(extra).join('')}</div>`:''}
       ${secBox(pg.sec)}</div>`; };
   const pagesHtml=UF_PAGES.map(pageRow).join('');
   const tools=[...UF_TOOLS, ...MODULES.map(m=>m.key).filter(k=>!used.has(k)&&!UF_TOOLS.includes(k)&&!UF_PAGES.some(p=>p.mod===k||(p.extras||[]).includes(k)))];
-  const toolsHtml=tools.map(k=>`<div class="uf-tool"><label class="uf-switch"><input type="checkbox" data-mod value="${k}" ${has(k)?'checked':''}><i aria-hidden="true"></i></label><div class="uf-page-txt"><strong>${escapeHtml(UF_EXTRA_LABEL[k]||modLbl(k))}</strong><span>${escapeHtml((MODULES.find(m=>m.key===k)||{}).hint||'')}</span></div></div>`).join('')
+  const toolsHtml=tools.map(k=>`<div class="uf-tool"><label class="uf-switch"><input type="checkbox" data-mod value="${k}" ${has(k)?'checked':''}><i aria-hidden="true"></i></label><div class="uf-page-txt"><strong>${escapeHtml(UF_EXTRA_LABEL[k]||modLbl(k))}</strong><span>${escapeHtml((MODULES.find(m=>m.key===k)||{}).hint||'')}</span></div></div>${k==='settings'?`<div class="uf-tool-sec" ${has('settings')?'':'hidden'}>${secBox('settings')}</div>`:''}${k==='upload'?`<div class="uf-tool"><label class="uf-switch"><input type="checkbox" data-grant="grant.upload_range" ${hidden('grant.upload_range')?'checked':''}><i aria-hidden="true"></i></label><div class="uf-page-txt"><strong>${escapeHtml(UF_EXTRA_LABEL['grant.upload_range'])}</strong><span>Upload → “Past data” — one file covering many weeks (normally super admin only)</span></div></div>`:''}`).join('')
     +`<div class="uf-tool"><label class="uf-switch"><input type="checkbox" data-sec="copy.tables" ${hidden('copy.tables')?'':'checked'}><i aria-hidden="true"></i></label><div class="uf-page-txt"><strong>Copy tables</strong><span>Copy tables and lists to the clipboard</span></div></div>`;
   const initials=(u.name||'?').trim().split(/\s+/).map(x=>x[0]).slice(0,2).join('').toUpperCase()||'+';
   host.innerHTML = `<div class="user-form uf-drawer" role="dialog" aria-modal="true" aria-labelledby="ufTitle">
@@ -10749,8 +10807,8 @@ function drawUserForm(){
     <div class="uf-body">
      <section class="uf-sec"><h5>Sign-in</h5>
       <div class="field-row">
-       <div class="field"><label for="ufName">Name (used to sign in)</label><input id="ufName" value="${escapeHtml(u.name)}" autocomplete="off"></div>
-       <div class="field"><label for="ufPw">${isNew?'Password':'New password'}</label><div class="pw-wrap"><input id="ufPw" type="text" autocomplete="new-password" placeholder="${isNew?'8+ characters, letters and numbers':'Leave blank to keep the current one'}" ${pwLocked?'disabled':''}><button type="button" class="pw-toggle" id="ufGen" ${pwLocked?'disabled':''}>Generate</button></div>${sa?'<span class="hint">Change your own password under My account.</span>':pwLocked?'<span class="hint">Only the super admin can change passwords.</span>':''}</div>
+       <div class="field"><label for="ufName">${window.DV_MODE?'Name':'Name (used to sign in)'}</label><input id="ufName" value="${escapeHtml(u.name)}" autocomplete="off"></div>
+       ${window.DV_MODE?`<div class="field"><label for="ufEmail">Work email (their Microsoft 365 sign-in)</label><input id="ufEmail" type="email" value="${escapeHtml(u.email||'')}" placeholder="name@company.com" autocomplete="off" ${sa&&!meSuper?'disabled':''}></div>`:`<div class="field"><label for="ufPw">${isNew?'Password':'New password'}</label><div class="pw-wrap"><input id="ufPw" type="text" autocomplete="new-password" placeholder="${isNew?'8+ characters, letters and numbers':'Leave blank to keep the current one'}" ${pwLocked?'disabled':''}><button type="button" class="pw-toggle" id="ufGen" ${pwLocked?'disabled':''}>Generate</button></div>${sa?'<span class="hint">Change your own password under My account.</span>':pwLocked?'<span class="hint">Only the super admin can change passwords.</span>':''}</div>`}
       </div>
       ${sa?'':`<label class="uf-tool uf-active"><span class="uf-switch"><input type="checkbox" id="ufActive" ${u.active?'checked':''}><i aria-hidden="true"></i></span><span class="uf-page-txt"><strong>Account active</strong><span>Turn off to block sign-in without deleting the account</span></span></label>`}
      </section>
@@ -10772,7 +10830,7 @@ function drawUserForm(){
     <footer class="uf-foot"><p class="auth-msg" id="ufMsg" role="alert"></p><button class="btn btn-secondary" id="ufCancel">Cancel</button><button class="btn btn-primary" id="ufSave">${isNew?'Create user':'Save changes'}</button></footer>
   </div>`;
   host.classList.add('uf-open'); document.body.classList.add('uf-lock');
-  const mainSw='.uf-page-main input[data-mod], .uf-page-main input[data-grant-off]';
+  const mainSw='.uf-page-main input[data-mod], .uf-page-main input[data-grant-off], .uf-page-main input[data-grant]';
   const countPages=()=>{ const el=host.querySelector('#ufPageCount'); if(!el) return; const all=[...host.querySelectorAll(mainSw)]; el.textContent=all.filter(i=>i.checked).length+' of '+all.length+' pages on'; };
   host.querySelectorAll(mainSw).forEach(i=>i.addEventListener('change',()=>{ i.closest('.uf-page').classList.toggle('off',!i.checked); countPages(); }));
   host.querySelectorAll(mainSw).forEach(i=>i.closest('.uf-page').classList.toggle('off',!i.checked)); countPages();
@@ -10781,11 +10839,11 @@ function drawUserForm(){
   const closeForm=()=>{ editingUserId=null; host.innerHTML=''; host.classList.remove('uf-open'); document.body.classList.remove('uf-lock'); };
   host.querySelector('#ufClose').onclick=closeForm;
   host.onkeydown=e=>{ if(e.key==='Escape') closeForm(); };
-  host.querySelector('#ufGen')?.addEventListener('click', ()=>{ host.querySelector('#ufPw').value = genPassword(); });
+  host.querySelector('#ufGen')?.addEventListener('click', ()=>{ const i=host.querySelector('#ufPw'); if(i) i.value = genPassword(); });
   host.querySelectorAll('input[name="ufRole"]').forEach(r=>r.addEventListener('change', ()=>{ const adm = host.querySelector('input[name="ufRole"]:checked').value==='admin'; host.querySelector('.admin-note')?.toggleAttribute('hidden', !adm); host.querySelectorAll('.uf-access').forEach(f=>f.classList.toggle('dimmed', adm)); }));
   if(u.role==='admin') host.querySelectorAll('.uf-access').forEach(f=>f.classList.add('dimmed'));
   const secCount = ()=>host.querySelectorAll('.sec-page').forEach(d=>{ const all=d.querySelectorAll('[data-sec]').length, on=d.querySelectorAll('[data-sec]:checked').length; d.querySelector('.sec-count').textContent = on===all ? 'everything' : on+' of '+all+' shown'; });
-  host.querySelectorAll('input[data-mod]').forEach(cb=>cb.addEventListener('change', ()=>{ const d=host.querySelector('.sec-page[data-sec-mod="'+cb.value+'"]'); if(d) d.hidden=!cb.checked; }));
+  host.querySelectorAll('input[data-mod]').forEach(cb=>cb.addEventListener('change', ()=>{ const d=host.querySelector('.sec-page[data-sec-mod="'+cb.value+'"]'); if(d) d.hidden=!cb.checked; const t=d&&d.closest('.uf-tool-sec'); if(t) t.hidden=!cb.checked; }));
   const LINE_PARENT={goal_reach:'schedules',shows:'interviews',no_shows:'interviews',hire_rate:'hires'};
   const syncDetail = ()=>{
     ['perf','team'].forEach(pf=>Object.entries(LINE_PARENT).forEach(([l,c])=>{ const cb=host.querySelector('[data-sec="'+pf+'.kpi.'+l+'"]'), par=host.querySelector('[data-sec="'+pf+'.kpi.'+c+'"]'); if(cb&&par){ cb.disabled=!par.checked; if(!par.checked) cb.checked=false; } }));
@@ -10801,10 +10859,11 @@ function drawUserForm(){
   host.querySelector('#ufSave').onclick=async ()=>{
     const p = {name:host.querySelector('#ufName').value.trim()};
     if(!isNew) p.id = u.id;
-    const pw = host.querySelector('#ufPw').value; if(pw) p.password = pw;
+    const pw = window.DV_MODE ? '' : host.querySelector('#ufPw').value; if(pw) p.password = pw;
+    if(window.DV_MODE){ const em=(host.querySelector('#ufEmail')?.value||'').trim().toLowerCase(); if(em) p.email=em; if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){ host.querySelector('#ufMsg').textContent='Enter their work email — it is how they sign in.'; return; } }
     const roleIn = host.querySelector('input[name="ufRole"]:checked'); if(roleIn) p.role = roleIn.value;
     if(!sa){ p.modules = [...host.querySelectorAll('input[data-mod]:checked')].map(i=>i.value); p.active = host.querySelector('#ufActive').checked; p.hidden_sections = [...host.querySelectorAll('[data-sec]:not(:checked)')].map(i=>i.dataset.sec).concat([...host.querySelectorAll('[data-grant]:checked')].map(i=>i.dataset.grant)).concat([...host.querySelectorAll('[data-grant-off]:not(:checked)')].map(i=>i.dataset.grantOff)); }
-    if(isNew && !pw){ host.querySelector('#ufMsg').textContent='Set a password (or click Generate).'; return; }
+    if(isNew && !pw && !window.DV_MODE){ host.querySelector('#ufMsg').textContent='Set a password (or click Generate).'; return; }
     try{
       const saved = await Server.rpc('dash_user_save', {p});
       const dvSel = host.querySelector('#ufDefaultView'); const uid = (saved&&saved.id)||u.id;
@@ -10820,7 +10879,7 @@ function drawUserForm(){
         const names = grantLost.map(k=>(MODULES.find(m=>m.key===k)||{label:k}).label).join(', ');
         alert(names+' couldn’t be saved yet.\n\nOpen Supabase → SQL Editor, paste team_candidates.sql (it adds the rights table), click Run, then tick it again.');
       }
-      showToast(isNew ? 'User created. Share the name and password with '+p.name+' privately.' : 'Saved.'+(dropped.length||grantLost.length?' Some rights were not accepted — see the message.':' '+p.name+' sees the change within a few seconds.'));
+      showToast(isNew && window.DV_MODE ? 'User added. '+p.name+' can open the app with '+p.email+'.' : isNew ? 'User created. Share the name and password with '+p.name+' privately.' : 'Saved.'+(dropped.length||grantLost.length?' Some rights were not accepted — see the message.':' '+p.name+' sees the change within a few seconds.'));
       if(isNew && pw) host.insertAdjacentHTML('afterend','');
       closeForm(); renderUsersAdmin();
       if(!isNew && u.id===Server.user.id){ Server.user = await Server.rpc('dash_me'); applyPermissions(); }
@@ -10846,13 +10905,14 @@ function renderMyAccount(){
   const mods = u.role!=='user' ? ['Everything ('+(u.role==='admin'?'admin':'super admin')+')'] : u.modules.map(k=>(MODULES.find(m=>m.key===k)||{label:k}).label);
   host.innerHTML = `<div class="panel">
     <h3 style="margin:0 0 4px;">${escapeHtml(u.name)}</h3><p class="hint" style="margin:0 0 12px;">${u.role==='super_admin'?'Super admin':u.role==='admin'?'Admin':'User'} · access: ${escapeHtml(mods.join(', ')||'none')}</p>
-    <button class="btn btn-secondary btn-sm" id="acctSignOut">Sign out</button>
+    ${window.DV_MODE?`<p class="hint" style="margin:0">Signed in with Microsoft 365${u.email?' as <strong>'+escapeHtml(u.email)+'</strong>':''}.</p>`:'<button class="btn btn-secondary btn-sm" id="acctSignOut">Sign out</button>'}
   </div>
+  ${u.role==='super_admin'?backupPanelHtml():''}
   ${u.role!=='user' ? `<div class="panel"><h3 style="margin:0 0 4px;">Candidate names</h3>
     <p class="hint" style="margin:0 0 10px;">Candidate names are stored encrypted, and everyone sees a short code such as #7C1E09A4 instead. As an admin you can show the real names on this device only — they’re unlocked here and never shared.</p>
     <label class="uf-tool uf-active" style="margin:0"><span class="uf-switch"><input type="checkbox" id="acctShowNames" ${NamePolicy.show()?'checked':''}><i aria-hidden="true"></i></span><span class="uf-page-txt"><strong>Show candidate names</strong><span>Admins only · this browser only</span></span></label>
     <p class="auth-msg" id="acctNamesMsg" role="status"></p></div>` : ''}
-  ${u.role==='super_admin' ? `<div class="panel">
+  ${window.DV_MODE ? '' : u.role==='super_admin' ? `<div class="panel">
     <h3 style="margin:0 0 4px;">Change my password</h3>
     ${u.default_password?'<p class="warn-note">You are still using the setup password <strong>India@5618</strong>. Change it now — anyone who knows it could sign in as you.</p>':'<p class="hint">Only you can change the super-admin password. Other users’ passwords are set in Users &amp; Access.</p>'}
     <div class="field-row"><div class="field"><label for="pwOld">Current password</label><input id="pwOld" type="password" autocomplete="current-password"></div>
@@ -10861,7 +10921,7 @@ function renderMyAccount(){
     <p class="auth-msg" id="pwMsg" role="alert"></p>
     <button class="btn btn-primary btn-sm" id="pwSave">Change password</button>
   </div>` : `<div class="panel"><p class="hint" style="margin:0;">Your password is managed by the super admin. Ask them if you need it reset.</p></div>`}`;
-  host.querySelector('#acctSignOut').onclick = signOut;
+  host.querySelector('#acctSignOut')?.addEventListener('click', signOut); wireBackupPanel(host);
   host.querySelector('#acctShowNames')?.addEventListener('change', async e=>{ const on=e.target.checked; NamePolicy.setShow(on);
     if(on){ const k=await NamePolicy.getKey(); host.querySelector('#acctNamesMsg').textContent=k?'Names will show across the dashboard.':'Older uploads show names; newer ones need the name-protection key (run privacy.sql).'; }
     else host.querySelector('#acctNamesMsg').textContent='Names hidden — encrypted codes show instead.';
@@ -10872,6 +10932,76 @@ function renderMyAccount(){
     if(n!==n2){ msg.textContent='The new passwords don’t match.'; return; }
     try{ await Server.rpc('dash_change_my_password', {p_old:o, p_new:n}); Server.user = await Server.rpc('dash_me'); showToast('Password changed. Other devices were signed out.'); renderMyAccount(); }
     catch(e){ msg.textContent = cleanErr(e); }
+  };
+}
+document.addEventListener('click',e=>{ if(e.target.closest&&e.target.closest('[data-open-manual]')) openManualEntryDialog({}); else if(e.target.closest&&e.target.closest('[data-merge-table]')) openBranchMergeFromTable(); });
+/* ---------- Moving to Power Apps: full backup (old dashboard) → import (Power Apps / Dataverse) ---------- */
+function backupPanelHtml(){
+  if(window.DV_MODE) return `<div class="panel" id="dvImportPanel"><h3 style="margin:0 0 4px;">Bring your data from the old dashboard</h3>
+    <p class="hint" style="margin:0 0 10px;">In the old (Supabase) dashboard, open Settings → My account → <b>Download full backup</b>. Then choose that file here. Users, weekly results, candidate rows, remarks, onboarding calls, order entry and teams are copied into Dataverse. Running it again updates the same records.</p>
+    <label class="btn btn-secondary btn-sm" style="cursor:pointer">Choose backup file<input type="file" id="dvImportFile" accept=".gz,.json,application/json,application/gzip" hidden></label>
+    <div id="dvImportStep"></div></div>`;
+  return `<div class="panel"><h3 style="margin:0 0 4px;">Move to Power Apps</h3>
+    <p class="hint" style="margin:0 0 10px;">Downloads everything in this dashboard as one file — settings, weekly results, every candidate row, users and their rights, remarks, onboarding calls, order entry and teams — for the Power Apps (Dataverse) version: Settings → My account → <b>Bring your data from the old dashboard</b>. Candidate names stay encrypted; the file includes the name key, so keep it private.</p>
+    <button class="btn btn-primary btn-sm" id="fullBackupBtn">Download full backup</button><span class="hint" id="fullBackupMsg" style="margin-left:10px"></span></div>`;
+}
+async function gzipText(text){ const cs=new Blob([text]).stream().pipeThrough(new CompressionStream('gzip')); return new Response(cs).blob(); }
+async function gunzipFile(file){ if(!/\.gz$/i.test(file.name)) return file.text(); const ds=file.stream().pipeThrough(new DecompressionStream('gzip')); return new Response(ds).text(); }
+async function buildFullBackup(say){
+  const B={format:'ipd-dashboard-backup', version:1, exported_at:new Date().toISOString(), exported_by:Server.user&&Server.user.name};
+  const soft=async(label,f)=>{ try{ return await f(); }catch(e){ console.warn('backup: '+label, e); (B.skipped||(B.skipped=[])).push(label+': '+cleanErr(e)); return null; } };
+  // settings + weekly results, stored values exactly as they are
+  const kv=[]; let after='';
+  for(;;){ const rows=await Server.rpc('dash_kv_page',{p_after:after,p_limit:25}); if(!rows||!rows.length) break; rows.forEach(r=>kv.push({key:r.key,value:r.value})); after=rows[rows.length-1].key; say('Settings and weekly results… '+kv.length); }
+  const have=new Set(kv.map(r=>r.key)), lk=kv.filter(r=>r.key.startsWith('weekly:')&&!r.key.endsWith(LISTS_SUFFIX)).map(r=>r.key+LISTS_SUFFIX).filter(k=>!have.has(k));
+  for(let i=0;i<lk.length;i+=4){ (await Server.rpc('dash_kv_get',{p_keys:lk.slice(i,i+4)})||[]).forEach(r=>kv.push({key:r.key,value:r.value})); say('Candidate lists… '+Math.min(i+4,lk.length)+' / '+lk.length); }
+  B.kv=kv;
+  B.users=(await Server.rpc('dash_users_list'))||[];
+  // every candidate row, with the week and order it counts in
+  const rows=[]; after='';
+  for(;;){ const page=await Server.rpc('dash_master_export',{p_after:after,p_limit:1000}); if(!page||!page.length) break; rows.push(...page); after=page[page.length-1].id; say('Candidate rows… '+fmtNum(rows.length)); }
+  const weeks=new Set(); rows.forEach(r=>{ const c=String((r.data||{})['Created On']||'').slice(0,10), d=String((r.data||{})['Date Of']||'').slice(0,10); if(/^\d{4}-\d{2}-\d{2}$/.test(c)) weeks.add(weekOfDate(c).weekEnd); if(/^\d{4}-\d{2}-\d{2}$/.test(d)) weeks.add(weekOfDate(d).weekEnd); });
+  const pos=new Map(), wl=[...weeks].sort();
+  for(let i=0;i<wl.length;i+=8){ let a=''; for(;;){ const page=await Server.rpc('dash_week_index',{p_weeks:wl.slice(i,i+8),p_after:a,p_limit:1000}); if(!page||!page.length) break; page.forEach(x=>pos.set(x.id,x)); a=page[page.length-1].id; } say('Row order… week '+Math.min(i+8,wl.length)+' / '+wl.length); }
+  B.master=rows.map(r=>{ const p=pos.get(r.id)||{}; return {id:r.id, s:!!r.s, v:!!r.v, excluded:!!r.excluded, sw:p.sw||null, so:p.so??0, vw:p.vw||null, vo:p.vo??0, data:r.data||{}}; });
+  B.removed_weeks=await soft('removed weeks',()=>Server.rpc('dash_removed_weeks'))||[];
+  B.upload_log=await soft('upload history',()=>Server.rpc('dash_upload_log',{p_limit:500}))||[];
+  B.remarks=await soft('remarks',()=>Server.rpc('dash_remarks_list'))||[];
+  B.name_key=await soft('name key',()=>Server.rpc('dash_name_key'));
+  B.branch_merges=await soft('branch merges',()=>Server.rpc('dash_branch_merges_get'));
+  const today=ltToday(), win=(from,days)=>{ const out=[]; for(let a=from;a<=today;){ const b=tgShift(a,days-1); out.push([a,b>today?today:b]); a=tgShift(b,1); } return out; };
+  say('Onboarding calls…');
+  B.onboarding=[]; for(const [a,b] of win('2023-01-01',400)){ const r=await soft('onboarding',()=>Server.rpc('dash_onb_list',{p_from:a,p_to:b})); if(r==null) break; B.onboarding.push(...r); }
+  B.onb_requests=await soft('onboarding requests',()=>Server.rpc('dash_onb_requests_list'))||[];
+  B.onb_assign=[]; for(const [a,b] of win('2023-01-01',400)){ const r=await soft('daily assignments',()=>Server.rpc('dash_onb_assign_list',{p_from:a,p_to:b})); if(r==null) break; B.onb_assign.push(...r); }
+  B.onb_links=Object.fromEntries(((KV.get('onbLists')||{}).onboarders||[]).filter(o=>o.userId).map(o=>[String(o.userId),o.label]));
+  say('Order entry…');
+  B.order_entry=[]; for(const [a,b] of win('2020-01-01',1400)){ const r=await soft('order entry',()=>Server.rpc('dash_oe_list',{p_from:a,p_to:b})); if(r==null) break; B.order_entry.push(...r); }
+  say('Teams…');
+  B.team_assignments=(await Promise.all(B.users.map(u=>soft('team of '+u.name,()=>Server.rpc('dash_team_assignment_get',{p_user_id:String(u.id)}))))).filter(Boolean);
+  return B;
+}
+function wireBackupPanel(host){
+  const btn=host.querySelector('#fullBackupBtn');
+  if(btn) btn.onclick=async()=>{ const msg=host.querySelector('#fullBackupMsg'); btn.disabled=true;
+    try{ const B=await buildFullBackup(t=>{ msg.textContent=t; setLoading(t); });
+      setLoading('Packing the file…'); const blob=await gzipText(JSON.stringify(B)); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='dashboard-backup-'+ltToday()+'.json.gz'; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1000);
+      msg.textContent='Done — '+fmtNum(B.master.length)+' candidate rows, '+B.users.length+' users, '+fmtNum(B.kv.length)+' stored items'+(B.skipped?' · not included: '+B.skipped.join('; '):'')+'.'; }
+    catch(e){ msg.textContent='Backup failed: '+cleanErr(e); }
+    finally{ btn.disabled=false; setLoading(null); } };
+  const file=host.querySelector('#dvImportFile'); if(!file) return;
+  file.onchange=async()=>{ const f=file.files[0]; file.value=''; if(!f) return; const step=host.querySelector('#dvImportStep');
+    let B; try{ B=JSON.parse(await gunzipFile(f)); if(!B||B.format!=='ipd-dashboard-backup') throw new Error('This is not a dashboard backup file.'); }catch(e){ step.innerHTML='<p class="auth-msg">'+escapeHtml(cleanErr(e))+'</p>'; return; }
+    const people=(B.users||[]).filter(u=>u.role!=='super_admin');
+    step.innerHTML=`<p class="hint" style="margin:12px 0 6px">Backup from ${escapeHtml(new Date(B.exported_at).toLocaleString())} · ${fmtNum((B.master||[]).length)} candidate rows · ${fmtNum((B.onboarding||[]).length)} onboarding calls · ${fmtNum((B.order_entry||[]).length)} order entry days. Type each person’s <b>work email</b> (their Microsoft 365 sign-in). Anyone left blank is copied but switched off until you add their email in Users.</p>
+      <div style="max-height:320px;overflow:auto"><table class="users-table"><thead><tr><th>Person</th><th>Role</th><th>Work email</th></tr></thead><tbody>${people.map(u=>`<tr><td>${escapeHtml(u.name)}</td><td>${u.role==='admin'?'Admin':'User'}</td><td><input type="email" data-dv-email="${escapeHtml(String(u.id))}" value="${/@/.test(u.name)?escapeHtml(u.name):''}" placeholder="name@company.com" style="width:100%"></td></tr>`).join('')||'<tr><td colspan="3" class="hint">No other users in the backup.</td></tr>'}</tbody></table></div>
+      <div style="display:flex;gap:10px;align-items:center;margin-top:10px"><button class="btn btn-primary btn-sm" id="dvImportGo">Import into Dataverse</button><span class="hint" id="dvImportMsg"></span></div>`;
+    step.querySelector('#dvImportGo').onclick=async()=>{ const go=step.querySelector('#dvImportGo'), msg=step.querySelector('#dvImportMsg'); go.disabled=true;
+      const emails={}; step.querySelectorAll('[data-dv-email]').forEach(i=>{ if(i.value.trim()) emails[i.dataset.dvEmail]=i.value.trim().toLowerCase(); });
+      try{ const st=await window.DVBackend.rpc('dash_dv_import',{backup:B, emails, progress:t=>{ msg.textContent=t; setLoading(t); }});
+        msg.textContent='Imported — '+Object.entries(st).map(([k,v])=>k+': '+v).join(' · ')+'. Reloading…'; setTimeout(()=>location.reload(), 2500); }
+      catch(e){ msg.textContent='Import failed: '+cleanErr(e); go.disabled=false; }
+      finally{ setLoading(null); } };
   };
 }
 /* ------------------------------------ CANDIDATES MODULE ------------------------------------ */
@@ -11253,13 +11383,13 @@ function ltGoalStatus(value,now=new Date()){
 }
 async function ltLoad(){
  const owner=String(Server.user?.id||'');if(!owner||ltState.loading)return;
- const admin=Server.isAdmin();if(!admin)ltState.viewingId=owner;
- const target=admin?(ltState.viewingId||owner):owner,seq=++ltState.requestSeq;
+ const admin=Server.isAdmin(), viewer=canViewLeads();if(!viewer)ltState.viewingId=owner;
+ const target=viewer?(ltState.viewingId||owner):owner,seq=++ltState.requestSeq;
  ltState.loading=true;ltState.error='';
  const valid=()=>seq===ltState.requestSeq&&String(Server.user?.id)===owner&&(ltState.viewingId||owner)===target;
  try{
   const [assignment,directory]=await Promise.allSettled([
-   Server.rpc('dash_team_assignment_get',admin?{p_user_id:target}:{}),
+   Server.rpc('dash_team_assignment_get',viewer&&target!==owner||admin?{p_user_id:target}:{}),
    admin&&!ltState.users?Server.rpc('dash_users_list'):Promise.resolve(ltState.users)
   ]);
   if(!valid())return;
@@ -11330,7 +11460,7 @@ function renderTeamGroups(){
  const host=document.getElementById('view-teams');if(!host||!Server.user)return;
  const owner=String(Server.user.id);
  if(ltState.owner!==owner)Object.assign(ltState,{owner,viewingId:owner,users:null,directoryError:'',assignment:null,loaded:false,loading:false,error:'',rangeMode:null,anchor:null,division:'',requestSeq:(ltState.requestSeq||0)+1});
- if(!Server.isAdmin()&&ltState.viewingId!==owner)Object.assign(ltState,{viewingId:owner,assignment:null,loaded:false,loading:false,error:'',users:null,requestSeq:ltState.requestSeq+1});
+ if(!canViewLeads()&&ltState.viewingId!==owner)Object.assign(ltState,{viewingId:owner,assignment:null,loaded:false,loading:false,error:'',users:null,requestSeq:ltState.requestSeq+1});
  const openGoals=host.querySelector('#ltGoalChecks')?.open||false;
  ['ltGoals','ltTimeline'].forEach(destroyChart);
  if(!ltState.loaded||!ltState.assignment){
@@ -11351,11 +11481,11 @@ function renderTeamGroups(){
  const weekTo=weekOfDate(checkDay).weekEnd<today?weekOfDate(checkDay).weekEnd:today;
  const names=[...new Set(g.memberships.filter(m=>m.from<=checkDay&&(!m.to||m.to>=checkDay)).map(m=>m.name))].filter(n=>!g.division||(getEffectiveRecruiterDivision(n,weekOfDate(checkDay).weekEnd)||'Unassigned')===g.division);
  const checks=names.map(n=>ltBreakCheck(n,checkDay,now,mode,weekTo)),eligible=checks.filter(x=>x.eligible),missed=checks.filter(x=>x.late||x.mid),unknown=checks.filter(x=>!x.known);
- const isOwn=String(a.owner_id)===owner,self=isOwn?a.recruiter_name:null,AN=ltAnalytics(g,p,cutoff,mode,today,isOwn?a.recruiter_name:null,checks,checkDay),leader=ltState.users?.find(u=>String(u.id)===String(a.owner_id))?.name||Server.user.name;
+ const isOwn=String(a.owner_id)===owner,self=isOwn?a.recruiter_name:null,AN=ltAnalytics(g,p,cutoff,mode,today,isOwn?a.recruiter_name:null,checks,checkDay),leader=ltState.users?.find(u=>String(u.id)===String(a.owner_id))?.name||(isOwn?Server.user.name:((ltLeads.teams||[]).find(t=>t.id===String(a.owner_id))||{}).lead||a.recruiter_name);
  const divisions=[...new Set(g.memberships.flatMap(m=>weeksData.filter(w=>w.weekEndDate>=p.from&&tgShift(w.weekEndDate,-6)<=p.to).map(w=>getEffectiveRecruiterDivision(m.name,w.weekEndDate)||'Unassigned')))].sort();if(g.division&&!divisions.includes(g.division))divisions.push(g.division);
  const rangeText=mode==='day'?fmtDate(p.from):`${fmtDate(p.from)} – ${fmtDate(p.to)}`;
  host.innerHTML=`<div class="lt-sticky">
- <header class="lt-toolbar">${Server.isAdmin()?'<button type="button" class="btn btn-secondary btn-sm lt-back" id="ltBackLeads">← All team leads</button>':''}<div class="lt-title"><h2>${escapeHtml(a.team_name)}</h2><span>${escapeHtml(leader)} · ${escapeHtml(a.recruiter_name)}</span></div>${ltTeamPicker()}
+ <header class="lt-toolbar">${canViewLeads()?'<button type="button" class="btn btn-secondary btn-sm lt-back" id="ltBackLeads">← All team leads</button>':''}<div class="lt-title"><h2>${escapeHtml(a.team_name)}</h2><span>${escapeHtml(leader)} · ${escapeHtml(a.recruiter_name)}</span></div>${ltTeamPicker()}
  <div class="lt-period" role="group" aria-label="Team reporting period"><label class="lt-field">View<select id="ltRangeMode"><option value="day" ${mode==='day'?'selected':''}>Day</option><option value="week" ${mode==='week'?'selected':''}>Week</option><option value="month" ${mode==='month'?'selected':''}>Month</option></select></label><button class="btn btn-secondary" id="ltPrevious" aria-label="Previous ${mode}">←</button><label class="lt-field">${mode==='month'?'Month':mode==='week'?'Week ending':'Date'}<input id="ltAnchor" type="${mode==='month'?'month':'date'}" ${mode==='week'?'data-dp="week"':''} value="${mode==='month'?anchor.slice(0,7):mode==='week'?p.to:anchor}" max="${mode==='month'?today.slice(0,7):mode==='week'?weekOfDate(today).weekEnd:today}"></label><button class="btn btn-secondary" id="ltNext" aria-label="Next ${mode}" ${p.to>=today?'disabled':''}>→</button><button class="btn btn-secondary" id="ltCurrent">${mode==='day'?'Today':mode==='month'?'This month':'This week'}</button></div>
  <label class="lt-field">Division<select id="ltDivision"><option value="">All team divisions</option>${divisions.map(d=>`<option ${d===g.division?'selected':''}>${escapeHtml(d)}</option>`).join('')}</select></label><button class="btn btn-secondary" id="ltRefresh" aria-label="Refresh team" title="Refresh team">↻</button></header>
  <div class="lt-scope"><span><strong>${rangeText}</strong> · ${escapeHtml(g.division||'All divisions')}${p.to>today?' · through today':''}</span><span title="Dates and cutoff times use your system timezone">${escapeHtml(zone)}</span></div>
@@ -11384,7 +11514,7 @@ function renderTeamGroups(){
  host.querySelector('#ltBrkToggle')?.addEventListener('click',()=>{ ltSetBreakVisible(!ltBreakVisible()); renderTeamGroups(); });
  host.querySelector('#ltBrkImg')?.addEventListener('click',()=>{ if(!canCopyBreakImage()) return; ltCopyBreakImage(AN.breakLists, {team:a.team_name, dayLabel:AN.breakLists.dayLabel, day:AN.breakLists.day}); });
  ltBindTeamPicker(host);
- if(Server.isAdmin()){ document.querySelectorAll('#navList button[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view==='leads')); layoutNav(); }
+ if(Server.isAdmin()||(canViewLeads()&&String(ltState.viewingId||'')!==String(Server.user.id))){ document.querySelectorAll('#navList button[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view==='leads')); layoutNav(); }
  host.querySelector('#ltBackLeads')?.addEventListener('click',()=>{ currentView='leads'; document.querySelectorAll('#navList button[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view==='leads')); refreshUI(); window.scrollTo(0,0); });
  host.querySelector('#ltDivision').onchange=e=>{ltState.division=e.target.value;renderTeamGroups();};
  host.querySelector('#ltRangeMode').onchange=e=>{ltState.rangeMode=e.target.value;renderTeamGroups();};
@@ -11525,12 +11655,19 @@ const ltLeads={owner:null,teams:null,loading:false,error:'',at:0};
 const LEADS_LS=()=> 'ipd_leads_cache:'+(Server.user?.id||'');
 function ltLeadsFromCache(){ if(ltLeads.teams&&ltLeads.owner===String(Server.user?.id)) return; try{ const c=JSON.parse(localStorage.getItem(LEADS_LS())||'null'); if(c&&Array.isArray(c.teams)){ Object.assign(ltLeads,{owner:String(Server.user.id),teams:c.teams,at:c.at||0}); } }catch(e){} }
 async function ltLoadLeads(force){
- const owner=String(Server.user?.id||''); if(!Server.isAdmin()||ltLeads.loading) return;
+ const owner=String(Server.user?.id||''); if(!canViewLeads()||ltLeads.loading) return;
  ltLeadsFromCache();
  if(!force&&ltLeads.owner===owner&&ltLeads.teams&&Date.now()-ltLeads.at<2*60e3) return;
  ltLeads.loading=true; ltLeads.error='';
  const before=JSON.stringify(ltLeads.teams||null);
  try{
+  if(!Server.isAdmin()){
+   const list=await Server.rpc('dash_leads_teams'); if(String(Server.user?.id)!==owner) return;
+   ltLeads.teams=(Array.isArray(list)?list:[]).map(a=>({id:String(a.owner_id), lead:a.recruiter_name||a.team_name, a}));
+   ltLeads.owner=owner; ltLeads.at=Date.now();
+   try{ localStorage.setItem(LEADS_LS(), JSON.stringify({at:ltLeads.at,teams:ltLeads.teams})); }catch(e){}
+   return;
+  }
   const users=ltState.users||await Server.rpc('dash_users_list'); if(!Array.isArray(users)) throw Error('Could not load the user list'); if(!ltState.users) ltState.users=users;
   const list=(users||[]).filter(u=>u.active!==false);
   const res=await Promise.allSettled(list.map(u=>Server.rpc('dash_team_assignment_get',{p_user_id:u.id})));
@@ -11544,7 +11681,7 @@ async function ltLoadLeads(force){
 // remember the heavy table for the same period / division / data
 const ltLeadsMemo={key:'',html:''};
 function ltLeadsHtml(p,cutoff,mode,today,division){
- if(!Server.isAdmin()) return '';
+ if(!canViewLeads()) return '';
  const memoKey=[p.from,p.to,cutoff,mode,division,ltLeads.at,(ltLeads.teams||[]).length,weeksData.length,weeksData.map(w=>w.savedAt||'').join(),JSON.stringify(KV.get('branchMerges')||null),ltState.viewingId].join('|');
  if(ltLeads.teams&&ltLeadsMemo.key===memoKey) return ltLeadsMemo.html;
  const html=ltLeadsHtmlBuild(p,cutoff,mode,today,division)+ltLeadsBreakHtml(p,cutoff,mode,today,division);
@@ -11554,7 +11691,7 @@ function ltLeadsHtml(p,cutoff,mode,today,division){
 // Third break for every team at once (admins, Team Leads page) — same rule as each team's My Team page.
 const ltLeadsBreak={};
 function ltLeadsBreakHtml(p,cutoff,mode,today,division){
- if(!Server.isAdmin()||!ltLeads.teams||!ltLeads.teams.length||!canSeeSection('team.goals')) return '';
+ if(!canViewLeads()||!ltLeads.teams||!ltLeads.teams.length||!canSeeSection('team.goals')) return '';
  let checkDay=cutoff; if(mode!=='day'){ while(checkDay>p.from&&[0,6].includes(new Date(checkDay+'T12:00:00Z').getUTCDay())) checkDay=tgShift(checkDay,-1); }
  if(checkDay<p.from) return '';
  const weekTo=weekOfDate(checkDay).weekEnd<today?weekOfDate(checkDay).weekEnd:today, now=new Date();
@@ -11574,7 +11711,7 @@ function ltLeadsBreakHtml(p,cutoff,mode,today,division){
     <div class="ld-brk-lists"><div><h5>✓ Eligible · ${e}</h5><ul>${t.lists.eligible.map(x=>person(x,true)).join('')||'<li class="hint">Nobody yet.</li>'}</ul></div><div><h5>⏳ Not yet · ${ny}</h5><ul>${t.lists.notyet.map(x=>person(x,false)).join('')||'<li class="hint">Everyone is eligible. 🎉</li>'}</ul></div></div></details>`; }).join('')}</div></section>`;
 }
 function ltLeadsHtmlBuild(p,cutoff,mode,today,division){
- if(!Server.isAdmin()) return '';
+ if(!canViewLeads()) return '';
  const head=`<div class="lt-section-head"><h3>How each team is doing</h3><span class="hint">Every lead’s team for the same ${mode} and division · schedules vs goal, interviews (shows vs no shows) and hires</span><button class="btn btn-secondary btn-sm" id="ltLeadsRefresh" style="margin-left:auto">↻ Refresh</button></div>`;
  if(ltLeads.owner!==String(Server.user.id)||!ltLeads.teams){ setTimeout(()=>ltLoadLeads(),0); return `<section class="panel ta" data-section="team.leads">${head}<p class="hint">${ltLeads.error?'Could not load teams: '+escapeHtml(ltLeads.error):'Loading every team…'}</p></section>`; }
  if(!ltLeads.teams.length) return `<section class="panel ta" data-section="team.leads">${head}<p class="hint">No teams have been assigned yet.</p></section>`;
@@ -11635,7 +11772,7 @@ function ltLeadsHtmlBuild(p,cutoff,mode,today,division){
 const leadsState={mode:null,anchor:null,division:''};
 function renderLeadsView(){
  const host=document.getElementById('view-leads'); if(!host||!Server.user) return;
- if(!Server.isAdmin()){ host.innerHTML='<section class="panel"><p>Team Leads is available to admins only.</p></section>'; return; }
+ if(!canViewLeads()){ host.innerHTML='<section class="panel"><p>Team Leads needs the “Team Leads” right — ask an admin.</p></section>'; return; }
  const today=ltToday(), mode=leadsState.mode||ltDefaultMode(), anchor=leadsState.anchor||today, p=ltRange(mode,anchor), cutoff=p.to>today?today:p.to;
  const rangeText=mode==='day'?fmtDate(p.from):`${fmtDate(p.from)} – ${fmtDate(p.to)}`;
  const maxAnchor=mode==='week'?weekOfDate(today).weekEnd:today;
@@ -11801,7 +11938,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.64.1';   // shown only in the browser tab title
+const APP_VERSION = '4.66.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -11850,8 +11987,8 @@ document.addEventListener('keydown', e=>{
 });
 // ---------- Manage access in place (super admin) ----------
 const PAGE_MODULE = {performance:'performance', recruiters:'recruiters', branches:'branches', candidates:'candidates', master:'master', alerts:'alerts', pivot:'pivot', divreport:'divreport', onboarding:'onboarding', orderentry:'orderentry'};
-const PAGE_EDIT = {performance:['upload','export'], recruiters:['remarks','export'], branches:['export','grant.branch_merge'], candidates:['master_edit','export'], master:['master_edit','export'], alerts:['remarks','remarks_approve'], pivot:['export'], teams:['grant.team_names','grant.break_image'], leads:[], divreport:['upload','candidates']};
-const EDIT_LABEL = {'grant.branch_merge':'Merge branches', 'grant.break_image':'Copy third-break list as image', 'grant.team_names':'See their team’s candidate names', candidates:'See all candidate names'};
+const PAGE_EDIT = {performance:['upload','export','grant.ov_onb','grant.ov_oe'], recruiters:['remarks','export','grant.manual_edit'], onboarding:['grant.onb_report','grant.onb_all','grant.onb_lists'], orderentry:['grant.oe_bulk','grant.oe_agents'], branches:['export','grant.branch_merge'], candidates:['master_edit','export'], master:['master_edit','export'], alerts:['remarks','remarks_approve'], pivot:['export'], teams:['grant.team_names','grant.break_image'], leads:[], divreport:['upload','candidates']};
+const EDIT_LABEL = {'grant.manual_edit':'Adjust numbers by hand', 'grant.onb_report':'See everyone’s onboarding numbers', 'grant.onb_all':'Manage everyone’s calls', 'grant.onb_lists':'Manage onboarding dropdowns', 'grant.oe_bulk':'Bulk upload past days', 'grant.oe_agents':'Manage agent names', 'grant.ov_onb':'Overview → Onboarding tab', 'grant.ov_oe':'Overview → Order Entry tab', 'grant.branch_merge':'Merge branches', 'grant.break_image':'Copy third-break list as image', 'grant.team_names':'See their team’s candidate names', candidates:'See all candidate names'};
 let accessMode=false, accessObs=null;
 function sectionLabel(key){ for(const secs of Object.values(PAGE_SECTIONS)) for(const [k,l] of secs) if(k===key) return l.replace(/^·+ /,''); return null; }
 // Super admin: locks appear on hover everywhere (no mode needed); "Show all locks" pins them all on.
@@ -12557,6 +12694,8 @@ const Onboarding=(()=>{
  // onboarder names: only admins add or remove them (Manage dropdowns → Onboarders)
  const roster=()=>(lists().onboarders||[]).map(x=>x.label).filter(Boolean);
  const hasGrant=g=>!!Server.user&&(Server.isAdmin()||(Server.user.hidden_sections||[]).includes(g));
+ // per-user rights (Settings → Users → Onboarding): everyone's calls, and the dropdowns / onboarder names
+ const ADM=()=>hasGrant('grant.onb_all'), LST=()=>hasGrant('grant.onb_lists');
  // a dashboard user can be linked to their onboarder (pseudo) name — their calls are logged and reported under it
  const linkedName=uid=>{ const x=(lists().onboarders||[]).find(o=>o.userId&&String(o.userId)===String(uid)); return x?x.label:null; };
  const myName=()=>linkedName(Server.user&&Server.user.id)||(Server.user&&Server.user.name)||'';
@@ -12640,7 +12779,7 @@ const Onboarding=(()=>{
  async function load(){
   st.err='';
   try{ st.rows=await Server.rpc('dash_onb_list',{p_from:st.from, p_to:st.to}) || []; st.demo=false; }
-  catch(e){ if(missing(e)||!Server.token){ st.demo=true; const me=Server.user&&Server.user.id; st.rows=demoRows().filter(r=>r.call_date>=st.from&&r.call_date<=st.to&&(Server.isAdmin()||r.onboarder_id===me)); }
+  catch(e){ if(missing(e)||!Server.token){ st.demo=true; const me=Server.user&&Server.user.id; st.rows=demoRows().filter(r=>r.call_date>=st.from&&r.call_date<=st.to&&(ADM()||r.onboarder_id===me)); }
    else { st.rows=[]; st.err=cleanErr(e); } }
   (st.rows||[]).forEach(r=>{ const ln=linkedName(r.onboarder_id); if(ln) r.onboarder=ln; });
   await loadRequests(); st.loadedAt=new Date();
@@ -12658,10 +12797,10 @@ const Onboarding=(()=>{
  async function save(row){
   row={...row, cat:catOf(row.status,row.call_type)};
   if(!st.demo) return Server.rpc('dash_onb_save',{p_row:row});
-  if(!Server.isAdmin()){ const l=demoLock(row.eid, Server.user.id); if(l.locked) throw new Error(`LOCKED: ${l.owner} completed onboarding for this candidate on ${l.since} — locked until ${l.until}. Ask them to approve your request.`); }
+  if(!ADM()){ const l=demoLock(row.eid, Server.user.id); if(l.locked) throw new Error(`LOCKED: ${l.owner} completed onboarding for this candidate on ${l.since} — locked until ${l.until}. Ask them to approve your request.`); }
   const list=demoRows(); const now=new Date().toISOString();
-  if(row.id){ const i=list.findIndex(x=>String(x.id)===String(row.id)); if(i>=0) list[i]={...list[i], ...row, onboarder:(Server.isAdmin()&&row.onboarder)||list[i].onboarder, updated_at:now}; }
-  else list.push({...row, id:Date.now(), onboarder_id:Server.user.id, onboarder:(Server.isAdmin()&&row.onboarder)||myName(), created_at:now, updated_at:now});
+  if(row.id){ const i=list.findIndex(x=>String(x.id)===String(row.id)); if(i>=0) list[i]={...list[i], ...row, onboarder:(ADM()&&row.onboarder)||list[i].onboarder, updated_at:now}; }
+  else list.push({...row, id:Date.now(), onboarder_id:Server.user.id, onboarder:(ADM()&&row.onboarder)||myName(), created_at:now, updated_at:now});
   demoSave(list); return true;
  }
  // ---- 30-day lock: after a candidate reaches an EB Complete stage, only that onboarder (or someone they approve) can log them ----
@@ -12678,7 +12817,7 @@ const Onboarding=(()=>{
  }
  async function lockFor(eid){
   if(!st.demo){ try{ return await Server.rpc('dash_onb_lock',{p_eid:eid}); }catch(e){ if(!missing(e)) throw e; return {locked:false}; } }
-  if(Server.isAdmin()){ const l=demoLock(eid,''); return {...l, locked:false, admin:true}; }
+  if(ADM()){ const l=demoLock(eid,''); return {...l, locked:false, admin:true}; }
   return demoLock(eid, Server.user.id);
  }
  async function requestAccess(eid, note){
@@ -12688,13 +12827,13 @@ const Onboarding=(()=>{
   return demoLock(eid, Server.user.id);
  }
  async function loadRequests(){
-  try{ st.requests=st.demo?demoReq().filter(q=>Server.isAdmin()||String(q.owner_id)===String(Server.user.id)||String(q.requester_id)===String(Server.user.id)):(await Server.rpc('dash_onb_requests_list'))||[]; }
+  try{ st.requests=st.demo?demoReq().filter(q=>ADM()||String(q.owner_id)===String(Server.user.id)||String(q.requester_id)===String(Server.user.id)):(await Server.rpc('dash_onb_requests_list'))||[]; }
   catch(e){ st.requests=[]; }
  }
  async function decide(id, ok){
   if(!st.demo) return Server.rpc('dash_onb_request_decide',{p_id:id, p_approve:ok});
   const list=demoReq(), q=list.find(x=>String(x.id)===String(id)); if(!q||q.status!=='pending') return;
-  if(!Server.isAdmin()&&String(q.owner_id)!==String(Server.user.id)) throw new Error('Only the original onboarder or an admin can answer this request.');
+  if(!ADM()&&String(q.owner_id)!==String(Server.user.id)) throw new Error('Only the original onboarder or an admin can answer this request.');
   q.status=ok?'approved':'denied'; q.decided_at=new Date().toISOString(); q.decided_by=Server.user.name; demoReqSave(list);
  }
  function lockHtml(l, eid){
@@ -12707,7 +12846,7 @@ const Onboarding=(()=>{
    ${rq==='pending'?'<span class="pill warn">Request sent — waiting for approval</span>':rq==='denied'?`<span class="pill bad">Request declined</span> <button type="button" class="btn btn-secondary btn-sm" data-onb-req="${escapeHtml(eid)}">Ask again</button>`:`<button type="button" class="btn btn-primary btn-sm" data-onb-req="${escapeHtml(eid)}">Request access from ${escapeHtml(l.owner)}</button>`}</div>`;
  }
  function requestsHtml(){
-  const me=String(Server.user.id), adm=Server.isAdmin(), list=st.requests||[];
+  const me=String(Server.user.id), adm=ADM(), list=st.requests||[];
   const toMe=list.filter(q=>q.status==='pending'&&(adm||String(q.owner_id)===me)), mine=list.filter(q=>String(q.requester_id)===me).slice(0,5);
   if(!toMe.length&&!mine.length) return '';
   return `<section class="panel onb-reqs"><div class="panel-head"><div><h3>🔒 Access requests${toMe.length?` <span class="al-count">${toMe.length}</span>`:''}</h3><span class="hint">Candidates locked for 30 days after reaching an EB Complete stage. The original onboarder${adm?' (or an admin)':''} decides who else may log them.</span></div></div>
@@ -12773,7 +12912,7 @@ const Onboarding=(()=>{
  // ---- UI ----
  const sel=(id,opts,val,ph)=>`<select id="${id}" required><option value="">${ph||'Choose…'}</option>${opts.map(c=>`<option ${val===c?'selected':''}>${escapeHtml(c)}</option>`).join('')}${val&&!opts.includes(val)?`<option selected>${escapeHtml(val)}</option>`:''}</select>`;
  function formHtml(){
-  const e=st.editing||{}, adm=Server.isAdmin();
+  const e=st.editing||{}, adm=ADM();
   return `<form class="panel onb-form" id="onbForm" autocomplete="off">
    <div class="onb-form-head"><h3>${e.id?'Edit call':'Log a call'}</h3><div>${e.id?'<button type="button" class="link-btn" id="onbCancel">Cancel edit</button>':''}</div></div>
    <div class="onb-grid">
@@ -12832,10 +12971,10 @@ const Onboarding=(()=>{
  function render(){
   const host=document.getElementById('view-onboarding'); if(!host) return;
   if(!Server.can('onboarding')){ host.innerHTML='<div class="panel"><p class="hint" style="margin:0">Ask an admin for the Onboarding right.</p></div>'; return; }
-  const all=st.rows||[], adm=Server.isAdmin(), q=st.q.trim().toLowerCase();
+  const all=st.rows||[], adm=ADM()||canReport(), q=st.q.trim().toLowerCase();
   // Daily assignments tab removed — its numbers now come from Log calls (Report → Assignments in these dates)
-  const pages=[['log','📞 Log calls'],...(canReport()?[['report','📊 Report']]:[])];
-  if(!st.page||!pages.some(([k])=>k===st.page)) st.page=canReport()?'report':'log';
+  let pages=[['log','📞 Log calls'],...(canReport()?[['report','📊 Report']]:[])].filter(([k])=>canSeeSection('onb.'+k)); if(!pages.length) pages=[['log','📞 Log calls']];
+  if(!st.page||!pages.some(([k])=>k===st.page)) st.page=pages.some(([k])=>k==='report')?'report':pages[0][0];
   const rows=all.filter(r=>(!st.fOnb||r.onboarder===st.fOnb)&&(!st.fType||r.call_type===st.fType));
   const assign=mergedAssign().map(d=>st.fOnb?{...d, data:{...d.data, rows:Object.fromEntries(Object.entries((d.data&&d.data.rows)||{}).filter(([n])=>n===st.fOnb))}}:d);
   let cands=candidates(rows);
@@ -12846,7 +12985,7 @@ const Onboarding=(()=>{
   const onbs=[...new Set([...all.map(r=>r.onboarder), ...(st.assign||[]).flatMap(d=>Object.keys((d.data&&d.data.rows)||{}))])].filter(Boolean).sort();
   const nav0=pages.length<2?'':`<div class="onb-nav" role="tablist">${pages.map(([k,l])=>`<button type="button" data-onb-page="${k}" class="${st.page===k?'on':''}">${l}</button>`).join('')}</div>`;
   const nav=`<div class="onb-navbar">${nav0||'<span></span>'}<span class="onb-updated">${st.loadedAt?'Updated '+st.loadedAt.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}):''}</span><button type="button" class="btn btn-secondary btn-sm onb-refresh" id="onbRefresh" ${st.refreshing?'disabled':''} title="Get the latest calls, assignments and settings without reloading the page">${st.refreshing?'Refreshing…':'↻ Refresh'}</button></div>`;
-  const top=`${adm?`<div class="onb-admin"><span><strong>Admin</strong> · onboarder names, call types, statuses and assignment types</span><button type="button" class="btn btn-primary btn-sm" id="onbLists2">⚙ Manage dropdowns</button></div>`:''}${st.demo?'<div class="onb-demo"><strong>Demo mode</strong> — entries are saved in this browser only. Run <code>onboarding.sql</code> in Supabase to share them with everyone.</div>':''}${st.err?`<div class="onb-demo bad">Could not load: ${escapeHtml(st.err)}</div>`:''}${nav}`;
+  const top=`${LST()?`<div class="onb-admin"><span><strong>${Server.isAdmin()?'Admin':'Manage'}</strong> · onboarder names, call types, statuses and assignment types</span><button type="button" class="btn btn-primary btn-sm" id="onbLists2">⚙ Manage dropdowns</button></div>`:''}${st.demo?'<div class="onb-demo"><strong>Demo mode</strong> — entries are saved in this browser only. Run <code>onboarding.sql</code> in Supabase to share them with everyone.</div>':''}${st.err?`<div class="onb-demo bad">Could not load: ${escapeHtml(st.err)}</div>`:''}${nav}`;
   let body='';
   if(st.page==='assign') body=assignHtml();
   else if(st.page==='log') body=`${requestsHtml()}${formHtml()}${filters(adm,onbs,true)}
@@ -12916,7 +13055,7 @@ const Onboarding=(()=>{
   const saved=(st.assign||[]).find(d=>d.day===day), data=st.aDraft&&st.aDraft.day===day?st.aDraft.data:JSON.parse(JSON.stringify((saved&&saved.data)||{rows:{},pool:{},inactive:{}}));
   st.aDraft={day, data}; data.rows=data.rows||{}; data.pool=data.pool||{}; data.inactive=data.inactive||{};
   const A=autoAssign()[day]||{rows:{},other:0}; st.autoDay=A;
-  const adm=Server.isAdmin(), names=[...new Set([...roster(), ...Object.keys(data.rows), ...Object.keys(A.rows)])].sort((a,b)=>a.localeCompare(b));
+  const adm=LST(), names=[...new Set([...roster(), ...Object.keys(data.rows), ...Object.keys(A.rows)])].sort((a,b)=>a.localeCompare(b));
   const SF=selfType(), LT=ltType(), SL=slType();
   const raw=(n,t)=>isAuto(t)?((A.rows[n]||{})[t]||0):(Number((data.rows[n]||{})[t])||0);
   const autoSelf=n=>(SL?raw(n,SL):0)+(Number((A.rows[n]||{}).__outbound)||0);
@@ -12974,7 +13113,7 @@ const Onboarding=(()=>{
   });
   return {data:out, unknown};
  }
- const canEditRow=r=>Server.isAdmin()||r.onboarder_id===Server.user.id;
+ const canEditRow=r=>ADM()||r.onboarder_id===Server.user.id;
  const actions=r=>canEditRow(r)?`<button class="link-btn" data-onb-edit="${r.id}">Edit</button><button class="link-btn danger" data-onb-del="${r.id}">Delete</button>`:'';
  const durTxt=r=>r.duration_min!=null&&r.duration_min!==''?Number(r.duration_min)+' min':'–';
  function candTable(cands){
@@ -13066,7 +13205,7 @@ const Onboarding=(()=>{
   host.querySelectorAll('[data-as-rm]').forEach(b=>b.onclick=()=>{ delete d.data.rows[b.dataset.asRm]; render(); });
   host.querySelectorAll('[data-as-day]').forEach(b=>b.onclick=()=>{ st.aDay=b.dataset.asDay; st.aDraft=null; render(); });
   const nw=$('#asNew');
-  if(nw&&Server.isAdmin()) nw.addEventListener('keydown',async e=>{ if(e.key!=='Enter') return; e.preventDefault(); const n=nw.value.trim().replace(/\s+/g,' '); if(!n) return;
+  if(nw&&LST()) nw.addEventListener('keydown',async e=>{ if(e.key!=='Enter') return; e.preventDefault(); const n=nw.value.trim().replace(/\s+/g,' '); if(!n) return;
    if(roster().some(x=>x.toLowerCase()===n.toLowerCase())){ showToast(n+' is already on the list.'); return; }
    if(await addToRoster([n])){ showToast(n+' added to the onboarder list.'); render(); setTimeout(()=>document.getElementById('asNew')?.focus(),20); } });
   $('#asDay').addEventListener('change',async e=>{ if(!e.target.value) return; st.aDay=e.target.value; st.aDraft=null; st.asMsg=null; if(st.aDay<st.from){ st.from=st.aDay; await load(); } render(); });
@@ -13078,7 +13217,7 @@ const Onboarding=(()=>{
    Object.assign(d.data.pool, data.pool); Object.assign(d.data.inactive, data.inactive);
    st.asMsg={missingN, ambiguous, unknown, txt}; render();
    showToast(`Filled ${matched.length} onboarder${matched.length===1?'':'s'}${missingN.length+ambiguous.length?' · '+(missingN.length+ambiguous.length)+' name(s) not matched':''} — check and click Save.`); };
-  const m=st.asMsg; if(m&&(m.missingN.length||m.ambiguous.length||m.unknown.length)){ const box=$('#asMsg'); const adm=Server.isAdmin();
+  const m=st.asMsg; if(m&&(m.missingN.length||m.ambiguous.length||m.unknown.length)){ const box=$('#asMsg'); const adm=LST();
    box.innerHTML=`${m.missingN.length?`Not on the onboarder list (skipped): <strong>${m.missingN.map(escapeHtml).join(', ')}</strong>${adm?' <button type="button" class="btn btn-secondary btn-sm" id="asAddMissing">Add them to the list &amp; fill again</button>':' — ask an admin to add them.'}<br>`:''}${m.ambiguous.length?`More than one onboarder has this first name — type the full name in the message: <strong>${m.ambiguous.map(escapeHtml).join(', ')}</strong><br>`:''}${m.unknown.length?`Lines not understood: ${m.unknown.slice(0,6).map(escapeHtml).join(' · ')}${m.unknown.length>6?' …':''}`:''}`;
    const pd=host.querySelector('.as-paste'); if(pd) pd.open=true; const ta=$('#asText'); if(ta&&!ta.value) ta.value=m.txt;
    $('#asAddMissing')?.addEventListener('click',async()=>{ if(await addToRoster(m.missingN)){ st.asMsg=null; render(); const t=document.getElementById('asText'); t.value=m.txt; document.getElementById('asParse').click(); } }); }
@@ -13090,7 +13229,7 @@ const Onboarding=(()=>{
   totals();
  }
  async function addToRoster(names){
-  if(!Server.isAdmin()) return false;
+  if(!LST()) return false;
   const L=JSON.parse(JSON.stringify(lists())); L.onboarders=L.onboarders||[];
   names.forEach(n=>{ n=String(n).trim().replace(/\s+/g,' '); if(n&&!L.onboarders.some(x=>x.label.toLowerCase()===n.toLowerCase())) L.onboarders.push({label:n}); });
   L.onboarders.sort((a,b)=>a.label.localeCompare(b.label));
@@ -13099,7 +13238,7 @@ const Onboarding=(()=>{
  }
  // ---- admin: manage the dropdowns ----
  async function openListsDialog(){
-  if(!Server.isAdmin()) return;
+  if(!LST()) return;
   let users=[]; try{ users=(await Server.rpc('dash_users_list'))||[]; }catch(e){}
   users=(Array.isArray(users)?users:[]).filter(u=>u&&u.id!=null).sort((a,b)=>String(a.name).localeCompare(String(b.name)));
   const L=JSON.parse(JSON.stringify(lists()));
@@ -13154,6 +13293,7 @@ const Onboarding=(()=>{
   render();
   try{
     try{ const got=await Server.rpc('dash_kv_get',{p_keys:['onbLists']}); for(const r of (got||[])) KV.set(r.key, await decodeKvValue(r.key, r.value)); }catch(e){}
+    await loadGrantedKv();
     eidSrv.clear(); eidIdx=null; autoKey=null;
     await load(); showToast('Onboarding is up to date.');
   }catch(e){ showToast('Could not refresh: '+cleanErr(e)); }
@@ -13171,7 +13311,7 @@ const Onboarding=(()=>{
  // the Overview page reads a date range without touching this page's own filters
  async function fetchRange(a,b){ let rows, demo=false;
   try{ rows=await Server.rpc('dash_onb_list',{p_from:a, p_to:b})||[]; }
-  catch(e){ if(!(missing(e)||!Server.token)) throw e; demo=true; const me=Server.user&&Server.user.id; rows=demoRows().filter(r=>r.call_date>=a&&r.call_date<=b&&(Server.isAdmin()||r.onboarder_id===me)); }
+  catch(e){ if(!(missing(e)||!Server.token)) throw e; demo=true; const me=Server.user&&Server.user.id; rows=demoRows().filter(r=>r.call_date>=a&&r.call_date<=b&&(ADM()||r.onboarder_id===me)); }
   rows=rows.map(r=>({...r, call_date:String(r.call_date).slice(0,10)})); rows.forEach(r=>{ const ln=linkedName(r.onboarder_id); if(ln) r.onboarder=ln; });
   return {rows, demo}; }
  return {show, reload:async()=>{ await load(); render(); }, candidates, catOf, fetchRange, summary, perOnboarder, CAT_LBL, CAT_CLS};
@@ -13182,6 +13322,8 @@ const Onboarding=(()=>{
 // by day, week (Sunday–Saturday), month or quarter, as a total and split into RC / CRM.
 // Agent names are managed by admins (KV 'oeLists'); a renamed agent keeps the old name as an alias.
 const OrderEntry=(()=>{
+ // per-user rights (Settings → Users → Order Entry): manage agent names, bulk upload of past days
+ const canAgents=()=>hasRight('grant.oe_agents'), canBulk=()=>hasRight('grant.oe_bulk');
  const DEMO_KEY='ipd_oe_demo';
  const parse=s=>new Date(s+'T12:00:00'), iso=d=>toIsoDateOnly(d);
  const add=(s,n)=>{ const d=parse(s); d.setDate(d.getDate()+n); return iso(d); };
@@ -13260,10 +13402,11 @@ const OrderEntry=(()=>{
   const host=document.getElementById('view-orderentry'); if(!host) return;
   if(!Server.can('orderentry')){ host.innerHTML='<div class="panel"><p class="hint" style="margin:0">Ask an admin for the Order Entry right.</p></div>'; return; }
   if(OrderEntry._chart){ try{ OrderEntry._chart.destroy(); }catch(e){} OrderEntry._chart=null; }
-  const adm=Server.isAdmin(); if(!st.page||(st.page==='bulk'&&!adm)) st.page='entry';
-  const pages=[['entry','✏️ Daily entry'],['report','📊 Report'],...(adm?[['bulk','⬆ Bulk upload']]:[])];
+  const adm=canAgents(), bulkOk=canBulk(); if(!st.page||(st.page==='bulk'&&!bulkOk)) st.page='entry';
+  let pages=[['entry','✏️ Daily entry'],['report','📊 Report'],...(bulkOk?[['bulk','⬆ Bulk upload']]:[])].filter(([k])=>k==='bulk'||canSeeSection('oe.'+k)); if(!pages.length) pages=[['entry','✏️ Daily entry']];
+  if(!pages.some(([k])=>k===st.page)) st.page=pages[0][0];
   const nav=`<div class="onb-navbar"><div class="onb-nav" role="tablist">${pages.map(([k,l])=>`<button type="button" role="tab" data-oe-page="${k}" class="${st.page===k?'on':''}" aria-selected="${st.page===k}">${l}</button>`).join('')}</div><span class="onb-updated">${st.loadedAt?'Updated '+st.loadedAt.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}):''}</span><button type="button" class="btn btn-secondary btn-sm onb-refresh" id="oeRefresh" ${st.refreshing?'disabled':''} title="Get the latest numbers and agent names without reloading the page">${st.refreshing?'Refreshing…':'↻ Refresh'}</button></div>`;
-  const top=`${adm?`<div class="onb-admin"><span><strong>Admin</strong> · order entry agent names</span><button type="button" class="btn btn-primary btn-sm" id="oeAgents">⚙ Manage agents</button></div>`:''}${st.demo?'<div class="onb-demo"><strong>Demo mode</strong> — numbers are saved in this browser only. Run <code>order_entry.sql</code> in Supabase to share them with everyone.</div>':''}${st.err?`<div class="onb-demo bad">Could not load: ${escapeHtml(st.err)}</div>`:''}${nav}`;
+  const top=`${adm?`<div class="onb-admin"><span><strong>${Server.isAdmin()?'Admin':'Manage'}</strong> · order entry agent names</span><button type="button" class="btn btn-primary btn-sm" id="oeAgents">⚙ Manage agents</button></div>`:''}${st.demo?'<div class="onb-demo"><strong>Demo mode</strong> — numbers are saved in this browser only. Run <code>order_entry.sql</code> in Supabase to share them with everyone.</div>':''}${st.err?`<div class="onb-demo bad">Could not load: ${escapeHtml(st.err)}</div>`:''}${nav}`;
   host.innerHTML=top+(st.page==='report'?reportHtml():st.page==='bulk'?bulkHtml():entryHtml());
   wire(host);
   if(st.page==='report') drawChart();
@@ -13294,7 +13437,7 @@ const OrderEntry=(()=>{
    ${names.length?`<div class="onb-scroll"><table class="users-table onb-table oe-table" id="oeEntry"><thead><tr><th>Agent</th><th class="num">Recruitment Cloud</th><th class="num">CRM</th><th class="num">Total</th><th>Note</th><th>Last saved</th></tr></thead><tbody>${rows}</tbody>
     <tfoot><tr class="onb-total"><td><strong>All agents</strong></td><td class="num" data-sum="rc"></td><td class="num" data-sum="crm"></td><td class="num" data-sum="t"></td><td colspan="2" class="hint" data-sum="n"></td></tr></tfoot></table></div>
     <div class="onb-form-foot oe-foot"><span class="oe-dirty" id="oeDirty"></span><span class="onb-err" id="oeErr" role="alert"></span><button type="button" class="btn btn-secondary" id="oeUndo">Undo changes</button><button type="button" class="btn btn-primary" id="oeSave" ${st.busy?'disabled':''}>Save ${escapeHtml(dayName(st.day))}</button></div>`
-    :`<p class="hint">No order entry agents yet. ${Server.isAdmin()?'Add them with <b>⚙ Manage agents</b> above.':'Ask an admin to add the agent names.'}</p>`}
+    :`<p class="hint">No order entry agents yet. ${canAgents()?'Add them with <b>⚙ Manage agents</b> above.':'Ask an admin to add the agent names.'}</p>`}
   </section>
   <section class="panel"><div class="panel-head"><div><h3>Last two weeks</h3><span class="hint">What has been saved for the days before ${escapeHtml(short(st.day))}. Click a day to open it.</span></div>${copyBtnHtml('oeRecent')}</div>
    <div class="onb-scroll"><table class="users-table onb-table" id="oeRecent"><thead><tr><th>Day</th><th class="num">Recruitment Cloud</th><th class="num">CRM</th><th class="num">Total</th><th class="num">Agents entered</th><th>Not entered yet</th></tr></thead><tbody>
@@ -13419,6 +13562,7 @@ const OrderEntry=(()=>{
   st.refreshing=true; render();
   try{
    try{ const got=await Server.rpc('dash_kv_get',{p_keys:['oeLists']}); for(const r of (got||[])) KV.set(r.key, await decodeKvValue(r.key, r.value)); }catch(e){}
+   await loadGrantedKv();
    st.draft=null; await ensure(true); showToast('Order entry is up to date.');
   }catch(e){ showToast('Could not refresh: '+cleanErr(e)); }
   st.refreshing=false; render();
@@ -13532,7 +13676,7 @@ const OrderEntry=(()=>{
      ${dup.length?`<div class="warn"><b>${fmtNum(dup.length)}</b><span>repeated — last one used</span></div>`:''}
     </div>
     <p class="hint">${escapeHtml(R.layout)} · ${R.from?`${escapeHtml(dayName(R.from))} → ${escapeHtml(dayName(R.to))}`:'no valid dates'} · ${new Set(k.map(x=>x.agent)).size} agents · RC ${fmtNum(k.reduce((a,x)=>a+(x.rc||0),0))} · CRM ${fmtNum(k.reduce((a,x)=>a+(x.crm||0),0))}</p>
-    ${R.newAgents.length?`<div class="onb-demo"><b>${R.newAgents.length} name${R.newAgents.length===1?' is':'s are'} not on the agent list:</b> ${escapeHtml(R.newAgents.join(', '))}<label class="oe-chk"><input type="checkbox" id="oeAddAg" ${b.addAgents?'checked':''}> Add ${R.newAgents.length===1?'it':'them'} to the agent list and import ${R.newAgents.length===1?'its':'their'} rows</label><span class="hint">Untick to skip those rows — fix the spelling in the file if it’s a typo of an existing name.</span></div>`:''}
+    ${R.newAgents.length?`<div class="onb-demo"><b>${R.newAgents.length} name${R.newAgents.length===1?' is':'s are'} not on the agent list:</b> ${escapeHtml(R.newAgents.join(', '))}<label class="oe-chk"><input type="checkbox" id="oeAddAg" ${b.addAgents?'checked':''} ${canAgents()?'':'disabled title="Needs the Manage agents right"'}> Add ${R.newAgents.length===1?'it':'them'} to the agent list and import ${R.newAgents.length===1?'its':'their'} rows</label><span class="hint">Untick to skip those rows — fix the spelling in the file if it’s a typo of an existing name.</span></div>`:''}
     ${R.rows.some(x=>x.guessed)?`<p class="hint">First names matched to the agent list: ${escapeHtml([...new Set(R.rows.filter(x=>x.guessed).map(x=>x.rawAgent+' → '+x.agent))].join(', '))}</p>`:''}
     <div class="oe-mode" role="radiogroup" aria-label="When a day is already saved"><span>When an agent’s day is already saved:</span>
      <label><input type="radio" name="oeMode" value="replace" ${b.mode==='replace'?'checked':''}> Replace it with the file</label>
@@ -13553,7 +13697,7 @@ const OrderEntry=(()=>{
  }
  async function readBulk(grid, fileName, pasted){
   const parsed=finish(parseGrid(grid));
-  st.bulk={...(st.bulk||{mode:'replace', addAgents:true}), res:parsed, fileName, pasted};
+  st.bulk={...(st.bulk||{mode:'replace', addAgents:canAgents()}), res:parsed, fileName, pasted}; if(!canAgents()) st.bulk.addAgents=false;
   if(!parsed.error&&parsed.from){ // the saved numbers for those dates, to show what changes
    const a=[parsed.from, st.lf||parsed.from].sort()[0], z=[parsed.to, st.lt||parsed.to].sort().pop();
    if(!st.rows||st.lf>parsed.from||st.lt<parsed.to) await load(a,z);
@@ -13621,7 +13765,7 @@ const OrderEntry=(()=>{
  }
  // ---- admin: agent names ----
  async function openAgentsDialog(){
-  if(!Server.isAdmin()) return;
+  if(!canAgents()) return;
   let users=[]; try{ users=(await Server.rpc('dash_users_list'))||[]; }catch(e){}
   users=(Array.isArray(users)?users:[]).filter(u=>u&&u.id!=null).sort((a,b)=>String(a.name).localeCompare(String(b.name)));
   const work=lists().agents.map(x=>({...x, orig:x.label}));
@@ -13689,13 +13833,27 @@ const OverviewX=(()=>{
  const weekEnd=s=>{ const d=parse(s); d.setDate(d.getDate()+(6-d.getDay())); return iso(d); };
  const short=s=>parse(s).toLocaleDateString(undefined,{month:'short',day:'numeric'});
  const span=(a,b)=>short(a)+' – '+short(b)+', '+b.slice(0,4);
- const st={mode:null, quick:'picker', cache:new Map(), charts:[]};
- const modes=()=>[['recruiting','Recruiting'], ...(canOnb()?[['onboarding','Onboarding']]:[]), ...(Server.can('orderentry')?[['orderentry','Order Entry']]:[])];
- const canOnb=()=>Server.can('onboarding')&&(Server.isAdmin()||(Server.user&&(Server.user.hidden_sections||[]).includes('grant.onb_report')));
+ const st={mode:null, quick:'picker', cFrom:null, cTo:null, cache:new Map(), charts:[]};
+ const dayLabel=s=>parse(s).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+ const modes=()=>[['recruiting','Recruiting'], ...(canOnb()?[['onboarding','Onboarding']]:[]), ...(canOe()?[['orderentry','Order Entry']]:[])];
+ // who sees the extra tabs: admins; users given the Overview right for that tab (Settings → Users → Overview);
+ // onboarders with the onboarding report right; order entry team members
+ const hasG=g=>!!(Server.user&&(Server.user.hidden_sections||[]).includes(g));
+ const canOnb=()=>!!Server.user&&(Server.isAdmin()||hasG('grant.ov_onb')||(Server.can('onboarding')&&hasG('grant.onb_report')));
+ const canOe=()=>!!Server.user&&(Server.isAdmin()||hasG('grant.ov_oe')||Server.can('orderentry'));
  function mode(){ if(st.mode==null){ try{ st.mode=localStorage.getItem(LS)||'recruiting'; }catch(e){ st.mode='recruiting'; } } if(!modes().some(([k])=>k===st.mode)) st.mode='recruiting'; return st.mode; }
  // the weeks being looked at: the period picker's weeks (Saturday week-endings) or a quick range
  function period(){
   const t=ltToday(), tw=weekEnd(t);
+  // day ranges: Today, Yesterday, or any From–To (a single day is fine)
+  const dr=st.quick==='today'?[t,t]:st.quick==='yesterday'?[add(t,-1),add(t,-1)]:st.quick==='custom'&&st.cFrom?[st.cFrom,st.cTo||st.cFrom]:null;
+  if(dr){ let [from,to]=dr; if(to<from) [from,to]=[to,from];
+   const n=Math.round((parse(to)-parse(from))/864e5)+1, wks=new Set();
+   // one weekday is compared with the working day before it (Monday → Friday); longer ranges with the same number of days before
+   let pTo=add(from,-1); if(n===1&&parse(from).getDay()%6) while(!(parse(pTo).getDay()%6)) pTo=add(pTo,-1);
+   const pFrom=add(pTo,-n+1); for(let d=from; d<=to; d=add(d,7)) wks.add(weekEnd(d)); wks.add(weekEnd(to));
+   return {weeks:[...wks], set:wks, from, to, has:d=>d>=from&&d<=to, days:true, label:from===to?dayLabel(from):span(from,to)+' ('+n+' days)', running:to>=t, pFrom, pTo,
+    prevLabel:pFrom===pTo?dayLabel(pFrom):span(pFrom,pTo), t8:[...Array(8).keys()].map(i=>add(weekEnd(to),-7*i)).reverse()}; }
   const q={week:[tw], lastweek:[add(tw,-7)], w4:[1,2,3,4].map(i=>add(tw,-7*i)), w13:[...Array(13).keys()].map(i=>add(tw,-7*(i+1)))}[st.quick];   // 'last N weeks' = full weeks, ending last Saturday
   let weeks=q||(selectedWeekEndDates.length?selectedWeekEndDates.slice():currentWeekEndDate==='all-weeks'?weeksData.map(w=>w.weekEndDate):currentWeekEndDate?[currentWeekEndDate]:[]);
   weeks=[...new Set(weeks.map(weekEnd))].sort(); if(!weeks.length) weeks=[tw];
@@ -13703,9 +13861,10 @@ const OverviewX=(()=>{
   const wk=weeksData.find(w=>w.weekEndDate===to);
   const label=weeks.length===1?(wk?'Week '+wk.weekNumber+' · ':'')+span(from,to):`${weeks.length} weeks · ${span(from,to)}`;
   const pTo=add(from,-1), pFrom=add(pTo,-7*n+1);   // the same number of weeks just before
-  return {weeks, set:new Set(weeks), from, to, label, running:to>=t, pFrom, pTo, prevLabel:span(pFrom,pTo), t8:[...Array(8).keys()].map(i=>add(to,-7*i)).reverse()};
+  const set=new Set(weeks);
+  return {weeks, set, has:d=>set.has(weekEnd(d)), from, to, label, running:to>=t, pFrom, pTo, prevLabel:span(pFrom,pTo), t8:[...Array(8).keys()].map(i=>add(to,-7*i)).reverse()};
  }
- const inWeeks=(P,day)=>P.set.has(weekEnd(day));
+ const inWeeks=(P,day)=>P.has(day);
  function get(kind, a, b){ const k=kind+'|'+a+'|'+b; if(!st.cache.has(k)) st.cache.set(k,(kind==='onb'?Onboarding.fetchRange(a,b):OrderEntry.fetchRange(a,b)).catch(e=>{ st.cache.delete(k); throw e; })); return st.cache.get(k); }
  const dlt=(cur,prev,good=1)=>{ if(prev==null||!isFinite(prev)) return ''; if(!prev&&!cur) return '<em class="ovx-d">no change</em>'; if(!prev) return '<em class="ovx-d up">new</em>';
   const d=Math.round((cur-prev)/prev*100); return `<em class="ovx-d ${d*good>0?'up':d*good<0?'down':''}" title="Before: ${fmtNum(Math.round(prev*10)/10)}">${d>0?'▲':d<0?'▼':'•'} ${Math.abs(d)}% vs before</em>`; };
@@ -13717,10 +13876,12 @@ const OverviewX=(()=>{
   const ms=modes(); if(ms.length<2){ host.innerHTML=''; host.classList.add('hidden'); return; }
   host.classList.remove('hidden'); const m=mode();
   host.innerHTML=`<div class="ovx-switch" role="tablist" aria-label="Overview">${ms.map(([k,l])=>`<button type="button" role="tab" data-ovx="${k}" class="${m===k?'on':''}" aria-selected="${m===k}">${l}</button>`).join('')}</div>
-   ${m==='recruiting'?'':`<div class="ovx-quick" role="group" aria-label="Weeks">${[['picker','Period picker'],['week','This week'],['lastweek','Last week'],['w4','Last 4 weeks'],['w13','Last 13 weeks']].map(([k,l])=>`<button type="button" data-ovq="${k}" class="${st.quick===k?'on':''}" title="${k==='picker'?'Use the weeks chosen in the Period picker at the top':''}">${l}</button>`).join('')}<button type="button" class="ovx-refresh" data-ovr title="Get the latest numbers">↻</button></div>`}`;
+   ${m==='recruiting'?'':`<div class="ovx-quick" role="group" aria-label="Weeks">${[['picker','Period picker'],['today','Today'],['yesterday','Yesterday'],['week','This week'],['lastweek','Last week'],['w4','Last 4 weeks'],['w13','Last 13 weeks']].map(([k,l])=>`<button type="button" data-ovq="${k}" class="${st.quick===k?'on':''}" title="${k==='picker'?'Use the weeks chosen in the Period picker at the top':''}">${l}</button>`).join('')}<span class="ovx-dates ${st.quick==='custom'?'on':''}" title="Any dates — pick one day, or click a second day for a range"><label>From<input type="date" id="ovxFrom" value="${st.cFrom||''}" max="${ltToday()}"></label><label>To<input type="date" id="ovxTo" value="${st.cTo||''}" max="${ltToday()}"></label></span><button type="button" class="ovx-refresh" data-ovr title="Get the latest numbers">↻</button></div>`}`;
   host.querySelectorAll('[data-ovx]').forEach(b=>b.onclick=()=>{ st.mode=b.dataset.ovx; try{ localStorage.setItem(LS,st.mode); }catch(e){} refreshUI(); });
   host.querySelectorAll('[data-ovq]').forEach(b=>b.onclick=()=>{ st.quick=b.dataset.ovq; refreshUI(); });
   host.querySelector('[data-ovr]')?.addEventListener('click',()=>{ st.cache.clear(); refreshUI(); });
+  let dt; ['#ovxFrom','#ovxTo'].forEach(id=>host.querySelector(id)?.addEventListener('change',()=>{ clearTimeout(dt); dt=setTimeout(()=>{
+   const a=host.querySelector('#ovxFrom').value, b=host.querySelector('#ovxTo').value||a; if(!a) return; st.cFrom=a<b?a:b; st.cTo=a<b?b:a; st.quick='custom'; refreshUI(); },30); }));
  }
  function killCharts(){ st.charts.forEach(c=>{ try{ c.destroy(); }catch(e){} }); st.charts=[]; }
  async function render(){
@@ -13756,7 +13917,7 @@ const OverviewX=(()=>{
     ${card('Never responded',fmtNum(by.no_response),pc(by.no_response,S.n)+' · incl. LVM on 3+ days',dlt(by.no_response,pb.no_response,-1),'bad')}
     ${card('Reached',fmtNum(reached),pc(reached,S.n)+' of candidates picked up at least once','')}
    </div>
-   <p class="ovx-cmp">${P.running?'<b>This week is still going</b> — the numbers so far are compared with the full week(s) before. ':''}Compared with ${escapeHtml(P.prevLabel)} (${fmtNum(pS.n)} candidates, ${fmtNum(pb.complete)} complete). Each candidate counts once — the latest call in the period decides where they stand.</p>
+   <p class="ovx-cmp">${P.running?(P.days?'<b>Today is still going</b> — the numbers so far are compared with the full day(s) before. ':'<b>This week is still going</b> — the numbers so far are compared with the full week(s) before. '):''}Compared with ${escapeHtml(P.prevLabel)} (${fmtNum(pS.n)} candidates, ${fmtNum(pb.complete)} complete). Each candidate counts once — the latest call in the period decides where they stand.</p>
    ${S.n?`<div class="panel onb-mix"><h4>Where candidates stand</h4><div class="onb-bar">${keys.map(k=>by[k]?`<i class="${O.CAT_CLS[k]}" style="flex:${by[k]}" title="${O.CAT_LBL[k]}: ${by[k]}"></i>`:'').join('')}</div>
     <div class="onb-legend">${keys.map(k=>`<span><b class="${O.CAT_CLS[k]}"></b>${O.CAT_LBL[k]} · <strong>${by[k]}</strong> <small>${pc(by[k],S.n)}</small></span>`).join('')}</div></div>`:''}
    <div class="ovx-two ovx-stack">
@@ -13769,7 +13930,7 @@ const OverviewX=(()=>{
     <div class="onb-scroll"><table class="users-table onb-table" id="ovxOnbWk"><thead><tr><th>Week ending</th><th class="num">Calls</th><th class="num">People called</th><th class="num">Reached</th><th class="num">Completed</th><th class="num">Never resp.</th></tr></thead><tbody>
     ${wk.slice().reverse().map(x=>`<tr class="${P.set.has(x.w)?'ovx-sel':''}"><td>${escapeHtml(fmtDate(x.w))}</td><td class="num">${x.calls?fmtNum(x.calls):'–'}</td><td class="num">${x.people?fmtNum(x.people):'–'}</td><td class="num">${x.people?fmtNum(x.reached)+'<small>'+pc(x.reached,x.people)+'</small>':'–'}</td><td class="num"><strong>${x.done?fmtNum(x.done):'–'}</strong></td><td class="num">${x.nr||'–'}</td></tr>`).join('')}
     </tbody></table></div></section></div>
-   <div class="ovx-go"><button type="button" class="btn btn-secondary btn-sm" data-ovgo="onboarding">Open Onboarding →</button></div>`;
+   ${Server.can('onboarding')?`<div class="ovx-go"><button type="button" class="btn btn-secondary btn-sm" data-ovgo="onboarding">Open Onboarding →</button></div>`:''}`;
  }
  // ---------- order entry ----------
  function oeSum(rs){ const rc=rs.reduce((a,r)=>a+(r.rc||0),0), crm=rs.reduce((a,r)=>a+(r.crm||0),0), days=new Set(rs.map(r=>r.day)).size, ad=new Set(rs.map(r=>r.day+'|'+r.agent)).size; return {rc, crm, total:rc+crm, days, ad, agents:new Set(rs.map(r=>r.agent)).size}; }
@@ -13789,7 +13950,7 @@ const OverviewX=(()=>{
     ${card('Per agent per day',f1(T.ad?T.total/T.ad:null),fmtNum(T.agents)+' agent'+(T.agents===1?'':'s')+' entered',dlt(T.ad?T.total/T.ad:0,pT.ad?pT.total/pT.ad:null))}
     ${card('Best day',best?fmtNum(best[1]):'–',best?escapeHtml(fmtDate(best[0])):'No entries yet','','good')}
    </div>
-   <p class="ovx-cmp">${P.running?'<b>This week is still going</b> — the numbers so far are compared with the full week(s) before. ':''}Compared with ${escapeHtml(P.prevLabel)} (${fmtNum(pT.total)} orders: RC ${fmtNum(pT.rc)} · CRM ${fmtNum(pT.crm)}).${missing.length&&rows.length?` No entries in these weeks from: ${escapeHtml(missing.join(', '))}.`:''}</p>
+   <p class="ovx-cmp">${P.running?(P.days?'<b>Today is still going</b> — the numbers so far are compared with the full day(s) before. ':'<b>This week is still going</b> — the numbers so far are compared with the full week(s) before. '):''}Compared with ${escapeHtml(P.prevLabel)} (${fmtNum(pT.total)} orders: RC ${fmtNum(pT.rc)} · CRM ${fmtNum(pT.crm)}).${missing.length&&rows.length?` No entries in these weeks from: ${escapeHtml(missing.join(', '))}.`:''}</p>
    <section class="panel"><div class="panel-head"><div><h3>Last 8 weeks — RC and CRM</h3><span class="hint">Stacked, so each bar’s height is the week’s total. Selected weeks are highlighted in the table.</span></div></div><div class="ovx-chart"><canvas id="ovxOeChart" role="img" aria-label="Orders per week"></canvas></div></section>
    <div class="ovx-two">
    <section class="panel"><div class="panel-head"><div><h3>By agent</h3><span class="hint">These weeks, with the change against the weeks before.</span></div>${copyBtnHtml('ovxOeAg')}</div>
@@ -13801,7 +13962,7 @@ const OverviewX=(()=>{
     <div class="onb-scroll"><table class="users-table onb-table" id="ovxOeWk"><thead><tr><th>Week ending</th><th class="num">RC</th><th class="num">CRM</th><th class="num">Total</th><th class="num">RC %</th><th class="num">Per day</th></tr></thead><tbody>
     ${wk.slice().reverse().map(x=>`<tr class="${P.set.has(x.w)?'ovx-sel':''}"><td>${escapeHtml(fmtDate(x.w))}</td><td class="num">${x.total?fmtNum(x.rc):'–'}</td><td class="num">${x.total?fmtNum(x.crm):'–'}</td><td class="num"><strong>${x.total?fmtNum(x.total):'–'}</strong></td><td class="num">${pc(x.rc,x.total)}</td><td class="num">${f1(x.days?x.total/x.days:null)}</td></tr>`).join('')}
     </tbody></table></div></section></div>
-   <div class="ovx-go"><button type="button" class="btn btn-secondary btn-sm" data-ovgo="orderentry">Open Order Entry →</button></div>`;
+   ${Server.can('orderentry')?`<div class="ovx-go"><button type="button" class="btn btn-secondary btn-sm" data-ovgo="orderentry">Open Order Entry →</button></div>`:''}`;
  }
  function oeChart(all,P){
   const c=document.getElementById('ovxOeChart'); if(!c) return;
