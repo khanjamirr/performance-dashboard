@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.60.0</title>
+<title>Performance Dashboard · v4.61.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -1138,6 +1138,23 @@ button.onb-tile{font:inherit;text-align:left;cursor:pointer}button.onb-tile:disa
 .ol-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}.ol-row{display:flex;gap:8px;align-items:center}.ol-row input{flex:1;padding:7px 9px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:13px;min-width:0}.ol-row select[data-uid]{width:200px}.ol-row select{padding:7px 8px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:12.5px;width:170px}
 .ol-move{display:flex;flex-direction:column}.ol-move button{border:0;background:none;font-size:9px;line-height:1;padding:1px 4px;color:#64748b;cursor:pointer}.ol-move button:disabled{opacity:.3;cursor:default}
 .ol-note{font-size:12px;margin:12px 0 0}
+/* Order Entry */
+#view-orderentry .panel-head{display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap}#view-orderentry .panel-head>div:first-child{flex:1}
+.oe-tiles{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:12px}.oe-tiles .onb-tile.oe-rc strong{color:#2563eb}.oe-tiles .onb-tile.oe-crm strong{color:#0f766e}.oe-tiles .onb-tile.good strong{color:#15803d}
+@media (max-width:1100px){.oe-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}@media (max-width:560px){.oe-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.oe-group{display:inline-flex;gap:3px;padding:3px;background:#e9edf4;border-radius:9px;align-self:flex-end}.oe-group button{border:0;background:transparent;padding:7px 13px;border-radius:7px;font:inherit;font-size:13px;font-weight:600;color:#475569;cursor:pointer;white-space:nowrap}.oe-group button.on{background:#fff;color:#0a1f44;box-shadow:0 1px 2px #0f172a1f}
+.oe-view{align-self:center}.oe-view button{padding:5px 10px;font-size:12px}
+.oe-chart{position:relative;height:280px}@media (max-width:560px){#view-orderentry .onb-updated{display:none}#view-orderentry .onb-navbar{gap:6px}#view-orderentry .onb-nav button{padding:8px 12px}}
+.oe-daypick{display:flex;align-items:center;gap:6px}.oe-daypick input{padding:6px 9px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:13px}
+.oe-table input.oe-in{width:92px;text-align:right;padding:6px 8px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:13px}.oe-table input.oe-note{width:100%;min-width:160px;padding:6px 8px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:12.5px}
+.oe-table input:focus{outline:2px solid #93b4f5;border-color:#2563eb}.oe-table tr.oe-me td{background:#f3f7ff}.oe-you{font-size:10.5px;font-weight:700;background:#dbe7ff;color:#1e40af;border-radius:999px;padding:1px 7px;margin-left:4px}.oe-off{font-size:10.5px;background:#f1f5f9;color:#64748b;border-radius:999px;padding:1px 7px;margin-left:4px}
+.oe-by{font-size:12px;color:#475569}.oe-foot{display:flex;align-items:center;gap:10px;justify-content:flex-end;margin-top:12px}.oe-foot .onb-err{margin-right:auto}.oe-dirty{font-size:12.5px;color:#64748b}.oe-dirty.on{color:#b45309;font-weight:600}
+.oe-miss{white-space:normal!important;font-size:12px;color:#64748b;max-width:420px}.oe-cur td{background:#f3f7ff}.oe-zero td{color:#94a3b8}
+.oe-part{font-size:10.5px;font-weight:600;background:#fef3c7;color:#92400e;border-radius:999px;padding:1px 7px;margin-left:4px}.oe-part.run{background:#e0f2fe;color:#075985}
+.oe-d{font-size:12px;color:#64748b}.oe-d.up{color:#15803d}.oe-d.down{color:#c8102e}
+.oe-grid th.oe-sep,.oe-grid td.oe-sep{border-right:1px solid #e2e8f0}
+.oe-bulk{display:flex;flex-direction:column;gap:4px;margin-top:12px;font-size:12.5px;font-weight:600;color:#0a1f44}.oe-bulk textarea{font:inherit;font-size:13px;padding:7px 9px;border:1px solid #cfd6df;border-radius:6px;resize:vertical}
+
 @media(max-width:1200px){.onb-tiles{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
 @media(max-width:700px){.onb-tiles{grid-template-columns:1fr 1fr!important}.ol-row select{width:120px}}
 .me-box{border:1px solid #dfe6f0;border-radius:8px;background:#f8fafd;padding:8px 12px;margin:0 0 10px}.me-box>summary{display:flex;align-items:center;gap:8px;flex-wrap:wrap;cursor:pointer;list-style:none}.me-box>summary::-webkit-details-marker{display:none}.me-box>summary .hint{flex:1;font-size:12px}
@@ -1936,6 +1953,7 @@ input[type=date]::-webkit-calendar-picker-indicator{cursor:pointer}
       <button data-view="divreport" title="Pipeline by client and location, per division"><span class="dot"></span>Division Report</button>
       <button data-view="pivot" title="Build your own tables and charts"><span class="dot"></span>Report Builder</button>
       <button data-view="onboarding" title="Onboarding call log, linked to interviews by EID"><span class="dot"></span>Onboarding</button>
+      <button data-view="orderentry" title="Daily order entries in Recruitment Cloud and CRM"><span class="dot"></span>Order Entry</button>
     </nav>
     <div class="side-label side-label-tools">Tools</div>
     <div class="ribbon-actions">
@@ -2026,6 +2044,7 @@ input[type=date]::-webkit-calendar-picker-indicator{cursor:pointer}
         <div id="view-history" class="hidden"></div>
         <div id="view-divreport" class="hidden"></div>
         <div id="view-onboarding" class="hidden"></div>
+        <div id="view-orderentry" class="hidden"></div>
       </div>
       <div class="muted-note" id="storageModeNote" style="text-align:center;margin-top:24px;">Data stored locally in this browser.</div>
       <div class="muted-note" style="text-align:center;margin-top:4px;opacity:.65;">
@@ -2829,7 +2848,7 @@ document.addEventListener('mouseout', (e)=>{
 });
 // Candidate names / Employee Numbers are only shown to people with the Candidates right.
 const TEAM_SCOPE='scope.team_names_only';
-const GRANT_MODULES=['divreport','onboarding'];   // page rights stored as grant.<key> (see Server.rpc)
+const GRANT_MODULES=['divreport','onboarding','orderentry'];   // page rights stored as grant.<key> (see Server.rpc)
 function canSeeCandidates(){ return Server.can('candidates'); }
 // v4.21: the hover lists moved to Report Builder — tables show plain numbers everywhere.
 function candidateCellHtml(value, list, metricKey, entityName){
@@ -4280,6 +4299,7 @@ const VIEW_META = {
   pivot:{title:'Report Builder', sub:'Drag fields into Rows, Columns, Values and Filters — the chart builds itself'},
   divreport:{title:'Division Report', sub:'Pipeline by client and location, per division'},
   onboarding:{title:'Onboarding', sub:'Onboarder call log — each EID linked to its schedule and interview'},
+  orderentry:{title:'Order Entry', sub:'Orders entered each day in Recruitment Cloud and CRM — daily, weekly, monthly and quarterly'},
   history:{title:'History', sub:'Every week on record'},
   master:{title:'Candidate Hub', sub:'Every candidate row from every import, in one sheet — filter any column, exclude or include candidates'},
   settings:{title:'Settings', sub:'Uploads, saved weeks, divisions, users and your account'},
@@ -4343,7 +4363,7 @@ async function refreshUI(){
   // The Uploads page must stay reachable even with zero weeks saved — it's the page you use
   // to add the first one — so it's treated as always-showable, unlike Performance/Recruiter/
   // Branch which genuinely have nothing to render without data.
-  const showDashboardViews = hasData || currentView==='master' || currentView==='teams' || currentView==='leads' || currentView==='divreport' || currentView==='onboarding';
+  const showDashboardViews = hasData || currentView==='master' || currentView==='teams' || currentView==='leads' || currentView==='divreport' || currentView==='onboarding' || currentView==='orderentry';
   document.getElementById('emptyState').classList.toggle('hidden', showDashboardViews);
   document.getElementById('dashboardViews').classList.toggle('hidden', !showDashboardViews);
   document.getElementById('downloadDropdownWrap').classList.toggle('hidden', !hasData);
@@ -4352,11 +4372,11 @@ async function refreshUI(){
   document.getElementById('viewTitle').textContent = meta.title;
   document.getElementById('viewSub').textContent = showDashboardViews ? meta.sub : 'No data uploaded yet';
 
-  ['teams','leads','performance','recruiters','branches','master','candidates','alerts','pivot','history','divreport','onboarding'].forEach(v=>{
+  ['teams','leads','performance','recruiters','branches','master','candidates','alerts','pivot','history','divreport','onboarding','orderentry'].forEach(v=>{
     document.getElementById('view-'+v).classList.toggle('hidden', v!==currentView);
   });
 
-  document.getElementById('topbarCenter').classList.toggle('hidden', !showDashboardViews || ['teams','leads','candidates','alerts','pivot','history','divreport','onboarding'].includes(currentView));
+  document.getElementById('topbarCenter').classList.toggle('hidden', !showDashboardViews || ['teams','leads','candidates','alerts','pivot','history','divreport','onboarding','orderentry'].includes(currentView));
 
   if(currentView!=='recruiters' && currentView!=='branches' && currentView!=='master' && currentView!=='candidates' && currentView!=='alerts' && currentView!=='pivot'){
     const extra = document.getElementById('topbarExtra');
@@ -4366,12 +4386,13 @@ async function refreshUI(){
   renderPeriodPickerButton();
   closePeriodPicker();
   syncDedupeControls();
-  document.getElementById('periodPicker')?.classList.toggle('hidden', currentView==='teams' || currentView==='leads' || currentView==='candidates' || currentView==='alerts' || currentView==='pivot' || currentView==='history' || currentView==='divreport' || currentView==='onboarding');
+  document.getElementById('periodPicker')?.classList.toggle('hidden', currentView==='teams' || currentView==='leads' || currentView==='candidates' || currentView==='alerts' || currentView==='pivot' || currentView==='history' || currentView==='divreport' || currentView==='onboarding' || currentView==='orderentry');
   ['weeklyDivisionSelect','weeklyDivisionSelectLbl'].forEach(id=>document.getElementById(id).classList.toggle('hidden',currentView!=='performance'));
   if(currentView==='teams'){ renderTeamGroups(); return; }
   if(currentView==='leads'){ renderLeadsView(); return; }
   if(currentView==='divreport'){ renderDivReportView(); return; }
   if(currentView==='onboarding'){ Onboarding.show(); return; }
+  if(currentView==='orderentry'){ OrderEntry.show(); return; }
   if(!hasData){ if(showDashboardViews) renderMasterView(); return; }
 
   if(!currentWeekEndDate || (currentWeekEndDate!=='all-weeks' && !weeksData.find(w=>w.weekEndDate===currentWeekEndDate))){
@@ -8077,6 +8098,7 @@ const MODULES = [
   {key:'alerts',      label:'Alerts', hint:'Recruiters below 50% of their goal, other signals and remarks'},
   {key:'pivot',       label:'Report Builder', hint:'Build their own pivot tables and charts, and save views'},
   {key:'onboarding',  label:'Onboarding', hint:'Onboarding call log — onboarders add and edit their own calls; admins see everyone'},
+  {key:'orderentry',  label:'Order Entry', hint:'Daily Recruitment Cloud and CRM order counts — the order entry team enters them and sees the reports'},
   {key:'divreport',   label:'Division Report', hint:'Client / location pipeline (North / SE / SC and West weekly); red flags need the candidate-names right'},
   {key:'master',      label:'Candidate Hub — all records', hint:'Browse and filter every candidate row'},
   {key:'master_edit', label:'Candidate Hub — exclude / include', hint:'Remove candidates from the metrics or bring them back'},
@@ -8086,7 +8108,7 @@ const MODULES = [
   {key:'settings',    label:'Settings', hint:'Divisions, branch divisions, show/hide recruiters, saved weeks'},
   {key:'export',      label:'Download & share', hint:'Excel, PDF, Word, master sheet download, snapshots'},
 ];
-const VIEW_MODULE = {teams:'teams',leads:'teams',performance:'performance', recruiters:'recruiters', branches:'branches', master:'master', candidates:'candidate_hub', alerts:'alerts', pivot:'pivot', divreport:'divreport', onboarding:'onboarding'};
+const VIEW_MODULE = {teams:'teams',leads:'teams',performance:'performance', recruiters:'recruiters', branches:'branches', master:'master', candidates:'candidate_hub', alerts:'alerts', pivot:'pivot', divreport:'divreport', onboarding:'onboarding', orderentry:'orderentry'};
 
 function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
 // ---------- Reload keeps you on the same page (this tab) ----------
@@ -8125,7 +8147,7 @@ async function restoreNav(){
 }
 window.addEventListener('beforeunload',()=>saveNav());
 // Default page: the person's own choice (this browser) → the one an admin set for them → first page they can open.
-const DEFAULT_VIEW_LABELS = {performance:'Performance Overview', teams:'My Team', leads:'Team Leads (admins)', recruiters:'Recruiter Scorecards', branches:'Branch Results', alerts:'Action Center', candidates:'Candidates', master:'Candidates — master sheet', pivot:'Report Builder', divreport:'Division Report', onboarding:'Onboarding'};
+const DEFAULT_VIEW_LABELS = {performance:'Performance Overview', teams:'My Team', leads:'Team Leads (admins)', recruiters:'Recruiter Scorecards', branches:'Branch Results', alerts:'Action Center', candidates:'Candidates', master:'Candidates — master sheet', pivot:'Report Builder', divreport:'Division Report', onboarding:'Onboarding', orderentry:'Order Entry'};
 function adminDefaultViews(){ return KV.get('userDefaultViews')||{}; }
 function defaultViewOptions(u){ const can=v=>v==='teams'&&(u?u.role!=='user':Server.isAdmin())?false:v==='leads'?(u?u.role!=='user':Server.isAdmin()):(!u||u.role!=='user'||v==='teams'||(u.modules||[]).includes(VIEW_MODULE[v])); return Object.keys(DEFAULT_VIEW_LABELS).filter(v=>VIEW_MODULE[v]&&can(v)).map(v=>[v,DEFAULT_VIEW_LABELS[v]]); }
 function myDefaultViewKey(){ return 'ipd_default_view:'+(Server.user?.id||''); }
@@ -8607,8 +8629,9 @@ function showAuthGate(mode, message){
 // the page opens with just the onboarding settings and their calls.
 function isOnboardingOnlyUser(u){
   if(!u || u.role!=='user') return false;
-  const hs=u.hidden_sections||[], mods=(u.modules||[]).filter(m=>!['onboarding','remarks','export'].includes(m));
-  return (hs.includes('grant.onboarding')||(u.modules||[]).includes('onboarding')) && !mods.length && hs.includes('grant.no_team') && !hs.includes('grant.divreport');
+  const hs=u.hidden_sections||[], mods=(u.modules||[]).filter(m=>!['onboarding','orderentry','remarks','export'].includes(m));
+  const has=m=>hs.includes('grant.'+m)||(u.modules||[]).includes(m);
+  return (has('onboarding')||has('orderentry')) && !mods.length && hs.includes('grant.no_team') && !hs.includes('grant.divreport');
 }
 async function startAuthFlow(){
   // Fast path on refresh: a saved session opens the dashboard with a single server call.
@@ -8660,11 +8683,12 @@ async function afterLogin(boot, lightReady){
     lsSet('ipd_light_user','1');
     try{
       KV.clear();
-      try{ const got=await Server.rpc('dash_kv_get',{p_keys:['onbLists','divisionNames','branchMerges']}); for(const r of (got||[])) KV.set(r.key, await decodeKvValue(r.key, r.value)); }
+      try{ const got=await Server.rpc('dash_kv_get',{p_keys:['onbLists','oeLists','divisionNames','branchMerges']}); for(const r of (got||[])) KV.set(r.key, await decodeKvValue(r.key, r.value)); }
       catch(e){ await Server.loadKv(t=>setLoading(t)); }
       weeksData=[]; window.__lightMode=true;
-      currentView='onboarding';
-      applyPermissions(); currentView='onboarding';
+      const lv=Server.can('onboarding')?((()=>{ try{ return JSON.parse(sessionStorage.getItem(NAV_KEY())||'{}').view; }catch(e){ return null; } })()==='orderentry'&&Server.can('orderentry')?'orderentry':'onboarding'):'orderentry';
+      currentView=lv;
+      applyPermissions(); currentView=lv;
       document.getElementById('storageModeNote').textContent = 'Signed in as '+Server.user.name+' · data is stored securely on the server.';
       refreshUI();
     }catch(e){ console.error(e); showToast('Could not load: '+cleanErr(e)); }
@@ -10516,6 +10540,7 @@ const UF_PAGES = [
   {mod:'alerts', label:'Action Center', desc:'Who is below goal and other signals', sec:'alerts', extras:['remarks_approve']},
   {mod:'divreport', label:'Division Report', desc:'Pipeline by client and location, per division'},
   {mod:'onboarding', label:'Onboarding', desc:'Log calls — they see and edit their own entries. Tick below for more.', extras:['grant.onb_report']},
+  {mod:'orderentry', label:'Order Entry', desc:'Enter the daily Recruitment Cloud and CRM order counts and see the team’s reports'},
   {mod:'pivot', label:'Report Builder', desc:'Build their own tables and charts', sec:'pivot'},
   {mod:'candidates', label:'Candidates', desc:'Settings → Candidates, plus candidate names and Employee Numbers everywhere', sec:'candidates', extras:['master','master_edit']},
 ];
@@ -10525,6 +10550,7 @@ const UF_EXTRA_LABEL = {'grant.onb_assign':'Fill in daily assignments', 'grant.o
 const UF_PRESETS = [
   {name:'Viewer', desc:'Overview, recruiters and branches', modules:['performance','recruiters','branches']},
   {name:'Onboarder', desc:'Only the Onboarding page — logs their own calls', modules:['onboarding'], grants:['grant.no_team']},
+  {name:'Order entry', desc:'Only the Order Entry page — daily RC and CRM counts', modules:['orderentry'], grants:['grant.no_team']},
   {name:'Team lead', desc:'Viewer + Action Center, remarks, team names', modules:['performance','recruiters','branches','alerts','remarks'], grants:['grant.team_names','grant.break_image']},
   {name:'Manager', desc:'Every page, approves remarks, downloads', modules:['performance','recruiters','branches','alerts','remarks','remarks_approve','divreport','pivot','candidates','master','export'], grants:['grant.team_names','grant.break_image','grant.branch_merge']},
 ];
@@ -11654,7 +11680,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.60.0';   // shown only in the browser tab title
+const APP_VERSION = '4.61.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -11702,7 +11728,7 @@ document.addEventListener('keydown', e=>{
   const search=document.querySelector('#topbarExtra input[type="search"]'); if(search){ e.preventDefault(); search.focus(); }
 });
 // ---------- Manage access in place (super admin) ----------
-const PAGE_MODULE = {performance:'performance', recruiters:'recruiters', branches:'branches', candidates:'candidates', master:'master', alerts:'alerts', pivot:'pivot', divreport:'divreport', onboarding:'onboarding'};
+const PAGE_MODULE = {performance:'performance', recruiters:'recruiters', branches:'branches', candidates:'candidates', master:'master', alerts:'alerts', pivot:'pivot', divreport:'divreport', onboarding:'onboarding', orderentry:'orderentry'};
 const PAGE_EDIT = {performance:['upload','export'], recruiters:['remarks','export'], branches:['export','grant.branch_merge'], candidates:['master_edit','export'], master:['master_edit','export'], alerts:['remarks','remarks_approve'], pivot:['export'], teams:['grant.team_names','grant.break_image'], leads:[], divreport:['upload','candidates']};
 const EDIT_LABEL = {'grant.branch_merge':'Merge branches', 'grant.break_image':'Copy third-break list as image', 'grant.team_names':'See their team’s candidate names', candidates:'See all candidate names'};
 let accessMode=false, accessObs=null;
@@ -11867,8 +11893,9 @@ function toggleNavMore(force){ const on=force===undefined?!document.body.classLi
     pivot:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/><path d="M13 17v-3M16 17v-5M19 17v-2" stroke-width="1.6"/>',
     divreport:'<path d="M4 4h16v4H4zM4 10h7v10H4zM13 10h7v4h-7zM13 16h7v4h-7z"/>',
     onboarding:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/>',
+    orderentry:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/>',
     candidates:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2.2"/><path d="M5.8 16c.6-1.6 1.8-2.4 3.2-2.4s2.6.8 3.2 2.4M14.5 10h4M14.5 13.5h3"/>'};
-  const short = {teams:'My Team', leads:'Leads', performance:'Overview', recruiters:'Recruiters', branches:'Branches', master:'Master', candidates:'Names', alerts:'Alerts', pivot:'Pivot', divreport:'Divisions', onboarding:'Onboard'};
+  const short = {teams:'My Team', leads:'Leads', performance:'Overview', recruiters:'Recruiters', branches:'Branches', master:'Master', candidates:'Names', alerts:'Alerts', pivot:'Pivot', divreport:'Divisions', onboarding:'Onboard', orderentry:'Orders'};
   document.querySelectorAll('#navList button[data-view]').forEach(b=>{
     const v=b.dataset.view; if(!icons[v]) return;
     [...b.childNodes].forEach(n=>{ if(n.nodeType===3 && n.textContent.trim()){ const s=document.createElement('span'); s.className='nav-full'; s.textContent=n.textContent; b.replaceChild(s,n); } });
@@ -13021,6 +13048,308 @@ const Onboarding=(()=>{
   render();
  }
  return {show, reload:async()=>{ await load(); render(); }, candidates, catOf};
+})();
+/* ============================= ORDER ENTRY ============================= */
+// The order entry team types in, each day, how many orders each agent entered in Recruitment Cloud (RC)
+// and in CRM. One row per agent per day (dash_order_entry — order_entry.sql). The report adds them up
+// by day, week (Sunday–Saturday), month or quarter, as a total and split into RC / CRM.
+// Agent names are managed by admins (KV 'oeLists'); a renamed agent keeps the old name as an alias.
+const OrderEntry=(()=>{
+ const DEMO_KEY='ipd_oe_demo';
+ const parse=s=>new Date(s+'T12:00:00'), iso=d=>toIsoDateOnly(d);
+ const add=(s,n)=>{ const d=parse(s); d.setDate(d.getDate()+n); return iso(d); };
+ const today=()=>ltToday();
+ const weekStart=s=>{ const d=parse(s); d.setDate(d.getDate()-d.getDay()); return iso(d); };
+ const monthStart=s=>s.slice(0,8)+'01';
+ const monthEnd=s=>{ const d=parse(monthStart(s)); d.setMonth(d.getMonth()+1,0); return iso(d); };
+ const qStart=s=>{ const d=parse(s); d.setMonth(Math.floor(d.getMonth()/3)*3,1); return iso(d); };
+ const qEnd=s=>{ const d=parse(qStart(s)); d.setMonth(d.getMonth()+3,0); return iso(d); };
+ const short=s=>parse(s).toLocaleDateString(undefined,{month:'short',day:'numeric'});
+ const dayName=s=>parse(s).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+ const monthsBack=(t,n)=>{ const d=parse(monthStart(t)); d.setMonth(d.getMonth()-n); return iso(d); };
+ const GROUPS={
+  day:    {label:'Daily',     unit:'day',     key:s=>s,         end:s=>s,                      name:dayName,                                     def:t=>[add(t,-29),t]},
+  week:   {label:'Weekly',    unit:'week',    key:weekStart,    end:s=>add(weekStart(s),6),    name:k=>short(k)+' – '+short(add(k,6))+', '+add(k,6).slice(0,4), def:t=>[add(weekStart(t),-77),t]},
+  month:  {label:'Monthly',   unit:'month',   key:monthStart,   end:monthEnd,                  name:k=>monthLabel(k),                            def:t=>[monthsBack(t,11),t]},
+  quarter:{label:'Quarterly', unit:'quarter', key:qStart,       end:qEnd,                      name:k=>quarterLabel(k),                          def:t=>[monthsBack(qStart(t),9),t]}};
+ const SRC=[['rc','Recruitment Cloud','RC'],['crm','CRM','CRM']];
+ // ---- agent list (admins) ----
+ const lists=()=>{ const v=KV.get('oeLists'); return {agents:Array.isArray(v&&v.agents)?v.agents.filter(a=>a&&a.label):[]}; };
+ const roster=()=>lists().agents.map(a=>a.label);
+ const canon=n=>{ const k=String(n||'').trim().toLowerCase(); const a=lists().agents.find(x=>x.label.toLowerCase()===k||(x.aliases||[]).some(y=>String(y).toLowerCase()===k)); return a?a.label:String(n||'').trim(); };
+ const linked=uid=>{ const a=lists().agents.find(x=>x.userId&&String(x.userId)===String(uid)); return a?a.label:null; };
+ const me=()=>Server.user&&linked(Server.user.id);
+ // ---- state + data ----
+ const st={rows:null, lf:null, lt:null, demo:false, err:'', page:'', day:today(), draft:null, from:null, to:null, group:'day', custom:false, agent:'', view:'total', busy:false, refreshing:false, loadedAt:null};
+ const num=v=>v===''||v==null||isNaN(Number(v))?null:Math.max(0,Math.round(Number(v)));
+ const tot=r=>(r.rc||0)+(r.crm||0);
+ const missing=e=>/Could not find|schema cache|does not exist|PGRST202/i.test(String(e&&e.message||e));
+ const demoAll=()=>{ try{ return JSON.parse(localStorage.getItem(DEMO_KEY)||'[]'); }catch(e){ return []; } };
+ const demoPut=l=>{ try{ localStorage.setItem(DEMO_KEY, JSON.stringify(l)); }catch(e){} };
+ function range(){
+  if(!st.custom||!st.from||!st.to){ const [a,b]=GROUPS[st.group].def(today()); st.from=a; st.to=b; }
+  if(st.from>st.to) [st.from,st.to]=[st.to,st.from];
+ }
+ async function load(a,b){
+  st.err='';
+  try{ st.rows=(await Server.rpc('dash_oe_list',{p_from:a, p_to:b}))||[]; st.demo=false; }
+  catch(e){ if(missing(e)||!Server.token){ st.demo=true; st.rows=demoAll().filter(r=>r.day>=a&&r.day<=b); } else { st.rows=st.rows||[]; st.err=cleanErr(e); } }
+  st.rows=st.rows.map(r=>({...r, day:String(r.day).slice(0,10), agent:canon(r.agent), rc:num(r.rc), crm:num(r.crm)}));
+  st.lf=a; st.lt=b; st.loadedAt=new Date();
+ }
+ // the data covers both the report range and the last two weeks before the entry day
+ async function ensure(force){
+  range(); const a=[st.from, add(st.day,-13)].sort()[0], b=[st.to, st.day].sort().pop();
+  if(!force&&st.rows&&st.lf<=a&&st.lt>=b) return;
+  await load(force||!st.rows?a:[a,st.lf].sort()[0], force||!st.rows?b:[b,st.lt].sort().pop());
+ }
+ async function saveDay(day, rows){
+  if(!st.demo){ try{ await Server.rpc('dash_oe_save',{p_day:day, p_rows:rows}); return; } catch(e){ if(!missing(e)) throw e; st.demo=true; } }
+  const all=demoAll().filter(r=>!(r.day===day&&rows.some(x=>x.agent===r.agent))), now=new Date().toISOString();
+  rows.forEach(x=>{ if(x.rc!=null||x.crm!=null) all.push({day, agent:x.agent, rc:x.rc, crm:x.crm, note:x.note||'', updated_by:Server.user&&Server.user.name, updated_at:now}); });
+  demoPut(all);
+ }
+ // ---- numbers ----
+ function inRange(){ return (st.rows||[]).filter(r=>r.day>=st.from&&r.day<=st.to&&(!st.agent||r.agent===st.agent)); }
+ function periods(rows){
+  const G=GROUPS[st.group], m=new Map(), blank=k=>({k, rc:0, crm:0, total:0, agents:new Set(), days:new Set(), n:0});
+  // every period in the range is listed (daily: Monday–Friday plus any day with entries) so gaps show
+  if(st.group==='day'){ for(let d=st.from; d<=st.to; d=add(d,1)){ const w=parse(d).getDay(); if(w&&w<6) m.set(d,blank(d)); } }
+  else for(let k=G.key(st.from); k<=st.to; k=G.key(add(G.end(k),1))) m.set(k,blank(k));
+  rows.forEach(r=>{ const k=G.key(r.day); const p=m.get(k)||(m.set(k,blank(k)), m.get(k)); p.rc+=r.rc||0; p.crm+=r.crm||0; p.total+=tot(r); p.agents.add(r.agent); p.days.add(r.day); p.n++; });
+  const out=[...m.values()].sort((a,b)=>a.k.localeCompare(b.k));
+  out.forEach((p,i)=>{ p.partial=st.group!=='day'&&(p.k<st.from||G.end(p.k)>st.to); p.running=G.end(p.k)>=today()&&p.k<=today()&&st.group!=='day'; p.prev=i?out[i-1]:null; });
+  return out;
+ }
+ function byAgent(rows){
+  const m=new Map(); rows.forEach(r=>{ const a=m.get(r.agent)||(m.set(r.agent,{a:r.agent, rc:0, crm:0, total:0, days:new Set()}), m.get(r.agent)); a.rc+=r.rc||0; a.crm+=r.crm||0; a.total+=tot(r); a.days.add(r.day); });
+  return [...m.values()].sort((x,y)=>y.total-x.total||x.a.localeCompare(y.a));
+ }
+ const pct=(n,d)=>d?Math.round(n/d*100)+'%':'–';
+ const f1=v=>v==null||!isFinite(v)?'–':(Math.round(v*10)/10).toLocaleString('en-US');
+ const delta=(p)=>{ if(!p.prev||p.partial||p.prev.partial||!p.prev.total) return '<span class="oe-d">–</span>'; const d=(p.total-p.prev.total)/p.prev.total*100; return `<span class="oe-d ${d>0?'up':d<0?'down':''}" title="vs ${escapeHtml(GROUPS[st.group].name(p.prev.k))}: ${fmtNum(p.prev.total)}">${d>0?'▲':d<0?'▼':''} ${Math.abs(Math.round(d))}%</span>`; };
+ // ---- render ----
+ function render(){
+  const host=document.getElementById('view-orderentry'); if(!host) return;
+  if(!Server.can('orderentry')){ host.innerHTML='<div class="panel"><p class="hint" style="margin:0">Ask an admin for the Order Entry right.</p></div>'; return; }
+  if(OrderEntry._chart){ try{ OrderEntry._chart.destroy(); }catch(e){} OrderEntry._chart=null; }
+  const adm=Server.isAdmin(); if(!st.page) st.page='entry';
+  const pages=[['entry','✏️ Daily entry'],['report','📊 Report']];
+  const nav=`<div class="onb-navbar"><div class="onb-nav" role="tablist">${pages.map(([k,l])=>`<button type="button" role="tab" data-oe-page="${k}" class="${st.page===k?'on':''}" aria-selected="${st.page===k}">${l}</button>`).join('')}</div><span class="onb-updated">${st.loadedAt?'Updated '+st.loadedAt.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}):''}</span><button type="button" class="btn btn-secondary btn-sm onb-refresh" id="oeRefresh" ${st.refreshing?'disabled':''} title="Get the latest numbers and agent names without reloading the page">${st.refreshing?'Refreshing…':'↻ Refresh'}</button></div>`;
+  const top=`${adm?`<div class="onb-admin"><span><strong>Admin</strong> · order entry agent names</span><button type="button" class="btn btn-primary btn-sm" id="oeAgents">⚙ Manage agents</button></div>`:''}${st.demo?'<div class="onb-demo"><strong>Demo mode</strong> — numbers are saved in this browser only. Run <code>order_entry.sql</code> in Supabase to share them with everyone.</div>':''}${st.err?`<div class="onb-demo bad">Could not load: ${escapeHtml(st.err)}</div>`:''}${nav}`;
+  host.innerHTML=top+(st.page==='report'?reportHtml():entryHtml());
+  wire(host);
+  if(st.page==='report') drawChart();
+ }
+ // daily entry: every agent on the list, RC + CRM → total
+ function dayRows(day){ const m=new Map(); (st.rows||[]).filter(r=>r.day===day).forEach(r=>{ const x=m.get(r.agent); m.set(r.agent, x?{...x, rc:(x.rc||0)+(r.rc||0), crm:(x.crm||0)+(r.crm||0)}:r); }); return m; }
+ function draftFor(day){
+  if(st.draft&&st.draft.day===day) return st.draft;
+  const saved=dayRows(day), vals={};
+  saved.forEach((r,a)=>{ vals[a]={rc:r.rc==null?'':String(r.rc), crm:r.crm==null?'':String(r.crm), note:r.note||''}; });
+  return st.draft={day, vals, saved};
+ }
+ const dirtyList=d=>{ const names=new Set([...Object.keys(d.vals), ...d.saved.keys()]); return [...names].filter(a=>{ const v=d.vals[a]||{rc:'',crm:'',note:''}, s=d.saved.get(a);
+   return num(v.rc)!==(s?s.rc:null)||num(v.crm)!==(s?s.crm:null)||String(v.note||'').trim()!==String((s&&s.note)||'').trim(); }); };
+ function entryHtml(){
+  const d=draftFor(st.day), mine=me();
+  const names=[...new Set([...roster(), ...d.saved.keys()])].sort((a,b)=>(b===mine)-(a===mine)||a.localeCompare(b));
+  const rows=names.map(a=>{ const v=d.vals[a]||{rc:'',crm:'',note:''}, s=d.saved.get(a), t=(num(v.rc)||0)+(num(v.crm)||0), off=!roster().includes(a);
+   return `<tr class="${a===mine?'oe-me':''}" data-agent="${escapeHtml(a)}"><td>${escapeHtml(a)}${a===mine?' <span class="oe-you">You</span>':''}${off?' <span class="oe-off" title="Not on the agent list any more">removed</span>':''}</td>
+    <td class="num"><input type="number" class="oe-in" data-k="rc" min="0" max="100000" step="1" inputmode="numeric" value="${escapeHtml(v.rc)}" aria-label="${escapeHtml(a)} — Recruitment Cloud"></td>
+    <td class="num"><input type="number" class="oe-in" data-k="crm" min="0" max="100000" step="1" inputmode="numeric" value="${escapeHtml(v.crm)}" aria-label="${escapeHtml(a)} — CRM"></td>
+    <td class="num"><strong data-tot>${v.rc===''&&v.crm===''?'–':fmtNum(t)}</strong></td>
+    <td><input class="oe-note" data-k="note" maxlength="500" value="${escapeHtml(v.note||'')}" placeholder="Optional" aria-label="${escapeHtml(a)} — note"></td>
+    <td class="oe-by">${s&&s.updated_by?escapeHtml(s.updated_by)+(s.updated_at?' · '+new Date(s.updated_at).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):''):'<span class="hint">Not entered</span>'}</td></tr>`; }).join('');
+  const recent=[]; for(let i=0;i<14;i++){ const dd=add(st.day,-i); const w=parse(dd).getDay(); const m=dayRows(dd); if((!w||w===6)&&!m.size) continue; recent.push([dd,m]); }
+  return `<section class="panel oe-entry"><div class="panel-head"><div><h3>Daily entry</h3><span class="hint">Type how many orders each agent entered today in Recruitment Cloud and in CRM — the total adds itself up. Clear both boxes to remove an agent’s day.</span></div>
+    <div class="oe-daypick"><button type="button" class="btn btn-secondary btn-sm" data-oe-step="-1" aria-label="Previous day">◀</button><input type="date" id="oeDay" value="${st.day}" max="${today()}" aria-label="Entry date"><button type="button" class="btn btn-secondary btn-sm" data-oe-step="1" ${st.day>=today()?'disabled':''} aria-label="Next day">▶</button>${st.day!==today()?'<button type="button" class="link-btn" data-oe-today>Today</button>':''}</div></div>
+   ${names.length?`<div class="onb-scroll"><table class="users-table onb-table oe-table" id="oeEntry"><thead><tr><th>Agent</th><th class="num">Recruitment Cloud</th><th class="num">CRM</th><th class="num">Total</th><th>Note</th><th>Last saved</th></tr></thead><tbody>${rows}</tbody>
+    <tfoot><tr class="onb-total"><td><strong>All agents</strong></td><td class="num" data-sum="rc"></td><td class="num" data-sum="crm"></td><td class="num" data-sum="t"></td><td colspan="2" class="hint" data-sum="n"></td></tr></tfoot></table></div>
+    <div class="onb-form-foot oe-foot"><span class="oe-dirty" id="oeDirty"></span><span class="onb-err" id="oeErr" role="alert"></span><button type="button" class="btn btn-secondary" id="oeUndo">Undo changes</button><button type="button" class="btn btn-primary" id="oeSave" ${st.busy?'disabled':''}>Save ${escapeHtml(dayName(st.day))}</button></div>`
+    :`<p class="hint">No order entry agents yet. ${Server.isAdmin()?'Add them with <b>⚙ Manage agents</b> above.':'Ask an admin to add the agent names.'}</p>`}
+  </section>
+  <section class="panel"><div class="panel-head"><div><h3>Last two weeks</h3><span class="hint">What has been saved for the days before ${escapeHtml(short(st.day))}. Click a day to open it.</span></div>${copyBtnHtml('oeRecent')}</div>
+   <div class="onb-scroll"><table class="users-table onb-table" id="oeRecent"><thead><tr><th>Day</th><th class="num">Recruitment Cloud</th><th class="num">CRM</th><th class="num">Total</th><th class="num">Agents entered</th><th>Not entered yet</th></tr></thead><tbody>
+   ${recent.map(([dd,m])=>{ const v=[...m.values()], rc=v.reduce((a,r)=>a+(r.rc||0),0), crm=v.reduce((a,r)=>a+(r.crm||0),0), miss=roster().filter(a=>!m.has(a));
+     return `<tr class="${dd===st.day?'oe-cur':''}"><td><button type="button" class="link-btn" data-oe-go="${dd}">${escapeHtml(dayName(dd))}</button></td><td class="num">${m.size?fmtNum(rc):'–'}</td><td class="num">${m.size?fmtNum(crm):'–'}</td><td class="num"><strong>${m.size?fmtNum(rc+crm):'–'}</strong></td><td class="num">${m.size} of ${roster().length}</td><td class="oe-miss">${miss.length?escapeHtml(miss.join(', ')):'<span class="hint">Everyone</span>'}</td></tr>`; }).join('')||'<tr><td colspan="6" class="hint">Nothing saved yet.</td></tr>'}
+   </tbody></table></div></section>`;
+ }
+ function reportHtml(){
+  range();
+  const G=GROUPS[st.group], rows=inRange(), P=periods(rows), A=byAgent(rows);
+  const T={rc:rows.reduce((a,r)=>a+(r.rc||0),0), crm:rows.reduce((a,r)=>a+(r.crm||0),0)}; T.total=T.rc+T.crm;
+  const days=new Set(rows.map(r=>r.day)).size, agentDays=new Set(rows.map(r=>r.day+'|'+r.agent)).size;
+  const full=P.filter(p=>!p.partial&&p.total), best=full.slice().sort((a,b)=>b.total-a.total)[0];
+  const names=[...new Set([...roster(), ...(st.rows||[]).map(r=>r.agent)])].sort();
+  const tile=(l,v,s,c)=>`<div class="onb-tile ${c||''}"><span>${l}</span><strong>${v}</strong>${s?`<em>${s}</em>`:''}</div>`;
+  const per=G.unit, cnt=P.filter(p=>p.total).length;
+  // agent × period grid (newest period first), in the chosen view
+  const gp=P.slice().reverse(), cell=(a,p)=>{ const rs=rows.filter(r=>r.agent===a&&G.key(r.day)===p.k); if(!rs.length) return st.view==='split'?'<td class="num">–</td><td class="num oe-sep">–</td>':'<td class="num">–</td>';
+   const rc=rs.reduce((x,r)=>x+(r.rc||0),0), crm=rs.reduce((x,r)=>x+(r.crm||0),0);
+   return st.view==='split'?`<td class="num">${fmtNum(rc)}</td><td class="num oe-sep">${fmtNum(crm)}</td>`:`<td class="num">${fmtNum(st.view==='rc'?rc:st.view==='crm'?crm:rc+crm)}</td>`; };
+  const colTot=p=>st.view==='split'?`<td class="num">${fmtNum(p.rc)}</td><td class="num oe-sep">${fmtNum(p.crm)}</td>`:`<td class="num">${fmtNum(st.view==='rc'?p.rc:st.view==='crm'?p.crm:p.total)}</td>`;
+  const views=[['total','Total'],['rc','RC only'],['crm','CRM only'],['split','RC + CRM side by side']];
+  return `<div class="onb-tools oe-tools">
+    <div class="oe-group" role="tablist" aria-label="Group by">${Object.entries(GROUPS).map(([k,g])=>`<button type="button" data-oe-group="${k}" class="${st.group===k?'on':''}" aria-pressed="${st.group===k}">${g.label}</button>`).join('')}</div>
+    <div class="onb-range"><label>From<input type="date" id="oeFrom" value="${st.from}"></label><label>To<input type="date" id="oeTo" value="${st.to}"></label></div>
+    ${st.custom?'<button type="button" class="link-btn" id="oeDefRange" title="Back to the usual dates for this view">Default dates</button>':''}
+    <label class="cand-field"><span>Agent</span><select id="oeAgent"><option value="">Everyone</option>${names.map(n=>`<option ${st.agent===n?'selected':''}>${escapeHtml(n)}</option>`).join('')}</select></label>
+   </div>
+   <div class="oe-tiles">
+    ${tile('Total orders',fmtNum(T.total),fmtNum(days)+' day'+(days===1?'':'s')+' with entries')}
+    ${tile('Recruitment Cloud',fmtNum(T.rc),pct(T.rc,T.total)+' of the total','oe-rc')}
+    ${tile('CRM',fmtNum(T.crm),pct(T.crm,T.total)+' of the total','oe-crm')}
+    ${tile('Per day',f1(days?T.total/days:null),'RC '+f1(days?T.rc/days:null)+' · CRM '+f1(days?T.crm/days:null))}
+    ${tile('Per agent per day',f1(agentDays?T.total/agentDays:null),fmtNum(A.length)+' agent'+(A.length===1?'':'s')+' entered')}
+    ${tile('Best '+per,best?fmtNum(best.total):'–',best?escapeHtml(G.name(best.k)):'No complete '+per+' yet','good')}
+   </div>
+   <section class="panel"><div class="panel-head"><div><h3>${G.label} orders — RC and CRM</h3><span class="hint">Each bar is one ${per}: Recruitment Cloud and CRM stacked, so the bar’s height is the total.${P.some(p=>p.partial)?' Periods cut off by the dates you picked are marked “part”.':''}</span></div></div>
+    <div class="oe-chart"><canvas id="oeChart" aria-label="${G.label} orders chart" role="img"></canvas></div></section>
+   <section class="panel"><div class="panel-head"><div><h3>${G.label} totals</h3><span class="hint">${cnt} ${per}${cnt===1?'':'s'} with orders. Change is against the ${per} before (only full ${per}s).</span></div>${copyBtnHtml('oePer')}${Server.can('export')?downloadBtnHtml('oePer','order-entry-'+st.group+'.xlsx'):''}</div>
+    <div class="onb-scroll"><table class="users-table onb-table" id="oePer"><thead><tr><th>${G.label.replace(/ly$/,'').replace('Dai','Day')}</th><th class="num">Recruitment Cloud</th><th class="num">CRM</th><th class="num">Total</th><th class="num">RC %</th><th class="num">CRM %</th><th class="num">Agents</th><th class="num">Per agent</th>${st.group==='day'?'':'<th class="num">Per day</th>'}<th class="num">Change</th></tr></thead><tbody>
+    ${P.slice().reverse().map(p=>`<tr class="${p.total?'':'oe-zero'}"><td>${escapeHtml(G.name(p.k))}${p.partial?' <span class="oe-part" title="Only part of this '+per+' is inside the dates you picked">part</span>':p.running?' <span class="oe-part run" title="This '+per+' is still going">so far</span>':''}</td><td class="num">${p.n?fmtNum(p.rc):'–'}</td><td class="num">${p.n?fmtNum(p.crm):'–'}</td><td class="num"><strong>${p.n?fmtNum(p.total):'–'}</strong></td><td class="num">${pct(p.rc,p.total)}</td><td class="num">${pct(p.crm,p.total)}</td><td class="num">${p.agents.size||'–'}</td><td class="num">${f1(p.agents.size?p.total/p.agents.size:null)}</td>${st.group==='day'?'':`<td class="num">${f1(p.days.size?p.total/p.days.size:null)}</td>`}<td class="num">${delta(p)}</td></tr>`).join('')}
+    <tr class="onb-total"><td><strong>All</strong></td><td class="num">${fmtNum(T.rc)}</td><td class="num">${fmtNum(T.crm)}</td><td class="num"><strong>${fmtNum(T.total)}</strong></td><td class="num">${pct(T.rc,T.total)}</td><td class="num">${pct(T.crm,T.total)}</td><td class="num">${A.length}</td><td class="num">${f1(A.length?T.total/A.length:null)}</td>${st.group==='day'?'':`<td class="num">${f1(days?T.total/days:null)}</td>`}<td></td></tr>
+    </tbody></table></div></section>
+   <section class="panel"><div class="panel-head"><div><h3>By agent</h3><span class="hint">Everything in these dates for each agent, split into Recruitment Cloud and CRM.</span></div>${copyBtnHtml('oeAg')}${Server.can('export')?downloadBtnHtml('oeAg','order-entry-agents.xlsx'):''}</div>
+    <div class="onb-scroll"><table class="users-table onb-table" id="oeAg"><thead><tr><th>Agent</th><th class="num">Recruitment Cloud</th><th class="num">CRM</th><th class="num">Total</th><th class="num">RC %</th><th class="num">Share of team</th><th class="num">Days entered</th><th class="num">Per day</th></tr></thead><tbody>
+    ${A.map(a=>`<tr><td><button type="button" class="link-btn" data-oe-pick="${escapeHtml(a.a)}">${escapeHtml(a.a)}</button></td><td class="num">${fmtNum(a.rc)}</td><td class="num">${fmtNum(a.crm)}</td><td class="num"><strong>${fmtNum(a.total)}</strong></td><td class="num">${pct(a.rc,a.total)}</td><td class="num">${pct(a.total,T.total)}</td><td class="num">${a.days.size}</td><td class="num">${f1(a.days.size?a.total/a.days.size:null)}</td></tr>`).join('')||'<tr><td colspan="8" class="hint">No entries in these dates.</td></tr>'}
+    ${A.length?`<tr class="onb-total"><td><strong>All agents</strong></td><td class="num">${fmtNum(T.rc)}</td><td class="num">${fmtNum(T.crm)}</td><td class="num"><strong>${fmtNum(T.total)}</strong></td><td class="num">${pct(T.rc,T.total)}</td><td class="num">100%</td><td class="num">${days}</td><td class="num">${f1(days?T.total/days:null)}</td></tr>`:''}
+    </tbody></table></div></section>
+   ${A.length?`<section class="panel"><div class="panel-head"><div><h3>Agents by ${per}</h3><span class="hint">Newest ${per} first. Pick what each cell shows.</span></div>
+     <div class="oe-group oe-view" role="tablist" aria-label="Show">${views.map(([k,l])=>`<button type="button" data-oe-view="${k}" class="${st.view===k?'on':''}" aria-pressed="${st.view===k}">${l}</button>`).join('')}</div>${copyBtnHtml('oeGrid')}${Server.can('export')?downloadBtnHtml('oeGrid','order-entry-agents-by-'+per+'.xlsx'):''}</div>
+    <div class="onb-scroll"><table class="users-table onb-table oe-grid" id="oeGrid"><thead>
+     <tr><th ${st.view==='split'?'rowspan="2"':''}>Agent</th>${gp.map(p=>`<th class="num" ${st.view==='split'?'colspan="2"':''}>${escapeHtml(st.group==='day'?short(p.k):G.name(p.k))}</th>`).join('')}<th class="num" ${st.view==='split'?'colspan="2"':''}>All</th></tr>
+     ${st.view==='split'?`<tr>${[...gp,0].map(()=>'<th class="num">RC</th><th class="num oe-sep">CRM</th>').join('')}</tr>`:''}</thead><tbody>
+     ${A.map(a=>`<tr><td>${escapeHtml(a.a)}</td>${gp.map(p=>cell(a.a,p)).join('')}${st.view==='split'?`<td class="num"><strong>${fmtNum(a.rc)}</strong></td><td class="num oe-sep"><strong>${fmtNum(a.crm)}</strong></td>`:`<td class="num"><strong>${fmtNum(st.view==='rc'?a.rc:st.view==='crm'?a.crm:a.total)}</strong></td>`}</tr>`).join('')}
+     <tr class="onb-total"><td><strong>All agents</strong></td>${gp.map(colTot).join('')}${colTot(T)}</tr>
+    </tbody></table></div></section>`:''}`;
+ }
+ function drawChart(){
+  const c=document.getElementById('oeChart'); if(!c) return;
+  const G=GROUPS[st.group], P=periods(inRange());
+  const lbl=p=>(st.group==='day'?short(p.k):st.group==='week'?short(p.k):G.name(p.k))+(p.partial?' (part)':'');
+  OrderEntry._chart=safeChart(c,{type:'bar', data:{labels:P.map(lbl), datasets:[
+    {label:'Recruitment Cloud', data:P.map(p=>p.rc), backgroundColor:'#2563eb', stack:'o'},
+    {label:'CRM', data:P.map(p=>p.crm), backgroundColor:'#14b8a6', stack:'o'}]},
+   options:{responsive:true, maintainAspectRatio:false, interaction:{mode:'index', intersect:false},
+    plugins:{legend:{position:'top', align:'end'}, tooltip:{callbacks:{footer:items=>'Total: '+fmtNum(items.reduce((a,i)=>a+(i.raw||0),0))}}},
+    scales:{x:{stacked:true, grid:{display:false}, ticks:{maxRotation:0, autoSkip:true}}, y:{stacked:true, beginAtZero:true, ticks:{precision:0}}}}});
+ }
+ // ---- events ----
+ function sums(host){
+  const d=st.draft; if(!d) return; let rc=0, crm=0, n=0;
+  Object.values(d.vals).forEach(v=>{ if(v.rc!==''||v.crm!==''){ n++; rc+=num(v.rc)||0; crm+=num(v.crm)||0; } });
+  const set=(k,t)=>{ const el=host.querySelector(`[data-sum="${k}"]`); if(el) el.innerHTML=t; };
+  set('rc',fmtNum(rc)); set('crm',fmtNum(crm)); set('t','<strong>'+fmtNum(rc+crm)+'</strong>'); set('n',`${n} of ${roster().length} agents entered`);
+  const dl=dirtyList(d), el=host.querySelector('#oeDirty'); if(el) el.textContent=dl.length?`${dl.length} unsaved change${dl.length===1?'':'s'}`:'All saved';
+  el&&el.classList.toggle('on',!!dl.length);
+ }
+ const leaveOk=()=>!st.draft||!dirtyList(st.draft).length||confirm('You have unsaved numbers for '+dayName(st.draft.day)+'. Leave without saving?');
+ async function goDay(d){ if(!d||d===st.day) return; if(d>today()) d=today(); if(!leaveOk()) return; st.day=d; st.draft=null; await ensure(); render(); }
+ function wire(host){
+  const $=s=>host.querySelector(s);
+  host.querySelectorAll('[data-oe-page]').forEach(b=>b.onclick=()=>{ if(b.dataset.oePage===st.page) return; if(st.page==='entry'&&!leaveOk()) return; if(st.page==='entry') st.draft=null; st.page=b.dataset.oePage; render(); });
+  $('#oeRefresh')?.addEventListener('click',refresh);
+  $('#oeAgents')?.addEventListener('click',openAgentsDialog);
+  // entry
+  host.querySelectorAll('#oeEntry tbody tr').forEach(tr=>{ const a=tr.dataset.agent;
+   tr.querySelectorAll('[data-k]').forEach(inp=>inp.addEventListener('input',()=>{ const v=st.draft.vals[a]||(st.draft.vals[a]={rc:'',crm:'',note:''}); v[inp.dataset.k]=inp.value;
+     if(inp.dataset.k!=='note'){ const t=tr.querySelector('[data-tot]'); t.textContent=v.rc===''&&v.crm===''?'–':fmtNum((num(v.rc)||0)+(num(v.crm)||0)); }
+     $('#oeErr').textContent=''; sums(host); }));
+   // Enter moves down the column, like a spreadsheet
+   tr.querySelectorAll('.oe-in').forEach(inp=>inp.addEventListener('keydown',e=>{ if(e.key!=='Enter') return; e.preventDefault(); const k=inp.dataset.k, nx=tr.nextElementSibling&&tr.nextElementSibling.querySelector(`[data-k="${k}"]`); if(nx){ nx.focus(); nx.select(); } else $('#oeSave')?.focus(); }));
+  });
+  if($('#oeEntry')) sums(host);
+  $('#oeDay')?.addEventListener('change',e=>goDay(e.target.value));
+  host.querySelectorAll('[data-oe-step]').forEach(b=>b.onclick=()=>goDay(add(st.day,+b.dataset.oeStep)));
+  host.querySelector('[data-oe-today]')?.addEventListener('click',()=>goDay(today()));
+  host.querySelectorAll('[data-oe-go]').forEach(b=>b.onclick=()=>goDay(b.dataset.oeGo));
+  $('#oeUndo')?.addEventListener('click',()=>{ st.draft=null; render(); });
+  $('#oeSave')?.addEventListener('click',async()=>{
+   const d=st.draft, dl=dirtyList(d), err=t=>{ $('#oeErr').textContent=t; };
+   if(!dl.length) return showToast('Nothing to save — no changes.');
+   const bad=dl.find(a=>{ const v=d.vals[a]||{}; return ['rc','crm'].some(k=>v[k]!==''&&v[k]!=null&&(!/^\d+$/.test(String(v[k]).trim())||Number(v[k])>100000)); });
+   if(bad) return err('“'+bad+'”: counts must be whole numbers from 0 to 100,000.');
+   const rows=dl.map(a=>{ const v=d.vals[a]||{rc:'',crm:'',note:''}; return {agent:a, rc:num(v.rc), crm:num(v.crm), note:String(v.note||'').trim()}; });
+   st.busy=true; $('#oeSave').disabled=true;
+   try{ await saveDay(d.day, rows); showToast(`Saved ${rows.length} agent${rows.length===1?'':'s'} for ${dayName(d.day)}.`); st.draft=null; await ensure(true); }
+   catch(e){ st.busy=false; $('#oeSave').disabled=false; return err('Not saved: '+cleanErr(e)); }
+   st.busy=false; render();
+  });
+  // report
+  host.querySelectorAll('[data-oe-group]').forEach(b=>b.onclick=async()=>{ st.group=b.dataset.oeGroup; await ensure(); render(); });
+  host.querySelectorAll('[data-oe-view]').forEach(b=>b.onclick=()=>{ st.view=b.dataset.oeView; render(); });
+  const rng=async()=>{ const a=$('#oeFrom').value, b=$('#oeTo').value; if(!a||!b) return; st.from=a; st.to=b; st.custom=true; await ensure(); render(); };
+  let rt; ['#oeFrom','#oeTo'].forEach(s=>$(s)?.addEventListener('change',()=>{ clearTimeout(rt); rt=setTimeout(rng,30); }));
+  $('#oeDefRange')?.addEventListener('click',async()=>{ st.custom=false; await ensure(); render(); });
+  $('#oeAgent')?.addEventListener('change',e=>{ st.agent=e.target.value; render(); });
+  host.querySelectorAll('[data-oe-pick]').forEach(b=>b.onclick=()=>{ st.agent=st.agent===b.dataset.oePick?'':b.dataset.oePick; render(); });
+ }
+ async function refresh(){
+  if(st.refreshing) return; if(st.page==='entry'&&!leaveOk()) return;
+  st.refreshing=true; render();
+  try{
+   try{ const got=await Server.rpc('dash_kv_get',{p_keys:['oeLists']}); for(const r of (got||[])) KV.set(r.key, await decodeKvValue(r.key, r.value)); }catch(e){}
+   st.draft=null; await ensure(true); showToast('Order entry is up to date.');
+  }catch(e){ showToast('Could not refresh: '+cleanErr(e)); }
+  st.refreshing=false; render();
+ }
+ // ---- admin: agent names ----
+ async function openAgentsDialog(){
+  if(!Server.isAdmin()) return;
+  let users=[]; try{ users=(await Server.rpc('dash_users_list'))||[]; }catch(e){}
+  users=(Array.isArray(users)?users:[]).filter(u=>u&&u.id!=null).sort((a,b)=>String(a.name).localeCompare(String(b.name)));
+  const work=lists().agents.map(x=>({...x, orig:x.label}));
+  document.getElementById('oeAgentsDlg')?.remove();
+  const wrap=document.createElement('div'); wrap.className='modal-overlay'; wrap.id='oeAgentsDlg';
+  const draw=()=>{
+   wrap.innerHTML=`<div class="modal ol-modal" role="dialog" aria-modal="true" aria-labelledby="oeAT"><div class="modal-header"><h3 id="oeAT">Order entry agents</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div>
+    <div class="modal-body">
+     <p class="hint" style="margin-top:0">These names are the rows of the daily entry sheet. Optionally link a name to the dashboard user who works as that agent — their row is shown first, marked “You”.</p>
+     <div class="ol-list">${work.map((x,i)=>`<div class="ol-row"><span class="ol-move"><button type="button" data-mv="${i}:-1" ${i?'':'disabled'} aria-label="Move up">▲</button><button type="button" data-mv="${i}:1" ${i<work.length-1?'':'disabled'} aria-label="Move down">▼</button></span><input data-lbl="${i}" value="${escapeHtml(x.label)}" maxlength="120" placeholder="Agent name" aria-label="Agent name">
+       <select data-uid="${i}" aria-label="Dashboard user"><option value="">— not linked —</option>${users.map(u=>`<option value="${escapeHtml(String(u.id))}" ${String(x.userId||'')===String(u.id)?'selected':''}>${escapeHtml(u.name||u.username||String(u.id))}</option>`).join('')}</select>
+       <button type="button" class="link-btn danger" data-rm="${i}" aria-label="Delete ${escapeHtml(x.label)}">Delete</button></div>`).join('')||'<p class="hint" style="margin:0">No agents yet.</p>'}</div>
+     <button type="button" class="btn btn-secondary btn-sm" id="oeAdd">＋ Add agent</button>
+     <label class="oe-bulk"><span>Add several at once <span class="hint">— one name per line, or separated by commas</span></span><textarea id="oeBulk" rows="3" placeholder="e.g.&#10;Priya Shah&#10;Mark Lee"></textarea></label>
+     <p class="hint ol-note">Renaming keeps the agent’s past numbers under the new name. Removing a name only takes it off the entry sheet — numbers already saved stay in the report.</p>
+     <p class="me-err" id="oeAErr"></p>
+    </div><div class="modal-footer"><button class="btn btn-secondary" data-close>Cancel</button><button class="btn btn-primary" id="oeASave">Save</button></div></div>`;
+   wrap.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>wrap.remove());
+   wrap.querySelectorAll('[data-lbl]').forEach(i=>i.oninput=()=>{ work[+i.dataset.lbl].label=i.value; });
+   wrap.querySelectorAll('[data-uid]').forEach(s=>s.onchange=()=>{ const v=s.value; if(v) work.forEach((o,j)=>{ if(j!==+s.dataset.uid&&String(o.userId)===v) o.userId=''; }); work[+s.dataset.uid].userId=v; draw(); });
+   wrap.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>{ const [i,d]=b.dataset.mv.split(':').map(Number), j=i+d; [work[i],work[j]]=[work[j],work[i]]; draw(); });
+   wrap.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{ work.splice(+b.dataset.rm,1); draw(); });
+   wrap.querySelector('#oeAdd').onclick=()=>{ work.push({label:''}); draw(); const ins=wrap.querySelectorAll('[data-lbl]'); ins[ins.length-1]?.focus(); };
+   wrap.querySelector('#oeASave').onclick=async()=>{
+    const err=t=>{ wrap.querySelector('#oeAErr').textContent=t; };
+    const bulk=wrap.querySelector('#oeBulk').value.split(/[\n,;]+/).map(s=>s.trim().replace(/\s+/g,' ')).filter(Boolean);
+    const list=[...work.map(x=>({...x, label:String(x.label||'').trim().replace(/\s+/g,' ')})).filter(x=>x.label)];
+    bulk.forEach(n=>{ if(!list.some(x=>x.label.toLowerCase()===n.toLowerCase())) list.push({label:n}); });
+    const dup=list.find((x,i)=>list.findIndex(y=>y.label.toLowerCase()===x.label.toLowerCase())!==i);
+    if(dup) return err('“'+dup.label+'” is listed twice.');
+    const renames=list.filter(x=>x.orig&&x.orig!==x.label).map(x=>[x.orig,x.label]);
+    const agents=list.map(({orig,...x})=>({...x, aliases:[...new Set([...(x.aliases||[]), ...(orig&&orig!==x.label?[orig]:[])])].filter(a=>a&&a.toLowerCase()!==x.label.toLowerCase())}));
+    const b=wrap.querySelector('#oeASave'); b.disabled=true;
+    const ok=await storageSet('oeLists',{agents}); if(ok===null){ b.disabled=false; return err('Not saved — the store did not accept the change.'); }
+    KV.set('oeLists',{agents});
+    // past entries move to the new name on the server too (older names still map through the aliases)
+    for(const [a,z] of renames){ try{ await Server.rpc('dash_oe_rename',{p_from:a, p_to:z}); }catch(e){ if(!missing(e)) showToast('Rename not applied on the server: '+cleanErr(e)); }
+     if(st.demo){ demoPut(demoAll().map(r=>r.agent===a?{...r, agent:z}:r)); } }
+    (st.rows||[]).forEach(r=>{ r.agent=canon(r.agent); }); st.draft=null;
+    wrap.remove(); showToast('Agents saved.'); render();
+   };
+  };
+  draw(); document.body.appendChild(wrap);
+ }
+ async function show(){
+  const host=document.getElementById('view-orderentry'); if(!host) return;
+  if(!Server.can('orderentry')){ render(); return; }
+  if(st.rows==null){ host.innerHTML='<div class="panel"><p class="hint" style="margin:0">Loading order entry numbers…</p></div>'; await ensure(); }
+  if(currentView!=='orderentry') return;
+  render();
+ }
+ return {show, _st:st};
 })();
 function renderDivReportView(){ DivReport.show(); }
 
