@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.70.1</title>
+<title>Performance Dashboard · v4.71.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -1128,6 +1128,7 @@ button.onb-tile{font:inherit;text-align:left;cursor:pointer}button.onb-tile:disa
 .onb-tile.i9 strong{color:#2563eb}.onb-tile.warn strong{color:#b45309}.onb-tile.bad strong{color:#c8102e}
 .onb-mix{margin-bottom:12px}.onb-mix h4{margin:0 0 8px;font-size:13px;color:#0a1f44}
 .c-complete{background:#16a34a}.c-i9{background:#60a5fa}.c-ip{background:#94a3b8}.c-lvm{background:#f59e0b}.c-nr{background:#c8102e}.c-other{background:#a78bfa}
+.onb-gorep{font-size:13px;font-weight:600}.onb-gorep-foot{margin:14px 0 0;text-align:center}
 .onb-counts{display:inline-block;margin-left:6px;font-size:10.5px;font-weight:700;color:#fff;border-radius:999px;padding:1px 7px;vertical-align:middle}
 .onb-cat{display:inline-block;font-size:11px;font-weight:700;border-radius:4px;padding:2px 7px;color:#fff;white-space:nowrap}
 .onb-link.prev{background:#eef3fe;color:#1e3a8a;margin-left:6px}
@@ -2394,6 +2395,8 @@ function allRawBranches(){
 // admins, or a user given that right (Settings → Users)
 function canUploadRange(){ return !!(Server.user && (Server.isSuperAdmin() || (Server.user.hidden_sections||[]).includes('grant.upload_range'))); }
 // Team Leads page: admins, or users given “Team Leads” (read-only) in Settings → Users
+function goOverviewTab(k){ try{ localStorage.setItem('ipd_ov_mode',k); }catch(e){} try{ OverviewX.setMode(k); }catch(e){}
+  currentView='performance'; document.querySelectorAll('#navList button').forEach(x=>x.classList.toggle('active',x.dataset.view==='performance')); refreshUI(); window.scrollTo(0,0); }
 function canViewLeads(){ return hasRight('grant.leads'); }
 function hasRight(g){ return !!(Server.user && (Server.isAdmin() || (Server.user.hidden_sections||[]).includes(g))); }
 function canMergeBranches(){ return !!(Server.user && (Server.isAdmin() || (Server.user.hidden_sections||[]).includes('grant.branch_merge'))); }
@@ -4480,7 +4483,7 @@ async function refreshUI(){
     document.getElementById('view-'+v).classList.toggle('hidden', v!==currentView);
   });
 
-  document.getElementById('topbarCenter').classList.toggle('hidden', !showDashboardViews || ['teams','leads','candidates','alerts','pivot','history','divreport','onboarding','orderentry'].includes(currentView));
+  document.getElementById('topbarCenter').classList.toggle('hidden', !showDashboardViews || (()=>{ try{ return currentView==='performance'&&OverviewX.active(); }catch(e){ return false; } })() || ['teams','leads','candidates','alerts','pivot','history','divreport','onboarding','orderentry'].includes(currentView));
 
   if(currentView!=='recruiters' && currentView!=='branches' && currentView!=='master' && currentView!=='candidates' && currentView!=='alerts' && currentView!=='pivot'){
     const extra = document.getElementById('topbarExtra');
@@ -4490,7 +4493,7 @@ async function refreshUI(){
   renderPeriodPickerButton();
   closePeriodPicker();
   syncDedupeControls();
-  document.getElementById('periodPicker')?.classList.toggle('hidden', currentView==='teams' || currentView==='leads' || currentView==='candidates' || currentView==='alerts' || currentView==='pivot' || currentView==='history' || currentView==='divreport' || currentView==='onboarding' || currentView==='orderentry');
+  document.getElementById('periodPicker')?.classList.toggle('hidden', (()=>{ try{ return currentView==='performance'&&OverviewX.active(); }catch(e){ return false; } })() || currentView==='teams' || currentView==='leads' || currentView==='candidates' || currentView==='alerts' || currentView==='pivot' || currentView==='history' || currentView==='divreport' || currentView==='onboarding' || currentView==='orderentry');
   ['weeklyDivisionSelect','weeklyDivisionSelectLbl'].forEach(id=>document.getElementById(id).classList.toggle('hidden',currentView!=='performance'));
   if(currentView==='teams'){ renderTeamGroups(); return; }
   if(currentView==='leads'){ renderLeadsView(); return; }
@@ -12020,7 +12023,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.70.1';   // shown only in the browser tab title
+const APP_VERSION = '4.71.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -13061,11 +13064,14 @@ const Onboarding=(()=>{
    </div>`;
  }
  function render(){
-  const host=document.getElementById('view-onboarding'); if(!host) return;
-  if(!Server.can('onboarding')){ host.innerHTML='<div class="panel"><p class="hint" style="margin:0">Ask an admin for the Onboarding right.</p></div>'; return; }
-  const all=st.rows||[], adm=ADM()||canReport(), q=st.q.trim().toLowerCase();
+  const embed=st.embed&&st.embed.isConnected?st.embed:null; if(!embed) st.embed=null;
+  const host=embed||document.getElementById('view-onboarding'); if(!host) return;
+  if(!embed&&!Server.can('onboarding')){ host.innerHTML='<div class="panel"><p class="hint" style="margin:0">Ask an admin for the Onboarding right.</p></div>'; return; }
+  const all=st.rows||[], adm=ADM()||canReport()||!!embed, q=st.q.trim().toLowerCase();
+  // the report lives on Overview → Onboarding for everyone who can open it there
+  const repOnOv=(()=>{ try{ return OverviewX.has('onboarding'); }catch(e){ return false; } })();
   // Daily assignments tab removed — its numbers now come from Log calls (Report → Assignments in these dates)
-  let pages=[['log','📞 Log calls'],...(canReport()?[['report','📊 Report']]:[])].filter(([k])=>canSeeSection('onb.'+k)); if(!pages.length) pages=[['log','📞 Log calls']];
+  let pages=embed?[['report','📊 Report']]:[['log','📞 Log calls'],...(canReport()&&!repOnOv?[['report','📊 Report']]:[])].filter(([k])=>canSeeSection('onb.'+k)); if(!pages.length) pages=[['log','📞 Log calls']];
   if(!st.page||!pages.some(([k])=>k===st.page)) st.page=pages.some(([k])=>k==='report')?'report':pages[0][0];
   const rows=all.filter(r=>(!st.fOnb||r.onboarder===st.fOnb)&&(!st.fType||r.call_type===st.fType));
   const assign=mergedAssign().map(d=>st.fOnb?{...d, data:{...d.data, rows:Object.fromEntries(Object.entries((d.data&&d.data.rows)||{}).filter(([n])=>n===st.fOnb))}}:d);
@@ -13076,8 +13082,8 @@ const Onboarding=(()=>{
   const shownCalls=cands.flatMap(c=>c.calls).sort((a,b)=>order(b,a));
   const onbs=[...new Set([...all.map(r=>r.onboarder), ...(st.assign||[]).flatMap(d=>Object.keys((d.data&&d.data.rows)||{}))])].filter(Boolean).sort();
   const nav0=pages.length<2?'':`<div class="onb-nav" role="tablist">${pages.map(([k,l])=>`<button type="button" data-onb-page="${k}" class="${st.page===k?'on':''}">${l}</button>`).join('')}</div>`;
-  const nav=`<div class="onb-navbar">${nav0||'<span></span>'}<span class="onb-updated">${st.loadedAt?'Updated '+st.loadedAt.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}):''}</span><button type="button" class="btn btn-secondary btn-sm onb-refresh" id="onbRefresh" ${st.refreshing?'disabled':''} title="Get the latest calls, assignments and settings without reloading the page">${st.refreshing?'Refreshing…':'↻ Refresh'}</button></div>`;
-  const top=`${LST()?`<div class="onb-admin"><span><strong>${Server.isAdmin()?'Admin':'Manage'}</strong> · onboarder names, call types, statuses and assignment types</span><button type="button" class="btn btn-primary btn-sm" id="onbLists2">⚙ Manage dropdowns</button></div>`:''}${st.demo?'<div class="onb-demo"><strong>Demo mode</strong> — entries are saved in this browser only. Run <code>onboarding.sql</code> in Supabase to share them with everyone.</div>':''}${st.err?`<div class="onb-demo bad">Could not load: ${escapeHtml(st.err)}</div>`:''}${nav}`;
+  const nav=`<div class="onb-navbar">${embed?'<span></span>':nav0||(repOnOv?'<button type="button" class="link-btn onb-gorep" data-ovgo-rep="onboarding">📊 Report is on Overview → Onboarding</button>':'<span></span>')}<span class="onb-updated">${st.loadedAt?'Updated '+st.loadedAt.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}):''}</span><button type="button" class="btn btn-secondary btn-sm onb-refresh" id="onbRefresh" ${st.refreshing?'disabled':''} title="Get the latest calls, assignments and settings without reloading the page">${st.refreshing?'Refreshing…':'↻ Refresh'}</button></div>`;
+  const top=`${LST()&&!embed?`<div class="onb-admin"><span><strong>${Server.isAdmin()?'Admin':'Manage'}</strong> · onboarder names, call types, statuses and assignment types</span><button type="button" class="btn btn-primary btn-sm" id="onbLists2">⚙ Manage dropdowns</button></div>`:''}${st.demo?'<div class="onb-demo"><strong>Demo mode</strong> — entries are saved in this browser only. Run <code>onboarding.sql</code> in Supabase to share them with everyone.</div>':''}${st.err?`<div class="onb-demo bad">Could not load: ${escapeHtml(st.err)}</div>`:''}${nav}`;
   let body='';
   if(st.page==='assign') body=assignHtml();
   else if(st.page==='log') body=`${requestsHtml()}${formHtml()}${filters(adm,onbs,true)}
@@ -13091,7 +13097,9 @@ const Onboarding=(()=>{
     ${st.tab==='cand'?candTable(cands):callTable(shownCalls)}</section>`;
   else body=reportHtml(adm, onbs, rows, cands, shownCalls, assign);
   host.innerHTML=top+body;
+  if(embed){ const v=document.getElementById('view-onboarding'); if(v) v.innerHTML=''; } else { const o=document.getElementById('view-ovx'); if(o) o.innerHTML=''; }
   wire(host);
+  host.querySelector('[data-ovgo-rep]')?.addEventListener('click',()=>goOverviewTab('onboarding'));
  }
  function reportHtml(adm, onbs, rows, cands, shownCalls, assign){
   const S=summary(cands, shownCalls), per=perOnboarder(candidates(rows), rows), vol=volume(rows, assign);
@@ -13399,8 +13407,16 @@ const Onboarding=(()=>{
  }
  async function show(){
   const host=document.getElementById('view-onboarding'); if(!host) return;
+  st.embed=null; if(st.page==='report'&&(()=>{ try{ return OverviewX.has('onboarding'); }catch(e){ return false; } })()) st.page='log';
   if(st.rows==null){ host.innerHTML='<div class="panel"><p class="hint" style="margin:0">Loading onboarding calls…</p></div>'; await load(); }
   if(currentView!=='onboarding') return;
+  render();
+ }
+ // Overview → Onboarding shows this page's report (same filters, tiles and tables)
+ async function showReport(el){
+  st.embed=el; st.page='report';
+  if(st.rows==null){ el.innerHTML='<div class="panel"><p class="hint" style="margin:0">Loading onboarding calls…</p></div>'; await load(); }
+  if(st.embed!==el||!el.isConnected) return;
   render();
  }
  // the Overview page reads a date range without touching this page's own filters
@@ -13409,7 +13425,7 @@ const Onboarding=(()=>{
   catch(e){ if(!(missing(e)||!Server.token)) throw e; demo=true; const me=Server.user&&Server.user.id; rows=demoRows().filter(r=>r.call_date>=a&&r.call_date<=b&&(ADM()||r.onboarder_id===me)); }
   rows=rows.map(r=>({...r, call_date:String(r.call_date).slice(0,10)})); rows.forEach(r=>{ const ln=linkedName(r.onboarder_id); if(ln) r.onboarder=ln; });
   return {rows, demo}; }
- return {show, reload:async()=>{ await load(); render(); }, candidates, catOf, fetchRange, summary, perOnboarder, CAT_LBL, CAT_CLS};
+ return {show, showReport, reload:async()=>{ await load(); render(); }, candidates, catOf, fetchRange, summary, perOnboarder, CAT_LBL, CAT_CLS};
 })();
 /* ============================= ORDER ENTRY ============================= */
 // The order entry team types in, each day, how many orders each agent entered in Recruitment Cloud (RC)
@@ -13494,16 +13510,20 @@ const OrderEntry=(()=>{
  const delta=(p)=>{ if(!p.prev||p.partial||p.prev.partial||!p.prev.total) return '<span class="oe-d">–</span>'; const d=(p.total-p.prev.total)/p.prev.total*100; return `<span class="oe-d ${d>0?'up':d<0?'down':''}" title="vs ${escapeHtml(GROUPS[st.group].name(p.prev.k))}: ${fmtNum(p.prev.total)}">${d>0?'▲':d<0?'▼':''} ${Math.abs(Math.round(d))}%</span>`; };
  // ---- render ----
  function render(){
-  const host=document.getElementById('view-orderentry'); if(!host) return;
-  if(!Server.can('orderentry')){ host.innerHTML='<div class="panel"><p class="hint" style="margin:0">Ask an admin for the Order Entry right.</p></div>'; return; }
+  const embed=st.embed&&st.embed.isConnected?st.embed:null; if(!embed) st.embed=null;
+  const host=embed||document.getElementById('view-orderentry'); if(!host) return;
+  const repOnOv=(()=>{ try{ return OverviewX.has('orderentry'); }catch(e){ return false; } })();
+  if(!embed&&!Server.can('orderentry')){ host.innerHTML='<div class="panel"><p class="hint" style="margin:0">Ask an admin for the Order Entry right.</p></div>'; return; }
   if(OrderEntry._chart){ try{ OrderEntry._chart.destroy(); }catch(e){} OrderEntry._chart=null; }
   const adm=canAgents(), bulkOk=canBulk(); if(!st.page||(st.page==='bulk'&&!bulkOk)) st.page='entry';
-  let pages=[['entry','✏️ Daily entry'],['report','📊 Report'],...(bulkOk?[['bulk','⬆ Bulk upload']]:[])].filter(([k])=>k==='bulk'||canSeeSection('oe.'+k)); if(!pages.length) pages=[['entry','✏️ Daily entry']];
+  let pages=embed?[['report','📊 Report']]:[['entry','✏️ Daily entry'],...(repOnOv?[]:[['report','📊 Report']]),...(bulkOk?[['bulk','⬆ Bulk upload']]:[])].filter(([k])=>k==='bulk'||canSeeSection('oe.'+k)); if(!pages.length) pages=[['entry','✏️ Daily entry']];
   if(!pages.some(([k])=>k===st.page)) st.page=pages[0][0];
-  const nav=`<div class="onb-navbar"><div class="onb-nav" role="tablist">${pages.map(([k,l])=>`<button type="button" role="tab" data-oe-page="${k}" class="${st.page===k?'on':''}" aria-selected="${st.page===k}">${l}</button>`).join('')}</div><span class="onb-updated">${st.loadedAt?'Updated '+st.loadedAt.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}):''}</span><button type="button" class="btn btn-secondary btn-sm onb-refresh" id="oeRefresh" ${st.refreshing?'disabled':''} title="Get the latest numbers and agent names without reloading the page">${st.refreshing?'Refreshing…':'↻ Refresh'}</button></div>`;
-  const top=`${adm?`<div class="onb-admin"><span><strong>${Server.isAdmin()?'Admin':'Manage'}</strong> · order entry agent names</span><button type="button" class="btn btn-primary btn-sm" id="oeAgents">⚙ Manage agents</button></div>`:''}${st.demo?'<div class="onb-demo"><strong>Demo mode</strong> — numbers are saved in this browser only. Run <code>order_entry.sql</code> in Supabase to share them with everyone.</div>':''}${st.err?`<div class="onb-demo bad">Could not load: ${escapeHtml(st.err)}</div>`:''}${nav}`;
-  host.innerHTML=top+(st.page==='report'?reportHtml():st.page==='bulk'?bulkHtml():entryHtml());
+  const nav=`<div class="onb-navbar">${embed?'<span></span>':''}<div class="onb-nav" role="tablist" ${embed?'style="display:none"':''}>${pages.map(([k,l])=>`<button type="button" role="tab" data-oe-page="${k}" class="${st.page===k?'on':''}" aria-selected="${st.page===k}">${l}</button>`).join('')}</div><span class="onb-updated">${st.loadedAt?'Updated '+st.loadedAt.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}):''}</span><button type="button" class="btn btn-secondary btn-sm onb-refresh" id="oeRefresh" ${st.refreshing?'disabled':''} title="Get the latest numbers and agent names without reloading the page">${st.refreshing?'Refreshing…':'↻ Refresh'}</button></div>`;
+  const top=`${adm&&!embed?`<div class="onb-admin"><span><strong>${Server.isAdmin()?'Admin':'Manage'}</strong> · order entry agent names</span><button type="button" class="btn btn-primary btn-sm" id="oeAgents">⚙ Manage agents</button></div>`:''}${st.demo?'<div class="onb-demo"><strong>Demo mode</strong> — numbers are saved in this browser only. Run <code>order_entry.sql</code> in Supabase to share them with everyone.</div>':''}${st.err?`<div class="onb-demo bad">Could not load: ${escapeHtml(st.err)}</div>`:''}${nav}`;
+  host.innerHTML=top+(st.page==='report'?reportHtml():st.page==='bulk'?bulkHtml():entryHtml())+(!embed&&repOnOv?'<p class="onb-gorep-foot"><button type="button" class="link-btn" data-ovgo-rep="orderentry">📊 The daily, weekly, monthly and quarterly report is on Overview → Order Entry</button></p>':'');
+  if(embed){ const v=document.getElementById('view-orderentry'); if(v) v.innerHTML=''; } else { const o=document.getElementById('view-ovx'); if(o) o.innerHTML=''; }
   wire(host);
+  host.querySelector('[data-ovgo-rep]')?.addEventListener('click',()=>goOverviewTab('orderentry'));
   if(st.page==='report') drawChart();
  }
  // daily entry: every agent on the list, RC + CRM → total
@@ -13907,16 +13927,25 @@ const OrderEntry=(()=>{
  }
  async function show(){
   const host=document.getElementById('view-orderentry'); if(!host) return;
+  st.embed=null; if(st.page==='report'&&(()=>{ try{ return OverviewX.has('orderentry'); }catch(e){ return false; } })()) st.page='entry';
   if(!Server.can('orderentry')){ render(); return; }
   if(st.rows==null){ host.innerHTML='<div class="panel"><p class="hint" style="margin:0">Loading order entry numbers…</p></div>'; await ensure(); }
   if(currentView!=='orderentry') return;
+  render();
+ }
+ // Overview → Order Entry shows this page's report
+ async function showReport(el){
+  st.embed=el; st.page='report';
+  if(st.rows==null){ el.innerHTML='<div class="panel"><p class="hint" style="margin:0">Loading order entry numbers…</p></div>'; }
+  await ensure();
+  if(st.embed!==el||!el.isConnected) return;
   render();
  }
  async function fetchRange(a,b){ let rows, demo=false;
   try{ rows=(await Server.rpc('dash_oe_list',{p_from:a, p_to:b}))||[]; }
   catch(e){ if(!(missing(e)||!Server.token)) throw e; demo=true; rows=demoAll().filter(r=>r.day>=a&&r.day<=b); }
   return {rows:rows.map(r=>({...r, day:String(r.day).slice(0,10), agent:canon(r.agent), rc:num(r.rc), crm:num(r.crm)})), demo}; }
- return {show, _st:st, fetchRange, roster};
+ return {show, showReport, _st:st, fetchRange, roster};
 })();
 /* ============================= OVERVIEW: ONBOARDING + ORDER ENTRY ============================= */
 // The Overview page has a switch: Recruiting (the weekly dashboard) · Onboarding · Order Entry.
@@ -13971,7 +14000,7 @@ const OverviewX=(()=>{
   const ms=modes(); if(ms.length<2){ host.innerHTML=''; host.classList.add('hidden'); return; }
   host.classList.remove('hidden'); const m=mode();
   host.innerHTML=`<div class="ovx-switch" role="tablist" aria-label="Overview">${ms.map(([k,l])=>`<button type="button" role="tab" data-ovx="${k}" class="${m===k?'on':''}" aria-selected="${m===k}">${l}</button>`).join('')}</div>
-   ${m==='recruiting'?'':`<div class="ovx-quick" role="group" aria-label="Weeks">${[['today','Today'],['yesterday','Yesterday'],['week','This week'],['lastweek','Last week'],['w4','Last 4 weeks'],['w13','Last 13 weeks']].map(([k,l])=>`<button type="button" data-ovq="${k}" class="${st.quick===k?'on':''}" title="${k==='picker'?'Use the weeks chosen in the Period picker at the top':''}">${l}</button>`).join('')}<button type="button" class="ovx-refresh" data-ovr title="Get the latest numbers">↻</button></div>`}`;
+   ${true?'':`<div class="ovx-quick" role="group" aria-label="Weeks">${[['today','Today'],['yesterday','Yesterday'],['week','This week'],['lastweek','Last week'],['w4','Last 4 weeks'],['w13','Last 13 weeks']].map(([k,l])=>`<button type="button" data-ovq="${k}" class="${st.quick===k?'on':''}" title="${k==='picker'?'Use the weeks chosen in the Period picker at the top':''}">${l}</button>`).join('')}<button type="button" class="ovx-refresh" data-ovr title="Get the latest numbers">↻</button></div>`}`;
   host.querySelectorAll('[data-ovx]').forEach(b=>b.onclick=()=>{ st.mode=b.dataset.ovx; try{ localStorage.setItem(LS,st.mode); }catch(e){} refreshUI(); });
   host.querySelectorAll('[data-ovq]').forEach(b=>b.onclick=()=>{ st.quick=b.dataset.ovq; refreshUI(); });
   host.querySelector('[data-ovr]')?.addEventListener('click',()=>{ st.cache.clear(); refreshUI(); });
@@ -13988,18 +14017,11 @@ const OverviewX=(()=>{
  function killCharts(){ st.charts.forEach(c=>{ try{ c.destroy(); }catch(e){} }); st.charts=[]; }
  async function render(){
   const host=document.getElementById('view-ovx'); if(!host) return; killCharts();
-  const m=mode(), P=period(), token=(render.n=(render.n||0)+1);
-  document.getElementById('viewTitle').textContent=m==='onboarding'?'Onboarding Overview':'Order Entry Overview';
-  document.getElementById('viewSub').textContent=(m==='onboarding'?'Candidates, completions and follow-ups':'Recruitment Cloud and CRM orders')+' — '+P.label;
-  host.innerHTML='<div class="panel"><p class="hint" style="margin:0">Loading…</p></div>';
-  const a=[P.pFrom, P.t8[0]&&add(P.t8[0],-6)].sort()[0];
-  try{
-   const res=await get(m==='onboarding'?'onb':'oe', a, P.to);
-   if(token!==render.n||currentView!=='performance'||mode()!==m) return;
-   host.innerHTML=(res.demo?`<div class="onb-demo"><strong>Demo mode</strong> — showing numbers saved in this browser only.</div>`:'')+(m==='onboarding'?onbHtml(res.rows,P):oeHtml(res.rows,P));
-   host.querySelectorAll('[data-ovgo]').forEach(b=>b.onclick=()=>{ currentView=b.dataset.ovgo; document.querySelectorAll('#navList button').forEach(x=>x.classList.toggle('active',x.dataset.view===currentView)); saveNavSoon&&saveNavSoon(); refreshUI(); });
-   if(m==='orderentry') oeChart(res.rows,P);
-  }catch(e){ if(token===render.n) host.innerHTML=`<div class="onb-demo bad">Could not load: ${escapeHtml(cleanErr(e))}</div>`; }
+  const m=mode();
+  document.getElementById('viewTitle').textContent=m==='onboarding'?'Onboarding Report':'Order Entry Report';
+  document.getElementById('viewSub').textContent=m==='onboarding'?'Candidates reached, finalized, onboarding complete and follow-ups — pick the dates below':'Recruitment Cloud and CRM orders — daily, weekly, monthly and quarterly';
+  try{ if(m==='onboarding') await Onboarding.showReport(host); else await OrderEntry.showReport(host); }
+  catch(e){ host.innerHTML=`<div class="onb-demo bad">Could not load: ${escapeHtml(cleanErr(e))}</div>`; }
  }
  // ---------- onboarding ----------
  function onbHtml(all,P){
@@ -14076,7 +14098,7 @@ const OverviewX=(()=>{
     scales:{x:{stacked:true, grid:{display:false}}, y:{stacked:true, beginAtZero:true, ticks:{precision:0}}}}});
   if(ch) st.charts.push(ch);
  }
- return {bar, render, mode, active:()=>mode()!=='recruiting', pickerLabel, openPicker, step, canStep};
+ return {bar, render, mode, active:()=>mode()!=='recruiting', has:k=>modes().some(([x])=>x===k), setMode:k=>{ st.mode=k; }, pickerLabel, openPicker, step, canStep};
 })();
 function renderDivReportView(){ DivReport.show(); }
 
