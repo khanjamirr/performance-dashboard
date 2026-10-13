@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.62.1</title>
+<title>Performance Dashboard · v4.63.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -1154,6 +1154,18 @@ button.onb-tile{font:inherit;text-align:left;cursor:pointer}button.onb-tile:disa
 .oe-d{font-size:12px;color:#64748b}.oe-d.up{color:#15803d}.oe-d.down{color:#c8102e}
 .oe-grid th.oe-sep,.oe-grid td.oe-sep{border-right:1px solid #e2e8f0}
 #view-orderentry p.hint{font-size:12.5px;margin:4px 0 8px}#view-orderentry .onb-demo .hint{display:block;font-size:12px}
+/* Overview: Recruiting · Onboarding · Order Entry */
+#ovModeBar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin:0 0 14px}
+.ovx-switch{display:inline-flex;gap:3px;padding:4px;background:#e9edf4;border-radius:10px}.ovx-switch button{border:0;background:transparent;padding:8px 18px;border-radius:7px;font:inherit;font-size:13.5px;font-weight:600;color:#475569;cursor:pointer;white-space:nowrap}.ovx-switch button.on{background:#fff;color:#0a1f44;box-shadow:0 1px 2px #0f172a24}
+.ovx-quick{display:flex;flex-wrap:wrap;gap:4px;align-items:center}.ovx-quick button{border:1px solid #d6dde8;background:#fff;border-radius:999px;padding:5px 11px;font:inherit;font-size:12px;font-weight:600;color:#334155;cursor:pointer}.ovx-quick button.on{background:#0a1f44;border-color:#0a1f44;color:#fff}.ovx-quick .ovx-refresh{padding:5px 9px}
+.ovx-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:8px}
+.ovx-card{background:#fff;border:1px solid #e1e7ef;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:2px;border-top:3px solid #2563eb}.ovx-card>span{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#64748b}.ovx-card strong{font-size:26px;line-height:1.15;color:#0a1f44}.ovx-card small{font-size:12px;color:#64748b}
+.ovx-card.good{border-top-color:#16a34a}.ovx-card.good strong{color:#15803d}.ovx-card.i9{border-top-color:#2563eb}.ovx-card.warn{border-top-color:#d97706}.ovx-card.warn strong{color:#b45309}.ovx-card.bad{border-top-color:#c8102e}.ovx-card.bad strong{color:#c8102e}.ovx-card.rc{border-top-color:#2563eb}.ovx-card.rc strong{color:#2563eb}.ovx-card.crm{border-top-color:#0f9488}.ovx-card.crm strong{color:#0f766e}
+.ovx-d{font-style:normal;font-size:11.5px;font-weight:600;color:#64748b;margin-top:4px}.ovx-d.up{color:#15803d}.ovx-d.down{color:#c8102e}td .ovx-d{margin:0}
+.ovx-cmp{font-size:12.5px;color:#64748b;margin:2px 0 12px}
+.ovx-two{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:12px}.ovx-two>.panel{margin:0}.ovx-two.ovx-stack{grid-template-columns:minmax(0,1fr)}@media (max-width:1100px){.ovx-two{grid-template-columns:1fr}}
+#view-ovx .panel-head{display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap}#view-ovx .panel-head>div:first-child{flex:1}#view-ovx .panel{margin-bottom:12px}
+.ovx-sel td{background:#f3f7ff;font-weight:600}.ovx-chart{position:relative;height:260px}.ovx-go{display:flex;justify-content:flex-end;margin:12px 0 0}
 .oe-bulk-help{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px 14px;margin:0 0 12px}.oe-bulk-help h4{margin:0 0 6px;font-size:13px;color:#0a1f44}.oe-bulk-help p{margin:4px 0;font-size:12.5px}
 .oe-sample{border-collapse:collapse;font-size:12px;margin:6px 0}.oe-sample th,.oe-sample td{border:1px solid #d6dde8;padding:3px 8px;text-align:left;background:#fff}.oe-sample th{background:#eef2f7;font-weight:600}.oe-sample i{font-weight:400;color:#64748b}
 .oe-bulk-in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:12px;margin-bottom:12px}@media (max-width:760px){.oe-bulk-in{grid-template-columns:1fr}.oe-bulk-help{flex-direction:column}}
@@ -2039,6 +2051,8 @@ input[type=date]::-webkit-calendar-picker-indicator{cursor:pointer}
 
       <div id="dashboardViews" class="hidden">
       <div id="view-performance" class="hidden">
+        <div id="ovModeBar" class="hidden"></div>
+        <div id="view-ovx" class="hidden"></div>
         <div id="view-weekly"></div>
         <div id="view-monthly" class="hidden"></div>
         <div id="view-quarterly" class="hidden"></div>
@@ -4373,7 +4387,7 @@ async function refreshUI(){
   // The Uploads page must stay reachable even with zero weeks saved — it's the page you use
   // to add the first one — so it's treated as always-showable, unlike Performance/Recruiter/
   // Branch which genuinely have nothing to render without data.
-  const showDashboardViews = hasData || currentView==='master' || currentView==='teams' || currentView==='leads' || currentView==='divreport' || currentView==='onboarding' || currentView==='orderentry';
+  const showDashboardViews = hasData || currentView==='master' || currentView==='teams' || currentView==='leads' || currentView==='divreport' || currentView==='onboarding' || currentView==='orderentry' || (currentView==='performance' && OverviewX.active());
   document.getElementById('emptyState').classList.toggle('hidden', showDashboardViews);
   document.getElementById('dashboardViews').classList.toggle('hidden', !showDashboardViews);
   document.getElementById('downloadDropdownWrap').classList.toggle('hidden', !hasData);
@@ -4403,6 +4417,7 @@ async function refreshUI(){
   if(currentView==='divreport'){ renderDivReportView(); return; }
   if(currentView==='onboarding'){ Onboarding.show(); return; }
   if(currentView==='orderentry'){ OrderEntry.show(); return; }
+  if(currentView==='performance' && OverviewX.active()){ showOverviewX(); return; }
   if(!hasData){ if(showDashboardViews) renderMasterView(); return; }
 
   if(!currentWeekEndDate || (currentWeekEndDate!=='all-weeks' && !weeksData.find(w=>w.weekEndDate===currentWeekEndDate))){
@@ -4640,7 +4655,15 @@ document.getElementById('settingsTabs').addEventListener('click', (e)=>{
   if(btn) switchSettingsTab(btn.dataset.tab);
 });
 
+// Overview → Onboarding / Order Entry: the weekly dashboard is hidden and the summary shown instead
+function showOverviewX(){
+  OverviewX.bar();
+  ['weekly','monthly','quarterly'].forEach(t=>document.getElementById('view-'+t).classList.add('hidden'));
+  document.getElementById('view-ovx').classList.remove('hidden');
+  OverviewX.render();
+}
 function renderPerformanceView(){
+  OverviewX.bar(); document.getElementById('view-ovx').classList.add('hidden');
   renderPeriodPickerButton();
   const meta = PERFORMANCE_TYPE_META[performancePeriodType];
   document.getElementById('viewTitle').textContent = meta.title;
@@ -11690,7 +11713,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.62.1';   // shown only in the browser tab title
+const APP_VERSION = '4.63.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -13057,7 +13080,13 @@ const Onboarding=(()=>{
   if(currentView!=='onboarding') return;
   render();
  }
- return {show, reload:async()=>{ await load(); render(); }, candidates, catOf};
+ // the Overview page reads a date range without touching this page's own filters
+ async function fetchRange(a,b){ let rows, demo=false;
+  try{ rows=await Server.rpc('dash_onb_list',{p_from:a, p_to:b})||[]; }
+  catch(e){ if(!(missing(e)||!Server.token)) throw e; demo=true; const me=Server.user&&Server.user.id; rows=demoRows().filter(r=>r.call_date>=a&&r.call_date<=b&&(Server.isAdmin()||r.onboarder_id===me)); }
+  rows=rows.map(r=>({...r, call_date:String(r.call_date).slice(0,10)})); rows.forEach(r=>{ const ln=linkedName(r.onboarder_id); if(ln) r.onboarder=ln; });
+  return {rows, demo}; }
+ return {show, reload:async()=>{ await load(); render(); }, candidates, catOf, fetchRange, summary, perOnboarder, CAT_LBL, CAT_CLS};
 })();
 /* ============================= ORDER ENTRY ============================= */
 // The order entry team types in, each day, how many orders each agent entered in Recruitment Cloud (RC)
@@ -13556,7 +13585,147 @@ const OrderEntry=(()=>{
   if(currentView!=='orderentry') return;
   render();
  }
- return {show, _st:st};
+ async function fetchRange(a,b){ let rows, demo=false;
+  try{ rows=(await Server.rpc('dash_oe_list',{p_from:a, p_to:b}))||[]; }
+  catch(e){ if(!(missing(e)||!Server.token)) throw e; demo=true; rows=demoAll().filter(r=>r.day>=a&&r.day<=b); }
+  return {rows:rows.map(r=>({...r, day:String(r.day).slice(0,10), agent:canon(r.agent), rc:num(r.rc), crm:num(r.crm)})), demo}; }
+ return {show, _st:st, fetchRange, roster};
+})();
+/* ============================= OVERVIEW: ONBOARDING + ORDER ENTRY ============================= */
+// The Overview page has a switch: Recruiting (the weekly dashboard) · Onboarding · Order Entry.
+// The two extra views follow the period picker (the selected weeks, Sunday–Saturday) or a quick range,
+// compare with the same number of weeks just before, and show the last 8 weeks.
+const OverviewX=(()=>{
+ const LS='ipd_ov_mode', parse=s=>new Date(s+'T12:00:00'), iso=d=>toIsoDateOnly(d);
+ const add=(s,n)=>{ const d=parse(s); d.setDate(d.getDate()+n); return iso(d); };
+ const weekEnd=s=>{ const d=parse(s); d.setDate(d.getDate()+(6-d.getDay())); return iso(d); };
+ const short=s=>parse(s).toLocaleDateString(undefined,{month:'short',day:'numeric'});
+ const span=(a,b)=>short(a)+' – '+short(b)+', '+b.slice(0,4);
+ const st={mode:null, quick:'picker', cache:new Map(), charts:[]};
+ const modes=()=>[['recruiting','Recruiting'], ...(canOnb()?[['onboarding','Onboarding']]:[]), ...(Server.can('orderentry')?[['orderentry','Order Entry']]:[])];
+ const canOnb=()=>Server.can('onboarding')&&(Server.isAdmin()||(Server.user&&(Server.user.hidden_sections||[]).includes('grant.onb_report')));
+ function mode(){ if(st.mode==null){ try{ st.mode=localStorage.getItem(LS)||'recruiting'; }catch(e){ st.mode='recruiting'; } } if(!modes().some(([k])=>k===st.mode)) st.mode='recruiting'; return st.mode; }
+ // the weeks being looked at: the period picker's weeks (Saturday week-endings) or a quick range
+ function period(){
+  const t=ltToday(), tw=weekEnd(t);
+  const q={week:[tw], lastweek:[add(tw,-7)], w4:[1,2,3,4].map(i=>add(tw,-7*i)), w13:[...Array(13).keys()].map(i=>add(tw,-7*(i+1)))}[st.quick];   // 'last N weeks' = full weeks, ending last Saturday
+  let weeks=q||(selectedWeekEndDates.length?selectedWeekEndDates.slice():currentWeekEndDate==='all-weeks'?weeksData.map(w=>w.weekEndDate):currentWeekEndDate?[currentWeekEndDate]:[]);
+  weeks=[...new Set(weeks.map(weekEnd))].sort(); if(!weeks.length) weeks=[tw];
+  const from=add(weeks[0],-6), to=weeks[weeks.length-1], n=Math.max(1,Math.round((parse(to)-parse(from)+864e5)/(7*864e5)));
+  const wk=weeksData.find(w=>w.weekEndDate===to);
+  const label=weeks.length===1?(wk?'Week '+wk.weekNumber+' · ':'')+span(from,to):`${weeks.length} weeks · ${span(from,to)}`;
+  const pTo=add(from,-1), pFrom=add(pTo,-7*n+1);   // the same number of weeks just before
+  return {weeks, set:new Set(weeks), from, to, label, running:to>=t, pFrom, pTo, prevLabel:span(pFrom,pTo), t8:[...Array(8).keys()].map(i=>add(to,-7*i)).reverse()};
+ }
+ const inWeeks=(P,day)=>P.set.has(weekEnd(day));
+ function get(kind, a, b){ const k=kind+'|'+a+'|'+b; if(!st.cache.has(k)) st.cache.set(k,(kind==='onb'?Onboarding.fetchRange(a,b):OrderEntry.fetchRange(a,b)).catch(e=>{ st.cache.delete(k); throw e; })); return st.cache.get(k); }
+ const dlt=(cur,prev,good=1)=>{ if(prev==null||!isFinite(prev)) return ''; if(!prev&&!cur) return '<em class="ovx-d">no change</em>'; if(!prev) return '<em class="ovx-d up">new</em>';
+  const d=Math.round((cur-prev)/prev*100); return `<em class="ovx-d ${d*good>0?'up':d*good<0?'down':''}" title="Before: ${fmtNum(Math.round(prev*10)/10)}">${d>0?'▲':d<0?'▼':'•'} ${Math.abs(d)}% vs before</em>`; };
+ const pc=(n,d)=>d?Math.round(n/d*100)+'%':'–';
+ const f1=v=>v==null||!isFinite(v)?'–':(Math.round(v*10)/10).toLocaleString('en-US');
+ const card=(l,v,sub,d,cls)=>`<div class="ovx-card ${cls||''}"><span>${l}</span><strong>${v}</strong>${sub?`<small>${sub}</small>`:''}${d||''}</div>`;
+ function bar(){
+  const host=document.getElementById('ovModeBar'); if(!host) return;
+  const ms=modes(); if(ms.length<2){ host.innerHTML=''; host.classList.add('hidden'); return; }
+  host.classList.remove('hidden'); const m=mode();
+  host.innerHTML=`<div class="ovx-switch" role="tablist" aria-label="Overview">${ms.map(([k,l])=>`<button type="button" role="tab" data-ovx="${k}" class="${m===k?'on':''}" aria-selected="${m===k}">${l}</button>`).join('')}</div>
+   ${m==='recruiting'?'':`<div class="ovx-quick" role="group" aria-label="Weeks">${[['picker','Period picker'],['week','This week'],['lastweek','Last week'],['w4','Last 4 weeks'],['w13','Last 13 weeks']].map(([k,l])=>`<button type="button" data-ovq="${k}" class="${st.quick===k?'on':''}" title="${k==='picker'?'Use the weeks chosen in the Period picker at the top':''}">${l}</button>`).join('')}<button type="button" class="ovx-refresh" data-ovr title="Get the latest numbers">↻</button></div>`}`;
+  host.querySelectorAll('[data-ovx]').forEach(b=>b.onclick=()=>{ st.mode=b.dataset.ovx; try{ localStorage.setItem(LS,st.mode); }catch(e){} refreshUI(); });
+  host.querySelectorAll('[data-ovq]').forEach(b=>b.onclick=()=>{ st.quick=b.dataset.ovq; refreshUI(); });
+  host.querySelector('[data-ovr]')?.addEventListener('click',()=>{ st.cache.clear(); refreshUI(); });
+ }
+ function killCharts(){ st.charts.forEach(c=>{ try{ c.destroy(); }catch(e){} }); st.charts=[]; }
+ async function render(){
+  const host=document.getElementById('view-ovx'); if(!host) return; killCharts();
+  const m=mode(), P=period(), token=(render.n=(render.n||0)+1);
+  document.getElementById('viewTitle').textContent=m==='onboarding'?'Onboarding Overview':'Order Entry Overview';
+  document.getElementById('viewSub').textContent=(m==='onboarding'?'Candidates, completions and follow-ups':'Recruitment Cloud and CRM orders')+' — '+P.label;
+  host.innerHTML='<div class="panel"><p class="hint" style="margin:0">Loading…</p></div>';
+  const a=[P.pFrom, P.t8[0]&&add(P.t8[0],-6)].sort()[0];
+  try{
+   const res=await get(m==='onboarding'?'onb':'oe', a, P.to);
+   if(token!==render.n||currentView!=='performance'||mode()!==m) return;
+   host.innerHTML=(res.demo?`<div class="onb-demo"><strong>Demo mode</strong> — showing numbers saved in this browser only.</div>`:'')+(m==='onboarding'?onbHtml(res.rows,P):oeHtml(res.rows,P));
+   host.querySelectorAll('[data-ovgo]').forEach(b=>b.onclick=()=>{ currentView=b.dataset.ovgo; document.querySelectorAll('#navList button').forEach(x=>x.classList.toggle('active',x.dataset.view===currentView)); saveNavSoon&&saveNavSoon(); refreshUI(); });
+   if(m==='orderentry') oeChart(res.rows,P);
+  }catch(e){ if(token===render.n) host.innerHTML=`<div class="onb-demo bad">Could not load: ${escapeHtml(cleanErr(e))}</div>`; }
+ }
+ // ---------- onboarding ----------
+ function onbHtml(all,P){
+  const O=Onboarding, rows=all.filter(r=>inWeeks(P,r.call_date)), prev=all.filter(r=>r.call_date>=P.pFrom&&r.call_date<=P.pTo);
+  const C=O.candidates(rows), S=O.summary(C,rows), pC=O.candidates(prev), pS=O.summary(pC,prev);
+  const by=S.by, pb=pS.by, keys=['complete','i9','in_process','lvm','no_response'];
+  const reach=c=>c.calls.some(x=>!['lvm','no_response'].includes(O.catOf(x.status,x.call_type)));
+  const reached=C.filter(reach).length;
+  const per=O.perOnboarder(C,rows);
+  const wk=P.t8.map(w=>{ const rs=all.filter(r=>weekEnd(r.call_date)===w), cs=O.candidates(rs); return {w, calls:rs.length, people:cs.length, reached:cs.filter(reach).length, done:cs.filter(c=>c.calls.some(x=>O.catOf(x.status,x.call_type)==='complete')).length, nr:cs.filter(c=>c.cat==='no_response').length}; });
+  return `<div class="ovx-cards">
+    ${card('Candidates worked',fmtNum(S.n),fmtNum(S.calls)+' calls · '+f1(S.avgCalls)+' per candidate',dlt(S.n,pS.n))}
+    ${card('Onboarding complete',fmtNum(by.complete),pc(by.complete,S.n)+' of candidates'+(S.avgDays!=null?' · avg '+f1(S.avgDays)+' days':''),dlt(by.complete,pb.complete),'good')}
+    ${card('Between I9 stages',fmtNum(by.i9),pc(by.i9,S.n),dlt(by.i9,pb.i9),'i9')}
+    ${card('In process',fmtNum(by.in_process),pc(by.in_process,S.n),dlt(by.in_process,pb.in_process))}
+    ${card('LVM / No answer',fmtNum(by.lvm),pc(by.lvm,S.n),dlt(by.lvm,pb.lvm,-1),'warn')}
+    ${card('Never responded',fmtNum(by.no_response),pc(by.no_response,S.n)+' · incl. LVM on 3+ days',dlt(by.no_response,pb.no_response,-1),'bad')}
+    ${card('Reached',fmtNum(reached),pc(reached,S.n)+' of candidates picked up at least once','')}
+   </div>
+   <p class="ovx-cmp">${P.running?'<b>This week is still going</b> — the numbers so far are compared with the full week(s) before. ':''}Compared with ${escapeHtml(P.prevLabel)} (${fmtNum(pS.n)} candidates, ${fmtNum(pb.complete)} complete). Each candidate counts once — the latest call in the period decides where they stand.</p>
+   ${S.n?`<div class="panel onb-mix"><h4>Where candidates stand</h4><div class="onb-bar">${keys.map(k=>by[k]?`<i class="${O.CAT_CLS[k]}" style="flex:${by[k]}" title="${O.CAT_LBL[k]}: ${by[k]}"></i>`:'').join('')}</div>
+    <div class="onb-legend">${keys.map(k=>`<span><b class="${O.CAT_CLS[k]}"></b>${O.CAT_LBL[k]} · <strong>${by[k]}</strong> <small>${pc(by[k],S.n)}</small></span>`).join('')}</div></div>`:''}
+   <div class="ovx-two ovx-stack">
+   <section class="panel"><div class="panel-head"><div><h3>By onboarder</h3><span class="hint">Candidates credited to whoever made their latest call.</span></div>${copyBtnHtml('ovxOnbPer')}</div>
+    <div class="onb-scroll"><table class="users-table onb-table" id="ovxOnbPer"><thead><tr><th>Onboarder</th><th class="num">Candidates</th><th class="num">Complete</th><th class="num">Between I9</th><th class="num">In process</th><th class="num">LVM</th><th class="num">Never resp.</th><th class="num">Calls</th></tr></thead><tbody>
+    ${per.map(x=>`<tr><td>${escapeHtml(x.o)}</td><td class="num"><strong>${fmtNum(x.n)}</strong></td>${['complete','i9','in_process','lvm','no_response'].map(k=>`<td class="num">${x.by[k]||'–'}${x.by[k]?`<small>${pc(x.by[k],x.n)}</small>`:''}</td>`).join('')}<td class="num">${fmtNum(x.myCalls)}</td></tr>`).join('')||'<tr><td colspan="8" class="hint">No calls in these weeks.</td></tr>'}
+    ${per.length?`<tr class="onb-total"><td><strong>All</strong></td><td class="num">${fmtNum(S.n)}</td>${keys.map(k=>`<td class="num">${by[k]||'–'}${by[k]?`<small>${pc(by[k],S.n)}</small>`:''}</td>`).join('')}<td class="num">${fmtNum(S.calls)}</td></tr>`:''}
+    </tbody></table></div></section>
+   <section class="panel"><div class="panel-head"><div><h3>Last 8 weeks</h3><span class="hint">Week by week, up to ${escapeHtml(short(P.to))}. Completed = finished onboarding on a call that week.</span></div>${copyBtnHtml('ovxOnbWk')}</div>
+    <div class="onb-scroll"><table class="users-table onb-table" id="ovxOnbWk"><thead><tr><th>Week ending</th><th class="num">Calls</th><th class="num">People called</th><th class="num">Reached</th><th class="num">Completed</th><th class="num">Never resp.</th></tr></thead><tbody>
+    ${wk.slice().reverse().map(x=>`<tr class="${P.set.has(x.w)?'ovx-sel':''}"><td>${escapeHtml(fmtDate(x.w))}</td><td class="num">${x.calls?fmtNum(x.calls):'–'}</td><td class="num">${x.people?fmtNum(x.people):'–'}</td><td class="num">${x.people?fmtNum(x.reached)+'<small>'+pc(x.reached,x.people)+'</small>':'–'}</td><td class="num"><strong>${x.done?fmtNum(x.done):'–'}</strong></td><td class="num">${x.nr||'–'}</td></tr>`).join('')}
+    </tbody></table></div></section></div>
+   <div class="ovx-go"><button type="button" class="btn btn-secondary btn-sm" data-ovgo="onboarding">Open Onboarding →</button></div>`;
+ }
+ // ---------- order entry ----------
+ function oeSum(rs){ const rc=rs.reduce((a,r)=>a+(r.rc||0),0), crm=rs.reduce((a,r)=>a+(r.crm||0),0), days=new Set(rs.map(r=>r.day)).size, ad=new Set(rs.map(r=>r.day+'|'+r.agent)).size; return {rc, crm, total:rc+crm, days, ad, agents:new Set(rs.map(r=>r.agent)).size}; }
+ function oeHtml(all,P){
+  const rows=all.filter(r=>inWeeks(P,r.day)), prev=all.filter(r=>r.day>=P.pFrom&&r.day<=P.pTo), T=oeSum(rows), pT=oeSum(prev);
+  const dayMap=new Map(); rows.forEach(r=>dayMap.set(r.day,(dayMap.get(r.day)||0)+(r.rc||0)+(r.crm||0))); const best=[...dayMap.entries()].sort((a,b)=>b[1]-a[1])[0];
+  const ag=new Map(); rows.forEach(r=>{ const x=ag.get(r.agent)||{a:r.agent, rc:0, crm:0, days:new Set()}; x.rc+=r.rc||0; x.crm+=r.crm||0; x.days.add(r.day); ag.set(r.agent,x); });
+  const pag=new Map(); prev.forEach(r=>pag.set(r.agent,(pag.get(r.agent)||0)+(r.rc||0)+(r.crm||0)));
+  const A=[...ag.values()].map(x=>({...x, total:x.rc+x.crm})).sort((a,b)=>b.total-a.total);
+  const wk=P.t8.map(w=>({w, ...oeSum(all.filter(r=>weekEnd(r.day)===w))}));
+  const missing=OrderEntry.roster().filter(n=>!ag.has(n));
+  return `<div class="ovx-cards">
+    ${card('Total orders',fmtNum(T.total),fmtNum(T.days)+' day'+(T.days===1?'':'s')+' with entries',dlt(T.total,pT.total))}
+    ${card('Recruitment Cloud',fmtNum(T.rc),pc(T.rc,T.total)+' of the total',dlt(T.rc,pT.rc),'rc')}
+    ${card('CRM',fmtNum(T.crm),pc(T.crm,T.total)+' of the total',dlt(T.crm,pT.crm),'crm')}
+    ${card('Per day',f1(T.days?T.total/T.days:null),'RC '+f1(T.days?T.rc/T.days:null)+' · CRM '+f1(T.days?T.crm/T.days:null),dlt(T.days?T.total/T.days:0,pT.days?pT.total/pT.days:null))}
+    ${card('Per agent per day',f1(T.ad?T.total/T.ad:null),fmtNum(T.agents)+' agent'+(T.agents===1?'':'s')+' entered',dlt(T.ad?T.total/T.ad:0,pT.ad?pT.total/pT.ad:null))}
+    ${card('Best day',best?fmtNum(best[1]):'–',best?escapeHtml(fmtDate(best[0])):'No entries yet','','good')}
+   </div>
+   <p class="ovx-cmp">${P.running?'<b>This week is still going</b> — the numbers so far are compared with the full week(s) before. ':''}Compared with ${escapeHtml(P.prevLabel)} (${fmtNum(pT.total)} orders: RC ${fmtNum(pT.rc)} · CRM ${fmtNum(pT.crm)}).${missing.length&&rows.length?` No entries in these weeks from: ${escapeHtml(missing.join(', '))}.`:''}</p>
+   <section class="panel"><div class="panel-head"><div><h3>Last 8 weeks — RC and CRM</h3><span class="hint">Stacked, so each bar’s height is the week’s total. Selected weeks are highlighted in the table.</span></div></div><div class="ovx-chart"><canvas id="ovxOeChart" role="img" aria-label="Orders per week"></canvas></div></section>
+   <div class="ovx-two">
+   <section class="panel"><div class="panel-head"><div><h3>By agent</h3><span class="hint">These weeks, with the change against the weeks before.</span></div>${copyBtnHtml('ovxOeAg')}</div>
+    <div class="onb-scroll"><table class="users-table onb-table" id="ovxOeAg"><thead><tr><th>Agent</th><th class="num">RC</th><th class="num">CRM</th><th class="num">Total</th><th class="num">Share</th><th class="num">Per day</th><th class="num">Change</th></tr></thead><tbody>
+    ${A.map(x=>`<tr><td>${escapeHtml(x.a)}</td><td class="num">${fmtNum(x.rc)}</td><td class="num">${fmtNum(x.crm)}</td><td class="num"><strong>${fmtNum(x.total)}</strong></td><td class="num">${pc(x.total,T.total)}</td><td class="num">${f1(x.days.size?x.total/x.days.size:null)}</td><td class="num">${dlt(x.total,pag.has(x.a)?pag.get(x.a):null).replace(' vs before','')||'<em class="ovx-d">–</em>'}</td></tr>`).join('')||'<tr><td colspan="7" class="hint">No entries in these weeks.</td></tr>'}
+    ${A.length?`<tr class="onb-total"><td><strong>All agents</strong></td><td class="num">${fmtNum(T.rc)}</td><td class="num">${fmtNum(T.crm)}</td><td class="num"><strong>${fmtNum(T.total)}</strong></td><td class="num">100%</td><td class="num">${f1(T.days?T.total/T.days:null)}</td><td class="num">${dlt(T.total,pT.total).replace(' vs before','')}</td></tr>`:''}
+    </tbody></table></div></section>
+   <section class="panel"><div class="panel-head"><div><h3>Last 8 weeks</h3><span class="hint">Week by week, up to ${escapeHtml(short(P.to))}.</span></div>${copyBtnHtml('ovxOeWk')}</div>
+    <div class="onb-scroll"><table class="users-table onb-table" id="ovxOeWk"><thead><tr><th>Week ending</th><th class="num">RC</th><th class="num">CRM</th><th class="num">Total</th><th class="num">RC %</th><th class="num">Per day</th></tr></thead><tbody>
+    ${wk.slice().reverse().map(x=>`<tr class="${P.set.has(x.w)?'ovx-sel':''}"><td>${escapeHtml(fmtDate(x.w))}</td><td class="num">${x.total?fmtNum(x.rc):'–'}</td><td class="num">${x.total?fmtNum(x.crm):'–'}</td><td class="num"><strong>${x.total?fmtNum(x.total):'–'}</strong></td><td class="num">${pc(x.rc,x.total)}</td><td class="num">${f1(x.days?x.total/x.days:null)}</td></tr>`).join('')}
+    </tbody></table></div></section></div>
+   <div class="ovx-go"><button type="button" class="btn btn-secondary btn-sm" data-ovgo="orderentry">Open Order Entry →</button></div>`;
+ }
+ function oeChart(all,P){
+  const c=document.getElementById('ovxOeChart'); if(!c) return;
+  const wk=P.t8.map(w=>({w, ...oeSum(all.filter(r=>weekEnd(r.day)===w))}));
+  const ch=safeChart(c,{type:'bar', data:{labels:wk.map(x=>'Wk end '+short(x.w)), datasets:[
+   {label:'Recruitment Cloud', data:wk.map(x=>x.rc), backgroundColor:wk.map(x=>P.set.has(x.w)?'#2563eb':'#93b4f5'), stack:'o'},
+   {label:'CRM', data:wk.map(x=>x.crm), backgroundColor:wk.map(x=>P.set.has(x.w)?'#0f9488':'#8fd9cf'), stack:'o'}]},
+   options:{responsive:true, maintainAspectRatio:false, interaction:{mode:'index', intersect:false}, plugins:{legend:{position:'top', align:'end'}, tooltip:{callbacks:{footer:i=>'Total: '+fmtNum(i.reduce((a,x)=>a+(x.raw||0),0))}}},
+    scales:{x:{stacked:true, grid:{display:false}}, y:{stacked:true, beginAtZero:true, ticks:{precision:0}}}}});
+  if(ch) st.charts.push(ch);
+ }
+ return {bar, render, mode, active:()=>mode()!=='recruiting'};
 })();
 function renderDivReportView(){ DivReport.show(); }
 
