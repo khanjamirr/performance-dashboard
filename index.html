@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.63.0</title>
+<title>Performance Dashboard · v4.64.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -1154,6 +1154,16 @@ button.onb-tile{font:inherit;text-align:left;cursor:pointer}button.onb-tile:disa
 .oe-d{font-size:12px;color:#64748b}.oe-d.up{color:#15803d}.oe-d.down{color:#c8102e}
 .oe-grid th.oe-sep,.oe-grid td.oe-sep{border-right:1px solid #e2e8f0}
 #view-orderentry p.hint{font-size:12.5px;margin:4px 0 8px}#view-orderentry .onb-demo .hint{display:block;font-size:12px}
+.rtl{margin-top:14px}.rtl .panel-head{display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap}.rtl .panel-head>div:first-child{flex:1}
+.rtl-tools{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 14px;margin:2px 0 10px}.rtl-chk{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#334155;padding-bottom:8px}
+.rtl-scroll{overflow:auto;max-height:620px;border:1px solid #e6ebf2;border-radius:10px}.rtl-table{width:max-content;min-width:100%;margin:0;border-collapse:separate;border-spacing:0}
+.rtl-table th,.rtl-table td{white-space:nowrap;padding:7px 9px;font-size:12.5px;border-bottom:1px solid #eef2f6}.rtl-table thead th{position:sticky;top:0;background:#f6f8fb;z-index:2;font-size:11px}
+.rtl-table .rtl-name{position:sticky;left:0;background:#fff;z-index:1;min-width:150px;font-weight:600;border-right:1px solid #e6ebf2}.rtl-table thead .rtl-name{z-index:3;background:#f6f8fb}
+.rtl-h{text-align:center}.rtl-h span{display:block;font-weight:700;color:#0a1f44}.rtl-h small{display:block;font-weight:500;color:#64748b;text-transform:none;letter-spacing:0}
+.rtl-c{text-align:center;min-width:44px;font-variant-numeric:tabular-nums}.rtl-c.g{background:#dcfce7;color:#14532d}.rtl-c.a{background:#fef3c7;color:#78350f}.rtl-c.r{background:#fde2e2;color:#7f1d1d}.rtl-c.h{background:rgba(37,99,235,calc(var(--h)*.55));color:#0a1f44}.rtl-c.rtl-we{background:#f8fafc;color:#94a3b8}.rtl-c.rtl-best{font-weight:800;box-shadow:inset 0 0 0 2px #0a1f4433}
+.rtl-sum{text-align:right;font-variant-numeric:tabular-nums;background:#fbfcfe}.rtl-sum small{color:#64748b}.rtl-pct.g{color:#15803d;font-weight:700}.rtl-pct.a{color:#b45309;font-weight:700}.rtl-pct.r{color:#c8102e;font-weight:700}
+.rtl-tot td{background:#f1f5f9!important;font-weight:700;border-top:2px solid #dbe3ee}.rtl-tot .rtl-name{background:#f1f5f9}.rtl-avg td{color:#475569;background:#fafbfd}.rtl-avg .rtl-name{font-weight:500;background:#fafbfd}
+.rtl-k{font-weight:600;border-radius:4px;padding:0 5px}.rtl-k.g{background:#dcfce7;color:#14532d}.rtl-k.a{background:#fef3c7;color:#78350f}.rtl-k.r{background:#fde2e2;color:#7f1d1d}
 /* Overview: Recruiting · Onboarding · Order Entry */
 #ovModeBar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin:0 0 14px}
 .ovx-switch{display:inline-flex;gap:3px;padding:4px;background:#e9edf4;border-radius:10px}.ovx-switch button{border:0;background:transparent;padding:8px 18px;border-radius:7px;font:inherit;font-size:13.5px;font-weight:600;color:#475569;cursor:pointer;white-space:nowrap}.ovx-switch button.on{background:#fff;color:#0a1f44;box-shadow:0 1px 2px #0f172a24}
@@ -6569,6 +6579,7 @@ async function renderPeopleView(mode){
           <div class="panel-head"><h3>${mode==='recruiters'?'Recruiter':'Branch'} Detail</h3><div style="display:flex;align-items:center;gap:10px;"><span class="hint">Click a row for its trend · Ctrl/Cmd-click to compare · click a column to sort · &#9660; to filter${mode==='recruiters'?' · Remarks are saved per week':''}</span>${mode==='recruiters'&&canManualEdit()?`<button type="button" class="btn btn-secondary btn-sm" onclick="openManualEntryDialog({})" title="Add or take away schedules, interviews, shows or hires by hand">＋ Adjust numbers</button>`:''}${mode==='branches'&&canMergeBranches()?`<button type="button" class="btn btn-secondary btn-sm" data-merge-open onclick="openBranchMergeFromTable()">${(selectedPieTargets.branches||[]).length>=2?`⇄ Merge ${(selectedPieTargets.branches||[]).length} selected`:`⇄ Merge branches${branchMergeList().length?' · '+branchMergeList().length:''}`}</button>`:''}${copyBtnHtml('peopleTable_'+mode)}${downloadBtnHtml('peopleTable_'+mode, (mode==='recruiters'?'recruiter':'branch')+'-performance.xlsx')}</div></div>
           <table id="peopleTable_${mode}"></table>
         </div>
+        ${mode==='recruiters'?'<div id="recTimeline"></div>':''}
       </div>
 
     </div>
@@ -6615,6 +6626,7 @@ async function renderPeopleView(mode){
     let displayRows = term ? rows.filter(r=> r.name.toLowerCase().includes(term)) : rows;
     Object.entries(peopleColumnFilters[mode]).forEach(([key,set])=>{ if(set) displayRows = displayRows.filter(r=> set.has(key==='division' ? (r.division||'Unassigned') : String(r[key]??''))); });
     renderPeopleTable(mode, rows, displayRows);
+    if(mode==='recruiters'){ clearTimeout(applyFilterAndRender.t); applyFilterAndRender.t=setTimeout(()=>renderRecruiterTimeline(displayRows.map(r=>r.name)),120); }
   }
   peopleRerender[mode] = applyFilterAndRender;
   if(mode==='recruiters' && latestWeekInPeriod) renderSmartAlerts(document.getElementById('smartAlertsHost'), latestWeekInPeriod, rows.map(r=>r.name));
@@ -6624,6 +6636,71 @@ async function renderPeopleView(mode){
 
 }
 
+/* ============== Recruiters page: schedules by day / by week, recruiter against recruiter ============== */
+// Uses the name-free daily counts saved with each week (branchDays), or the candidate lists when those
+// aren't there yet. Rows follow the Recruiter Detail table's search, division and column filters.
+const recTl={grain:'day', from:null, to:null, key:'', vsGoal:true, sort:'total', busy:0};
+async function renderRecruiterTimeline(names){
+  const host=document.getElementById('recTimeline'); if(!host) return;
+  const weeks=selectedPeriodWeeks(), today=ltToday();
+  if(!weeks.length){ host.innerHTML=''; return; }
+  const pFrom=tgShift(weeks[0].weekEndDate,-6), pTo=weeks[weeks.length-1].weekEndDate, key=pFrom+'|'+pTo;
+  if(recTl.key!==key){ recTl.key=key; recTl.from=pFrom; recTl.to=pTo>today?today:pTo; }
+  let from=recTl.from, to=recTl.to>today?today:recTl.to; if(to<from) to=from;
+  const span=tgDays(from,to).length, grain=recTl.grain==='day'&&span>62?'week':recTl.grain;
+  const token=++recTl.busy;
+  host.innerHTML=`<div class="panel rtl"><p class="hint" style="margin:0">Loading schedules by ${grain}…</p></div>`;
+  const wFrom=weekOfDate(from).weekStart, wTo=weekOfDate(to).weekEnd;
+  let src=null, note='';
+  try{ const c=scheduleCountsBetween(wFrom,wTo); src=c.have?c.rows:(canSeeCandidates()?await scheduleRowsBetween(wFrom,wTo):scheduleRowsFromSummary(wFrom,wTo)); if(src&&src.missingWeeks) note=`Day counts for ${src.missingWeeks} week${src.missingWeeks===1?'':'s'} aren’t ready yet — they appear after the next upload.`; }
+  catch(e){ src=null; }
+  if(token!==recTl.busy||!host.isConnected) return;
+  const want=new Set(names);
+  const rows=(src||[]).filter(c=>c.date>=from&&c.date<=to&&want.has(c.recruiter));
+  const cols=grain==='day'?tgDays(from,to).filter(d=>{ const w=new Date(d+'T12:00:00Z').getUTCDay(); return (w&&w<6)||rows.some(c=>c.date===d); }):[...new Set(tgDays(from,to).map(d=>weekOfDate(d).weekEnd))];
+  const colOf=d=>grain==='day'?d:weekOfDate(d).weekEnd;
+  const by={}; rows.forEach(c=>{ const r=by[c.recruiter]||(by[c.recruiter]={}), k=colOf(c.date); r[k]=(r[k]||0)+(c.n||1); });
+  // target per cell: the week's goal (÷ 5 for a weekday; part weeks count only their weekdays)
+  const target=(n,c)=>{ if(grain==='day'){ const w=new Date(c+'T12:00:00Z').getUTCDay(); return w&&w<6?ltWeeklyGoal(n,c)/5:null; }
+   const ws=weekOfDate(c).weekStart, lo=ws>from?ws:from, hi=c<to?c:to; return ltWeeklyGoal(n,c)*wdIn(lo,hi)/5; };
+  const people=names.map(n=>{ const r=by[n]||{}, vals=cols.map(c=>r[c]||0), total=vals.reduce((a,b)=>a+b,0), active=vals.filter(v=>v).length;
+    const tgt=cols.reduce((a,c)=>a+(target(n,c)||0),0); return {n, r, vals, total, active, tgt, best:Math.max(0,...vals)}; })
+   .filter(p=>p.total||names.length<=40);
+  const sorters={total:(a,b)=>b.total-a.total||a.n.localeCompare(b.n), name:(a,b)=>a.n.localeCompare(b.n), goal:(a,b)=>(b.tgt?b.total/b.tgt:0)-(a.tgt?a.total/a.tgt:0)||b.total-a.total, avg:(a,b)=>(b.active?b.total/b.active:0)-(a.active?a.total/a.active:0)};
+  people.sort(sorters[recTl.sort]||sorters.total);
+  const colTot=cols.map((c,i)=>people.reduce((a,p)=>a+p.vals[i],0)), grand=colTot.reduce((a,b)=>a+b,0);
+  const max=Math.max(1,...people.flatMap(p=>p.vals));
+  const one=v=>v==null||!isFinite(v)?'–':(Math.round(v*10)/10).toLocaleString();
+  const head=c=>grain==='day'?`<span>${new Date(c+'T12:00:00Z').toLocaleDateString(undefined,{weekday:'short',timeZone:'UTC'})}</span><small>${new Date(c+'T12:00:00Z').toLocaleDateString(undefined,{month:'short',day:'numeric',timeZone:'UTC'})}</small>`
+   :`<span>Wk ${(weeksData.find(w=>w.weekEndDate===c)||{}).weekNumber||weekOfDate(c).number}</span><small>${new Date(weekOfDate(c).weekStart+'T12:00:00Z').toLocaleDateString(undefined,{month:'short',day:'numeric',timeZone:'UTC'})}–${new Date(c+'T12:00:00Z').toLocaleDateString(undefined,{month:'short',day:'numeric',timeZone:'UTC'})}${c>to?' · so far':''}</small>`;
+  const cell=(p,i)=>{ const v=p.vals[i], c=cols[i], t=recTl.vsGoal?target(p.n,c):null, we=grain==='day'&&!(t||t===0)&&recTl.vsGoal;
+   let cls='', style='';
+   if(t){ const r=v/t; cls=r>=1?'g':r>=.5?'a':'r'; } else if(!recTl.vsGoal&&v){ style=`style="--h:${(v/max).toFixed(2)}"`; cls='h'; }
+   const best=v&&v===p.best&&p.active>1?' rtl-best':'';
+   return `<td class="rtl-c ${cls}${best}${we?' rtl-we':''}" ${style} title="${escapeHtml(p.n)} · ${grain==='day'?fmtDate(c):'Week ending '+fmtDate(c)}: ${fmtNum(v)} schedule${v===1?'':'s'}${t?` · target ${one(t)}`:''}">${v?fmtNum(v):'<span class="ta-n">·</span>'}</td>`; };
+  const unit=grain==='day'?'day':'week';
+  host.innerHTML=`<div class="panel rtl" data-section="rec.timeline"><div class="panel-head"><div><h3>Schedules by ${unit} — recruiter comparison</h3><span class="hint">${fmtNum(people.length)} recruiter${people.length===1?'':'s'} from the table above (search, division and filters apply). ${recTl.vsGoal?`Colours compare with each recruiter’s weekly goal${grain==='day'?' ÷ 5 per weekday':''}: <b class="rtl-k g">at goal</b> <b class="rtl-k a">half way</b> <b class="rtl-k r">under half</b>.`:'Darker = more schedules.'} Bold = their best ${unit}.</span></div>${copyBtnHtml('recTlTable')}${Server.can('export')?downloadBtnHtml('recTlTable','recruiter-schedules-by-'+unit+'.xlsx'):''}</div>
+   <div class="rtl-tools">
+    <div class="oe-group" role="tablist" aria-label="By"><button type="button" data-rtl-g="day" class="${grain==='day'?'on':''}" ${span>62?'disabled title="Pick 62 days or fewer to see days"':''}>Day</button><button type="button" data-rtl-g="week" class="${grain==='week'?'on':''}">Week</button></div>
+    <div class="onb-range"><label>From<input type="date" id="rtlFrom" value="${from}" max="${today}"></label><label>To<input type="date" id="rtlTo" value="${to}" max="${today}"></label></div>
+    ${from!==pFrom||to!==(pTo>today?today:pTo)?'<button type="button" class="link-btn" id="rtlReset">Back to the selected period</button>':''}
+    <label class="cand-field"><span>Sort</span><select id="rtlSort">${[['total','Most schedules'],['goal','% of goal'],['avg','Per active '+unit],['name','Name']].map(([k,l])=>`<option value="${k}" ${recTl.sort===k?'selected':''}>${l}</option>`).join('')}</select></label>
+    <label class="rtl-chk"><input type="checkbox" id="rtlGoal" ${recTl.vsGoal?'checked':''}> Compare with goal</label>
+   </div>
+   ${note?`<p class="hint">${escapeHtml(note)}</p>`:''}${recTl.grain==='day'&&grain==='week'?'<p class="hint">More than 62 days picked — showing weeks.</p>':''}
+   ${!src?'<div class="lt-empty"><strong>Daily schedule counts aren’t available for these weeks yet.</strong><span>They’re added after the next upload, or when an admin opens the dashboard.</span></div>':people.length?`<div class="rtl-scroll"><table class="users-table rtl-table" id="recTlTable"><thead><tr><th class="rtl-name">Recruiter</th>${cols.map(c=>`<th class="rtl-h">${head(c)}</th>`).join('')}<th class="rtl-sum">Total</th>${recTl.vsGoal?'<th class="rtl-sum">Goal</th><th class="rtl-sum">% of goal</th>':''}<th class="rtl-sum">Per active ${unit}</th><th class="rtl-sum">Active ${unit}s</th></tr></thead><tbody>
+    ${people.map(p=>`<tr><td class="rtl-name">${escapeHtml(p.n)}</td>${cols.map((c,i)=>cell(p,i)).join('')}<td class="rtl-sum"><strong>${fmtNum(p.total)}</strong></td>${recTl.vsGoal?`<td class="rtl-sum">${one(p.tgt)}</td><td class="rtl-sum rtl-pct ${p.tgt?(p.total/p.tgt>=1?'g':p.total/p.tgt>=.5?'a':'r'):''}">${p.tgt?Math.round(p.total/p.tgt*100)+'%':'–'}</td>`:''}<td class="rtl-sum">${one(p.active?p.total/p.active:null)}</td><td class="rtl-sum">${p.active} / ${cols.length}</td></tr>`).join('')}
+    <tr class="rtl-tot"><td class="rtl-name"><strong>All shown</strong></td>${colTot.map(v=>`<td class="rtl-c">${fmtNum(v)}</td>`).join('')}<td class="rtl-sum"><strong>${fmtNum(grand)}</strong></td>${recTl.vsGoal?(()=>{ const t=people.reduce((a,p)=>a+p.tgt,0); return `<td class="rtl-sum">${one(t)}</td><td class="rtl-sum">${t?Math.round(grand/t*100)+'%':'–'}</td>`; })():''}<td class="rtl-sum">${one(cols.length?grand/cols.length:null)}<small> / ${unit}</small></td><td></td></tr>
+    <tr class="rtl-avg"><td class="rtl-name">Average per recruiter</td>${colTot.map(v=>`<td class="rtl-c">${one(people.length?v/people.length:null)}</td>`).join('')}<td class="rtl-sum">${one(people.length?grand/people.length:null)}</td>${recTl.vsGoal?'<td></td><td></td>':''}<td></td><td></td></tr>
+   </tbody></table></div>`:'<p class="hint">No schedules for these recruiters in these dates.</p>'}
+  </div>`;
+  const $=s=>host.querySelector(s);
+  host.querySelectorAll('[data-rtl-g]').forEach(b=>b.onclick=()=>{ recTl.grain=b.dataset.rtlG; renderRecruiterTimeline(names); });
+  let t; ['#rtlFrom','#rtlTo'].forEach(s=>$(s)?.addEventListener('change',()=>{ clearTimeout(t); t=setTimeout(()=>{ const a=$('#rtlFrom').value, b=$('#rtlTo').value; if(!a||!b) return; recTl.from=a<b?a:b; recTl.to=a<b?b:a; renderRecruiterTimeline(names); },30); }));
+  $('#rtlReset')?.addEventListener('click',()=>{ recTl.key=''; renderRecruiterTimeline(names); });
+  $('#rtlSort')?.addEventListener('change',e=>{ recTl.sort=e.target.value; renderRecruiterTimeline(names); });
+  $('#rtlGoal')?.addEventListener('change',e=>{ recTl.vsGoal=e.target.checked; renderRecruiterTimeline(names); });
+}
 let entityPopoverRevision=0;
 let entityPopoverAnchor=null;
 function closeEntityPopover(restoreFocus=false){
@@ -11713,7 +11790,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.63.0';   // shown only in the browser tab title
+const APP_VERSION = '4.64.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
