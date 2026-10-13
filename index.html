@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.73.2</title>
+<title>Performance Dashboard · v4.73.5</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -1130,6 +1130,7 @@ button.onb-tile{font:inherit;text-align:left;cursor:pointer}button.onb-tile:disa
 .c-complete{background:#16a34a}.c-i9{background:#60a5fa}.c-ip{background:#94a3b8}.c-lvm{background:#f59e0b}.c-nr{background:#c8102e}.c-other{background:#a78bfa}
 .onb-gorep{font-size:13px;font-weight:600}.onb-gorep-foot{margin:14px 0 0;text-align:center}
 .onb-lock.hold{background:#fff7e6;border-color:#f5d48a;color:#7a4b00}
+.ta-off-names{margin-top:3px;font-weight:400}.ta-off-names summary{cursor:pointer;font-size:11.5px;color:#1d4ed8;list-style:revert}.ta-off-names ul{list-style:none;margin:6px 0 4px;padding:0;display:flex;flex-direction:column;gap:3px}.ta-off-names li{display:flex;gap:8px;align-items:baseline;font-size:12.5px}.ta-off-names li span{color:#64748b;font-size:11.5px}.ta-off-names small{font-size:11px;color:#64748b}
 .onb-counts{display:inline-block;margin-left:6px;font-size:10.5px;font-weight:700;color:#fff;border-radius:999px;padding:1px 7px;vertical-align:middle}
 .onb-cat{display:inline-block;font-size:11px;font-weight:700;border-radius:4px;padding:2px 7px;color:#fff;white-space:nowrap}
 .onb-link.prev{background:#eef3fe;color:#1e3a8a;margin-left:6px}
@@ -10756,7 +10757,7 @@ async function renderUsersAdmin(){
   const counts={all:usersCache.length, admin:usersCache.filter(u=>u.role!=='user').length, user:usersCache.filter(u=>u.role==='user').length, off:usersCache.filter(u=>!u.active).length};
   host.innerHTML = `<div class="panel ua-panel">
     <div class="ua-head"><div><h3>Users &amp; access</h3><span class="hint">${window.DV_MODE?'Add people by their work email and choose what they can open. They sign in with Microsoft 365.':'Add people, set their passwords and choose what they can open.'}</span></div><button class="btn btn-primary" id="addUserBtn">+ Add user</button></div>
-    <div class="ua-bar"><input type="search" id="uaSearch" placeholder="Search people" aria-label="Search people"><div class="ua-filter" role="tablist">${[['all','Everyone'],['admin','Admins'],['user','Users'],['off','Disabled']].map(([k,l])=>`<button type="button" data-ua-f="${k}" class="${(window.__uaF||'all')===k?'on':''}">${l} <b>${counts[k]}</b></button>`).join('')}</div></div>
+    <div class="ua-bar"><input type="search" id="uaSearch" name="ua-find-person" placeholder="Search people" aria-label="Search people" autocomplete="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore data-form-type="other" readonly onfocus="this.removeAttribute('readonly')" value="${escapeHtml(window.__uaQ||'')}"><div class="ua-filter" role="tablist">${[['all','Everyone'],['admin','Admins'],['user','Users'],['off','Disabled']].map(([k,l])=>`<button type="button" data-ua-f="${k}" class="${(window.__uaF||'all')===k?'on':''}">${l} <b>${counts[k]}</b></button>`).join('')}</div></div>
     <div id="userForm"></div>
     <div style="overflow-x:auto"><table class="users-table ua-table"><thead><tr><th>Person</th><th>Can open</th><th>Status</th><th>Last sign-in</th><th></th></tr></thead><tbody>
     ${usersCache.map(u=>`<tr data-ua-name="${escapeHtml(String(u.name||'').toLowerCase())}" data-ua-role="${u.role==='user'?'user':'admin'}" data-ua-off="${u.active?0:1}">
@@ -10772,7 +10773,10 @@ async function renderUsersAdmin(){
   const applyUa=()=>{ const q=(host.querySelector('#uaSearch').value||'').trim().toLowerCase(), f=window.__uaF||'all'; let shown=0;
     host.querySelectorAll('tr[data-ua-name]').forEach(tr=>{ const ok=(!q||tr.dataset.uaName.includes(q))&&(f==='all'||(f==='off'?tr.dataset.uaOff==='1':tr.dataset.uaRole===f)); tr.hidden=!ok; if(ok) shown++; });
     host.querySelector('.ua-empty').hidden=!!shown; };
-  host.querySelector('#uaSearch').oninput=applyUa;
+  const uaS=host.querySelector('#uaSearch');
+  uaS.oninput=e=>{ if(e.isTrusted!==false) window.__uaQ=uaS.value; applyUa(); };
+  // autofill can still drop the signed-in name in a moment later: undo anything the person didn't type
+  [60,400,1200].forEach(ms=>setTimeout(()=>{ if(uaS.isConnected&&uaS.value!==(window.__uaQ||'')&&document.activeElement!==uaS){ uaS.value=window.__uaQ||''; applyUa(); } },ms));
   host.querySelectorAll('[data-ua-f]').forEach(b=>b.onclick=()=>{ window.__uaF=b.dataset.uaF; host.querySelectorAll('[data-ua-f]').forEach(x=>x.classList.toggle('on',x===b)); applyUa(); });
   applyUa();
   host.querySelectorAll('[data-team-user]').forEach(b=>b.onclick=()=>ltAdminOpen(usersCache.find(u=>String(u.id)===b.dataset.teamUser)));
@@ -11507,7 +11511,8 @@ function ltPick(from,to,mode0,anchor0){
  const today=ltToday();
  if(from&&to){ if(to<from)[from,to]=[to,from]; const w=weekOfDate(from), full=from===w.weekStart&&to===w.weekEnd;
   const mode=from===to?'day':full?'week':'period'; return {mode, anchor:to, p:{from,to,label:mode==='day'?'Day':mode==='week'?'Week':'Dates'}}; }
- const mode=mode0||ltDefaultMode(), anchor=anchor0||today; return {mode, anchor, p:ltRange(mode,anchor)};
+ // nothing picked yet: today (an older saved Day / Week / Month view is ignored)
+ return {mode:'day', anchor:today, p:ltRange('day',today)};
 }
 function ltStep(p,dir){ const n=Math.round((new Date(p.to+'T12:00:00Z')-new Date(p.from+'T12:00:00Z'))/864e5)+1, w=weekOfDate(p.from), full=p.from===w.weekStart&&p.to===w.weekEnd;
  const k=full?7:n; return {from:tgShift(p.from,dir*k), to:tgShift(p.to,dir*k)}; }
@@ -11828,7 +11833,7 @@ function ltLeadsHtmlBuild(p,cutoff,mode,today,division){
   const pace=r.members.reduce((a,x)=>a+work.filter(d=>tgActive(g,x.label,d)).reduce((s2,d)=>s2+ltDailyGoal(x.label,d),0),0);
   const people=r.members.length; if(!people) return null;
   const hprDen=r.hprDenominator||0;
-  return {people,T,pace,goal:rate(T.schedules,pace),show:rate(T.shows,T.scheduledDateOf,3),noshow:(T.shows||0)+(T.noShows||0)>=3?rate(T.noShows,T.scheduledDateOf,3):null,hire:rate(T.i9,T.shows,3),
+  return {members:r.members,people,T,pace,goal:rate(T.schedules,pace),show:rate(T.shows,T.scheduledDateOf,3),noshow:(T.shows||0)+(T.noShows||0)>=3?rate(T.noShows,T.scheduledDateOf,3):null,hire:rate(T.i9,T.shows,3),
    hpr:T.i9==null||!hprDen?null:T.i9/hprDen,
    behind:r.members.filter(x=>{const pc=work.filter(d=>tgActive(g,x.label,d)).reduce((s2,d)=>s2+ltDailyGoal(x.label,d),0);return pc>0&&(x.schedules||0)<pc*.5;}).length};
  };
@@ -11872,7 +11877,7 @@ function ltLeadsHtmlBuild(p,cutoff,mode,today,division){
  <div class="hp-table-wrap"><table class="ep-table ta-matrix" id="ltLeadsTable"><thead><tr><th rowspan="2">#</th><th rowspan="2">Team lead</th><th rowspan="2">Recruiters</th><th class="ta-grp">Schedules</th><th class="ta-grp" colspan="3">Interviews</th><th class="ta-grp" colspan="2">Hires</th></tr>
  <tr><th>vs goal<small>so far · min 90%</small></th><th>Interviews</th><th>Shows<small>show rate · min 70%</small></th><th>No shows<small>no-show rate · under 20%</small></th><th>Hires<small>of shows · avg ${pc(avg.hire)}</small></th><th>Per recruiter<small>min 15 a week</small></th></tr></thead>
  <tbody>${sorted.map((r,i)=>`<tr${r.tm.id===String(ltState.viewingId||Server.user.id)?' class="lt-mine"':''}><td>${i+1}</td><td>${lead(r)}</td><td>${r.people}${r.behind?`<small class="ta-behind">${r.behind} behind</small>`:''}</td>${cell('goal',r.goal,`${fmtNum(r.T.schedules||0)} / ${tgNumber(r.pace)}`)}<td class="ta-cell ta-n ta-plain">${r.T.scheduledDateOf==null?'–':fmtNum(r.T.scheduledDateOf)}</td>${cell('show',r.show,r.T.scheduledDateOf?`${fmtNum(r.T.shows||0)} shows`:'')}${cell('noshow',r.noshow,r.T.scheduledDateOf?`${fmtNum(r.T.noShows||0)} no shows`:'')}<td class="ta-cell ta-${band.hire(r.hire)||'n'}">${r.T.i9==null?'–':fmtNum(r.T.i9)}<small>${r.hire==null?'':pc(r.hire)+' of shows'}</small></td>${cell('hpr',r.hpr,'')}</tr>`).join('')}</tbody>
- <tfoot><tr><td></td><td>All teams</td><td>${rows.reduce((a,r)=>a+r.people,0)}</td><td>${pc(rate(all.schedules,all.pace))}<small class="hint"> ${fmtNum(all.schedules)} / ${tgNumber(all.pace)}</small></td><td>${fmtNum(all.scheduledDateOf)}</td><td>${pc(rate(all.shows,all.scheduledDateOf,3))}<small class="hint"> ${fmtNum(all.shows)}</small></td><td>${pc(rate(all.noShows,all.scheduledDateOf,3))}<small class="hint"> ${fmtNum(all.noShows)}</small></td><td>${fmtNum(all.i9)}<small class="hint"> ${pc(avg.hire)}</small></td><td></td></tr>${[offTeam&&['Not on a team',offTeam,'ta-off'],overall&&['All recruiters',overall,'ta-overall']].filter(Boolean).map(([l,x,cls])=>`<tr class="${cls}"><td></td><td>${l}${cls==='ta-overall'?'<small class="ta-team">everyone — all teams + not on a team</small>':'<small class="ta-team">recruiters who aren’t on any lead’s team</small>'}</td><td>${x.people}</td><td>${pc(x.goal)}<small class="hint"> ${fmtNum(x.T.schedules||0)} / ${tgNumber(x.pace)}</small></td><td>${x.T.scheduledDateOf==null?'–':fmtNum(x.T.scheduledDateOf)}</td><td>${pc(x.show)}<small class="hint"> ${fmtNum(x.T.shows||0)}</small></td><td>${pc(x.noshow)}<small class="hint"> ${fmtNum(x.T.noShows||0)}</small></td><td>${x.T.i9==null?'–':fmtNum(x.T.i9)}<small class="hint"> ${pc(x.hire)}</small></td><td>${x.hpr==null?'–':x.hpr.toFixed(1)}</td></tr>`).join('')}</tfoot></table></div>
+ <tfoot><tr><td></td><td>All teams</td><td>${rows.reduce((a,r)=>a+r.people,0)}</td><td>${pc(rate(all.schedules,all.pace))}<small class="hint"> ${fmtNum(all.schedules)} / ${tgNumber(all.pace)}</small></td><td>${fmtNum(all.scheduledDateOf)}</td><td>${pc(rate(all.shows,all.scheduledDateOf,3))}<small class="hint"> ${fmtNum(all.shows)}</small></td><td>${pc(rate(all.noShows,all.scheduledDateOf,3))}<small class="hint"> ${fmtNum(all.noShows)}</small></td><td>${fmtNum(all.i9)}<small class="hint"> ${pc(avg.hire)}</small></td><td></td></tr>${[offTeam&&['Not on a team',offTeam,'ta-off'],overall&&['All recruiters',overall,'ta-overall']].filter(Boolean).map(([l,x,cls])=>`<tr class="${cls}"><td></td><td>${l}${cls==='ta-overall'?'<small class="ta-team">everyone — all teams + not on a team</small>':`<details class="ta-off-names"><summary>${x.people} recruiter${x.people===1?'':'s'} who aren’t on any lead’s team — show names</summary><ul>${(x.members||[]).slice().sort((a,b)=>(b.schedules||0)-(a.schedules||0)||a.label.localeCompare(b.label)).map(m=>`<li><b>${escapeHtml(m.label)}</b><span>${fmtNum(m.schedules||0)} schedules · ${m.days} day${m.days===1?'':'s'} without a team</span></li>`).join('')}</ul>${Server.isAdmin()?'<small>Add them to a lead’s team in Settings → Users → <b>Team</b>.</small>':''}</details>`}</td><td>${x.people}</td><td>${pc(x.goal)}<small class="hint"> ${fmtNum(x.T.schedules||0)} / ${tgNumber(x.pace)}</small></td><td>${x.T.scheduledDateOf==null?'–':fmtNum(x.T.scheduledDateOf)}</td><td>${pc(x.show)}<small class="hint"> ${fmtNum(x.T.shows||0)}</small></td><td>${pc(x.noshow)}<small class="hint"> ${fmtNum(x.T.noShows||0)}</small></td><td>${x.T.i9==null?'–':fmtNum(x.T.i9)}<small class="hint"> ${pc(x.hire)}</small></td><td>${x.hpr==null?'–':x.hpr.toFixed(1)}</td></tr>`).join('')}</tfoot></table></div>
  <p class="hint">“All teams” covers only recruiters on a team; “All recruiters” adds everyone else and matches Performance Overview${p.to>today?' (Overview compares this week against the full-week goal, so its goal % is lower mid-week; here goals count only the working days so far)':''}. Click a team lead to open their team on My Team. Hires per recruiter is per recruiter per week, the same as on Performance Overview.</p></section>`;
 }
 const leadsState={mode:null,anchor:null,division:''};
@@ -12041,7 +12046,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.73.2';   // shown only in the browser tab title
+const APP_VERSION = '4.73.5';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
