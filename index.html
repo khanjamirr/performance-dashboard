@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.72.0</title>
+<title>Performance Dashboard · v4.73.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -8327,8 +8327,8 @@ function saveNav(){
   if(!Server.user) return;
   const nav={view:currentView,
     hist:currentView==='history'?{mode:historyState.mode,name:historyState.name,from:historyState.from,selWeek:historyState.selWeek,range:historyState.range,view:historyState.view}:null,
-    lt:{viewingId:ltState.viewingId,rangeMode:ltState.rangeMode,anchor:ltState.anchor,division:ltState.division,tab:ltState.tab,brTab:ltState.brTab},
-    leads:{mode:leadsState.mode,anchor:leadsState.anchor,division:leadsState.division},
+    lt:{viewingId:ltState.viewingId,rangeMode:ltState.rangeMode,anchor:ltState.anchor,from:ltState.from,to:ltState.to,division:ltState.division,tab:ltState.tab,brTab:ltState.brTab},
+    leads:{mode:leadsState.mode,anchor:leadsState.anchor,from:leadsState.from,to:leadsState.to,division:leadsState.division},
     perf:{week:currentWeekEndDate,sel:selectedWeekEndDates,div:universalDivision}};
   try{ sessionStorage.setItem(NAV_KEY(), JSON.stringify(nav)); }catch(e){}
 }
@@ -11502,6 +11502,21 @@ function ltCards(r,prev,series){
  return cards.join('').replaceAll('data-section="perf.kpi.','data-section="team.kpi.');
 }
 /* One shared period drives the team page and its drill-down. */
+// My Team / Team Leads: one date button. One day = Day view, a Sunday–Saturday week = Week view, anything else = those dates.
+function ltPick(from,to,mode0,anchor0){
+ const today=ltToday();
+ if(from&&to){ if(to<from)[from,to]=[to,from]; const w=weekOfDate(from), full=from===w.weekStart&&to===w.weekEnd;
+  const mode=from===to?'day':full?'week':'period'; return {mode, anchor:to, p:{from,to,label:mode==='day'?'Day':mode==='week'?'Week':'Dates'}}; }
+ const mode=mode0||ltDefaultMode(), anchor=anchor0||today; return {mode, anchor, p:ltRange(mode,anchor)};
+}
+function ltStep(p,dir){ const n=Math.round((new Date(p.to+'T12:00:00Z')-new Date(p.from+'T12:00:00Z'))/864e5)+1, w=weekOfDate(p.from), full=p.from===w.weekStart&&p.to===w.weekEnd;
+ const k=full?7:n; return {from:tgShift(p.from,dir*k), to:tgShift(p.to,dir*k)}; }
+function ltDatesHtml(prefix,p,today){
+ const nxt=ltStep(p,1);
+ return `<div class="lt-period lt-dates" role="group" aria-label="Reporting dates"><button class="btn btn-secondary" id="${prefix}Prev" aria-label="Earlier">←</button>
+  <div class="dpr-field"><span>Dates</span>${dateRangeBtn(prefix+'From',prefix+'To',p.from,p.to,'',true)}</div>
+  <button class="btn btn-secondary" id="${prefix}Next" aria-label="Later" ${nxt.from>today?'disabled':''}>→</button><button class="btn btn-secondary" id="${prefix}Today">Today</button></div>`;
+}
 function ltRange(mode,anchor=ltToday()){
  if(mode==='day')return {from:anchor,to:anchor,label:'Day'};
  if(mode==='month'){const from=anchor.slice(0,7)+'-01',d=new Date(from+'T12:00:00Z');d.setUTCMonth(d.getUTCMonth()+1);return {from,to:tgShift(d.toISOString().slice(0,10),-1),label:'Month'};}
@@ -11555,7 +11570,7 @@ function renderTeamGroups(){
   if(!ltState.loaded&&!ltState.error&&!ltState.loading)ltLoad();return;
  }
  const a=ltState.assignment,now=new Date(),today=ltToday(now),zone=Intl.DateTimeFormat().resolvedOptions().timeZone;
- const anchor=ltState.anchor||today,mode=ltState.rangeMode||ltDefaultMode(now),p=ltRange(mode,anchor),cutoff=p.to>today?today:p.to;
+ const pk=ltPick(ltState.from,ltState.to,ltState.rangeMode,ltState.anchor),anchor=pk.anchor,mode=pk.mode,p=pk.p,cutoff=p.to>today?today:p.to;
  const g={...ltGroup(a),division:ltState.division},report=ltReport(g,p.from,p.to,today);
  // Day by day: the whole week around the chosen day (Day view), otherwise the selected period.
  const dw=mode==='day'?weekOfDate(p.from):null, dFrom=dw?dw.weekStart:p.from, dTo=dw?dw.weekEnd:p.to, dCut=dTo>today?today:dTo;
@@ -11572,7 +11587,7 @@ function renderTeamGroups(){
  const rangeText=mode==='day'?fmtDate(p.from):`${fmtDate(p.from)} – ${fmtDate(p.to)}`;
  host.innerHTML=`<div class="lt-sticky">
  <header class="lt-toolbar">${canViewLeads()?'<button type="button" class="btn btn-secondary btn-sm lt-back" id="ltBackLeads">← All team leads</button>':''}<div class="lt-title"><h2>${escapeHtml(a.team_name)}</h2><span>${escapeHtml(leader)} · ${escapeHtml(a.recruiter_name)}</span></div>${ltTeamPicker()}
- <div class="lt-period" role="group" aria-label="Team reporting period"><label class="lt-field">View<select id="ltRangeMode"><option value="day" ${mode==='day'?'selected':''}>Day</option><option value="week" ${mode==='week'?'selected':''}>Week</option><option value="month" ${mode==='month'?'selected':''}>Month</option></select></label><button class="btn btn-secondary" id="ltPrevious" aria-label="Previous ${mode}">←</button><label class="lt-field">${mode==='month'?'Month':mode==='week'?'Week ending':'Date'}<input id="ltAnchor" type="${mode==='month'?'month':'date'}" ${mode==='week'?'data-dp="week"':''} value="${mode==='month'?anchor.slice(0,7):mode==='week'?p.to:anchor}" max="${mode==='month'?today.slice(0,7):mode==='week'?weekOfDate(today).weekEnd:today}"></label><button class="btn btn-secondary" id="ltNext" aria-label="Next ${mode}" ${p.to>=today?'disabled':''}>→</button><button class="btn btn-secondary" id="ltCurrent">${mode==='day'?'Today':mode==='month'?'This month':'This week'}</button></div>
+ ${ltDatesHtml('lt',p,today)}
  <label class="lt-field">Division<select id="ltDivision"><option value="">All team divisions</option>${divisions.map(d=>`<option ${d===g.division?'selected':''}>${escapeHtml(d)}</option>`).join('')}</select></label><button class="btn btn-secondary" id="ltRefresh" aria-label="Refresh team" title="Refresh team">↻</button></header>
  <div class="lt-scope"><span><strong>${rangeText}</strong> · ${escapeHtml(g.division||'All divisions')}${p.to>today?' · through today':''}</span><span title="Dates and cutoff times use your system timezone">${escapeHtml(zone)}</span></div>
  <section class="lt-summary" aria-label="Team performance summary" data-section="team.summary"><div class="kpi-grid mk-grid mk-team">${ltCompactCards(report, mode==='month'?Math.round(ltWorkdays(p.from,cutoff).length/5*10)/10:1, mode==='day'&&isHeldShowDay(p.from))}</div></section>
@@ -11603,11 +11618,11 @@ function renderTeamGroups(){
  if(Server.isAdmin()||(canViewLeads()&&String(ltState.viewingId||'')!==String(Server.user.id))){ document.querySelectorAll('#navList button[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view==='leads')); layoutNav(); }
  host.querySelector('#ltBackLeads')?.addEventListener('click',()=>{ currentView='leads'; document.querySelectorAll('#navList button[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view==='leads')); refreshUI(); window.scrollTo(0,0); });
  host.querySelector('#ltDivision').onchange=e=>{ltState.division=e.target.value;renderTeamGroups();};
- host.querySelector('#ltRangeMode').onchange=e=>{ltState.rangeMode=e.target.value;renderTeamGroups();};
- host.querySelector('#ltAnchor').onchange=e=>{const value=mode==='month'?e.target.value+'-01':e.target.value;if(tgDate(value)&&value<=(mode==='week'?weekOfDate(today).weekEnd:today)){ltState.anchor=mode==='week'?weekOfDate(value).weekEnd:value;renderTeamGroups();}};
- host.querySelector('#ltPrevious').onclick=()=>{ltState.anchor=ltMoveRange(mode,anchor,-1);renderTeamGroups();};
- host.querySelector('#ltNext').onclick=()=>{const next=ltMoveRange(mode,anchor,1);if(next<=(mode==='week'?weekOfDate(today).weekEnd:today)){ltState.anchor=next;renderTeamGroups();}};
- host.querySelector('#ltCurrent').onclick=()=>{ltState.anchor=null;renderTeamGroups();};
+ const ltSet=(f,t)=>{ltState.from=f;ltState.to=t;renderTeamGroups();};
+ host.querySelector('#ltTo').addEventListener('change',()=>ltSet(host.querySelector('#ltFrom').value,host.querySelector('#ltTo').value));
+ host.querySelector('#ltPrev').onclick=()=>{const r=ltStep(p,-1);ltSet(r.from,r.to);};
+ host.querySelector('#ltNext').onclick=()=>{const r=ltStep(p,1);if(r.from<=today)ltSet(r.from,r.to>today&&mode!=='week'?today:r.to);};
+ host.querySelector('#ltToday').onclick=()=>ltSet(today,today);
  host.querySelector('#ltRefresh').onclick=()=>{if(Server.isAdmin())ltState.users=null;ltLoad();};
  host.querySelector('#ltDirectoryRetry')?.addEventListener('click',()=>{ltState.users=null;ltLoad();});
  host.querySelectorAll('[data-lt-person]').forEach(b=>b.onclick=()=>{epState.week=weekOfDate(p.to).weekEnd;openHistoryPage('recruiters',b.dataset.ltPerson);});
@@ -11859,15 +11874,12 @@ const leadsState={mode:null,anchor:null,division:''};
 function renderLeadsView(){
  const host=document.getElementById('view-leads'); if(!host||!Server.user) return;
  if(!canViewLeads()){ host.innerHTML='<section class="panel"><p>Team Leads needs the “Team Leads” right — ask an admin.</p></section>'; return; }
- const today=ltToday(), mode=leadsState.mode||ltDefaultMode(), anchor=leadsState.anchor||today, p=ltRange(mode,anchor), cutoff=p.to>today?today:p.to;
+ const today=ltToday(), pk=ltPick(leadsState.from,leadsState.to,leadsState.mode,leadsState.anchor), mode=pk.mode, anchor=pk.anchor, p=pk.p, cutoff=p.to>today?today:p.to;
  const rangeText=mode==='day'?fmtDate(p.from):`${fmtDate(p.from)} – ${fmtDate(p.to)}`;
  const maxAnchor=mode==='week'?weekOfDate(today).weekEnd:today;
  const divs=[...DIVISIONS,'Unassigned'];
  host.innerHTML=`<div class="lt-sticky"><header class="lt-toolbar"><div class="lt-title"><h2>Team Leads</h2><span>All teams · ${escapeHtml(leadsState.division||'All divisions')}</span></div>
-  <div class="lt-period" role="group" aria-label="Reporting period"><label class="lt-field">View<select id="ldMode"><option value="day" ${mode==='day'?'selected':''}>Day</option><option value="week" ${mode==='week'?'selected':''}>Week</option><option value="month" ${mode==='month'?'selected':''}>Month</option></select></label>
-  <button class="btn btn-secondary" id="ldPrev" aria-label="Previous ${mode}">←</button>
-  <label class="lt-field">${mode==='month'?'Month':mode==='week'?'Week ending':'Date'}<input id="ldAnchor" type="${mode==='month'?'month':'date'}" value="${mode==='month'?p.from.slice(0,7):mode==='week'?p.to:p.from}" max="${mode==='month'?today.slice(0,7):maxAnchor}"></label>
-  <button class="btn btn-secondary" id="ldNext" aria-label="Next ${mode}" ${ltMoveRange(mode,anchor,1)>maxAnchor?'disabled':''}>→</button><button class="btn btn-secondary" id="ldNow">This ${mode}</button></div>
+  ${ltDatesHtml('ld',p,today)}
   <label class="lt-field">Division<select id="ldDiv"><option value="">All divisions</option>${divs.map(d=>`<option ${d===leadsState.division?'selected':''}>${escapeHtml(d)}</option>`).join('')}</select></label></header>
   <div class="lt-scope"><span><strong>${rangeText}</strong>${p.to>today?' · through today':''}</span></div></div>
   <div id="ldBody"><section class="panel"><p class="hint">Loading teams…</p></section></div>`;
@@ -11875,18 +11887,18 @@ function renderLeadsView(){
  const fill=()=>{ const body=host.querySelector('#ldBody'); if(!body) return; body.innerHTML=ltLeadsHtml(p,cutoff,mode,today,leadsState.division); bindLeadsBody(); };
  if(ltLeads.teams&&ltLeadsMemo.html) fill(); else requestAnimationFrame(()=>setTimeout(fill,0));
  if(ltLeads.teams) setTimeout(()=>ltLoadLeads(),50);
- host.querySelector('#ldMode').onchange=e=>{leadsState.mode=e.target.value;go();};
- host.querySelector('#ldAnchor').onchange=e=>{const v=mode==='month'?e.target.value+'-01':e.target.value;if(tgDate(v)&&v<=maxAnchor){leadsState.anchor=mode==='week'?weekOfDate(v).weekEnd:v;go();}};
- host.querySelector('#ldPrev').onclick=()=>{leadsState.anchor=ltMoveRange(mode,anchor,-1);go();};
- host.querySelector('#ldNext').onclick=()=>{const n=ltMoveRange(mode,anchor,1);if(n<=maxAnchor){leadsState.anchor=n;go();}};
- host.querySelector('#ldNow').onclick=()=>{leadsState.anchor=null;go();};
+ const ldSet=(f,t)=>{leadsState.from=f;leadsState.to=t;go();};
+ host.querySelector('#ldTo').addEventListener('change',()=>ldSet(host.querySelector('#ldFrom').value,host.querySelector('#ldTo').value));
+ host.querySelector('#ldPrev').onclick=()=>{const r=ltStep(p,-1);ldSet(r.from,r.to);};
+ host.querySelector('#ldNext').onclick=()=>{const r=ltStep(p,1);if(r.from<=today)ldSet(r.from,r.to>today&&mode!=='week'?today:r.to);};
+ host.querySelector('#ldToday').onclick=()=>ldSet(today,today);
  host.querySelector('#ldDiv').onchange=e=>{leadsState.division=e.target.value;go();};
  function bindLeadsBody(){
  host.querySelector('#ltLeadsRefresh')?.addEventListener('click',()=>{ltLoadLeads(true);});
  host.querySelectorAll('[data-ld-brk-img]').forEach(b=>b.onclick=e=>{ e.preventDefault(); e.stopPropagation(); const x=ltLeadsBreak[b.dataset.ldBrkImg]; if(x) ltCopyBreakImage(x.lists,{team:x.team, dayLabel:x.lists.dayLabel, day:x.lists.day}); });
  host.querySelector('#ldBrkAll')?.addEventListener('click',()=>{ ltLeadsBreak.__open=!ltLeadsBreak.__open; host.querySelectorAll('details.ld-brk').forEach(d=>d.open=ltLeadsBreak.__open); host.querySelector('#ldBrkAll').textContent=ltLeadsBreak.__open?'Collapse all':'Expand all'; });
  host.querySelectorAll('[data-lt-lead]').forEach(b=>b.onclick=()=>{
-  Object.assign(ltState,{owner:String(Server.user.id),viewingId:b.dataset.ltLead,assignment:null,loaded:false,loading:false,error:'',division:leadsState.division,rangeMode:leadsState.mode,anchor:leadsState.anchor});ltState.requestSeq++;
+  Object.assign(ltState,{owner:String(Server.user.id),viewingId:b.dataset.ltLead,assignment:null,loaded:false,loading:false,error:'',division:leadsState.division,rangeMode:leadsState.mode,anchor:leadsState.anchor,from:leadsState.from,to:leadsState.to});ltState.requestSeq++;
   currentView='teams'; document.querySelectorAll('#navList button').forEach(x=>x.classList.toggle('active',x.dataset.view==='teams')); refreshUI(); window.scrollTo(0,0);
  });
  }
@@ -12024,7 +12036,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.72.0';   // shown only in the browser tab title
+const APP_VERSION = '4.73.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -12906,12 +12918,12 @@ const Onboarding=(()=>{
   const k=normEid(eid)||String(eid).trim(), last=demoRows().filter(r=>(normEid(r.eid)||r.eid)===k).sort(order).pop();
   if(!last||String(last.onboarder_id)===String(uid)) return {locked:false};
   const at=new Date(last.created_at||last.call_date+'T00:00:00').getTime();
-  if((last.cat||catOf(last.status,last.call_type))!=='in_process'||Date.now()-at>=HOLD_MIN*6e4) return {locked:false};
+  if(catOf(last.status,last.call_type)!=='in_process'||Date.now()-at>=HOLD_MIN*6e4) return {locked:false};
   return {locked:true, hold:true, owner:last.onboarder, owner_id:last.onboarder_id, since:new Date(at).toISOString(), until:new Date(at+HOLD_MIN*6e4).toISOString()};
  }
  function demoLock(eid, uid){
   const k=normEid(eid)||String(eid).trim(), since=addDays(today(),-LOCK_DAYS);
-  const l=demoRows().filter(r=>(normEid(r.eid)||r.eid)===k&&LOCK_CATS.includes(r.cat||catOf(r.status,r.call_type))&&r.call_date>=since).sort(order)[0];
+  const l=demoRows().filter(r=>(normEid(r.eid)||r.eid)===k&&LOCK_CATS.includes(catOf(r.status,r.call_type))&&r.call_date>=since).sort(order)[0];
   if(!l||String(l.onboarder_id)===String(uid)) return demoHold(eid, uid);
   const req=demoReq().filter(q=>q.eid===k&&String(q.requester_id)===String(uid)&&String(q.owner_id)===String(l.onboarder_id)&&q.created_at.slice(0,10)>=l.call_date).sort((a,b)=>a.created_at.localeCompare(b.created_at)).pop();
   if(req&&req.status==='approved') return demoHold(eid, uid);
@@ -14145,6 +14157,8 @@ const DatePick=(()=>{
    ['#','Months'],['This month',monthStart(t),t],['Last month',monthStart(lm),monthEnd(lm)],[mName(mBack(t,2)),mBack(t,2),monthEnd(mBack(t,2))],['Last 3 months',mBack(t,3),add(monthStart(t),-1)],['Last 6 months',mBack(t,6),add(monthStart(t),-1)],
    ['#','Quarters'],['This quarter',qStart(t),t],['Last quarter',qStart(lq),qEnd(lq)],...qs.reverse().slice(2),
    ['#','Year'],['Year to date',yStart(t),t],['Last 12 months',add(t,-364),t],['Last year ('+ly+')',ly+'-01-01',ly+'-12-31']]; };
+ // short list for My Team / Team Leads: a day or a whole week
+ const SIMPLE_PRESETS=()=>{ const t=today(), lw=add(weekStart(t),-7); return [['#','Day'],['Today',t,t],['Yesterday',add(t,-1),add(t,-1)],['#','Week'],['This week',weekStart(t),weekEnd(t)],['Last week',lw,add(lw,6)],['2 weeks ago',add(lw,-7),add(lw,-1)]]; };
  const SINGLE_PRESETS=()=>{ const t=today(), lm=add(monthStart(t),-1), lq=add(qStart(t),-1);
   return [['#','Days'],['Today',t],['Yesterday',add(t,-1)],['Tomorrow',add(t,1)],['7 days ago',add(t,-7)],['30 days ago',add(t,-30)],
    ['#','Weeks'],['Start of this week',weekStart(t)],['End of this week',weekEnd(t)],['Start of last week',add(weekStart(t),-7)],['End of last week',add(weekStart(t),-1)],
@@ -14238,7 +14252,7 @@ const DatePick=(()=>{
   const H=x=>`<div class="dp-ph">${x}</div>`, tidy=h=>h.replace(/(<div class="dp-ph">[^<]*<\/div>)+(?=<div class="dp-ph">|$)/g,'');
   const wkNo=w=>{ const x=(typeof weeksData!=='undefined'?weeksData:[]).find(y=>y.weekEndDate===w); return x&&x.weekNumber!=null?x.weekNumber:weekOfDate(w).number; };
   const short=d=>parse(d).toLocaleDateString(undefined,{month:'short',day:'numeric'});
-  if(st.mode==='range') presets=tidy(RANGE_PRESETS().map(([l,a,b])=>{ if(l==='#') return H(a); const A=st.min&&a<st.min?st.min:a, B=st.max&&b>st.max?st.max:b; return A<=B?`<button type="button" data-pa="${A}" data-pb="${B}" class="${st.a===A&&st.b===B?'on':''}" title="${fmt(A)} – ${fmt(B)}">${l}</button>`:''; }).join(''));
+  if(st.mode==='range') presets=tidy((st.presets==='simple'?SIMPLE_PRESETS():RANGE_PRESETS()).map(([l,a,b])=>{ if(l==='#') return H(a); const A=st.min&&a<st.min?st.min:a, B=st.max&&b>st.max?st.max:b; return A<=B?`<button type="button" data-pa="${A}" data-pb="${B}" class="${st.a===A&&st.b===B?'on':''}" title="${fmt(A)} – ${fmt(B)}">${l}</button>`:''; }).join(''));
   else if(st.mode==='single') presets=tidy(SINGLE_PRESETS().map(([l,d])=>l==='#'?H(d):clampOk(d,st.min,st.max)?`<button type="button" data-p1="${d}" class="${st.value===d?'on':''}" title="${fmt(d)}">${l}</button>`:'').join(''))+(st.clearable?'<button type="button" data-p1="" class="dp-clear">No date</button>':'');
   else if(st.mode==='period'){ const W=st.weeks.slice().sort(), t=today(), latest=W[W.length-1]||weekEnd(t), lastN=n=>W.slice(-n), y=t.slice(0,4), ly=String(+y-1);
    const span=(a,b)=>{ const ws=W.filter(w=>w>=weekEnd(a)&&w<=weekEnd(b)); return ws.length?[weekStart(ws[0]),ws[ws.length-1]]:null; };
@@ -14285,7 +14299,7 @@ const DatePick=(()=>{
   pop.innerHTML=`<div class="dp-presets" role="listbox" aria-label="Quick picks">${presets}</div><div class="dp-main">
     <div class="dp-fields">${fields}</div>
     <div class="dp-months">${months.map((m,i)=>monthGrid(m,i,months.length)).join('')}</div>
-    </div><div class="dp-foot"><span class="dp-note">${escapeHtml(sum)}</span>${st.clearable&&st.mode==='single'?'<button type="button" class="btn btn-secondary btn-sm dp-clearbtn" data-p1="">Clear</button>':''}<button type="button" class="btn btn-secondary btn-sm" data-act="cancel">Cancel</button><button type="button" class="btn btn-primary btn-sm" data-act="apply" ${canDone()?'':'disabled'}>Done</button></div>`;
+    </div><div class="dp-foot"><span class="dp-note">${escapeHtml(sum)}</span>${st.weekBtn&&st.mode==='range'&&st.a?`<button type="button" class="btn btn-secondary btn-sm" data-wkall="1" title="Sunday to Saturday">Whole week</button>`:''}${st.clearable&&st.mode==='single'?'<button type="button" class="btn btn-secondary btn-sm dp-clearbtn" data-p1="">Clear</button>':''}<button type="button" class="btn btn-secondary btn-sm" data-act="cancel">Cancel</button><button type="button" class="btn btn-primary btn-sm" data-act="apply" ${canDone()?'':'disabled'}>Done</button></div>`;
   pop.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>{ const d=parse(st.view); d.setMonth(d.getMonth()+Number(b.dataset.nav)); st.view=iso(d); draw(); });
   pop.querySelectorAll('.dp-day:not([disabled])').forEach(b=>{
    b.onclick=()=>{ const d=b.dataset.d;
@@ -14301,6 +14315,7 @@ const DatePick=(()=>{
   pop.querySelector('.dp-months').onmouseleave=()=>{ pop.querySelectorAll('.dp-day.hv').forEach(x=>x.classList.remove('hv')); };
   // quick picks fill the selection; Done applies it
   pop.querySelectorAll('[data-pa]').forEach(b=>b.onclick=()=>{ st.a=b.dataset.pa; st.b=b.dataset.pb; st.all=false; focusMonth(st.b); draw(); });
+  pop.querySelector('[data-wkall]')?.addEventListener('click',()=>{ const d=st.a; st.a=weekStart(d); st.b=weekEnd(d); done(); });
   pop.querySelectorAll('[data-pall]').forEach(b=>b.onclick=()=>{ st.all=true; st.a=null; st.b=null; const l=st.weeks.slice().sort().pop(); if(l) focusMonth(l); draw(); });
   pop.querySelectorAll('[data-p1]').forEach(b=>b.onclick=()=>{ st.value=b.dataset.p1; if(st.value) focusMonth(st.value); draw(); });
   pop.querySelectorAll('[data-pw]').forEach(b=>b.onclick=()=>{ st.value=b.dataset.pw; if(isDate(st.value)) focusMonth(st.value); draw(); });
@@ -14416,13 +14431,13 @@ function dateRangeLabel(a,b){ if(!a) return 'Pick dates'; const P=s=>new Date(s+
  if(a===b) return P(a).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'});
  const sameY=a.slice(0,4)===b.slice(0,4), n=Math.round((P(b)-P(a))/864e5)+1;
  return P(a).toLocaleDateString(undefined,{month:'short',day:'numeric',...(sameY?{}:{year:'numeric'})})+' – '+P(b).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})+' · '+n+' days'; }
-function dateRangeBtn(fromId,toId,from,to,max){
- return `<span class="dpr"><input type="date" id="${fromId}" value="${from||''}" data-dp-no hidden><input type="date" id="${toId}" value="${to||''}" data-dp-no hidden><button type="button" class="dpr-btn" data-dpr="${fromId}|${toId}" data-max="${max||''}" aria-label="Dates: ${escapeHtml(dateRangeLabel(from,to))} — click to change"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>${escapeHtml(dateRangeLabel(from,to))}</span><i aria-hidden="true">▾</i></button></span>`; }
+function dateRangeBtn(fromId,toId,from,to,max,simple){
+ return `<span class="dpr"><input type="date" id="${fromId}" value="${from||''}" data-dp-no hidden><input type="date" id="${toId}" value="${to||''}" data-dp-no hidden><button type="button" class="dpr-btn" data-dpr="${fromId}|${toId}" data-max="${max||''}" ${simple?'data-simple="1"':''} aria-label="Dates: ${escapeHtml(dateRangeLabel(from,to))} — click to change"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>${escapeHtml(dateRangeLabel(from,to))}</span><i aria-hidden="true">▾</i></button></span>`; }
 document.addEventListener('click',e=>{
  const b=e.target.closest&&e.target.closest('[data-dpr]'); if(!b) return;
  e.preventDefault(); e.stopPropagation();
  const [fi,ti]=b.dataset.dpr.split('|'), f=document.getElementById(fi), t=document.getElementById(ti); if(!f||!t) return;
- DatePick.open(b,{mode:'range', from:f.value||null, to:t.value||f.value||null, max:b.dataset.max||ltToday(), title:'Pick a day or a range',
+ DatePick.open(b,{mode:'range', from:f.value||null, to:t.value||f.value||null, max:b.dataset.max||ltToday(), title:'Pick a day or a range', ...(b.dataset.simple?{presets:'simple', weekBtn:true, max:(()=>{ const d=new Date(); d.setDate(d.getDate()+(6-d.getDay())); return toIsoDateOnly(d); })()}:{}),
   onPick:([x,y])=>{ if(!x) return; y=y||x; if(y<x) [x,y]=[y,x]; f.value=x; t.value=y;
    b.querySelector('span').textContent=dateRangeLabel(x,y);
    t.dispatchEvent(new Event('change',{bubbles:true})); }});
