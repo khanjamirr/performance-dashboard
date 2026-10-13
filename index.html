@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.71.0</title>
+<title>Performance Dashboard · v4.72.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -1129,6 +1129,7 @@ button.onb-tile{font:inherit;text-align:left;cursor:pointer}button.onb-tile:disa
 .onb-mix{margin-bottom:12px}.onb-mix h4{margin:0 0 8px;font-size:13px;color:#0a1f44}
 .c-complete{background:#16a34a}.c-i9{background:#60a5fa}.c-ip{background:#94a3b8}.c-lvm{background:#f59e0b}.c-nr{background:#c8102e}.c-other{background:#a78bfa}
 .onb-gorep{font-size:13px;font-weight:600}.onb-gorep-foot{margin:14px 0 0;text-align:center}
+.onb-lock.hold{background:#fff7e6;border-color:#f5d48a;color:#7a4b00}
 .onb-counts{display:inline-block;margin-left:6px;font-size:10.5px;font-weight:700;color:#fff;border-radius:999px;padding:1px 7px;vertical-align:middle}
 .onb-cat{display:inline-block;font-size:11px;font-weight:700;border-radius:4px;padding:2px 7px;color:#fff;white-space:nowrap}
 .onb-link.prev{background:#eef3fe;color:#1e3a8a;margin-left:6px}
@@ -12023,7 +12024,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.71.0';   // shown only in the browser tab title
+const APP_VERSION = '4.72.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -12888,7 +12889,7 @@ const Onboarding=(()=>{
  async function save(row){
   row={...row, cat:catOf(row.status,row.call_type)};
   if(!st.demo) return Server.rpc('dash_onb_save',{p_row:row});
-  if(!ADM()){ const l=demoLock(row.eid, Server.user.id); if(l.locked) throw new Error(`LOCKED: ${l.owner} completed onboarding for this candidate on ${l.since} — locked until ${l.until}. Ask them to approve your request.`); }
+  if(!ADM()){ const l=demoLock(row.eid, Server.user.id); if(l.locked&&l.hold) throw new Error(`LOCKED: ${l.owner} is working on this candidate (In process) — try again after ${new Date(l.until).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}.`); if(l.locked) throw new Error(`LOCKED: ${l.owner} completed onboarding for this candidate on ${l.since} — locked until ${l.until}. Ask them to approve your request.`); }
   const list=demoRows(); const now=new Date().toISOString();
   if(row.id){ const i=list.findIndex(x=>String(x.id)===String(row.id)); if(i>=0) list[i]={...list[i], ...row, onboarder:(ADM()&&row.onboarder)||list[i].onboarder, updated_at:now}; }
   else list.push({...row, id:Date.now(), onboarder_id:Server.user.id, onboarder:(ADM()&&row.onboarder)||myName(), created_at:now, updated_at:now});
@@ -12899,12 +12900,22 @@ const Onboarding=(()=>{
  const addDays=(d,n)=>{ const x=new Date(d+'T12:00:00'); x.setDate(x.getDate()+n); return toIsoDateOnly(x); };
  const demoReq=()=>{ try{ return JSON.parse(localStorage.getItem(RQ)||'[]'); }catch(e){ return []; } };
  const demoReqSave=l=>{ try{ localStorage.setItem(RQ, JSON.stringify(l)); }catch(e){} };
+ // 1-hour hold: the latest call is "In process" and was logged by someone else less than an hour ago
+ const HOLD_MIN=60;
+ function demoHold(eid, uid){
+  const k=normEid(eid)||String(eid).trim(), last=demoRows().filter(r=>(normEid(r.eid)||r.eid)===k).sort(order).pop();
+  if(!last||String(last.onboarder_id)===String(uid)) return {locked:false};
+  const at=new Date(last.created_at||last.call_date+'T00:00:00').getTime();
+  if((last.cat||catOf(last.status,last.call_type))!=='in_process'||Date.now()-at>=HOLD_MIN*6e4) return {locked:false};
+  return {locked:true, hold:true, owner:last.onboarder, owner_id:last.onboarder_id, since:new Date(at).toISOString(), until:new Date(at+HOLD_MIN*6e4).toISOString()};
+ }
  function demoLock(eid, uid){
   const k=normEid(eid)||String(eid).trim(), since=addDays(today(),-LOCK_DAYS);
   const l=demoRows().filter(r=>(normEid(r.eid)||r.eid)===k&&LOCK_CATS.includes(r.cat||catOf(r.status,r.call_type))&&r.call_date>=since).sort(order)[0];
-  if(!l||String(l.onboarder_id)===String(uid)) return {locked:false};
+  if(!l||String(l.onboarder_id)===String(uid)) return demoHold(eid, uid);
   const req=demoReq().filter(q=>q.eid===k&&String(q.requester_id)===String(uid)&&String(q.owner_id)===String(l.onboarder_id)&&q.created_at.slice(0,10)>=l.call_date).sort((a,b)=>a.created_at.localeCompare(b.created_at)).pop();
-  return {locked:!(req&&req.status==='approved'), owner:l.onboarder, owner_id:l.onboarder_id, since:l.call_date, until:addDays(l.call_date,LOCK_DAYS), request:req?{id:req.id,status:req.status}:null};
+  if(req&&req.status==='approved') return demoHold(eid, uid);
+  return {locked:true, owner:l.onboarder, owner_id:l.onboarder_id, since:l.call_date, until:addDays(l.call_date,LOCK_DAYS), request:req?{id:req.id,status:req.status}:null};
  }
  async function lockFor(eid){
   if(!st.demo){ try{ return await Server.rpc('dash_onb_lock',{p_eid:eid}); }catch(e){ if(!missing(e)) throw e; return {locked:false}; } }
@@ -12929,6 +12940,9 @@ const Onboarding=(()=>{
  }
  function lockHtml(l, eid){
   if(!l||!l.owner) return '';
+  if(l.hold){ const t=new Date(l.until), mins=Math.max(1,Math.ceil((t-Date.now())/6e4));
+   if(l.admin) return `<div class="onb-lock info">⏳ ${escapeHtml(l.owner)} is working on this candidate (In process) — other onboarders are held off until ${t.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}. Admins can still log.</div>`;
+   return `<div class="onb-lock hold">⏳ <b>${escapeHtml(l.owner)}</b> is working on this candidate — their call is <b>In process</b>. Nobody else can log them for <b>${mins} more minute${mins===1?'':'s'}</b> (until ${t.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}). After that you can log a new call or move the stage on.</div>`; }
   const when=`completed onboarding with <b>${escapeHtml(l.owner)}</b> on ${fmtDate(l.since)}`;
   if(l.admin) return `<div class="onb-lock info">🔒 This candidate ${when} — locked for other onboarders until ${fmtDate(l.until)}. Admins can still log.</div>`;
   if(!l.locked) return `<div class="onb-lock ok">✓ ${escapeHtml(l.owner)} approved your request — you can log this candidate.</div>`;
@@ -13255,6 +13269,7 @@ const Onboarding=(()=>{
    if(!eid||(st.editing&&(normEid(st.editing.eid)||st.editing.eid)===eid&&st.editing.onboarder_id===Server.user.id)){ box.innerHTML=''; sub.disabled=st.busy; return; }
    let l; try{ l=await lockFor(eid); }catch(e){ return; } if(seq!==lockSeq||!box.isConnected) return;
    box.innerHTML=lockHtml(l, eid); sub.disabled=st.busy||!!(l&&l.locked);
+   clearTimeout(showLock.t); if(l&&l.hold) showLock.t=setTimeout(()=>{ if(box.isConnected) showLock(); }, Math.min(6e4, Math.max(5e3, new Date(l.until)-Date.now()+1500)));
    box.querySelector('[data-onb-req]')?.addEventListener('click',async ()=>{ const note=prompt('Add a short note for '+l.owner+' (optional):','')??null; if(note===null) return;
     try{ await requestAccess(eid, note); showToast('Request sent to '+l.owner+'.'); await loadRequests(); showLock(); }catch(e){ showToast('Could not send: '+cleanErr(e)); } }); };
   let eidT;
