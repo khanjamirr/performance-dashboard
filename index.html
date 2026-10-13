@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.73.0</title>
+<title>Performance Dashboard · v4.73.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -11548,7 +11548,10 @@ function ltBreakCheck(name,date,now=new Date(),scope='day',weekTo=date){
  const mid=!weekDone&&weekly!==null&&weekly<wg&&new Date(date+'T12:00:00').getDay()>=4&&weekly<wg/2;
  const goalMet=scope==='day'?daily!==null&&daily>=dg:weekly!==null&&weekly>=wg;
  const status=scope==='day'?(daily===null?'Awaiting daily data':goalMet?'Daily goal met'+(daily>dg?' · '+tgNumber(daily-dg)+' above target':''):late?'Daily goal missed':'Daily goal in progress'):(weekly===null?'Awaiting weekly data':goalMet?'Weekly goal met'+(weekly>wg?' · '+tgNumber(weekly-wg)+' above target':''):late?'Weekly goal missed':'Weekly goal in progress');
- const days=Math.max(1,tgDays(w.weekStart,date).filter(d=>{const n=new Date(d+'T12:00:00Z').getUTCDay();return n>=1&&n<=5;}).length),required=Math.min(wg,Math.round(days*dg*10)/10);
+ // third break: a fifth of the weekly goal for each working day so far — goal 50 → Mon 10, Tue 20, Wed 30, Thu 40, Fri 50
+ // (an absent day adds nothing; the number is rounded up to a whole schedule)
+ const wdays=tgDays(w.weekStart,date).filter(d=>{const n=new Date(d+'T12:00:00Z').getUTCDay();return n>=1&&n<=5;});
+ const days=Math.max(1,wdays.length),required=Math.ceil(wdays.reduce((a,d)=>a+ltDailyGoal(name,d),0)-1e-9);
  const cum=weekTo===date?weekly:ltReport({memberships:[{name,from:w.weekStart,to:date}]},w.weekStart,date,today).total.schedules;
  const daySignal=recruiterSignal(daily,day.shows,day.scheduledDateOf,dg),weekSignal=recruiterSignal(weekly,wk.shows,wk.scheduledDateOf,wg);
  return {name,wg,dg,daily,weekly,cum,required,eligible:cum!==null&&cum>=required,known:cum!==null,goalMet,late,mid,status,daySignal,weekSignal};
@@ -11806,7 +11809,7 @@ function ltLeadsBreakHtml(p,cutoff,mode,today,division){
  if(!teams.length) return '';
  const E=teams.reduce((a,t)=>a+t.lists.eligible.length,0), N=teams.reduce((a,t)=>a+t.lists.notyet.length,0), U=teams.reduce((a,t)=>a+t.lists.unknown.length,0);
  const person=(x,ok)=>`<li><span><b>${escapeHtml(x.name)}</b>${x.branch?`<small>${escapeHtml(x.branch)}</small>`:''}</span><span class="${ok?'ok':'no'}">${tgNumber(x.cum)} / ${tgNumber(x.required)}<small>${ok?(x.cum>x.required?tgNumber(x.cum-x.required)+' above':'on target'):tgNumber(Math.max(0,x.required-x.cum))+' more needed'}</small></span></li>`;
- return `<section class="panel ta ld-break" data-section="team.goals"><div class="lt-section-head"><h3>☕ Third break · ${fmtDate(checkDay)}</h3><span class="hint">Eligible when schedules so far this week reach the daily goal × working days so far · ${E} eligible · ${N} not yet${U?' · '+U+' awaiting data':''}</span><button type="button" class="btn btn-secondary btn-sm" id="ldBrkAll" style="margin-left:auto">${ltLeadsBreak.__open?'Collapse all':'Expand all'}</button></div>
+ return `<section class="panel ta ld-break" data-section="team.goals"><div class="lt-section-head"><h3>☕ Third break · ${fmtDate(checkDay)}</h3><span class="hint">Eligible when schedules so far this week reach a fifth of the weekly goal per working day (goal 50: Mon 10 · Tue 20 · Wed 30 · Thu 40 · Fri 50) · ${E} eligible · ${N} not yet${U?' · '+U+' awaiting data':''}</span><button type="button" class="btn btn-secondary btn-sm" id="ldBrkAll" style="margin-left:auto">${ltLeadsBreak.__open?'Collapse all':'Expand all'}</button></div>
   <div class="ld-brk-grid">${teams.map(t=>{ const e=t.lists.eligible.length, ny=t.lists.notyet.length, pc=Math.round(e/t.n*100);
    return `<details class="ld-brk" ${ltLeadsBreak.__open?'open':''}><summary><span class="ld-brk-name"><b>${escapeHtml(t.tm.lead)}</b><small>${escapeHtml(t.tm.a.team_name||'')}</small></span><span class="ld-brk-bar" title="${e} of ${t.n} eligible"><i style="width:${pc}%"></i></span><span class="pill good">${e} eligible</span><span class="pill warn">${ny} not yet</span><button type="button" class="btn btn-secondary btn-sm" data-ld-brk-img="${escapeHtml(t.tm.id)}" title="Copy this team’s third-break list as an image">🖼 Copy</button></summary>
     <div class="ld-brk-lists"><div><h5>✓ Eligible · ${e}</h5><ul>${t.lists.eligible.map(x=>person(x,true)).join('')||'<li class="hint">Nobody yet.</li>'}</ul></div><div><h5>⏳ Not yet · ${ny}</h5><ul>${t.lists.notyet.map(x=>person(x,false)).join('')||'<li class="hint">Everyone is eligible. 🎉</li>'}</ul></div></div></details>`; }).join('')}</div></section>`;
@@ -11938,7 +11941,7 @@ async function ltCopyBreakImage(lists, meta){
     });
     y+=14;
   });
-  c.fillStyle='#9aa9b0'; c.font=font(500,11); c.fillText(`Needs the daily goal × working days so far this week · ${new Date().toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}`,P,H-16);
+  c.fillStyle='#9aa9b0'; c.font=font(500,11); c.fillText(`Needs a fifth of the weekly goal per working day (goal 50: Mon 10 · Tue 20 · Wed 30 · Thu 40 · Fri 50) · ${new Date().toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}`,P,H-16);
   const blob=await new Promise(r=>cv.toBlob(r,'image/png'));
   if(navigator.clipboard?.write && typeof ClipboardItem!=='undefined'){
     try{ await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]); showToast('Third-break list copied as an image — paste it anywhere.'); return; }catch(e){}
@@ -12036,7 +12039,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.73.0';   // shown only in the browser tab title
+const APP_VERSION = '4.73.1';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
