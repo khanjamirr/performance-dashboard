@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.69.1</title>
+<title>Performance Dashboard · v4.70.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -1121,7 +1121,9 @@ button.al-tile{cursor:pointer}button.al-tile:hover{box-shadow:0 6px 18px #183442
 .onb-remark{grid-column:1 / -1}.onb-remark textarea{padding:8px 10px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:13.5px;text-transform:none;letter-spacing:0;font-weight:400;resize:vertical;min-height:40px}
 .onb-form-head>div{display:flex;gap:10px;align-items:center}
 .onb-rule{margin:0 0 8px;font-size:12px}
-.onb-tiles{grid-template-columns:repeat(6,minmax(0,1fr))!important}
+.c-fin{background:#0f766e}.onb-quick button.c-fin{background:#fff}.onb-quick button.c-fin b{background:#ccfbf1;color:#115e59}.onb-quick button.on.c-fin{background:#0a1f44;color:#fff}.onb-tile.fin strong{color:#0f766e}.ovx-card.fin{border-top-color:#0f766e}.ovx-card.fin strong{color:#0f766e}
+.onb-tiles{grid-template-columns:repeat(7,minmax(0,1fr))!important}@media (max-width:1200px){.onb-tiles{grid-template-columns:repeat(4,minmax(0,1fr))!important}}@media (max-width:640px){.onb-tiles{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+
 button.onb-tile{font:inherit;text-align:left;cursor:pointer}button.onb-tile:disabled{cursor:default;color:inherit}button.onb-tile:not(:disabled):hover{box-shadow:0 4px 14px #0a1f4414}button.onb-tile.sel{box-shadow:0 0 0 2px #1d4ed8 inset}
 .onb-tile.i9 strong{color:#2563eb}.onb-tile.warn strong{color:#b45309}.onb-tile.bad strong{color:#c8102e}
 .onb-mix{margin-bottom:12px}.onb-mix h4{margin:0 0 8px;font-size:13px;color:#0a1f44}
@@ -12017,7 +12019,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.69.1';   // shown only in the browser tab title
+const APP_VERSION = '4.70.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -12761,14 +12763,15 @@ const DivReport=(()=>{
    until that SQL is run the page works in demo mode, saved in this browser only. */
 const Onboarding=(()=>{
  // ---- dropdowns: admins add / rename / delete / reorder them (stored as "onbLists"); each status has a report category ----
- const CATS=[['complete','Onboarding complete'],['i9','Between I9 stages (counts as In process)'],['in_process','In process'],['lvm','LVM / No answer'],['no_response','Never responded'],['other','Other']];
- const VIEW_CATS=CATS.filter(([k])=>k!=='i9');   // what reports show — I9 stages sit inside In process
- const CAT_LBL=Object.fromEntries(CATS), CAT_CLS={complete:'c-complete',i9:'c-i9',in_process:'c-ip',lvm:'c-lvm',no_response:'c-nr',other:'c-other'};
+ const CATS=[['finalized','Finalized'],['complete','Onboarding complete'],['i9','Between I9 stages (counts as In between stages)'],['in_process','In between stages'],['lvm','LVM / No answer'],['no_response','Never responded'],['other','Other']];
+ const VIEW_CATS=CATS.filter(([k])=>k!=='i9');
+ const isDone=c=>c==='complete'||c==='finalized';   // onboarding complete or finalized (EB Complete / I9 Complete)   // what reports show — I9 stages sit inside In process
+ const CAT_LBL=Object.fromEntries(CATS), CAT_CLS={finalized:'c-fin',complete:'c-complete',i9:'c-i9',in_process:'c-ip',lvm:'c-lvm',no_response:'c-nr',other:'c-other'};
  const DEFAULT_LISTS={
   callTypes:[{label:'Live Transfer'},{label:'Outbound'},{label:'Inbound'},{label:'Schedule Later'}],
   onboarders:[],
   assignTypes:[{label:'Live Transfer'},{label:'Schedule Later'},{label:'Already Completed'},{label:'Local Branch'},{label:'Self'}],
-  statuses:[{label:'In Process',cat:'in_process'},{label:'EB Complete / I9 Section-1 Pending',cat:'i9'},{label:'EB Complete / I9 Section-1 Complete',cat:'i9'},{label:'EB Complete / I9 Complete',cat:'complete'},{label:'LVM / No Answer',cat:'lvm'},{label:'Never Responded',cat:'no_response'}],
+  statuses:[{label:'In Process',cat:'in_process'},{label:'EB Complete / I9 Section-1 Pending',cat:'i9'},{label:'EB Complete / I9 Section-1 Complete',cat:'i9'},{label:'EB Complete / I9 Complete',cat:'finalized'},{label:'LVM / No Answer',cat:'lvm'},{label:'Never Responded',cat:'no_response'}],
   retired:[]};
  const lists=()=>{ const v=KV.get('onbLists'); const L=v&&Array.isArray(v.callTypes)&&Array.isArray(v.statuses)?{retired:[],...v}:{...DEFAULT_LISTS}; if(!Array.isArray(L.assignTypes)||!L.assignTypes.length) L.assignTypes=DEFAULT_LISTS.assignTypes; return L; };
  const assignTypes=()=>lists().assignTypes.map(x=>x.label);
@@ -12802,7 +12805,7 @@ const Onboarding=(()=>{
   if(autoKey===st.rows&&autoCache) return autoCache; autoKey=st.rows;
   const out={}, al=alreadyType(), types=assignTypes();
   candidates(st.rows||[]).forEach(c=>{ const f=c.first, day=f.call_date, o=f.onboarder;
-   const t=catOf(f.status,f.call_type)==='complete'&&al?al:types.find(x=>x!==al&&anorm(x)===anorm(f.call_type));
+   const t=isDone(catOf(f.status,f.call_type))&&al?al:types.find(x=>x!==al&&anorm(x)===anorm(f.call_type));
    const d=out[day]||(out[day]={rows:{}, other:0, list:[]});
    // no matching assignment type: outbound-style calls (Outbound, LVM / No answer, …) are self calls; Inbound goes to "Other"
    const k=t||(/inbound/i.test(f.call_type||'')?'__other':'__outbound'); if(!t) d.other++;
@@ -12810,7 +12813,7 @@ const Onboarding=(()=>{
    const r=d.rows[o]||(d.rows[o]={}); r[k]=(r[k]||0)+1; });
   return autoCache=out;
  }
- const catMatch=(cat,f)=>!f||(f==='pending'?cat!=='complete':cat===f);
+ const catMatch=(cat,f)=>!f||(f==='pending'?!isDone(cat):cat===f);
  // first-call rows for one stage only (latest status) — typed numbers can't be split by stage, so only the call log counts
  function autoRowsFor(day, f){ const a=autoAssign()[day]; if(!a) return {}; if(!f) return a.rows; const rows={};
   a.list.forEach(x=>{ if(!catMatch(x.cat,f)) return; const r=rows[x.o]||(rows[x.o]={}); r[x.k]=(r[x.k]||0)+1; }); return rows; }
@@ -12837,7 +12840,8 @@ const Onboarding=(()=>{
  function guessCat(t){ const k=String(t||'').toLowerCase();
   if(/\blvm\b|voice ?mail|v\/?m\b|left (a )?(message|msg)|no answer|not answer|unanswered|didn.?t answer|did not answer|no pick ?up|not picking|busy/.test(k)) return 'lvm';
   if(/never (respond|responded|answer|picked)|no response|not respond|unresponsive|ghost|unreachable|wrong number|disconnected/.test(k)) return 'no_response';
-  if(/i-?9 complete\b|onboarding complete|fully complete/.test(k)&&!/section/.test(k)) return 'complete';
+  if(/i-?9 complete\b|fully complete|finali[sz]ed/.test(k)&&!/section/.test(k)) return 'finalized';
+  if(/onboarding complete/.test(k)) return 'complete';
   if(/eb complete|section-?1|i-?9 (section|pending)/.test(k)) return 'i9';
   if(/in process|in progress|pending|follow ?up|call ?back/.test(k)) return 'in_process';
   return null; }
@@ -12846,6 +12850,8 @@ const Onboarding=(()=>{
   const g=guessCat(k);
   if(!cat) cat=g||'other';
   else if((cat==='in_process'||cat==='other')&&(g==='lvm'||g==='no_response')) cat=g;     // e.g. "LVM" saved as In process
+  if(g==='finalized') cat='finalized';                                   // “EB Complete / I9 Complete” is always Finalized
+  else if(/^(in[\s-]*process|in[\s-]*progress)$/.test(k)) cat='in_process'; // “In Process” is always In between stages
   // a call logged with an LVM / no-answer call type counts as LVM unless the status says they moved on
   if((cat==='in_process'||cat==='other')&&callType){ const gt=guessCat(callType); if(gt==='lvm'||gt==='no_response') cat=gt; }
   return cat; }
@@ -12885,7 +12891,7 @@ const Onboarding=(()=>{
   demoSave(list); return true;
  }
  // ---- 30-day lock: after a candidate reaches an EB Complete stage, only that onboarder (or someone they approve) can log them ----
- const LOCK_CATS=['complete','i9'], LOCK_DAYS=30, RQ='ipd_onb_req_demo';
+ const LOCK_CATS=['finalized','complete','i9'], LOCK_DAYS=30, RQ='ipd_onb_req_demo';
  const addDays=(d,n)=>{ const x=new Date(d+'T12:00:00'); x.setDate(x.getDate()+n); return toIsoDateOnly(x); };
  const demoReq=()=>{ try{ return JSON.parse(localStorage.getItem(RQ)||'[]'); }catch(e){ return []; } };
  const demoReqSave=l=>{ try{ localStorage.setItem(RQ, JSON.stringify(l)); }catch(e){} };
@@ -12967,7 +12973,7 @@ const Onboarding=(()=>{
  function candidates(rows){
   const m=new Map(); rows.forEach(r=>{ const k=normEid(r.eid)||String(r.eid); if(!m.has(k)) m.set(k,[]); m.get(k).push(r); });
   return [...m.entries()].map(([eid,calls])=>{ calls.sort(order); const last=calls[calls.length-1], first=calls[0];
-   const done=calls.find(c=>catOf(c.status,c.call_type)==='complete');
+   const done=calls.find(c=>isDone(catOf(c.status,c.call_type)));
    // LVM / no answer on 3 or more different days in a row (nothing in between) → Never responded
    let cat=catOf(last.status,last.call_type), lvmDays=0;
    if(cat==='lvm'){ const days=new Set(); for(let i=calls.length-1;i>=0;i--){ if(catOf(calls[i].status,calls[i].call_type)!=='lvm') break; days.add(calls[i].call_date); } lvmDays=days.size; if(lvmDays>=NR_LVM_DAYS) cat='no_response'; }
@@ -12980,9 +12986,10 @@ const Onboarding=(()=>{
  const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
  function summary(cands, calls){
   const by={}; CATS.forEach(([k])=>by[k]=0); cands.forEach(c=>by[c.cat]++); const i9n=cands.filter(c=>c.i9).length;
+  const reached=cands.filter(c=>c.calls.some(x=>!['lvm','no_response'].includes(catOf(x.status,x.call_type)))).length;
   const durs=calls.filter(r=>r.duration_min!=null&&r.duration_min!=='').map(r=>Number(r.duration_min));
-  const days=cands.filter(c=>c.cat==='complete'&&c.days!=null).map(c=>c.days);
-  return {n:cands.length, calls:calls.length, by, i9n, avgCalls:cands.length?calls.length/cands.length:null, avgDur:avg(durs), avgDays:avg(days), linked:cands.filter(c=>linkOf(c.eid)).length};
+  const days=cands.filter(c=>isDone(c.cat)&&c.days!=null).map(c=>c.days);
+  return {n:cands.length, calls:calls.length, by, i9n, reached, avgCalls:cands.length?calls.length/cands.length:null, avgDur:avg(durs), avgDays:avg(days), linked:cands.filter(c=>linkOf(c.eid)).length};
  }
  function perOnboarder(cands, rows){
   const names=[...new Set(rows.map(r=>r.onboarder))].sort();
@@ -13024,7 +13031,7 @@ const Onboarding=(()=>{
   const types=assignTypes();
   return [...names].filter(Boolean).sort().map(o=>{
    const mine=rows.filter(r=>r.onboarder===o), by=new Map(); mine.forEach(r=>{ const k=normEid(r.eid)||r.eid; if(!by.has(k)) by.set(k,[]); by.get(k).push(r); });
-   const people=by.size, reached=[...by.values()].filter(cs=>cs.some(c=>REACHED(catOf(c.status,c.call_type)))).length, completed=[...by.values()].filter(cs=>cs.some(c=>catOf(c.status,c.call_type)==='complete')).length;
+   const people=by.size, reached=[...by.values()].filter(cs=>cs.some(c=>REACHED(catOf(c.status,c.call_type)))).length, completed=[...by.values()].filter(cs=>cs.some(c=>isDone(catOf(c.status,c.call_type)))).length;
    const assigned={}; let aTot=0; const aDays=new Set();
    let calls_typed=0;
    assign.forEach(d=>{ const r=((d.data&&d.data.rows)||{})[o]; if(!r) return; let any=0; [...types,'__other'].forEach(t=>{ const n=Number(r[t])||0; assigned[t]=(assigned[t]||0)+n; if(inSum(t)) aTot+=n; any+=n; }); if(hasTot(r)) calls_typed+=Number(r.__total); if(any) aDays.add(d.day); });
@@ -13037,7 +13044,7 @@ const Onboarding=(()=>{
   const p=(n,d)=>d?Math.round(n/d*100)+'%':'0%', f=x=>x==null?'–':(Math.round(x*10)/10);
   const lines=[`<strong>${escapeHtml(v.o)}</strong> made <strong>${fmtNum(v.calls)} calls</strong> to <strong>${fmtNum(v.people)} different candidates</strong>${v.callDays?` over ${v.callDays} day${v.callDays===1?'':'s'} (about ${f(v.perDay)} calls and ${f(v.peoplePerDay)} people a day)`:''} — ${f(v.callsPerPerson)} calls per person on average.`];
   lines.push(`They <strong>reached ${fmtNum(v.reached)}</strong> of those people (${p(v.reached,v.people)}); ${fmtNum(v.notReached)} were LVM / no answer / never responded.`);
-  lines.push(`<strong>${fmtNum(v.completed)}</strong> finished onboarding (EB Complete / I9 Complete) on a call with them — ${p(v.completed,v.reached)} of the people they reached. The other ${fmtNum(Math.max(0,v.reached-v.completed))} they reached are still in process or between I9 stages.`);
+  lines.push(`<strong>${fmtNum(v.completed)}</strong> reached Onboarding complete or Finalized on a call with them — ${p(v.completed,v.reached)} of the people they reached. The other ${fmtNum(Math.max(0,v.reached-v.completed))} they reached are still in process or between I9 stages.`);
   if(v.aTot) lines.push(`They were assigned <strong>${fmtNum(v.aTot)}</strong> candidates in these dates: ${Object.entries(v.assigned).filter(([,n])=>n).map(([t,n])=>`${n} ${escapeHtml(t.toLowerCase())}`).join(', ')}.`);
   return lines.map(l=>`<p>${l}</p>`).join('');
  }
@@ -13061,7 +13068,7 @@ const Onboarding=(()=>{
   const assign=mergedAssign().map(d=>st.fOnb?{...d, data:{...d.data, rows:Object.fromEntries(Object.entries((d.data&&d.data.rows)||{}).filter(([n])=>n===st.fOnb))}}:d);
   let cands=candidates(rows);
   const allCands=cands;   // before the status filter — used for the quick-filter counts
-  if(st.fCat) cands=cands.filter(c=>st.fCat==='pending'?c.cat!=='complete':c.cat===st.fCat);
+  if(st.fCat) cands=cands.filter(c=>st.fCat==='pending'?!isDone(c.cat):c.cat===st.fCat);
   if(q) cands=cands.filter(c=>String(c.eid).toLowerCase().includes(q)||c.onboarders.some(o=>o.toLowerCase().includes(q))||String((linkOf(c.eid)||{}).recruiter||'').toLowerCase().includes(q)||c.calls.some(x=>String(x.note||'').toLowerCase().includes(q)));
   const shownCalls=cands.flatMap(c=>c.calls).sort((a,b)=>order(b,a));
   const onbs=[...new Set([...all.map(r=>r.onboarder), ...(st.assign||[]).flatMap(d=>Object.keys((d.data&&d.data.rows)||{}))])].filter(Boolean).sort();
@@ -13071,10 +13078,10 @@ const Onboarding=(()=>{
   let body='';
   if(st.page==='assign') body=assignHtml();
   else if(st.page==='log') body=`${requestsHtml()}${formHtml()}${filters(adm,onbs,true)}
-   ${(()=>{ const cnt=k=>k===''?allCands.length:k==='pending'?allCands.filter(c=>c.cat!=='complete').length:allCands.filter(c=>c.cat===k).length;
+   ${(()=>{ const cnt=k=>k===''?allCands.length:k==='pending'?allCands.filter(c=>!isDone(c.cat)).length:allCands.filter(c=>c.cat===k).length;
      const ever=allCands.filter(c=>c.calls.some(x=>catOf(x.status,x.call_type)==='lvm')).length;
      const nrAuto=allCands.filter(c=>c.cat==='no_response'&&c.lvmDays>=NR_LVM_DAYS).length;
-     const chips=[['','All'],['pending','Pending'],['complete','Completed'],['in_process','In process'],['lvm','LVM / No answer'],['no_response','Never responded']];
+     const chips=[['','All'],['pending','Pending'],['finalized','Finalized'],['complete','Onboarding complete'],['in_process','In between stages'],['lvm','LVM / No answer'],['no_response','Never responded']];
      return `<div class="onb-quick" role="tablist" aria-label="Show candidates">${chips.map(([k,l])=>`<button type="button" data-onb-q="${k}" class="${(st.fCat||'')===k?'on':''} ${k?CAT_CLS[k]||'q-pending':''}" aria-pressed="${(st.fCat||'')===k}" ${k==='lvm'?`title="${ever} candidate${ever===1?'':'s'} had an LVM / no answer at some point; ${fmtNum(cnt(k))} still ${cnt(k)===1?'is':'are'} at LVM on their latest call"`:''}><span>${l}</span><b>${fmtNum(cnt(k))}</b>${k==='lvm'&&ever>cnt(k)?`<small class="q-ever">${fmtNum(ever)} ever</small>`:''}${k==='no_response'&&nrAuto?`<small class="q-ever" title="${nrAuto} with LVM / no answer on ${NR_LVM_DAYS}+ days in a row">${nrAuto} from LVM</small>`:''}</button>`).join('')}</div>`; })()}
    <section class="panel"><div class="panel-head"><div><div class="ua-filter onb-tabs" role="tablist"><button type="button" data-onb-tab="cand" class="${st.tab==='cand'?'on':''}">Candidates · ${fmtNum(cands.length)}</button><button type="button" data-onb-tab="calls" class="${st.tab==='calls'?'on':''}">All calls · ${fmtNum(shownCalls.length)}</button></div>
      <span class="hint">${st.tab==='cand'?'One row per EID — all calls combined, the latest status counts. Click “calls” to see every call and remark.':(adm?'Everyone’s calls, newest first.':'Your calls, newest first.')}</span></div>${(st.tab==='cand'?cands.length:shownCalls.length)?copyBtnHtml('onbTable')+(Server.can('export')?downloadBtnHtml('onbTable',st.tab==='cand'?'onboarding-candidates.xlsx':'onboarding-calls.xlsx'):''):''}</div>
@@ -13100,12 +13107,13 @@ const Onboarding=(()=>{
   return `${filters(adm,onbs,true)}
    <p class="hint onb-rule">Each candidate (EID) is counted once — all their calls are combined and the <strong>latest call’s status</strong> decides where they land. Click a tile to filter.</p>
    <div class="onb-tiles">
-    ${tile('Candidates',fmtNum(S.n),fmtNum(S.calls)+' calls · '+fmt1(S.avgCalls)+' per candidate')}
-    ${tile('Onboarding complete',fmtNum(S.by.complete),pct(S.by.complete,S.n)+' · avg '+(S.avgDays==null?'–':fmt1(S.avgDays)+' days'),'good','complete')}
-    ${tile('In process',fmtNum(S.by.in_process),pct(S.by.in_process,S.n)+(S.i9n?' · '+fmtNum(S.i9n)+' at an I9 stage':''),'','in_process')}
+    ${tile('Candidates reached',fmtNum(S.reached),'unique · '+pct(S.reached,S.n)+' of '+fmtNum(S.n)+' called')}
+    ${tile('Finalized',fmtNum(S.by.finalized),pct(S.by.finalized,S.n)+' · EB / I9 complete'+(S.avgDays==null?'':' · avg '+fmt1(S.avgDays)+' days'),'fin','finalized')}
+    ${tile('Onboarding complete',fmtNum(S.by.complete),pct(S.by.complete,S.n),'good','complete')}
+    ${tile('In between stages',fmtNum(S.by.in_process),pct(S.by.in_process,S.n),'','in_process')}
     ${tile('LVM / No answer',fmtNum(S.by.lvm),pct(S.by.lvm,S.n),'warn','lvm')}
     ${tile('Never responded',fmtNum(S.by.no_response),pct(S.by.no_response,S.n),'bad','no_response')}
-    ${tile('Avg. call',S.avgDur==null?'–':fmt1(S.avgDur)+' min',fmtNum(S.linked)+' of '+fmtNum(S.n)+' EIDs matched to an interview')}
+    ${tile('Avg. calls',fmt1(S.avgCalls),'per candidate'+(S.avgDur==null?'':' · '+fmt1(S.avgDur)+' min a call'))}
    </div>
    <div class="panel onb-mix"><h4>Where candidates stand (latest status)</h4><div class="onb-bar">${barKeys.map(k=>S.by[k]?`<i class="${CAT_CLS[k]}" style="flex:${S.by[k]}" title="${CAT_LBL[k]}: ${S.by[k]}"></i>`:'').join('')}</div>
     <div class="onb-legend">${barKeys.map(k=>`<span><b class="${CAT_CLS[k]}"></b>${CAT_LBL[k]} · <strong>${S.by[k]}</strong> <small>${pct(S.by[k],S.n)}</small></span>`).join('')}</div></div>
@@ -13116,7 +13124,7 @@ const Onboarding=(()=>{
     <tr class="onb-total"><td><strong>All onboarders</strong></td>${assign.length?`<td class="num">${fmtNum(vol.reduce((a,v)=>a+v.aTot,0))}</td>`:''}<td class="num">${fmtNum(totCalls)}</td><td class="num">${fmtNum(totPeople)}</td><td class="num">${fmtNum(vol.reduce((a,v)=>a+v.reached,0))}</td><td class="num">${fmtNum(vol.reduce((a,v)=>a+v.notReached,0))}</td><td class="num">${fmtNum(vol.reduce((a,v)=>a+v.completed,0))}</td><td class="num">${pct(vol.reduce((a,v)=>a+v.completed,0),vol.reduce((a,v)=>a+v.reached,0))}</td><td></td><td></td><td></td><td class="num">${totPeople?fmt1(totCalls/totPeople):'–'}</td><td></td></tr>
     </tbody></table></div></section>`:''}
    ${assign.length?`<section class="panel"><div class="panel-head"><div><h3>Assignments in these dates</h3><span class="hint">From Log calls — each candidate counts once, on their first call, for the onboarder who made it. Pick a stage to see only candidates whose latest status is in it.</span></div>${copyBtnHtml('onbAsgTot')}</div>
-    <div class="onb-quick onb-aq" role="tablist" aria-label="Filter assignments by stage">${[['','All'],['pending','Pending'],['complete','Completed'],['in_process','In process'],['lvm','LVM / No answer'],['no_response','Never responded']].map(([k,l])=>`<button type="button" data-onb-aq="${k}" class="${aCat===k?'on':''} ${k?CAT_CLS[k]||'q-pending':''}" aria-pressed="${aCat===k}"><span>${l}</span><b>${fmtNum(aCnt(k))}</b></button>`).join('')}</div>
+    <div class="onb-quick onb-aq" role="tablist" aria-label="Filter assignments by stage">${[['','All'],['pending','Pending'],['finalized','Finalized'],['complete','Onboarding complete'],['in_process','In between stages'],['lvm','LVM / No answer'],['no_response','Never responded']].map(([k,l])=>`<button type="button" data-onb-aq="${k}" class="${aCat===k?'on':''} ${k?CAT_CLS[k]||'q-pending':''}" aria-pressed="${aCat===k}"><span>${l}</span><b>${fmtNum(aCnt(k))}</b></button>`).join('')}</div>
     ${aCat?`<p class="hint onb-aq-note">Showing only <strong>${aCat==='pending'?'Pending':escapeHtml(CAT_LBL[aCat])}</strong> candidates (latest status), counted from Log calls. Typed totals are left out while a stage is picked.</p>`:''}
     <div class="onb-scroll"><table class="users-table onb-table" id="onbAsgTot"><thead><tr><th>Onboarder</th>${types.map(t=>`<th class="num">${escapeHtml(tLbl(t))}</th>`).join('')}<th class="num">Total</th></tr></thead><tbody>
     ${volA.filter(v=>v.aTot).length?'':`<tr><td colspan="${types.length+2}" class="hint">No candidates in this stage for these dates.</td></tr>`}
@@ -13125,9 +13133,9 @@ const Onboarding=(()=>{
     ${!aCat&&types.some(t=>pool[t])?`<tr class="onb-total"><td><strong>Total (typed)</strong></td>${types.map(t=>`<td class="num">${pool[t]||'–'}${pool[t]&&aTot[t]!==pool[t]?`<small>${pool[t]-(aTot[t]||0)} not assigned</small>`:''}</td>`).join('')}<td class="num">${types.reduce((a,t)=>a+(pool[t]||0),0)||'–'}</td></tr>`:''}
     </tbody></table></div></section>`:''}
    ${per.length?`<section class="panel"><div class="panel-head"><div><h3>Where each onboarder’s candidates stand</h3><span class="hint">Candidates are credited to whoever made their latest call. % = share of that onboarder’s candidates.</span></div>${copyBtnHtml('onbPerf')}</div>
-    <div class="onb-scroll"><table class="users-table onb-table" id="onbPerf"><thead><tr><th>Onboarder</th><th class="num">Candidates</th><th class="num">Complete</th><th class="num">In process</th><th class="num">LVM / No ans.</th><th class="num">Never resp.</th><th class="num">Calls / cand.</th><th class="num">Avg. min</th><th class="num">Days to complete</th></tr></thead><tbody>
+    <div class="onb-scroll"><table class="users-table onb-table" id="onbPerf"><thead><tr><th>Onboarder</th><th class="num">Candidates</th><th class="num">Finalized</th><th class="num">Onb. complete</th><th class="num">In between</th><th class="num">LVM / No ans.</th><th class="num">Never resp.</th><th class="num">Calls / cand.</th><th class="num">Avg. min</th><th class="num">Days to complete</th></tr></thead><tbody>
     ${[...per, (()=>{ const t=summary(candidates(rows), rows); return {o:'All onboarders', total:true, ...t}; })()].map(x=>{ const c=k=>`<td class="num">${x.by[k]||'–'}${x.by[k]?`<small>${pct(x.by[k],x.n)}</small>`:''}</td>`;
-      return `<tr class="${x.total?'onb-total':''}"><td>${x.total?'<strong>All onboarders</strong>':escapeHtml(x.o)}</td><td class="num"><strong>${fmtNum(x.n)}</strong></td>${c('complete')}${c('in_process')}${c('lvm')}${c('no_response')}<td class="num">${fmt1(x.avgCalls)}</td><td class="num">${fmt1(x.avgDur)}</td><td class="num">${x.avgDays==null?'–':fmt1(x.avgDays)}</td></tr>`; }).join('')}
+      return `<tr class="${x.total?'onb-total':''}"><td>${x.total?'<strong>All onboarders</strong>':escapeHtml(x.o)}</td><td class="num"><strong>${fmtNum(x.n)}</strong></td>${c('finalized')}${c('complete')}${c('in_process')}${c('lvm')}${c('no_response')}<td class="num">${fmt1(x.avgCalls)}</td><td class="num">${fmt1(x.avgDur)}</td><td class="num">${x.avgDays==null?'–':fmt1(x.avgDays)}</td></tr>`; }).join('')}
     </tbody></table></div></section>`:''}`;
  }
  // ---- daily assignment sheet: onboarder × assignment type, plus the pool totals; or paste the daily message ----
@@ -13320,16 +13328,19 @@ const Onboarding=(()=>{
  // ---- admin: manage the dropdowns ----
  async function openListsDialog(){
   if(!LST()) return;
-  let users=[]; try{ users=(await Server.rpc('dash_users_list'))||[]; }catch(e){}
-  users=(Array.isArray(users)?users:[]).filter(u=>u&&u.id!=null).sort((a,b)=>String(a.name).localeCompare(String(b.name)));
+  let users=[], usersErr='';
+  try{ users=(await Server.rpc('dash_users_list'))||[]; }catch(e){ usersErr=cleanErr(e); }
+  if(!Array.isArray(users)||!users.length) users=(typeof usersCache!=='undefined'&&Array.isArray(usersCache)&&usersCache.length)?usersCache:(Array.isArray(users)?users:[]);
+  users=users.filter(u=>u&&u.id!=null).sort((a,b)=>String(a.name).localeCompare(String(b.name)));
   const L=JSON.parse(JSON.stringify(lists()));
   const work={onboarders:(L.onboarders||[]).map(x=>({...x, orig:x.label})), assignTypes:(L.assignTypes||DEFAULT_LISTS.assignTypes).map(x=>({...x, orig:x.label})), callTypes:L.callTypes.map(x=>({...x, orig:x.label})), statuses:L.statuses.map(x=>({...x, orig:x.label})), retired:L.retired||[]};
   document.getElementById('onbListsDlg')?.remove();
   const wrap=document.createElement('div'); wrap.className='modal-overlay'; wrap.id='onbListsDlg';
   const draw=()=>{
-   const row=(kind,x,i,n)=>`<div class="ol-row"><span class="ol-move"><button type="button" data-mv="${kind}:${i}:-1" ${i?'':'disabled'} aria-label="Move up">▲</button><button type="button" data-mv="${kind}:${i}:1" ${i<n-1?'':'disabled'} aria-label="Move down">▼</button></span><input data-lbl="${kind}:${i}" value="${escapeHtml(x.label)}" maxlength="120">${kind==='onboarders'?`<select data-uid="${i}" title="Dashboard user who logs in as this onboarder"><option value="">— no user linked —</option>${users.map(u=>`<option value="${escapeHtml(String(u.id))}" ${String(x.userId||'')===String(u.id)?'selected':''}>${escapeHtml(u.name)}${u.role&&u.role!=='user'?' ('+escapeHtml(u.role.replace('_',' '))+')':''}</option>`).join('')}${x.userId&&!users.some(u=>String(u.id)===String(x.userId))?`<option value="${escapeHtml(String(x.userId))}" selected>User #${escapeHtml(String(x.userId))}</option>`:''}</select>`:''}${kind==='statuses'?`<select data-cat="${i}">${CATS.map(([k,l])=>`<option value="${k}" ${x.cat===k?'selected':''}>${l}</option>`).join('')}</select>`:''}<button type="button" class="link-btn danger" data-rm="${kind}:${i}">Delete</button></div>`;
+   const row=(kind,x,i,n)=>`<div class="ol-row"><span class="ol-move"><button type="button" data-mv="${kind}:${i}:-1" ${i?'':'disabled'} aria-label="Move up">▲</button><button type="button" data-mv="${kind}:${i}:1" ${i<n-1?'':'disabled'} aria-label="Move down">▼</button></span><input data-lbl="${kind}:${i}" value="${escapeHtml(x.label)}" maxlength="120">${kind==='onboarders'?`<select data-uid="${i}" title="Dashboard user who logs in as this onboarder"><option value="">— no user linked —</option>${users.map(u=>`<option value="${escapeHtml(String(u.id))}" ${String(x.userId||'')===String(u.id)?'selected':''}>${escapeHtml(u.name)}${u.role&&u.role!=='user'?' ('+escapeHtml(u.role.replace('_',' '))+')':''}</option>`).join('')}${x.userId&&!users.some(u=>String(u.id)===String(x.userId))?`<option value="${escapeHtml(String(x.userId))}" selected>⚠ Linked user not found — pick again</option>`:''}</select>`:''}${kind==='statuses'?`<select data-cat="${i}">${CATS.map(([k,l])=>`<option value="${k}" ${x.cat===k?'selected':''}>${l}</option>`).join('')}</select>`:''}<button type="button" class="link-btn danger" data-rm="${kind}:${i}">Delete</button></div>`;
    wrap.innerHTML=`<div class="modal ol-modal" role="dialog" aria-modal="true" aria-labelledby="olT"><div class="modal-header"><h3 id="olT">Onboarding dropdowns</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div>
     <div class="modal-body">
+     ${(()=>{ const miss=work.onboarders.filter(o=>o.userId&&!users.some(u=>String(u.id)===String(o.userId))).length; return usersErr||miss?`<div class="onb-demo bad" style="margin:0 0 10px">${usersErr?'The user list could not be loaded ('+escapeHtml(usersErr)+') — only admins can load it.':''} ${miss?`${miss} onboarder${miss===1?' is':'s are'} linked to a user that no longer exists (the account was removed or re-created). Pick the right user for ${miss===1?'it':'them'} and Save.`:''}</div>`:''; })()}
      <h4>Onboarders <span class="hint">— names used on the onboarding page; link each to the user who logs in as them. Pasted messages match by first name.</span></h4><div class="ol-list">${work.onboarders.map((x,i)=>row('onboarders',x,i,work.onboarders.length)).join('')||'<p class="hint" style="margin:0">None yet.</p>'}</div><button type="button" class="btn btn-secondary btn-sm" data-add="onboarders">＋ Add onboarder</button>
      <h4>Call type</h4><div class="ol-list">${work.callTypes.map((x,i)=>row('callTypes',x,i,work.callTypes.length)).join('')}</div><button type="button" class="btn btn-secondary btn-sm" data-add="callTypes">＋ Add call type</button>
      <h4>Assignment type <span class="hint">— columns of the daily assignment sheet</span></h4><div class="ol-list">${work.assignTypes.map((x,i)=>row('assignTypes',x,i,work.assignTypes.length)).join('')}</div><button type="button" class="btn btn-secondary btn-sm" data-add="assignTypes">＋ Add assignment type</button>
@@ -13991,26 +14002,27 @@ const OverviewX=(()=>{
  function onbHtml(all,P){
   const O=Onboarding, rows=all.filter(r=>inWeeks(P,r.call_date)), prev=all.filter(r=>r.call_date>=P.pFrom&&r.call_date<=P.pTo);
   const C=O.candidates(rows), S=O.summary(C,rows), pC=O.candidates(prev), pS=O.summary(pC,prev);
-  const by=S.by, pb=pS.by, keys=['complete','in_process','lvm','no_response'];
+  const by=S.by, pb=pS.by, keys=['finalized','complete','in_process','lvm','no_response'];
   const reach=c=>c.calls.some(x=>!['lvm','no_response'].includes(O.catOf(x.status,x.call_type)));
   const reached=C.filter(reach).length;
   const per=O.perOnboarder(C,rows);
-  const wk=P.t8.map(w=>{ const rs=all.filter(r=>weekEnd(r.call_date)===w), cs=O.candidates(rs); return {w, calls:rs.length, people:cs.length, reached:cs.filter(reach).length, done:cs.filter(c=>c.calls.some(x=>O.catOf(x.status,x.call_type)==='complete')).length, nr:cs.filter(c=>c.cat==='no_response').length}; });
+  const wk=P.t8.map(w=>{ const rs=all.filter(r=>weekEnd(r.call_date)===w), cs=O.candidates(rs); return {w, calls:rs.length, people:cs.length, reached:cs.filter(reach).length, done:cs.filter(c=>c.calls.some(x=>['complete','finalized'].includes(O.catOf(x.status,x.call_type)))).length, nr:cs.filter(c=>c.cat==='no_response').length}; });
   return `<div class="ovx-cards">
-    ${card('Candidates worked',fmtNum(S.n),fmtNum(S.calls)+' calls · '+f1(S.avgCalls)+' per candidate',dlt(S.n,pS.n))}
-    ${card('Onboarding complete',fmtNum(by.complete),pc(by.complete,S.n)+' of candidates'+(S.avgDays!=null?' · avg '+f1(S.avgDays)+' days':''),dlt(by.complete,pb.complete),'good')}
-    ${card('In process',fmtNum(by.in_process),pc(by.in_process,S.n)+(S.i9n?' · '+fmtNum(S.i9n)+' at an I9 stage':''),dlt(by.in_process,pb.in_process))}
+    ${card('Candidates reached',fmtNum(S.reached),'unique · '+pc(S.reached,S.n)+' of '+fmtNum(S.n)+' called',dlt(S.reached,pS.reached))}
+    ${card('Finalized',fmtNum(by.finalized),pc(by.finalized,S.n)+' · EB / I9 complete',dlt(by.finalized,pb.finalized),'fin')}
+    ${card('Onboarding complete',fmtNum(by.complete),pc(by.complete,S.n),dlt(by.complete,pb.complete),'good')}
+    ${card('In between stages',fmtNum(by.in_process),pc(by.in_process,S.n),dlt(by.in_process,pb.in_process))}
     ${card('LVM / No answer',fmtNum(by.lvm),pc(by.lvm,S.n),dlt(by.lvm,pb.lvm,-1),'warn')}
     ${card('Never responded',fmtNum(by.no_response),pc(by.no_response,S.n)+' · incl. LVM on 3+ days',dlt(by.no_response,pb.no_response,-1),'bad')}
-    ${card('Reached',fmtNum(reached),pc(reached,S.n)+' of candidates picked up at least once','')}
+    ${card('Avg. calls',f1(S.avgCalls),'per candidate'+(S.avgDur==null?'':' · '+f1(S.avgDur)+' min a call'),'')}
    </div>
    <p class="ovx-cmp">${P.running?(P.days?'<b>Today is still going</b> — the numbers so far are compared with the full day(s) before. ':'<b>This week is still going</b> — the numbers so far are compared with the full week(s) before. '):''}Compared with ${escapeHtml(P.prevLabel)} (${fmtNum(pS.n)} candidates, ${fmtNum(pb.complete)} complete). Each candidate counts once — the latest call in the period decides where they stand.</p>
    ${S.n?`<div class="panel onb-mix"><h4>Where candidates stand</h4><div class="onb-bar">${keys.map(k=>by[k]?`<i class="${O.CAT_CLS[k]}" style="flex:${by[k]}" title="${O.CAT_LBL[k]}: ${by[k]}"></i>`:'').join('')}</div>
     <div class="onb-legend">${keys.map(k=>`<span><b class="${O.CAT_CLS[k]}"></b>${O.CAT_LBL[k]} · <strong>${by[k]}</strong> <small>${pc(by[k],S.n)}</small></span>`).join('')}</div></div>`:''}
    <div class="ovx-two ovx-stack">
    <section class="panel"><div class="panel-head"><div><h3>By onboarder</h3><span class="hint">Candidates credited to whoever made their latest call.</span></div>${copyBtnHtml('ovxOnbPer')}</div>
-    <div class="onb-scroll"><table class="users-table onb-table" id="ovxOnbPer"><thead><tr><th>Onboarder</th><th class="num">Candidates</th><th class="num">Complete</th><th class="num">In process</th><th class="num">LVM</th><th class="num">Never resp.</th><th class="num">Calls</th></tr></thead><tbody>
-    ${per.map(x=>`<tr><td>${escapeHtml(x.o)}</td><td class="num"><strong>${fmtNum(x.n)}</strong></td>${['complete','in_process','lvm','no_response'].map(k=>`<td class="num">${x.by[k]||'–'}${x.by[k]?`<small>${pc(x.by[k],x.n)}</small>`:''}</td>`).join('')}<td class="num">${fmtNum(x.myCalls)}</td></tr>`).join('')||'<tr><td colspan="8" class="hint">No calls in these weeks.</td></tr>'}
+    <div class="onb-scroll"><table class="users-table onb-table" id="ovxOnbPer"><thead><tr><th>Onboarder</th><th class="num">Candidates</th><th class="num">Finalized</th><th class="num">Onb. complete</th><th class="num">In between</th><th class="num">LVM</th><th class="num">Never resp.</th><th class="num">Calls</th></tr></thead><tbody>
+    ${per.map(x=>`<tr><td>${escapeHtml(x.o)}</td><td class="num"><strong>${fmtNum(x.n)}</strong></td>${['finalized','complete','in_process','lvm','no_response'].map(k=>`<td class="num">${x.by[k]||'–'}${x.by[k]?`<small>${pc(x.by[k],x.n)}</small>`:''}</td>`).join('')}<td class="num">${fmtNum(x.myCalls)}</td></tr>`).join('')||'<tr><td colspan="8" class="hint">No calls in these weeks.</td></tr>'}
     ${per.length?`<tr class="onb-total"><td><strong>All</strong></td><td class="num">${fmtNum(S.n)}</td>${keys.map(k=>`<td class="num">${by[k]||'–'}${by[k]?`<small>${pc(by[k],S.n)}</small>`:''}</td>`).join('')}<td class="num">${fmtNum(S.calls)}</td></tr>`:''}
     </tbody></table></div></section>
    <section class="panel"><div class="panel-head"><div><h3>Last 8 weeks</h3><span class="hint">Week by week, up to ${escapeHtml(short(P.to))}. Completed = finished onboarding on a call that week.</span></div>${copyBtnHtml('ovxOnbWk')}</div>
