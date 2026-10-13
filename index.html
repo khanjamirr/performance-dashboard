@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.66.0</title>
+<title>Performance Dashboard · v4.67.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -1166,6 +1166,8 @@ button.onb-tile{font:inherit;text-align:left;cursor:pointer}button.onb-tile:disa
 .rtl-sum{text-align:right;font-variant-numeric:tabular-nums;background:#fbfcfe}.rtl-sum small{color:#64748b}.rtl-pct.g{color:#15803d;font-weight:700}.rtl-pct.a{color:#b45309;font-weight:700}.rtl-pct.r{color:#c8102e;font-weight:700}
 .rtl-tot td{background:#f1f5f9!important;font-weight:700;border-top:2px solid #dbe3ee}.rtl-tot .rtl-name{background:#f1f5f9}.rtl-avg td{color:#475569;background:#fafbfd}.rtl-avg .rtl-name{font-weight:500;background:#fafbfd}
 .rtl-k{font-weight:600;border-radius:4px;padding:0 5px}.rtl-k.g{background:#dcfce7;color:#14532d}.rtl-k.a{background:#fef3c7;color:#78350f}.rtl-k.r{background:#fde2e2;color:#7f1d1d}
+.dpr-field{display:flex;flex-direction:column;gap:4px}.dpr-field>span{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#64748b}
+.dpr-btn{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;border:1px solid #cfd6df;border-radius:8px;background:#fff;font:inherit;font-size:13px;font-weight:600;color:#0a1f44;cursor:pointer;white-space:nowrap}.dpr-btn:hover{border-color:#94a3b8}.dpr-btn:focus-visible{outline:2px solid #2563eb;outline-offset:1px}.dpr-btn svg{color:#2563eb;flex:0 0 auto}.dpr-btn i{font-style:normal;opacity:.55;font-size:11px}
 /* Overview: Recruiting · Onboarding · Order Entry */
 #ovModeBar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin:0 0 14px}
 .ovx-switch{display:inline-flex;gap:3px;padding:4px;background:#e9edf4;border-radius:10px}.ovx-switch button{border:0;background:transparent;padding:8px 18px;border-radius:7px;font:inherit;font-size:13.5px;font-weight:600;color:#475569;cursor:pointer;white-space:nowrap}.ovx-switch button.on{background:#fff;color:#0a1f44;box-shadow:0 1px 2px #0f172a24}
@@ -4748,14 +4750,17 @@ function adjacentUploadedWeek(direction){
  if(!selected.length)return direction<0?available[available.length-1]:null;
  return direction<0?available.filter(d=>d<selected[0]).pop():available.find(d=>d>selected[selected.length-1]);
 }
-function navigateUploadedWeek(direction){const date=adjacentUploadedWeek(direction);if(!date)return;selectedWeekEndDates=[date];currentWeekEndDate=date;closePeriodPicker();refreshUI();}
+function navigateUploadedWeek(direction){if(currentView==='performance'&&OverviewX.active()){OverviewX.step(direction);return;}const date=adjacentUploadedWeek(direction);if(!date)return;selectedWeekEndDates=[date];currentWeekEndDate=date;closePeriodPicker();refreshUI();}
 document.getElementById('periodPrevious').onclick=()=>navigateUploadedWeek(-1);
 document.getElementById('periodNext').onclick=()=>navigateUploadedWeek(1);
 function renderPeriodPickerButton(){
- document.getElementById('periodPrevious').disabled=!adjacentUploadedWeek(-1);
- document.getElementById('periodNext').disabled=!adjacentUploadedWeek(1);
+ let ovx=false; try{ ovx=currentView==='performance'&&OverviewX.active(); }catch(e){}
+ document.getElementById('periodPrevious').disabled=ovx?false:!adjacentUploadedWeek(-1);
+ document.getElementById('periodNext').disabled=ovx?!OverviewX.canStep(1):!adjacentUploadedWeek(1);
+ ['periodPrevious','periodNext'].forEach(id=>document.getElementById(id).title=ovx?(id==='periodPrevious'?'Previous days':'Next days'):(id==='periodPrevious'?'Previous uploaded week':'Next uploaded week'));
   const btn = document.getElementById('periodPickerBtn');
   if(!btn) return;
+  if(ovx){ btn.innerHTML = escapeHtml(OverviewX.pickerLabel())+' <span style="opacity:.6;">&#9662;</span>'; return; }
   btn.innerHTML = escapeHtml(periodPickerButtonLabel())+' <span style="opacity:.6;">&#9662;</span>';
 }
 function closePeriodPicker(){
@@ -4879,6 +4884,7 @@ function renderPeriodPickerList(searchText){
 }
 document.getElementById('periodPickerBtn').addEventListener('click', (e)=>{
   e.stopPropagation(); closePeriodPicker();
+  if(currentView==='performance' && OverviewX.active()){ OverviewX.openPicker(e.currentTarget); return; }
   // calendar: click a day to pick its week, click another day to cover several weeks; quick picks on the left
   const weeks=[...new Set(weeksData.map(w=>w.weekEndDate))].sort();
   const sel=selectedWeekEndDates.length?[...selectedWeekEndDates].sort():(currentWeekEndDate&&currentWeekEndDate!=='all-weeks'?[currentWeekEndDate]:[]);
@@ -6714,7 +6720,7 @@ async function renderRecruiterTimeline(names){
   host.innerHTML=`<div class="rtl" data-section="rec.timeline"><div class="rtl-head"><div><h4>Schedules by ${unit} — recruiter comparison</h4><span class="hint">${fmtNum(people.length)} recruiter${people.length===1?'':'s'} — the search, division and column filters of the detail table apply. ${recTl.vsGoal?`Colours compare with each recruiter’s weekly goal${grain==='day'?' ÷ 5 per weekday':''}: <b class="rtl-k g">at goal</b> <b class="rtl-k a">half way</b> <b class="rtl-k r">under half</b>.`:'Darker = more schedules.'} Bold = their best ${unit}.</span></div>${copyBtnHtml('recTlTable')}${Server.can('export')?downloadBtnHtml('recTlTable','recruiter-schedules-by-'+unit+'.xlsx'):''}</div>
    <div class="rtl-tools">
     <label class="rtl-chk" title="${span>62?'More than 62 days picked — weeks only':'Off = one column per day · On = one column per week'}"><button type="button" class="switch" role="switch" id="rtlWeek" aria-checked="${grain==='week'}" ${span>62?'disabled':''}><i></i></button>By week</label>
-    <div class="onb-range"><label>From<input type="date" id="rtlFrom" value="${from}" max="${today}"></label><label>To<input type="date" id="rtlTo" value="${to}" max="${today}"></label></div>
+    <div class="onb-range"><div class="dpr-field"><span>Dates</span>${dateRangeBtn('rtlFrom','rtlTo',from,to,today)}</div></div>
     ${from!==pFrom||to!==(pTo>today?today:pTo)?'<button type="button" class="link-btn" id="rtlReset">Back to the selected period</button>':''}
     <label class="cand-field"><span>Sort</span><select id="rtlSort">${[['total','Most schedules'],['goal','% of goal'],['avg','Per active '+unit],['name','Name']].map(([k,l])=>`<option value="${k}" ${recTl.sort===k?'selected':''}>${l}</option>`).join('')}</select></label>
     <label class="rtl-chk"><button type="button" class="switch" role="switch" id="rtlGoal" aria-checked="${recTl.vsGoal}"><i></i></button>Compare with goal</label>
@@ -11938,7 +11944,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.66.0';   // shown only in the browser tab title
+const APP_VERSION = '4.67.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -12961,7 +12967,7 @@ const Onboarding=(()=>{
  }
  function filters(adm, onbs, withCat){
   return `<div class="onb-tools">
-    <div class="onb-range"><label>From<input type="date" id="onbFrom" value="${st.from}"></label><label>To<input type="date" id="onbTo" value="${st.to}"></label></div>
+    <div class="onb-range"><div class="dpr-field"><span>Dates</span>${dateRangeBtn('onbFrom','onbTo',st.from,st.to)}</div></div>
     ${adm?`<label class="cand-field"><span>Onboarder</span><select id="onbFOnb"><option value="">Everyone</option>${onbs.map(o=>`<option ${st.fOnb===o?'selected':''}>${escapeHtml(o)}</option>`).join('')}</select></label>`:''}
     <label class="cand-field"><span>Call type</span><select id="onbFType"><option value="">All</option>${callTypes().map(c=>`<option ${st.fType===c?'selected':''}>${escapeHtml(c)}</option>`).join('')}</select></label>
     ${withCat?`<label class="cand-field"><span>Latest status</span><select id="onbFCat"><option value="">All</option><option value="pending" ${st.fCat==='pending'?'selected':''}>Pending (not complete yet)</option>${CATS.map(([k,l])=>`<option value="${k}" ${st.fCat===k?'selected':''}>${l}</option>`).join('')}</select></label>
@@ -13138,7 +13144,7 @@ const Onboarding=(()=>{
   $('#onbLists2')?.addEventListener('click',openListsDialog);
   const filt=()=>{ const reload=async()=>{ await load(); render(); };
    $('#onbFrom')?.addEventListener('change',e=>{ if(e.target.value){ st.from=e.target.value; if(st.to<st.from) st.to=st.from; reload(); } });
-   $('#onbTo')?.addEventListener('change',e=>{ if(e.target.value){ st.to=e.target.value; reload(); } });
+   $('#onbTo')?.addEventListener('change',e=>{ if(e.target.value){ st.from=$('#onbFrom')?.value||st.from; st.to=e.target.value; if(st.to<st.from) [st.from,st.to]=[st.to,st.from]; reload(); } });
    $('#onbFOnb')?.addEventListener('change',e=>{ st.fOnb=e.target.value; render(); });
    $('#onbFType')?.addEventListener('change',e=>{ st.fType=e.target.value; render(); });
    $('#onbFCat')?.addEventListener('change',e=>{ st.fCat=e.target.value; render(); });
@@ -13462,7 +13468,7 @@ const OrderEntry=(()=>{
   const views=[['total','Total'],['rc','RC only'],['crm','CRM only'],['split','RC + CRM side by side']];
   return `<div class="onb-tools oe-tools">
     <div class="oe-group" role="tablist" aria-label="Group by">${Object.entries(GROUPS).map(([k,g])=>`<button type="button" data-oe-group="${k}" class="${st.group===k?'on':''}" aria-pressed="${st.group===k}">${g.label}</button>`).join('')}</div>
-    <div class="onb-range"><label>From<input type="date" id="oeFrom" value="${st.from}"></label><label>To<input type="date" id="oeTo" value="${st.to}"></label></div>
+    <div class="onb-range"><div class="dpr-field"><span>Dates</span>${dateRangeBtn('oeFrom','oeTo',st.from,st.to)}</div></div>
     ${st.custom?'<button type="button" class="link-btn" id="oeDefRange" title="Back to the usual dates for this view">Default dates</button>':''}
     <label class="cand-field"><span>Agent</span><select id="oeAgent"><option value="">Everyone</option>${names.map(n=>`<option ${st.agent===n?'selected':''}>${escapeHtml(n)}</option>`).join('')}</select></label>
    </div>
@@ -13876,13 +13882,20 @@ const OverviewX=(()=>{
   const ms=modes(); if(ms.length<2){ host.innerHTML=''; host.classList.add('hidden'); return; }
   host.classList.remove('hidden'); const m=mode();
   host.innerHTML=`<div class="ovx-switch" role="tablist" aria-label="Overview">${ms.map(([k,l])=>`<button type="button" role="tab" data-ovx="${k}" class="${m===k?'on':''}" aria-selected="${m===k}">${l}</button>`).join('')}</div>
-   ${m==='recruiting'?'':`<div class="ovx-quick" role="group" aria-label="Weeks">${[['picker','Period picker'],['today','Today'],['yesterday','Yesterday'],['week','This week'],['lastweek','Last week'],['w4','Last 4 weeks'],['w13','Last 13 weeks']].map(([k,l])=>`<button type="button" data-ovq="${k}" class="${st.quick===k?'on':''}" title="${k==='picker'?'Use the weeks chosen in the Period picker at the top':''}">${l}</button>`).join('')}<span class="ovx-dates ${st.quick==='custom'?'on':''}" title="Any dates — pick one day, or click a second day for a range"><label>From<input type="date" id="ovxFrom" value="${st.cFrom||''}" max="${ltToday()}"></label><label>To<input type="date" id="ovxTo" value="${st.cTo||''}" max="${ltToday()}"></label></span><button type="button" class="ovx-refresh" data-ovr title="Get the latest numbers">↻</button></div>`}`;
+   ${m==='recruiting'?'':`<div class="ovx-quick" role="group" aria-label="Weeks">${[['today','Today'],['yesterday','Yesterday'],['week','This week'],['lastweek','Last week'],['w4','Last 4 weeks'],['w13','Last 13 weeks']].map(([k,l])=>`<button type="button" data-ovq="${k}" class="${st.quick===k?'on':''}" title="${k==='picker'?'Use the weeks chosen in the Period picker at the top':''}">${l}</button>`).join('')}<button type="button" class="ovx-refresh" data-ovr title="Get the latest numbers">↻</button></div>`}`;
   host.querySelectorAll('[data-ovx]').forEach(b=>b.onclick=()=>{ st.mode=b.dataset.ovx; try{ localStorage.setItem(LS,st.mode); }catch(e){} refreshUI(); });
   host.querySelectorAll('[data-ovq]').forEach(b=>b.onclick=()=>{ st.quick=b.dataset.ovq; refreshUI(); });
   host.querySelector('[data-ovr]')?.addEventListener('click',()=>{ st.cache.clear(); refreshUI(); });
-  let dt; ['#ovxFrom','#ovxTo'].forEach(id=>host.querySelector(id)?.addEventListener('change',()=>{ clearTimeout(dt); dt=setTimeout(()=>{
-   const a=host.querySelector('#ovxFrom').value, b=host.querySelector('#ovxTo').value||a; if(!a) return; st.cFrom=a<b?a:b; st.cTo=a<b?b:a; st.quick='custom'; refreshUI(); },30); }));
+
  }
+ // the top Period button: in these views it picks days (one day or a range) instead of uploaded weeks
+ function pickerLabel(){ const P=period(); return (st.quick==='picker'?'':'')+dateRangeLabel(P.from, P.to); }
+ function openPicker(anchor){ const P=period(), t=ltToday();
+  DatePick.open(anchor,{mode:'range', from:P.from, to:P.to>t?t:P.to, max:t, title:'Pick a day or a range',
+   onPick:([a,b])=>{ if(!a) return; b=b||a; if(b<a) [a,b]=[b,a]; st.cFrom=a; st.cTo=b; st.quick='custom'; refreshUI(); }}); }
+ function step(dir){ const P=period(), t=ltToday(), n=Math.round((parse(P.to)-parse(P.from))/864e5)+1;
+  let a=add(P.from,dir*n), b=add(P.to,dir*n); if(a>t) return; if(b>t) b=t; st.cFrom=a; st.cTo=b; st.quick='custom'; refreshUI(); }
+ const canStep=dir=>dir<0||period().to<ltToday();
  function killCharts(){ st.charts.forEach(c=>{ try{ c.destroy(); }catch(e){} }); st.charts=[]; }
  async function render(){
   const host=document.getElementById('view-ovx'); if(!host) return; killCharts();
@@ -13974,7 +13987,7 @@ const OverviewX=(()=>{
     scales:{x:{stacked:true, grid:{display:false}}, y:{stacked:true, beginAtZero:true, ticks:{precision:0}}}}});
   if(ch) st.charts.push(ch);
  }
- return {bar, render, mode, active:()=>mode()!=='recruiting'};
+ return {bar, render, mode, active:()=>mode()!=='recruiting', pickerLabel, openPicker, step, canStep};
 })();
 function renderDivReportView(){ DivReport.show(); }
 
@@ -14154,7 +14167,7 @@ const DatePick=(()=>{
     if(st.mode==='week'){ st.value=weekEnd(d); draw(); return; }
     if(st.mode==='period'){ st.all=false; if(!st.a||st.b){ st.a=weekStart(d); st.b=null; } else { const e=weekEnd(d); if(e<st.a){ st.b=weekEnd(st.a); st.a=weekStart(d); } else st.b=e; } draw(); return; }
     if(!st.a||st.b){ st.a=d; st.b=null; } else { if(d<st.a){ st.b=st.a; st.a=d; } else st.b=d; } draw(); };
-   b.ondblclick=()=>{ if(st.mode==='single'||st.mode==='week') done(); };
+   b.ondblclick=()=>{ if(st.mode==='single'||st.mode==='week') done(); else if(st.mode==='range'){ st.a=st.b=b.dataset.d; done(); } };
    if(st.mode==='range') b.onmouseenter=()=>{ if(st.a&&!st.b){ st.hover=b.dataset.d; pop.querySelectorAll('.dp-day').forEach(x=>{ const lo=st.a<st.hover?st.a:st.hover, hi=st.a<st.hover?st.hover:st.a; x.classList.toggle('in',x.dataset.d>=lo&&x.dataset.d<=hi); }); } };
    if(st.mode==='period') b.onmouseenter=()=>{ if(st.a&&!st.b){ st.hover=b.dataset.d; const he=weekEnd(st.hover), lo=st.a<he?st.a:weekStart(st.hover), hi=st.a<he?he:weekEnd(st.a); pop.querySelectorAll('.dp-day').forEach(x=>x.classList.toggle('in',x.dataset.d>=lo&&x.dataset.d<=hi)); } };
    if(st.mode==='week') b.onmouseenter=()=>{ const we=weekEnd(b.dataset.d); pop.querySelectorAll('.dp-day').forEach(x=>x.classList.toggle('hv',weekEnd(x.dataset.d)===we&&!x.disabled)); };
@@ -14247,6 +14260,23 @@ const DatePick=(()=>{
  addEventListener('resize',()=>place()); addEventListener('scroll',()=>{ if(pop&&!pop.classList.contains('sheet')) place(); },true);
  return {open, close};
 })();
+
+/* ---- one button for a date range: opens the calendar with quick picks; one day + Done = a single date ---- */
+function dateRangeLabel(a,b){ if(!a) return 'Pick dates'; const P=s=>new Date(s+'T12:00:00'); b=b||a;
+ if(a===b) return P(a).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+ const sameY=a.slice(0,4)===b.slice(0,4), n=Math.round((P(b)-P(a))/864e5)+1;
+ return P(a).toLocaleDateString(undefined,{month:'short',day:'numeric',...(sameY?{}:{year:'numeric'})})+' – '+P(b).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})+' · '+n+' days'; }
+function dateRangeBtn(fromId,toId,from,to,max){
+ return `<span class="dpr"><input type="date" id="${fromId}" value="${from||''}" data-dp-no hidden><input type="date" id="${toId}" value="${to||''}" data-dp-no hidden><button type="button" class="dpr-btn" data-dpr="${fromId}|${toId}" data-max="${max||''}" aria-label="Dates: ${escapeHtml(dateRangeLabel(from,to))} — click to change"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>${escapeHtml(dateRangeLabel(from,to))}</span><i aria-hidden="true">▾</i></button></span>`; }
+document.addEventListener('click',e=>{
+ const b=e.target.closest&&e.target.closest('[data-dpr]'); if(!b) return;
+ e.preventDefault(); e.stopPropagation();
+ const [fi,ti]=b.dataset.dpr.split('|'), f=document.getElementById(fi), t=document.getElementById(ti); if(!f||!t) return;
+ DatePick.open(b,{mode:'range', from:f.value||null, to:t.value||f.value||null, max:b.dataset.max||ltToday(), title:'Pick a day or a range',
+  onPick:([x,y])=>{ if(!x) return; y=y||x; if(y<x) [x,y]=[y,x]; f.value=x; t.value=y;
+   b.querySelector('span').textContent=dateRangeLabel(x,y);
+   t.dispatchEvent(new Event('change',{bubbles:true})); }});
+},true);
 
 </script>
 </body>
