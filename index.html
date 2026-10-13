@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.61.0</title>
+<title>Performance Dashboard · v4.62.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -1153,6 +1153,16 @@ button.onb-tile{font:inherit;text-align:left;cursor:pointer}button.onb-tile:disa
 .oe-part{font-size:10.5px;font-weight:600;background:#fef3c7;color:#92400e;border-radius:999px;padding:1px 7px;margin-left:4px}.oe-part.run{background:#e0f2fe;color:#075985}
 .oe-d{font-size:12px;color:#64748b}.oe-d.up{color:#15803d}.oe-d.down{color:#c8102e}
 .oe-grid th.oe-sep,.oe-grid td.oe-sep{border-right:1px solid #e2e8f0}
+#view-orderentry p.hint{font-size:12.5px;margin:4px 0 8px}#view-orderentry .onb-demo .hint{display:block;font-size:12px}
+.oe-bulk-help{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px 14px;margin:0 0 12px}.oe-bulk-help h4{margin:0 0 6px;font-size:13px;color:#0a1f44}.oe-bulk-help p{margin:4px 0;font-size:12.5px}
+.oe-sample{border-collapse:collapse;font-size:12px;margin:6px 0}.oe-sample th,.oe-sample td{border:1px solid #d6dde8;padding:3px 8px;text-align:left;background:#fff}.oe-sample th{background:#eef2f7;font-weight:600}.oe-sample i{font-weight:400;color:#64748b}
+.oe-bulk-in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:12px;margin-bottom:12px}@media (max-width:760px){.oe-bulk-in{grid-template-columns:1fr}.oe-bulk-help{flex-direction:column}}
+.oe-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:2px dashed #c3cede;border-radius:10px;padding:18px;cursor:pointer;text-align:center;font-size:13px;color:#1f2a37;background:#fff;min-height:120px}.oe-drop:hover,.oe-drop.on{border-color:#2563eb;background:#f3f7ff}.oe-drop-ico{font-size:22px;color:#2563eb}
+.oe-paste{display:flex;flex-direction:column;gap:6px;align-items:flex-start}.oe-paste textarea{width:100%;font:12.5px/1.4 ui-monospace,Menlo,Consolas,monospace;padding:8px 10px;border:1px solid #cfd6df;border-radius:8px;resize:vertical;box-sizing:border-box}
+.oe-bulk-sum{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 8px}.oe-bulk-sum>div{border:1px solid #e1e7ef;border-radius:9px;padding:8px 12px;background:#fff;display:flex;flex-direction:column;min-width:110px}.oe-bulk-sum b{font-size:18px;color:#0a1f44}.oe-bulk-sum span{font-size:11.5px;color:#64748b}
+.oe-bulk-sum .new b{color:#15803d}.oe-bulk-sum .chg b{color:#b45309}.oe-bulk-sum .bad b{color:#c8102e}.oe-bulk-sum .warn b{color:#92400e}
+.oe-chk{display:flex;align-items:center;gap:6px;margin:6px 0 2px;font-weight:600}.oe-mode{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;font-size:13px;margin:8px 0 10px}.oe-mode>span{font-weight:600;color:#0a1f44}.oe-mode label{display:flex;align-items:center;gap:5px}
+.oe-prev{max-height:420px}.oe-bad td{background:#fff5f5}.oe-tag{font-size:11px;font-weight:600;border-radius:999px;padding:2px 8px;white-space:nowrap}.oe-tag.new{background:#dcfce7;color:#166534}.oe-tag.chg{background:#ffedd5;color:#9a3412}.oe-tag.same{background:#f1f5f9;color:#64748b}.oe-tag.skip{background:#f1f5f9;color:#475569}.oe-tag.bad{background:#fde2e2;color:#991b1b;white-space:normal}.oe-tag.warn{background:#fef3c7;color:#92400e}
 .oe-bulk{display:flex;flex-direction:column;gap:4px;margin-top:12px;font-size:12.5px;font-weight:600;color:#0a1f44}.oe-bulk textarea{font:inherit;font-size:13px;padding:7px 9px;border:1px solid #cfd6df;border-radius:6px;resize:vertical}
 
 @media(max-width:1200px){.onb-tiles{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
@@ -11680,7 +11690,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.61.0';   // shown only in the browser tab title
+const APP_VERSION = '4.62.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -13133,11 +13143,11 @@ const OrderEntry=(()=>{
   const host=document.getElementById('view-orderentry'); if(!host) return;
   if(!Server.can('orderentry')){ host.innerHTML='<div class="panel"><p class="hint" style="margin:0">Ask an admin for the Order Entry right.</p></div>'; return; }
   if(OrderEntry._chart){ try{ OrderEntry._chart.destroy(); }catch(e){} OrderEntry._chart=null; }
-  const adm=Server.isAdmin(); if(!st.page) st.page='entry';
-  const pages=[['entry','✏️ Daily entry'],['report','📊 Report']];
+  const adm=Server.isAdmin(); if(!st.page||(st.page==='bulk'&&!adm)) st.page='entry';
+  const pages=[['entry','✏️ Daily entry'],['report','📊 Report'],...(adm?[['bulk','⬆ Bulk upload']]:[])];
   const nav=`<div class="onb-navbar"><div class="onb-nav" role="tablist">${pages.map(([k,l])=>`<button type="button" role="tab" data-oe-page="${k}" class="${st.page===k?'on':''}" aria-selected="${st.page===k}">${l}</button>`).join('')}</div><span class="onb-updated">${st.loadedAt?'Updated '+st.loadedAt.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}):''}</span><button type="button" class="btn btn-secondary btn-sm onb-refresh" id="oeRefresh" ${st.refreshing?'disabled':''} title="Get the latest numbers and agent names without reloading the page">${st.refreshing?'Refreshing…':'↻ Refresh'}</button></div>`;
   const top=`${adm?`<div class="onb-admin"><span><strong>Admin</strong> · order entry agent names</span><button type="button" class="btn btn-primary btn-sm" id="oeAgents">⚙ Manage agents</button></div>`:''}${st.demo?'<div class="onb-demo"><strong>Demo mode</strong> — numbers are saved in this browser only. Run <code>order_entry.sql</code> in Supabase to share them with everyone.</div>':''}${st.err?`<div class="onb-demo bad">Could not load: ${escapeHtml(st.err)}</div>`:''}${nav}`;
-  host.innerHTML=top+(st.page==='report'?reportHtml():entryHtml());
+  host.innerHTML=top+(st.page==='report'?reportHtml():st.page==='bulk'?bulkHtml():entryHtml());
   wire(host);
   if(st.page==='report') drawChart();
  }
@@ -13252,6 +13262,7 @@ const OrderEntry=(()=>{
   host.querySelectorAll('[data-oe-page]').forEach(b=>b.onclick=()=>{ if(b.dataset.oePage===st.page) return; if(st.page==='entry'&&!leaveOk()) return; if(st.page==='entry') st.draft=null; st.page=b.dataset.oePage; render(); });
   $('#oeRefresh')?.addEventListener('click',refresh);
   $('#oeAgents')?.addEventListener('click',openAgentsDialog);
+  wireBulk(host);
   // entry
   host.querySelectorAll('#oeEntry tbody tr').forEach(tr=>{ const a=tr.dataset.agent;
    tr.querySelectorAll('[data-k]').forEach(inp=>inp.addEventListener('input',()=>{ const v=st.draft.vals[a]||(st.draft.vals[a]={rc:'',crm:'',note:''}); v[inp.dataset.k]=inp.value;
@@ -13294,6 +13305,198 @@ const OrderEntry=(()=>{
    st.draft=null; await ensure(true); showToast('Order entry is up to date.');
   }catch(e){ showToast('Could not refresh: '+cleanErr(e)); }
   st.refreshing=false; render();
+ }
+ // ---- admin: bulk upload of past days (Excel / CSV file, or pasted from Excel) ----
+ // Layout A (one row per agent per day): Date | Agent | Recruitment Cloud | CRM | (Total) | (Note)
+ // Layout B (one row per day):          Date | <Agent> RC | <Agent> CRM | <Agent 2> RC | …
+ const hnorm=s=>String(s==null?'':s).toLowerCase().replace(/[^a-z0-9]/g,'');
+ const MONTHS={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,sept:9,oct:10,nov:11,dec:12};
+ function toDay(v){
+  if(v==null||v==='') return null;
+  const ymd=(y,m,d)=>{ y=+y; m=+m; d=+d; if(y<100) y+=2000; const x=new Date(y,m-1,d,12); return x.getFullYear()===y&&x.getMonth()===m-1&&x.getDate()===d?iso(x):null; };
+  if(v instanceof Date&&!isNaN(v)) return ymd(v.getFullYear(),v.getMonth()+1,v.getDate());
+  if(typeof v==='number'||/^\d{5}(\.\d+)?$/.test(String(v).trim())){ const n=Number(v); if(n<20000||n>80000) return null; const x=new Date(Math.round((Math.floor(n)-25569)*864e5)); return ymd(x.getUTCFullYear(),x.getUTCMonth()+1,x.getUTCDate()); }
+  const s=String(v).trim(); let m;
+  if((m=/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})/.exec(s))) return ymd(m[1],m[2],m[3]);
+  if((m=/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{2,4})$/.exec(s))) return +m[1]>12?ymd(m[3],m[2],m[1]):ymd(m[3],m[1],m[2]);   // US M/D/Y; D/M/Y when the first number can't be a month
+  const w=s.toLowerCase().replace(/(\d)(st|nd|rd|th)\b/g,'$1').replace(/^[a-z]+,?\s+(?=[a-z]{3})/,'');           // "Mon, Oct 5th 2026" → "oct 5 2026"
+  if((m=/^([a-z]{3,9})\.?[\s-]+(\d{1,2}),?[\s-]+(\d{2,4})$/.exec(w))&&MONTHS[m[1].slice(0,m[1]==='sept'?4:3)]) return ymd(m[3],MONTHS[m[1].slice(0,3)],m[2]);
+  if((m=/^(\d{1,2})[\s-]+([a-z]{3,9})\.?,?[\s-]+(\d{2,4})$/.exec(w))&&MONTHS[m[2].slice(0,3)]) return ymd(m[3],MONTHS[m[2].slice(0,3)],m[1]);
+  return null;
+ }
+ const cnt=v=>{ if(v==null) return {v:null}; const s=String(v).trim().replace(/,/g,''); if(s===''||s==='-'||s==='–') return {v:null}; if(!/^\d+(\.0+)?$/.test(s)) return {bad:true}; const n=Number(s); return n>100000?{bad:true}:{v:n}; };
+ const isDateH=h=>/^(date|day|entrydate|workdate|orderdate|dt)$/.test(h)||h.endsWith('date');
+ const isAgentH=h=>/^(agent|agentname|name|orderentryagent|oeagent|user|username|employee|employeename|member|teammember|person|enteredby)$/.test(h);
+ const isRcH=h=>h==='rc'||h.startsWith('recruitmentcloud')||h==='rcorders'||h==='rccount'||h==='rcentries'||h==='recruitment';
+ const isCrmH=h=>h==='crm'||h.startsWith('crm');
+ const isTotH=h=>h==='total'||h.startsWith('total');
+ const isNoteH=h=>/^(note|notes|remark|remarks|comment|comments)$/.test(h);
+ // "Priya RC", "Priya Shah - Recruitment Cloud", "CRM (Mark)" → {agent, src}
+ function wideHead(raw){
+  const s=String(raw==null?'':raw).trim(); if(!s) return null;
+  const re=/\b(recruitment\s*cloud|rc|crm)\b/i, m=re.exec(s); if(!m) return null;
+  const agent=s.replace(re,'').replace(/[()\[\]\-–—:|_/]+/g,' ').replace(/\b(orders?|entries|count)\b/ig,'').replace(/\s+/g,' ').trim();
+  return agent?{agent, src:/crm/i.test(m[1])?'crm':'rc'}:null;
+ }
+ function resolveAgent(n){
+  const r=roster(), k=String(n||'').trim().replace(/\s+/g,' '), lk=k.toLowerCase(); if(!k) return {name:null};
+  const c=canon(k); if(r.includes(c)) return {name:c};
+  const first=lk.split(' ')[0], m=r.filter(x=>x.toLowerCase().split(/\s+/)[0]===first);
+  if(m.length===1&&lk.split(' ').length===1) return {name:m[0], guessed:true};
+  return {name:k, unknown:true};
+ }
+ function parseGrid(grid){
+  grid=(grid||[]).filter(r=>Array.isArray(r)&&r.some(c=>c!==''&&c!=null));
+  if(!grid.length) return {error:'The file is empty.'};
+  let hi=-1; for(let i=0;i<Math.min(grid.length,15);i++){ const hs=grid[i].map(hnorm); if(hs.some(isDateH)&&(hs.some(isAgentH)||hs.some(isRcH)||hs.some(isCrmH)||grid[i].some(wideHead))){ hi=i; break; } }
+  if(hi<0) return {error:'Could not find the header row. The first row should have column names such as Date, Agent, Recruitment Cloud and CRM — download the template to see the layout.'};
+  const H=grid[hi], hs=H.map(hnorm), col=f=>hs.findIndex(f);
+  const cD=col(isDateH), cA=col(isAgentH), cR=col(isRcH), cC=col(isCrmH), cT=col(isTotH), cN=col(isNoteH);
+  const out=[], body=grid.slice(hi+1);
+  const push=(line, day, agentRaw, rc, crm, tot, note)=>{
+   const x={line, rawDay:day, rawAgent:agentRaw, note:String(note==null?'':note).trim().slice(0,500)}, iss=[];
+   x.day=toDay(day); if(!x.day) iss.push('date not recognised'); else if(x.day>today()) iss.push('date is in the future');
+   const a=resolveAgent(agentRaw); x.agent=a.name; x.unknown=a.unknown; x.guessed=a.guessed; if(!a.name) iss.push('no agent name');
+   const R=cnt(rc), C=cnt(crm); if(R.bad) iss.push('RC is not a whole number'); if(C.bad) iss.push('CRM is not a whole number');
+   x.rc=R.v; x.crm=C.v; if(!R.bad&&!C.bad&&x.rc==null&&x.crm==null) iss.push('no RC or CRM count');
+   if(tot!=null&&!iss.length){ const T=cnt(tot); if(T.v!=null&&T.v!==(x.rc||0)+(x.crm||0)) x.totWarn=`Total column says ${fmtNum(T.v)}, RC + CRM = ${fmtNum((x.rc||0)+(x.crm||0))}`; }
+   x.issues=iss; out.push(x); };
+  if(cA>=0&&(cR>=0||cC>=0)){ body.forEach((r,i)=>push(hi+i+2, r[cD], r[cA], cR>=0?r[cR]:null, cC>=0?r[cC]:null, cT>=0?r[cT]:null, cN>=0?r[cN]:''));
+   return {rows:out, layout:'One row per agent per day'}; }
+  const wide=H.map((h,j)=>({j, w:j===cD?null:wideHead(h)})).filter(x=>x.w);
+  if(wide.length){ const agentsW=[...new Set(wide.map(x=>x.w.agent))];
+   body.forEach((r,i)=>agentsW.forEach(a=>{ const rcC=wide.find(x=>x.w.agent===a&&x.w.src==='rc'), crC=wide.find(x=>x.w.agent===a&&x.w.src==='crm');
+     const rc=rcC?r[rcC.j]:null, crm=crC?r[crC.j]:null; if(cnt(rc).v==null&&cnt(crm).v==null&&!cnt(rc).bad&&!cnt(crm).bad) return; push(hi+i+2, r[cD], a, rc, crm, null, ''); }));
+   return {rows:out, layout:`One row per day, ${agentsW.length} agent${agentsW.length===1?'':'s'} across the columns`}; }
+  return {error:'Found a Date column but no Agent / Recruitment Cloud / CRM columns. Use Date, Agent, Recruitment Cloud, CRM — or columns like “Priya RC” and “Priya CRM”.'};
+ }
+ function pastedGrid(text){ const lines=String(text||'').replace(/\r/g,'').split('\n').filter(l=>l.trim()); const tab=lines.some(l=>l.includes('\t'));
+  return lines.map(l=>tab?l.split('\t'):l.match(/("([^"]|"")*"|[^,]*)(,|$)/g).slice(0,-1).map(c=>c.replace(/,$/,'').replace(/^"|"$/g,'').replace(/""/g,'"'))); }
+ // combine duplicates (same agent + day inside the file: the last one wins) and compare with what is saved
+ function finish(parsed){
+  if(parsed.error) return parsed;
+  const ok=parsed.rows.filter(x=>!x.issues.length), seen=new Map();
+  ok.forEach(x=>{ const k=x.day+'|'+x.agent; if(seen.has(k)){ seen.get(k).dupOf=x.line; } seen.set(k,x); });
+  const keep=[...seen.values()];
+  parsed.rows.forEach(x=>{ if(!x.issues.length&&seen.get(x.day+'|'+x.agent)!==x) x.dup=true; });
+  const days=keep.map(x=>x.day).sort();
+  return {...parsed, keep, from:days[0]||null, to:days[days.length-1]||null, newAgents:[...new Set(keep.filter(x=>x.unknown).map(x=>x.agent))].sort()};
+ }
+ function compare(b){
+  const saved=new Map(); (st.rows||[]).forEach(r=>{ const k=r.day+'|'+r.agent; const s=saved.get(k); saved.set(k, s?{...s, rc:(s.rc||0)+(r.rc||0), crm:(s.crm||0)+(r.crm||0)}:r); });
+  b.keep.forEach(x=>{ const s=saved.get(x.day+'|'+x.agent); x.old=s||null; x.state=!s?'new':(s.rc===x.rc&&s.crm===x.crm)?'same':'change'; });
+ }
+ function bulkHtml(){
+  const b=st.bulk, R=b&&b.res;
+  const tmpl=`<div class="oe-bulk-help"><div><h4>What the file should look like</h4>
+     <p>One row per agent per day — headers in the first row:</p>
+     <table class="oe-sample"><tr><th>Date</th><th>Agent</th><th>Recruitment Cloud</th><th>CRM</th><th>Note <i>(optional)</i></th></tr><tr><td>09/14/2026</td><td>${escapeHtml(roster()[0]||'Priya Shah')}</td><td>12</td><td>5</td><td></td></tr><tr><td>09/14/2026</td><td>${escapeHtml(roster()[1]||'Mark Lee')}</td><td>9</td><td>7</td><td></td></tr></table>
+     <p class="hint">Also works: one row per day with a pair of columns per agent, e.g. <b>Date · Priya RC · Priya CRM · Mark RC · Mark CRM</b>. A Total column is optional — it is only used to check RC + CRM. Agents can be written by first name if it’s unique.</p></div>
+     <button type="button" class="btn btn-secondary btn-sm" id="oeTmpl">⬇ Download template</button></div>`;
+  let preview='';
+  if(R&&R.error) preview=`<div class="onb-demo bad">${escapeHtml(R.error)}</div>`;
+  else if(R){
+   const bad=R.rows.filter(x=>x.issues.length), dup=R.rows.filter(x=>x.dup), k=R.keep;
+   const skipNew=!b.addAgents?k.filter(x=>x.unknown):[], go=k.filter(x=>!skipNew.includes(x)&&(b.mode==='replace'?x.state!=='same':x.state==='new'));
+   const n=s=>k.filter(x=>x.state===s&&!skipNew.includes(x)).length;
+   st.bulkGo=go;
+   const shown=[...bad, ...k].slice(0,300);
+   const stTag=x=>x.issues.length?`<span class="oe-tag bad">${escapeHtml(x.issues.join(', '))}</span>`:skipNew.includes(x)?'<span class="oe-tag skip">skipped — agent not on the list</span>':x.state==='new'?'<span class="oe-tag new">new</span>':x.state==='same'?'<span class="oe-tag same">already saved</span>':b.mode==='replace'?`<span class="oe-tag chg">replaces RC ${x.old.rc??'–'} · CRM ${x.old.crm??'–'}</span>`:'<span class="oe-tag skip">kept existing</span>';
+   preview=`<div class="oe-bulk-sum">
+     <div><b>${fmtNum(R.rows.length)}</b><span>rows read</span></div>
+     <div class="new"><b>${fmtNum(n('new'))}</b><span>new</span></div>
+     <div class="chg"><b>${fmtNum(n('change'))}</b><span>different from saved</span></div>
+     <div><b>${fmtNum(n('same'))}</b><span>already saved</span></div>
+     <div class="${bad.length?'bad':''}"><b>${fmtNum(bad.length)}</b><span>with problems (skipped)</span></div>
+     ${dup.length?`<div class="warn"><b>${fmtNum(dup.length)}</b><span>repeated — last one used</span></div>`:''}
+    </div>
+    <p class="hint">${escapeHtml(R.layout)} · ${R.from?`${escapeHtml(dayName(R.from))} → ${escapeHtml(dayName(R.to))}`:'no valid dates'} · ${new Set(k.map(x=>x.agent)).size} agents · RC ${fmtNum(k.reduce((a,x)=>a+(x.rc||0),0))} · CRM ${fmtNum(k.reduce((a,x)=>a+(x.crm||0),0))}</p>
+    ${R.newAgents.length?`<div class="onb-demo"><b>${R.newAgents.length} name${R.newAgents.length===1?' is':'s are'} not on the agent list:</b> ${escapeHtml(R.newAgents.join(', '))}<label class="oe-chk"><input type="checkbox" id="oeAddAg" ${b.addAgents?'checked':''}> Add ${R.newAgents.length===1?'it':'them'} to the agent list and import ${R.newAgents.length===1?'its':'their'} rows</label><span class="hint">Untick to skip those rows — fix the spelling in the file if it’s a typo of an existing name.</span></div>`:''}
+    ${R.rows.some(x=>x.guessed)?`<p class="hint">First names matched to the agent list: ${escapeHtml([...new Set(R.rows.filter(x=>x.guessed).map(x=>x.rawAgent+' → '+x.agent))].join(', '))}</p>`:''}
+    <div class="oe-mode" role="radiogroup" aria-label="When a day is already saved"><span>When an agent’s day is already saved:</span>
+     <label><input type="radio" name="oeMode" value="replace" ${b.mode==='replace'?'checked':''}> Replace it with the file</label>
+     <label><input type="radio" name="oeMode" value="skip" ${b.mode==='skip'?'checked':''}> Keep what’s saved</label></div>
+    <div class="onb-scroll oe-prev"><table class="users-table onb-table" id="oeBulkPrev"><thead><tr><th class="num">Line</th><th>Date</th><th>Agent</th><th class="num">RC</th><th class="num">CRM</th><th class="num">Total</th><th>Result</th></tr></thead><tbody>
+     ${shown.map(x=>`<tr class="${x.issues.length?'oe-bad':''}"><td class="num">${x.line}</td><td>${x.day?escapeHtml(dayName(x.day)):escapeHtml(String(x.rawDay??''))}</td><td>${escapeHtml(x.agent||String(x.rawAgent||''))}${x.unknown?' <span class="oe-off">new name</span>':''}</td><td class="num">${x.rc??'–'}</td><td class="num">${x.crm??'–'}</td><td class="num">${x.issues.length?'':fmtNum((x.rc||0)+(x.crm||0))}${x.totWarn?` <span class="oe-tag warn" title="${escapeHtml(x.totWarn)}">check total</span>`:''}</td><td>${stTag(x)}</td></tr>`).join('')}
+     ${R.rows.length>shown.length?`<tr><td colspan="7" class="hint">…and ${fmtNum(R.rows.length-shown.length)} more rows</td></tr>`:''}
+    </tbody></table></div>
+    <div class="oe-foot"><span class="onb-err" id="oeBErr" role="alert"></span><button type="button" class="btn btn-secondary" id="oeBClear">Clear</button><button type="button" class="btn btn-primary" id="oeBGo" ${go.length&&!st.busy?'':'disabled'}>${st.busy?'Importing…':`Import ${fmtNum(go.length)} row${go.length===1?'':'s'}`}</button></div>`;
+  }
+  return `<section class="panel"><div class="panel-head"><div><h3>Bulk upload — past days</h3><span class="hint">Load earlier months in one go from an Excel / CSV file, or paste the cells straight from Excel. Nothing is saved until you check the preview and click <b>Import</b>.</span></div></div>
+   ${tmpl}
+   <div class="oe-bulk-in">
+    <label class="oe-drop" id="oeDrop"><input type="file" id="oeFile" accept=".xlsx,.xls,.xlsm,.csv,.txt" hidden><span class="oe-drop-ico">⬆</span><span><b>Choose a file</b> or drop it here</span><span class="hint">${b&&b.fileName?escapeHtml(b.fileName):'.xlsx, .xls or .csv'}</span></label>
+    <div class="oe-paste"><textarea id="oePaste" rows="5" placeholder="…or paste here, including the header row&#10;Date	Agent	Recruitment Cloud	CRM">${escapeHtml((b&&b.pasted)||'')}</textarea><button type="button" class="btn btn-secondary btn-sm" id="oePasteGo">Read pasted cells</button></div>
+   </div>
+   ${preview}</section>`;
+ }
+ async function readBulk(grid, fileName, pasted){
+  const parsed=finish(parseGrid(grid));
+  st.bulk={...(st.bulk||{mode:'replace', addAgents:true}), res:parsed, fileName, pasted};
+  if(!parsed.error&&parsed.from){ // the saved numbers for those dates, to show what changes
+   const a=[parsed.from, st.lf||parsed.from].sort()[0], z=[parsed.to, st.lt||parsed.to].sort().pop();
+   if(!st.rows||st.lf>parsed.from||st.lt<parsed.to) await load(a,z);
+   compare(parsed);
+  }
+  render();
+ }
+ async function readFile(file){
+  if(!file) return;
+  if(typeof XLSX==='undefined'){ showToast('The spreadsheet reader has not loaded — check the connection and reload, or paste the cells instead.'); return; }
+  try{ const wb=XLSX.read(new Uint8Array(await file.arrayBuffer()),{type:'array', cellDates:false, raw:false});
+   // use the first sheet that has a recognisable header
+   let grid=null; for(const n of wb.SheetNames){ const g=XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1, defval:'', raw:true}); const p=parseGrid(g); if(!p.error){ grid=g; break; } if(!grid) grid=g; }
+   await readBulk(grid, file.name, '');
+  }catch(e){ st.bulk={...(st.bulk||{mode:'replace', addAgents:true}), res:{error:'Could not read '+file.name+': '+cleanErr(e)}, fileName:file.name}; render(); }
+ }
+ async function importBulk(){
+  const b=st.bulk, go=(st.bulkGo||[]).slice(); if(!go.length) return;
+  const err=t=>{ const el=document.getElementById('oeBErr'); if(el) el.textContent=t; };
+  st.busy=true; render();
+  try{
+   if(b.addAgents&&b.res.newAgents.length){ const L=lists().agents.slice(); b.res.newAgents.forEach(n=>{ if(!L.some(x=>x.label.toLowerCase()===n.toLowerCase())) L.push({label:n}); });
+    const ok=await storageSet('oeLists',{agents:L}); if(ok===null) throw new Error('the agent list could not be saved'); KV.set('oeLists',{agents:L}); }
+   const rows=go.map(x=>({day:x.day, agent:x.agent, rc:x.rc, crm:x.crm, note:x.note||''}));
+   let saved=0, skipped=0;
+   if(!st.demo){
+    try{ for(let i=0;i<rows.length;i+=1000){ const r=await Server.rpc('dash_oe_bulk',{p_rows:rows.slice(i,i+1000), p_mode:b.mode})||{}; saved+=r.saved||0; skipped+=r.skipped||0; } }
+    catch(e){ if(!missing(e)) throw e;
+     // older SQL without dash_oe_bulk: save day by day
+     const byDay=new Map(); rows.forEach(r=>{ if(!byDay.has(r.day)) byDay.set(r.day,[]); byDay.get(r.day).push(r); });
+     try{ for(const [d,list] of byDay){ await Server.rpc('dash_oe_save',{p_day:d, p_rows:list}); saved+=list.length; } }
+     catch(e2){ if(!missing(e2)) throw e2; st.demo=true; } }
+   }
+   if(st.demo){ const all=demoAll(), now=new Date().toISOString(), idx=new Map(all.map((r,i)=>[r.day+'|'+r.agent,i]));
+    rows.forEach(r=>{ const k=r.day+'|'+r.agent, i=idx.get(k); if(i!=null&&b.mode==='skip'){ skipped++; return; } const v={day:r.day, agent:r.agent, rc:r.rc, crm:r.crm, note:r.note||(i!=null?all[i].note:''), updated_by:(Server.user&&Server.user.name||'')+' (bulk upload)', updated_at:now}; if(i!=null) all[i]=v; else { idx.set(k,all.length); all.push(v); } saved++; });
+    demoPut(all); }
+   const from=b.res.from, to=b.res.to;
+   st.busy=false; st.bulk=null; st.bulkGo=null;
+   st.from=from; st.to=to; st.custom=true; st.group=(Date.parse(to)-Date.parse(from))/864e5>120?'month':(Date.parse(to)-Date.parse(from))/864e5>45?'week':'day'; st.agent='';
+   await ensure(true); st.page='report';
+   showToast(`Imported ${fmtNum(saved)} row${saved===1?'':'s'}${skipped?` (${fmtNum(skipped)} kept as saved)`:''} — showing ${dayName(from)} to ${dayName(to)}.`);
+   render();
+  }catch(e){ st.busy=false; render(); err('Not imported: '+cleanErr(e)); }
+ }
+ function templateCsv(){
+  const names=roster().length?roster():['Priya Shah','Mark Lee'], d=add(today(),-1);
+  const lines=['Date,Agent,Recruitment Cloud,CRM,Note', ...names.map(n=>`${d},"${n.replace(/"/g,'""')}",,,`)];
+  const blob=new Blob([lines.join('\r\n')+'\r\n'],{type:'text/csv'}), a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download='order-entry-upload-template.csv'; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500);
+ }
+ function wireBulk(host){
+  const $=s=>host.querySelector(s); if(!$('#oeFile')) return;
+  $('#oeFile').onchange=e=>readFile(e.target.files[0]);
+  const drop=$('#oeDrop');
+  ['dragenter','dragover'].forEach(t=>drop.addEventListener(t,e=>{ e.preventDefault(); drop.classList.add('on'); }));
+  ['dragleave','drop'].forEach(t=>drop.addEventListener(t,e=>{ e.preventDefault(); drop.classList.remove('on'); }));
+  drop.addEventListener('drop',e=>readFile(e.dataTransfer.files[0]));
+  $('#oePasteGo').onclick=()=>{ const t=$('#oePaste').value; if(!t.trim()) return showToast('Paste the cells first, including the header row.'); readBulk(pastedGrid(t), 'Pasted cells', t); };
+  $('#oeTmpl').onclick=templateCsv;
+  $('#oeAddAg')?.addEventListener('change',e=>{ st.bulk.addAgents=e.target.checked; render(); });
+  host.querySelectorAll('[name=oeMode]').forEach(r=>r.onchange=()=>{ st.bulk.mode=r.value; render(); });
+  $('#oeBClear')?.addEventListener('click',()=>{ st.bulk=null; st.bulkGo=null; render(); });
+  $('#oeBGo')?.addEventListener('click',()=>{ const n=(st.bulkGo||[]).length, ch=(st.bulkGo||[]).filter(x=>x.state==='change').length;
+   if(ch&&!confirm(`Import ${n} rows? ${ch} of them replace numbers that are already saved.`)) return; importBulk(); });
  }
  // ---- admin: agent names ----
  async function openAgentsDialog(){
