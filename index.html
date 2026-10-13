@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.70.0</title>
+<title>Performance Dashboard · v4.70.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -1128,6 +1128,7 @@ button.onb-tile{font:inherit;text-align:left;cursor:pointer}button.onb-tile:disa
 .onb-tile.i9 strong{color:#2563eb}.onb-tile.warn strong{color:#b45309}.onb-tile.bad strong{color:#c8102e}
 .onb-mix{margin-bottom:12px}.onb-mix h4{margin:0 0 8px;font-size:13px;color:#0a1f44}
 .c-complete{background:#16a34a}.c-i9{background:#60a5fa}.c-ip{background:#94a3b8}.c-lvm{background:#f59e0b}.c-nr{background:#c8102e}.c-other{background:#a78bfa}
+.onb-counts{display:inline-block;margin-left:6px;font-size:10.5px;font-weight:700;color:#fff;border-radius:999px;padding:1px 7px;vertical-align:middle}
 .onb-cat{display:inline-block;font-size:11px;font-weight:700;border-radius:4px;padding:2px 7px;color:#fff;white-space:nowrap}
 .onb-link.prev{background:#eef3fe;color:#1e3a8a;margin-left:6px}
 .onb-table td.num small{display:block;font-size:10.5px;color:#64748b;font-weight:400}.onb-total td{background:#f6f8fc;font-weight:600;border-top:2px solid #dbe3ee}
@@ -12019,7 +12020,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.70.0';   // shown only in the browser tab title
+const APP_VERSION = '4.70.1';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -13023,7 +13024,9 @@ const Onboarding=(()=>{
   return linkHtml(linkOf(eid))+(prev.length?` <span class="onb-link prev">${prev.length} earlier call${prev.length===1?'':'s'} · last: <b>${escapeHtml(last.status)}</b> on ${fmtDate(last.call_date)} by ${escapeHtml(last.onboarder)}</span>`:(canReport()||canAssign()?' <span class="onb-link no">First call for this EID</span>':''));
  }
  const catPill=c=>`<span class="onb-cat ${CAT_CLS[c]}">${CAT_LBL[c]}</span>`;
- const stPill=s=>`<span class="onb-st ${CAT_CLS[catOf(s)]}" title="${escapeHtml(CAT_LBL[catOf(s)])}">${escapeHtml(s)}</span>`;
+ // the status as logged; when the call type changes where it counts (e.g. an LVM call logged "In Process") a small tag says so
+ const stPill=(s,ct)=>{ const base=catOf(s), real=ct?catOf(s,ct):base;
+  return `<span class="onb-st ${CAT_CLS[real]}" title="Counts as ${escapeHtml(CAT_LBL[real])}">${escapeHtml(s)}</span>${real!==base?`<small class="onb-counts ${CAT_CLS[real]}" title="Logged as ${escapeHtml(s)} with call type ${escapeHtml(ct)} — counted as ${escapeHtml(CAT_LBL[real])}">→ ${escapeHtml(CAT_LBL[real])}</small>`:''}`; };
  // ---- per-onboarder daily volume: calls → people → reached → completed (answers "143 calls but 24 completed?") ----
  const REACHED=c=>!['lvm','no_response'].includes(c);
  function volume(rows, assign){
@@ -13210,13 +13213,13 @@ const Onboarding=(()=>{
   return `<div class="onb-scroll"><table class="users-table onb-table" id="onbTable"><thead><tr><th>EID</th><th>Latest status</th><th>Result</th><th class="num">Calls</th><th>First call</th><th>Last call</th><th>Onboarder</th><th>Latest remark</th><th>Schedule / interview (by EID)</th><th></th></tr></thead><tbody>
    ${cands.map(c=>{ const open=st.open.has(c.eid);
     return `<tr class="onb-cand"><td><strong>${escapeHtml(c.eid)}</strong></td><td>${stPill(c.status)}</td><td>${catPill(c.cat)}${c.lvmDays>=NR_LVM_DAYS?`<small class="onb-nr-note" title="LVM / no answer on ${c.lvmDays} different days in a row">LVM ${c.lvmDays} days</small>`:c.cat==='lvm'&&c.lvmDays?`<small class="onb-nr-note lvm" title="Becomes Never responded after ${NR_LVM_DAYS} days of LVM">day ${c.lvmDays} of ${NR_LVM_DAYS}</small>`:''}</td><td class="num">${c.calls.length}</td><td>${fmtDate(c.first.call_date)}</td><td>${fmtDate(c.last.call_date)}</td><td>${escapeHtml(c.onboarder)}${c.onboarders.length>1?` <small class="hint">+${c.onboarders.length-1}</small>`:''}</td><td class="onb-note">${escapeHtml(c.remark||'')}</td><td>${linkHtml(linkOf(c.eid))}</td><td class="onb-act"><button class="link-btn" data-onb-open="${escapeHtml(c.eid)}">${open?'Hide':'Calls ('+c.calls.length+')'}</button><button class="link-btn" data-onb-new="${escapeHtml(c.eid)}" title="Log another call for this EID">＋ Call</button></td></tr>
-    ${open?[...c.calls].reverse().map(r=>`<tr class="onb-sub"><td></td><td colspan="2">${stPill(r.status)}</td><td class="num">${escapeHtml(r.call_type)}</td><td>${fmtDate(r.call_date)}</td><td>${durTxt(r)}</td><td>${escapeHtml(r.onboarder)}</td><td class="onb-note" colspan="2">${escapeHtml(r.note||'')}</td><td class="onb-act">${actions(r)}</td></tr>`).join(''):''}`; }).join('')}
+    ${open?[...c.calls].reverse().map(r=>`<tr class="onb-sub"><td></td><td colspan="2">${stPill(r.status,r.call_type)}</td><td class="num">${escapeHtml(r.call_type)}</td><td>${fmtDate(r.call_date)}</td><td>${durTxt(r)}</td><td>${escapeHtml(r.onboarder)}</td><td class="onb-note" colspan="2">${escapeHtml(r.note||'')}</td><td class="onb-act">${actions(r)}</td></tr>`).join(''):''}`; }).join('')}
    </tbody></table></div>`;
  }
  function callTable(calls){
   if(!calls.length) return `<p class="hint" style="margin:0">${(st.rows||[]).length?'No calls match these filters.':'No calls logged in these dates yet — use “Log a call” above.'}</p>`;
   return `<div class="onb-scroll"><table class="users-table onb-table" id="onbTable"><thead><tr><th>Date</th><th>Onboarder</th><th>EID</th><th>Call type</th><th class="num">Duration</th><th>Status</th><th>Remarks</th><th>Schedule / interview (by EID)</th><th></th></tr></thead><tbody>
-   ${calls.map(r=>`<tr><td>${fmtDate(r.call_date)}</td><td>${escapeHtml(r.onboarder)}</td><td><strong>${escapeHtml(r.eid)}</strong></td><td><span class="onb-type t${typeIdx(r.call_type)}">${escapeHtml(r.call_type)}</span></td><td class="num">${durTxt(r)}</td><td>${stPill(r.status)}</td><td class="onb-note">${escapeHtml(r.note||'')}</td><td>${linkHtml(linkOf(r.eid))}</td><td class="onb-act">${actions(r)}</td></tr>`).join('')}
+   ${calls.map(r=>`<tr><td>${fmtDate(r.call_date)}</td><td>${escapeHtml(r.onboarder)}</td><td><strong>${escapeHtml(r.eid)}</strong></td><td><span class="onb-type t${typeIdx(r.call_type)}">${escapeHtml(r.call_type)}</span></td><td class="num">${durTxt(r)}</td><td>${stPill(r.status,r.call_type)}</td><td class="onb-note">${escapeHtml(r.note||'')}</td><td>${linkHtml(linkOf(r.eid))}</td><td class="onb-act">${actions(r)}</td></tr>`).join('')}
   </tbody></table></div>`;
  }
  function wire(host){
