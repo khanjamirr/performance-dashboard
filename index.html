@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.76.2</title>
+<title>Performance Dashboard · v4.76.4</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2067,8 +2067,8 @@ button.mr-kpi:not(:disabled):hover{border-color:#c7d2e3;box-shadow:0 4px 14px #0
 .basis-sw{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#13264a;text-transform:none!important;letter-spacing:0!important;white-space:nowrap;margin-top:4px}.basis-sw .switch:disabled{opacity:.45;cursor:not-allowed}
 .al-head{display:flex;align-items:flex-start;gap:4px}.al-head .al-pct{margin-left:auto}
 .al-rdot{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#c8102e;color:#fff;font-size:11px;font-weight:800;margin:1px 0 0 6px;box-shadow:0 0 0 3px #fff;flex:0 0 auto}
-.refresh-stamp{margin:auto 12px 6px;padding:6px 9px;border-radius:8px;background:#ffffff0d;border:1px solid #ffffff17;color:#dbe6f5;font-size:10.5px;line-height:1.45;display:flex;flex-direction:column;gap:0}.refresh-stamp:not([hidden])+.ribbon-actions{margin-top:0!important;padding-top:8px!important}.refresh-stamp span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.refresh-stamp b{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#8da3c2;margin-bottom:1px;font-weight:700}.refresh-stamp em{font-style:normal;color:#9fb3cf;display:inline-block;min-width:56px}.refresh-stamp time{color:#fff;font-weight:600}.rs-by{font-size:10px;color:#9fb3cf;white-space:normal}.refresh-stamp.top .rs-by{color:#5b6b82}
+.refresh-stamp{margin:auto 12px 6px;padding:6px 9px;border-radius:8px;background:#ffffff0d;border:1px solid #ffffff17;color:#dbe6f5;font-size:10.5px;line-height:1.45;display:flex;flex-direction:column;gap:0}.refresh-stamp:not([hidden])+.ribbon-actions{margin-top:0!important;padding-top:8px!important}.refresh-stamp span{display:block}
+.refresh-stamp b{font-size:10.5px;color:#8da3c2;margin-bottom:1px;font-weight:700}.refresh-stamp em{font-style:normal;color:#9fb3cf}.refresh-stamp time{color:#fff;font-weight:600}.rs-by{font-size:10px;color:#9fb3cf;white-space:normal}.refresh-stamp.top .rs-by{color:#5b6b82}
 .refresh-stamp[hidden]{display:none!important}
 .refresh-stamp.top{display:none!important}
 body.side-collapsed .refresh-stamp:not(.top){display:none!important}
@@ -2099,7 +2099,7 @@ body.side-collapsed .refresh-stamp:not(.top){display:none!important}
 .hi-spark i{display:block;width:13px;border-radius:2px 2px 0 0}.hi-spark i.g{background:#15803d}.hi-spark i.a{background:#7aa95c}.hi-spark i.w{background:#e48a1b}.hi-spark i.r{background:#c8102e}
 .hi-spark u{position:absolute;left:0;right:0;bottom:80%;border-top:1.5px dashed #0a1f44;opacity:.55;text-decoration:none;pointer-events:none}
 .hi-spark.demo{height:20px;border:0}.hi-spark.demo i{width:7px}
-.hi-more{margin-top:8px}
+.hi-more{margin-top:8px}.hi-streak{display:block;color:#94a3b8!important;font-size:11px}.hi-tr{white-space:nowrap;font-weight:700;font-size:12.5px;color:#64748b}.hi-tr.up{color:#15803d}.hi-tr.down{color:#c8102e}.hi-tr small{font-weight:600;color:inherit!important;opacity:.8}
 .hi-rank2{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:8px}
 .hi-rank2 li{display:grid;grid-template-columns:26px minmax(160px,260px) 1fr auto;align-items:center;gap:12px;padding:6px 4px;border-bottom:1px solid #eef2f6}
 .hi-rk-name{display:flex;flex-direction:column}.hi-rk-name small{color:#64748b;font-size:11.5px}
@@ -4555,11 +4555,11 @@ function renderRefreshStamp(){
  const saved=(typeof KV!=='undefined'&&KV.get('lastUploads'))||{}, log=uploadLogStamps||{};
  const latestWeek=[...weeksData].map(w=>w.savedAt).filter(Boolean).sort().pop();
  const when=src=>{ const x=saved[src]||log[src]; const d=new Date((x&&x.at)||latestWeek||''); return Number.isFinite(d.getTime())?d:null; };
- const by=src=>{ const x=saved[src]||log[src]; return x&&x.by||''; }, bs=by('schedules'), bi=by('shows');
- const whoLine=bs&&bi&&bs!==bi?`<small class="rs-by">by ${escapeHtml(bs)} (schedules) · ${escapeHtml(bi)} (interviews)</small>`:(bs||bi)?`<small class="rs-by">by ${escapeHtml(bs||bi)}</small>`:'';
- const fmt=d=>d.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'}), full=d=>d.toLocaleString('en-US',{dateStyle:'full',timeStyle:'long'});
+ const fmt=d=>d.toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'}), full=d=>d.toLocaleString('en-US',{dateStyle:'full',timeStyle:'long'});
  const s=when('schedules'), i=when('shows');
- const html=`<b>Last refreshed on:</b><span><em>Schedules</em> ${s?`<time datetime="${s.toISOString()}" title="${escapeHtml(full(s))}">${escapeHtml(fmt(s))}</time>`:'—'}</span><span><em>Interviews</em> ${i?`<time datetime="${i.toISOString()}" title="${escapeHtml(full(i))}">${escapeHtml(fmt(i))}</time>`:'—'}</span>${whoLine}`;
+ const by=src=>{ const x=saved[src]||log[src]; return x&&x.by?` (by ${escapeHtml(x.by)})`:''; };
+ const line=(lbl,d,src)=>`<span><em>${lbl}:</em> ${d?`<time datetime="${d.toISOString()}" title="${escapeHtml(full(d))}">${escapeHtml(fmt(d))}</time>${by(src)}`:'—'}</span>`;
+ const html=`<b>Last refreshed on:</b>${line('Schedules',s,'schedules')}${line('Interviews',i,'shows')}`;
  [box,top].forEach(el=>{ if(el){ el.innerHTML=html; el.hidden=!(typeof Server!=='undefined'&&Server.user); } });
 }
 async function refreshUI(){
@@ -10661,7 +10661,13 @@ function alertsHighlights(weekEnd, rows, inProgress){
     // back-to-back weeks below goal, newest first
     let k=0; const weeks=[];
     for(let i=done.length-1;i>=0;i--){ const w=done[i], r=recOf(w,n), g=goalOf(w.weekEndDate,n); if(!r||!(g>0)) break; const sc=r.schedules||0; if(sc>=g) break; k++; weeks.push({w:w.weekEndDate, sc, g, pct:Math.round(sc/g*100)}); }
-    if(k>=3) streak.push({row, n:k, weeks:weeks.slice(0,6), avg:Math.round(weeks.reduce((a,x)=>a+x.pct,0)/weeks.length)});
+    if(k>=3){
+      // what management acts on: the last 4 completed weeks, and whether it is getting better or worse
+      const l4=done.slice(-4).map(w=>{ const r=recOf(w,n), g=goalOf(w.weekEndDate,n); return r&&g>0?{w:w.weekEndDate, sc:r.schedules||0, g, pct:Math.round((r.schedules||0)/g*100)}:null; }).filter(Boolean);
+      const sc4=l4.reduce((a,x)=>a+x.sc,0), g4=l4.reduce((a,x)=>a+x.g,0);
+      const half=a=>a.length?a.reduce((s2,x)=>s2+x.pct,0)/a.length:null, recent=half(l4.slice(-2)), before=half(l4.slice(0,-2));
+      streak.push({row, n:k, weeks:weeks.slice(0,6), avg:Math.round(weeks.reduce((a,x)=>a+x.pct,0)/weeks.length),
+        l4:{n:l4.length, sc:sc4, g:g4, pct:g4?Math.round(sc4/g4*100):0, hit:l4.filter(x=>x.sc>=x.g).length}, trend:recent!=null&&before!=null&&l4.length>=3?Math.round(recent-before):null}); }
     // consistency over the last 8 completed weeks they worked
     const last=done.slice(-8).map(w=>({w:w.weekEndDate, r:recOf(w,n), g:goalOf(w.weekEndDate,n)})).filter(x=>x.r&&((x.r.schedules||0)+(x.r.scheduledDateOf||0))>0&&x.g>0);
     if(last.length>=4){ const v=last.map(x=>x.r.schedules||0), mean=v.reduce((a,b)=>a+b,0)/v.length, sd=Math.sqrt(v.reduce((a,b)=>a+(b-mean)**2,0)/v.length), cv=mean?sd/mean:9;
@@ -10669,7 +10675,7 @@ function alertsHighlights(weekEnd, rows, inProgress){
       if(cv<=0.35&&hit>=Math.ceil(last.length*0.75)) steady.push(info);
       else if(cv>=0.5) swing.push(info); }
   });
-  streak.sort((a,b)=>b.n-a.n||a.avg-b.avg); steady.sort((a,b)=>b.hit/b.weeks-a.hit/a.weeks||a.cv-b.cv); swing.sort((a,b)=>b.cv-a.cv);
+  streak.sort((a,b)=>a.l4.pct-b.l4.pct||b.n-a.n); steady.sort((a,b)=>b.hit/b.weeks-a.hit/a.weeks||a.cv-b.cv); swing.sort((a,b)=>b.cv-a.cv);
   // top 3 in each category for the selected week
   const wk=all[idx]||{byRecruiter:{}}, names=new Set(rows.map(r=>r.name)), byName=new Map(rows.map(r=>[r.name,r]));
   const list=[...names].map(n=>({row:byName.get(n), r:recOf(wk,n)||{}}));
@@ -10705,9 +10711,15 @@ function alertsHighlightsHtml(h, weekEnd, inProgress){
   let body='';
   if(st.hiSec==='streak'){
    const L=h.streak;
-   body=`<div class="hi-head"><p class="hi-what"><b>${fmtNum(L.length)}</b> recruiter${L.length===1?' has':'s have'} been below their weekly schedule goal for 3 or more completed weeks in a row. Longest run first.</p>${L.length?'<button type="button" class="btn btn-secondary btn-sm" data-hi-copy="1" title="Copy these recruiters with their remarks — paste into email or Excel">📋 Copy remarks</button>':''}</div>
-    ${L.length?`${legend}<div class="hi-tbl-wrap"><table class="hi-tbl"><thead><tr><th>Recruiter</th><th>Branch</th><th class="num">Weeks below goal</th><th class="num">Average in that time</th><th class="num">Last week</th><th>Week by week</th></tr></thead><tbody>
-    ${cut(L).map(x=>{ const wk=x.weeks.slice().reverse(), last=x.weeks[0]; return `<tr><td>${nm(x.row)}</td><td class="hi-br">${where(x.row)}</td><td class="num"><span class="hi-pill bad">${x.n} weeks</span></td><td class="num"><b class="${band(x.avg)}">${x.avg}%</b> <small>of goal</small></td><td class="num">${last?`${fmtNum(last.sc)} of ${fmtNum(last.g)}`:'–'}</td><td>${spark(wk.map(w=>({w:w.w,p:w.pct,sc:w.sc})))}</td></tr>`; }).join('')}</tbody></table></div>${more(L)}`:empty('Nobody has missed their schedule goal 3 weeks running. 🎉')}`;
+   body=`<div class="hi-head"><p class="hi-what"><b>${fmtNum(L.length)}</b> recruiter${L.length===1?' has':'s have'} missed their weekly schedule goal 3 or more completed weeks in a row. Furthest from goal over the last 4 weeks first.</p>${L.length?'<button type="button" class="btn btn-secondary btn-sm" data-hi-copy="1" title="Copy these recruiters with their remarks — paste into email or Excel">📋 Copy remarks</button>':''}</div>
+    ${L.length?`${legend}<div class="hi-tbl-wrap"><table class="hi-tbl"><thead><tr><th>Recruiter</th><th>Branch</th><th class="num" title="Schedules vs goal over the last 4 completed weeks">Last 4 weeks</th><th title="Last 2 weeks compared with the 2 before">Trend</th><th class="num" title="${inProgress?'Schedules vs the goal so far this week':'Schedules vs goal in the selected week'}">${inProgress?'This week so far':'Selected week'}</th><th class="num">Remarks this week</th><th>Week by week</th></tr></thead><tbody>
+    ${cut(L).map(x=>{ const wk=x.weeks.slice().reverse(), r=x.row, tw=inProgress?(r.pace??r.pct):r.pct, rk=Remarks.forWeek(r.name, weekEnd).filter(y=>(y.status||'approved')!=='rejected').length, t=x.trend;
+      return `<tr><td>${nm(r)}<small class="hi-streak" title="Below goal ${x.n} completed weeks in a row">below goal ${x.n} wks running</small></td><td class="hi-br">${where(r)}</td>
+      <td class="num"><b class="${band(x.l4.pct)}">${x.l4.pct}%</b> <small>${fmtNum(x.l4.sc)} of ${fmtNum(x.l4.g)}</small></td>
+      <td>${t==null?'<span class="hi-tr">–</span>':t>=5?`<span class="hi-tr up">▲ Improving <small>+${t} pts</small></span>`:t<=-5?`<span class="hi-tr down">▼ Slipping <small>${t} pts</small></span>`:'<span class="hi-tr">● No change</span>'}</td>
+      <td class="num">${tw==null?'–':`<b class="${band(tw)}">${Math.round(tw)}%</b> <small>${fmtNum(r.sched)} of ${fmtNum(inProgress?Math.round(r.expected||0):r.goal)}</small>`}</td>
+      <td class="num">${rk?`<span class="hi-pill good">${rk}</span>`:'<span class="hi-pill bad" title="No remark yet this week — ask the team lead">None</span>'}</td>
+      <td>${spark(wk.map(w=>({w:w.w,p:w.pct,sc:w.sc})))}</td></tr>`; }).join('')}</tbody></table></div>${more(L)}`:empty('Nobody has missed their schedule goal 3 weeks running. 🎉')}`;
   } else if(st.hiSec==='steady'){
    const L=h.steady;
    body=`<div class="hi-head"><p class="hi-what"><b>${fmtNum(L.length)}</b> recruiter${L.length===1?' was':'s were'} at 80% or more of goal in at least 3 of every 4 weeks they worked (last 8 completed weeks), without big swings. Most reliable first.</p></div>
@@ -12194,7 +12206,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.76.2';   // shown only in the browser tab title
+const APP_VERSION = '4.76.4';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
