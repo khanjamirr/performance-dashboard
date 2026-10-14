@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.73.6</title>
+<title>Performance Dashboard · v4.74.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2009,6 +2009,45 @@ input[type=date]::-webkit-calendar-picker-indicator{cursor:pointer}
 }
 @media (max-width:760px){ .nav .nav-parent{display:none!important} .nav button.nav-sub-closed{display:flex} }
 </style>
+<style>
+/* management summary on the Onboarding + Order Entry reports */
+.mr-hero{background:#fff;border:1px solid #e1e7ef;border-radius:14px;padding:20px 22px;margin:0 0 14px;display:grid;gap:16px;box-shadow:0 1px 2px #0a1f440a}
+.mr-top{display:flex;justify-content:space-between;align-items:flex-end;gap:18px 28px;flex-wrap:wrap}
+.mr-title{min-width:260px;flex:1 1 360px}
+.mr-eyebrow{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#64748b}
+.mr-headline{margin:6px 0 4px;font-size:23px;line-height:1.25;font-weight:700;color:#0a1f44;letter-spacing:-.01em;text-wrap:balance}
+.mr-sub{margin:0;font-size:13.5px;color:#475569;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.mr-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.mr-kpi{border:1px solid #e6ebf2;border-radius:11px;padding:12px 14px;background:#fafbfd;display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;font:inherit;color:inherit;min-width:0}
+.mr-kpi>span{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#64748b}
+.mr-kpi>strong{font-size:26px;line-height:1.1;color:#0a1f44;font-variant-numeric:tabular-nums;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mr-kpi.name>strong{font-size:19px;line-height:1.45}
+.mr-kpi>em{font-style:normal;font-size:12px;color:#64748b;line-height:1.35}
+.mr-kpi.rc>strong{color:#2563eb}.mr-kpi.crm>strong{color:#0f766e}.mr-kpi.fin>strong{color:#0f766e}.mr-kpi.good>strong{color:#15803d}.mr-kpi.warn>strong{color:#b45309}.mr-kpi.bad>strong{color:#c8102e}.mr-kpi.ip>strong{color:#475569}
+button.mr-kpi{cursor:pointer;transition:box-shadow .15s,border-color .15s}button.mr-kpi:disabled{cursor:default}
+button.mr-kpi:not(:disabled):hover{border-color:#c7d2e3;box-shadow:0 4px 14px #0a1f4412}button.mr-kpi.sel{border-color:#1d4ed8;box-shadow:0 0 0 1px #1d4ed8 inset;background:#f3f7ff}
+.mr-d{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;line-height:1.5;padding:0 7px;border-radius:999px;background:#eef2f6;color:#475569;white-space:nowrap;font-style:normal}
+.mr-d.up{background:#dcfce7;color:#166534}.mr-d.down{background:#fee2e2;color:#991b1b}
+.mr-mix{display:flex;height:8px;border-radius:99px;overflow:hidden;background:#eef2f6;gap:2px}.mr-mix i{background:#2563eb}.mr-mix b{background:#14b8a6}
+.mr-mix-key,.mr-legend{display:flex;gap:6px 18px;flex-wrap:wrap;font-size:12.5px;color:#334155;margin-top:-8px}.mr-legend{margin:0;font-size:12px;color:#475569}
+.mr-mix-key span,.mr-legend span{display:inline-flex;align-items:center;gap:6px}
+.mr-mix-key i,.mr-legend i{width:10px;height:10px;border-radius:3px;display:inline-block}.mr-mix-key i.rc,.mr-legend i.rc{background:#2563eb}.mr-mix-key i.crm,.mr-legend i.crm{background:#14b8a6}
+.mr-notes{margin:0;padding:12px 16px;border-radius:11px;background:#f5f7fb;border:1px solid #e9eef5;list-style:none;display:grid;gap:7px;font-size:13px;line-height:1.45;color:#13264a}
+.mr-notes li{display:flex;gap:9px;align-items:flex-start}.mr-notes li:before{content:'';flex:0 0 6px;height:6px;border-radius:50%;background:#1d4ed8;margin-top:7px}
+.mr-warn{color:#b45309;font-weight:700}
+.mr-head-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-left:auto}
+.mr-share{white-space:nowrap;min-width:120px}.mr-share small{font-size:12px;color:#475569;margin-left:8px;font-variant-numeric:tabular-nums}
+.mr-bar{display:inline-block;vertical-align:middle;width:80px;height:6px;border-radius:99px;background:#eef2f6;overflow:hidden}.mr-bar i{display:block;height:100%;background:#2563eb;border-radius:99px}.mr-bar.done i{background:#0f766e}
+.oe-ag .oe-pcol{border-left:1px solid #e6ebf2}.oe-ag td.oe-nil{color:#cbd5e1}
+.mr-funnel{display:grid;grid-template-columns:repeat(3,minmax(110px,1fr));gap:14px;flex:1 1 420px;max-width:560px}
+.mr-step{display:flex;flex-direction:column;gap:5px}.mr-step-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.mr-step-top span{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#64748b}.mr-step-top b{font-size:20px;color:#0a1f44;font-variant-numeric:tabular-nums}
+.mr-step-bar{height:8px;border-radius:99px;background:#eef2f6;overflow:hidden}.mr-step-bar i{display:block;height:100%;background:#94a3b8;border-radius:99px}
+.mr-step.reach .mr-step-bar i{background:#2563eb}.mr-step.done .mr-step-bar i{background:#0f766e}.mr-step small{font-size:12px;color:#64748b}
+.mr-onbbar{height:10px!important;margin:0 0 8px}.mr-legend2{font-size:12px}.mr-rule{color:#94a3b8;margin-left:auto}
+.mr-tabhint{margin:-4px 0 10px!important;font-size:12px!important;color:#64748b}.mr-kpis.onb-k{grid-template-columns:repeat(7,minmax(0,1fr))}@media(max-width:1250px){.mr-kpis.onb-k{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:700px){.mr-kpis.onb-k{grid-template-columns:1fr 1fr}.mr-hero{padding:16px}.mr-headline{font-size:19px}.mr-kpis{grid-template-columns:1fr 1fr}.mr-kpi>strong{font-size:22px}.mr-funnel{grid-template-columns:1fr;max-width:none}.mr-rule{margin-left:0}.mr-head-tools{margin-left:0}}
+</style>
 </head>
 <body class="locked">
 <div id="appLoading" class="app-loading"><div class="spinner" aria-hidden="true"></div><p>Loading dashboard…</p></div>
@@ -3043,6 +3082,12 @@ const arcSegmentLabels={id:'arcSegmentLabels',afterDatasetsDraw(chart){
  }
  c.restore();
 }};
+// stacked bars: one label per bar with the stack's total (the split is in the tooltip)
+const stackTotalLabels={id:'stackTotalLabels',afterDatasetsDraw(ch){
+  const metas=ch.data.datasets.map((d,i)=>ch.isDatasetVisible(i)?ch.getDatasetMeta(i):null).filter(Boolean); if(!metas.length) return;
+  const n=(ch.data.labels||[]).length, ctx=ch.ctx; ctx.save(); ctx.font='600 '+(n>36?9:11)+'px Inter, system-ui, sans-serif'; ctx.textAlign='center'; ctx.textBaseline='bottom'; ctx.fillStyle='#0a1f44';
+  for(let i=0;i<n;i++){ let t=0, top=Infinity, x=null; metas.forEach(m=>{ t+=Number(ch.data.datasets[m.index].data[i])||0; const el=m.data[i]; if(el&&isFinite(el.y)){ top=Math.min(top,el.y); x=el.x; } }); if(!t||x==null) continue; const txt=Number(t).toLocaleString('en-US'); if(ctx.measureText(txt).width>(ch.chartArea.width/n)-2) continue; ctx.fillText(txt,x,top-4); }
+  ctx.restore(); }};
 const universalValueLabels={
   id:'universalValueLabels',
   afterDatasetsDraw(chart){
@@ -10439,7 +10484,7 @@ function drawPivot(){
 // Who needs attention in a week. Main list: recruiters below 50% of their schedule goal (for the
 // week in progress: below 50% of where they should be by today). Then 50–79%, other signals
 // (show rate drops, no-shows, inactivity, wins), and remarks waiting for approval.
-const alertsState = {week:null, signals:'attention', search:'', group:lsGet('ipd_alerts_group2')||'none', band:'below', bands:['below'], basis:lsGet('ipd_alerts_basis')||'week'};
+const alertsState = {week:null, signals:'attention', search:'', group:lsGet('ipd_alerts_group2')||'none', band:'below', bands:['below'], basis:'today'};
 // Groups alert items as Division › Branch (or Branch only, or none). Biggest groups first.
 // Smart grouping: small branches sit side by side, single-recruiter branches share one box, and each
 // group header carries its own summary (average %, schedules vs goal) so you can scan without opening cards.
@@ -10631,7 +10676,7 @@ async function renderAlertsView(){
     <div class="al-toolbar">
       <label class="cand-field"><span>Week ending</span><select id="alWeek">${weeks.map(d=>`<option value="${d}" ${d===st.week?'selected':''}>Wk ${weekOfDate(d).number} · ending ${fmtDate(d)}${d===toIsoDateOnly(saturdayOnOrAfter(new Date()))?' (this week)':''}</option>`).join('')}</select></label>
       <label class="cand-field"><span>Group by</span><select id="alGroup"><option value="division" ${st.group==='division'?'selected':''}>Division › Branch</option><option value="branch" ${st.group==='branch'?'selected':''}>Branch</option><option value="none" ${st.group==='none'?'selected':''}>No grouping</option></select></label>
-      <div class="cand-field al-basis-pick"><span>Compare with</span><div class="ua-filter" role="tablist"><button type="button" data-al-basis="week" class="${st.basis!=='today'?'on':''}">Weekly goal</button><button type="button" data-al-basis="today" class="${st.basis==='today'?'on':''}" ${inProgress?'':'disabled title="Only for the week in progress"'}>Goal so far (today)</button></div></div>
+      <div class="cand-field al-basis-pick"><span>Compare with</span><div class="ua-filter" role="tablist"><button type="button" data-al-basis="week" class="${!today?'on':''}">Weekly goal</button><button type="button" data-al-basis="today" class="${today?'on':''}" ${inProgress?'':'disabled title="Only for the week in progress"'}>Goal so far (today)</button></div></div>
       <p class="hint al-basis">${today?`Week in progress — ${elapsed} of 5 working days so far. Each recruiter’s schedules are compared with their goal so far (daily goal × ${elapsed} day${elapsed===1?'':'s'}).`:inProgress?`Week in progress — ${elapsed} of 5 working days so far. Groups compare schedules with each recruiter’s full weekly goal; each card also shows where they should be by today. Recruiters with no schedules yet are included.`:`Completed week — schedules compared with each recruiter’s weekly goal (default ${DEFAULT_WEEKLY_GOAL}).`}</p>
     </div>
     <div class="al-tiles" data-section="alerts.summary">
@@ -10666,7 +10711,7 @@ async function renderAlertsView(){
   host.querySelectorAll('[data-hi-name]').forEach(b=>b.onclick=()=>openRemarksModal(b.dataset.hiName, st.week));
   host.querySelectorAll('[data-hi-cat]').forEach(b=>b.onclick=()=>{ st.hiCat=b.dataset.hiCat; host.querySelectorAll('[data-hi-cat]').forEach(x=>x.classList.toggle('on',x===b)); host.querySelectorAll('[data-hi-list]').forEach(x=>x.hidden=x.dataset.hiList!==st.hiCat); });
   host.querySelector('[data-hi-copy]')?.addEventListener('click',e=>{ e.preventDefault(); copyRemarksTable(hiShown.streak.map(x=>x.row), st.week, 'below', today); });
-  host.querySelectorAll('[data-al-basis]').forEach(b=>b.onclick=()=>{ if(b.disabled) return; st.basis=b.dataset.alBasis; lsSet('ipd_alerts_basis', st.basis); renderAlertsView(); });
+  host.querySelectorAll('[data-al-basis]').forEach(b=>b.onclick=()=>{ if(b.disabled) return; st.basis=b.dataset.alBasis; renderAlertsView(); });
   host.querySelectorAll('[data-sig]').forEach(b=>b.onclick=()=>{ st.signals=b.dataset.sig; renderAlertsView(); });
   host.querySelectorAll('[data-al-remarks]').forEach(b=>b.onclick=()=>openRemarksModal(b.dataset.alRemarks, st.week));
   host.querySelectorAll('[data-al-copy]').forEach(b=>b.onclick=e=>{ e.preventDefault(); e.stopPropagation(); copyRemarksTable(b.dataset.alCopy==='below'?belowShown:b.dataset.alCopy==='good'?goodShown:watchShown, st.week, b.dataset.alCopy, today); });
@@ -12047,7 +12092,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.73.6';   // shown only in the browser tab title
+const APP_VERSION = '4.74.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -13138,11 +13183,72 @@ const Onboarding=(()=>{
   wire(host);
   host.querySelector('[data-ovgo-rep]')?.addEventListener('click',()=>goOverviewTab('onboarding'));
  }
+ // the same number of days just before the picked dates, with the same filters — for "vs before" on the summary
+ function prevSummary(){
+  const d=s=>new Date(s+'T12:00:00'), iso=x=>toIsoDateOnly(x), n=Math.round((d(st.to)-d(st.from))/864e5)+1;
+  const f=d(st.from); f.setDate(f.getDate()-n); const t=d(st.from); t.setDate(t.getDate()-1);
+  const pF=iso(f), pT=iso(t), key=[pF,pT,st.fOnb,st.fType,st.fCat].join('|');
+  if(st.prevC&&st.prevC.key===key) return st.prevC;
+  const box=st.prevC={key, n, S:null, done:false};
+  fetchRange(pF,pT).then(({rows})=>{ if(st.prevC!==box) return;
+   const r=rows.filter(x=>(!st.fOnb||x.onboarder===st.fOnb)&&(!st.fType||x.call_type===st.fType));
+   let c=candidates(r); if(st.fCat) c=c.filter(x=>st.fCat==='pending'?!isDone(x.cat):x.cat===st.fCat);
+   box.S=summary(c, c.flatMap(x=>x.calls)); box.done=true;
+   if(st.page==='report'&&document.activeElement?.id!=='onbQ') render(); }).catch(()=>{ box.done=true; });
+  return box;
+ }
  function reportHtml(adm, onbs, rows, cands, shownCalls, assign){
   const S=summary(cands, shownCalls), per=perOnboarder(candidates(rows), rows), vol=volume(rows, assign);
-  const tile=(lbl,val,sub,cls,cat)=>`<button type="button" class="onb-tile ${cls||''} ${cat&&st.fCat===cat?'sel':''}" ${cat?`data-onb-cat="${cat}"`:'disabled'}><span>${lbl}</span><strong>${val}</strong>${sub?`<em>${sub}</em>`:''}</button>`;
+  const PV=prevSummary(), P=PV.S;
   const fmt1=v=>v==null?'–':v.toFixed(1);
+  const done=S.by.finalized+S.by.complete, pDone=P?P.by.finalized+P.by.complete:null;
+  const rate=(a,b)=>b?a/b*100:null;
+  const isDef=st.from===back(29)&&st.to===today();
+  const label=isDef?'Last 30 days':`${fmtDate(st.from)} – ${fmtDate(st.to)}`, before=`the ${fmtNum(PV.n)} days before`;
+  // change chips: % for counts, points for rates; "good" says which way is better
+  const chip=(c,p,good=1)=>{ if(!P||!P.n||p==null) return ''; if(!p) return ''; const d=(c-p)/p*100;
+   return `<span class="mr-d ${Math.abs(d)<.5?'':(d>0)===(good>0)?'up':'down'}" title="${escapeHtml(before)}: ${fmtNum(p)}">${d>=.5?'▲':d<=-.5?'▼':'●'} ${Math.abs(Math.round(d))}%</span>`; };
+  const pts=(c,p,good=1)=>{ if(c==null||p==null) return ''; const d=Math.round(c-p);
+   return `<span class="mr-d ${!d?'':(d>0)===(good>0)?'up':'down'}" title="${escapeHtml(before)}: ${Math.round(p)}%">${d>0?'▲':d<0?'▼':'●'} ${Math.abs(d)} pts</span>`; };
+  const tile=(lbl,val,sub,cls,cat,extra)=>`<button type="button" class="mr-kpi ${cls||''} ${cat&&st.fCat===cat?'sel':''}" ${cat?`data-onb-cat="${cat}" title="Show only these candidates — click again to show everyone"`:'disabled'}><span>${lbl}</span><strong>${val}</strong>${extra||''}${sub?`<em>${sub}</em>`:''}</button>`;
   const barKeys=VIEW_CATS.map(([k])=>k).filter(k=>k!=='other'||S.by.other);
+  const reachR=rate(S.reached,S.n), doneR=rate(done,S.n), pReachR=P?rate(P.reached,P.n):null, pDoneR=P?rate(pDone,P.n):null;
+  const headline=S.n?`${fmtNum(done)} of ${fmtNum(S.n)} candidates finalized or completed onboarding`:'No calls logged in these dates';
+  const sub=!S.n?'Pick other dates, or log calls on Onboarding → Log calls.'
+   :`${Math.round(doneR)}% of everyone called${pDoneR!=null&&P.n?` · ${pts(doneR,pDoneR)} vs ${escapeHtml(before)} (${Math.round(pDoneR)}%)`:PV.done||!P?'':' · comparing with the days before…'}`;
+  const step=(l,v,of,note,cls)=>`<div class="mr-step ${cls||''}"><div class="mr-step-top"><span>${l}</span><b>${fmtNum(v)}</b></div><div class="mr-step-bar"><i style="width:${of?Math.max(v?3:0,Math.round(v/of*100)):0}%"></i></div><small>${note}</small></div>`;
+  const funnel=S.n?`<div class="mr-funnel">
+    ${step('Called',S.n,S.n,fmtNum(S.calls)+' calls')}
+    ${step('Reached',S.reached,S.n,pct(S.reached,S.n)+' of called','reach')}
+    ${step('Finalized / complete',done,S.n,pct(done,S.reached)+' of reached','done')}
+   </div>`:'';
+  // takeaways in plain words
+  const notes=[];
+  if(S.n){
+   const pend=S.n-done; if(pend) notes.push(`<b>${fmtNum(pend)} still pending</b>: ${[['in_process','in between stages'],['lvm','at LVM / no answer'],['no_response','never responded']].filter(([k])=>S.by[k]).map(([k,l])=>`${fmtNum(S.by[k])} ${l}`).join(', ')||'other statuses'}.`);
+   const bestO=per.filter(x=>x.n).map(x=>({o:x.o, n:x.n, d:(x.by.finalized||0)+(x.by.complete||0)})).sort((a,b)=>b.d-a.d||b.n-a.n)[0];
+   if(!st.fOnb&&per.length>1&&bestO&&bestO.d) notes.push(`<b>${escapeHtml(bestO.o)}</b> finalized or completed the most — ${fmtNum(bestO.d)} of ${fmtNum(bestO.n)} candidates (${pct(bestO.d,bestO.n)}).`);
+   const lowR=vol.filter(v=>v.people>=5).sort((a,b)=>a.reached/a.people-b.reached/b.people)[0];
+   if(!st.fOnb&&vol.length>1&&lowR&&lowR.people) notes.push(`<b>${escapeHtml(lowR.o)}</b> reached ${pct(lowR.reached,lowR.people)} of the people they called — the lowest; ${fmtNum(lowR.notReached)} were LVM / no answer.`);
+   if(S.avgDays!=null) notes.push(S.avgDays<.5?`Finalized / completed candidates mostly finished <b>the same day</b> as their first call; ${fmt1(S.avgCalls)} calls per candidate on average.`:`Finalized / completed candidates took <b>${fmt1(S.avgDays)} days</b> on average from their first call; ${fmt1(S.avgCalls)} calls per candidate.`);
+  }
+  const hero=`<section class="mr-hero">
+    <div class="mr-top"><div class="mr-title"><span class="mr-eyebrow">${escapeHtml(label)}${st.fOnb?' · '+escapeHtml(st.fOnb):''}${st.fType?' · '+escapeHtml(st.fType):''}${st.fCat?' · '+escapeHtml(st.fCat==='pending'?'Pending':CAT_LBL[st.fCat]):''}</span><h3 class="mr-headline">${headline}</h3><p class="mr-sub">${sub}</p></div>${funnel}</div>
+    <div class="mr-kpis onb-k">
+     ${tile('Candidates reached',fmtNum(S.reached),'unique · '+pct(S.reached,S.n)+' of '+fmtNum(S.n)+' called','','',chip(S.reached,P&&P.reached))}
+     ${tile('Finalized',fmtNum(S.by.finalized),pct(S.by.finalized,S.n)+' · EB / I9 complete','fin','finalized',chip(S.by.finalized,P&&P.by.finalized))}
+     ${tile('Onboarding complete',fmtNum(S.by.complete),pct(S.by.complete,S.n),'good','complete',chip(S.by.complete,P&&P.by.complete))}
+     ${tile('In between stages',fmtNum(S.by.in_process),pct(S.by.in_process,S.n),'ip','in_process',chip(S.by.in_process,P&&P.by.in_process,0))}
+     ${tile('LVM / No answer',fmtNum(S.by.lvm),pct(S.by.lvm,S.n),'warn','lvm',chip(S.by.lvm,P&&P.by.lvm,-1))}
+     ${tile('Never responded',fmtNum(S.by.no_response),pct(S.by.no_response,S.n),'bad','no_response',chip(S.by.no_response,P&&P.by.no_response,-1))}
+     ${tile('Avg. calls',fmt1(S.avgCalls),'per candidate'+(S.avgDur==null?'':' · '+fmt1(S.avgDur)+' min a call'))}
+    </div>
+    ${S.n?`<div><div class="onb-bar mr-onbbar">${barKeys.map(k=>S.by[k]?`<i class="${CAT_CLS[k]}" style="flex:${S.by[k]}" title="${CAT_LBL[k]}: ${S.by[k]} (${pct(S.by[k],S.n)})"></i>`:'').join('')}</div>
+     <div class="onb-legend mr-legend2">${barKeys.filter(k=>S.by[k]).map(k=>`<span><b class="${CAT_CLS[k]}"></b>${CAT_LBL[k]} <small>${pct(S.by[k],S.n)}</small></span>`).join('')}<span class="mr-rule">Each candidate counts once, by their latest call. Click a box above to filter.</span></div></div>`:''}
+    ${notes.length?`<ul class="mr-notes">${notes.map(n=>`<li><span>${n}</span></li>`).join('')}</ul>`:''}
+   </section>`;
+  // ---- one panel, three views of the onboarders ----
+  const ex=st.explain&&vol.find(v=>v.o===st.explain);
   const aCat=st.aCat||'', assignF=aCat?mergedAssign(aCat).map(d=>st.fOnb?{...d, data:{...d.data, rows:Object.fromEntries(Object.entries(d.data.rows).filter(([n])=>n===st.fOnb))}}:d):assign;
   const volA=aCat?volume(rows, assignF):vol;
   const aList=Object.entries(autoAssign()).filter(([d])=>d>=st.from&&d<=st.to).flatMap(([,a])=>a.list).filter(x=>!st.fOnb||x.o===st.fOnb);
@@ -13151,40 +13257,32 @@ const Onboarding=(()=>{
   const types=aTot.__other?[...types0,'__other']:types0, tLbl=t=>t==='__other'?'Other (Inbound…)':t;
   const pool={}; assign.forEach(d=>types.forEach(t=>{ pool[t]=(pool[t]||0)+(Number(((d.data&&d.data.pool)||{})[t])||0); }));
   const totPeople=vol.reduce((a,v)=>a+v.people,0), totCalls=vol.reduce((a,v)=>a+v.calls,0);
-  const ex=st.explain&&vol.find(v=>v.o===st.explain);
-  return `${filters(adm,onbs,true)}
-   <p class="hint onb-rule">Each candidate (EID) is counted once — all their calls are combined and the <strong>latest call’s status</strong> decides where they land. Click a tile to filter.</p>
-   <div class="onb-tiles">
-    ${tile('Candidates reached',fmtNum(S.reached),'unique · '+pct(S.reached,S.n)+' of '+fmtNum(S.n)+' called')}
-    ${tile('Finalized',fmtNum(S.by.finalized),pct(S.by.finalized,S.n)+' · EB / I9 complete'+(S.avgDays==null?'':' · avg '+fmt1(S.avgDays)+' days'),'fin','finalized')}
-    ${tile('Onboarding complete',fmtNum(S.by.complete),pct(S.by.complete,S.n),'good','complete')}
-    ${tile('In between stages',fmtNum(S.by.in_process),pct(S.by.in_process,S.n),'','in_process')}
-    ${tile('LVM / No answer',fmtNum(S.by.lvm),pct(S.by.lvm,S.n),'warn','lvm')}
-    ${tile('Never responded',fmtNum(S.by.no_response),pct(S.by.no_response,S.n),'bad','no_response')}
-    ${tile('Avg. calls',fmt1(S.avgCalls),'per candidate'+(S.avgDur==null?'':' · '+fmt1(S.avgDur)+' min a call'))}
-   </div>
-   <div class="panel onb-mix"><h4>Where candidates stand (latest status)</h4><div class="onb-bar">${barKeys.map(k=>S.by[k]?`<i class="${CAT_CLS[k]}" style="flex:${S.by[k]}" title="${CAT_LBL[k]}: ${S.by[k]}"></i>`:'').join('')}</div>
-    <div class="onb-legend">${barKeys.map(k=>`<span><b class="${CAT_CLS[k]}"></b>${CAT_LBL[k]} · <strong>${S.by[k]}</strong> <small>${pct(S.by[k],S.n)}</small></span>`).join('')}</div></div>
-   ${vol.length?`<section class="panel"><div class="panel-head"><div><h3>Daily volume — who they talk to</h3><span class="hint">Calls → different people called → people reached → people who completed onboarding with them. Click <b>Explain</b> for a plain-English summary.</span></div>${copyBtnHtml('onbVol')}</div>
+  const tabs=[['results','Results',per.length],['activity','Activity',vol.length],['assign','Assignments',assign.length]].filter(t=>t[2]);
+  let tab=st.repTab&&tabs.some(t=>t[0]===st.repTab)?st.repTab:(tabs[0]||[])[0];
+  const resultsHtml=()=>`<p class="hint mr-tabhint">Where each onboarder’s candidates stand — credited to whoever made the latest call. % = share of that onboarder’s candidates.</p>
+    <div class="onb-scroll"><table class="users-table onb-table" id="onbRep"><thead><tr><th>Onboarder</th><th class="num">Candidates</th><th class="num">Finalized</th><th class="num">Onb. complete</th><th>Done</th><th class="num">In between</th><th class="num">LVM / No ans.</th><th class="num">Never resp.</th><th class="num">Calls / cand.</th><th class="num">Avg. min</th><th class="num">Days to complete</th></tr></thead><tbody>
+    ${[...per, (()=>{ const t=summary(candidates(rows), rows); return {o:'All onboarders', total:true, ...t}; })()].map(x=>{ const c=k=>`<td class="num">${x.by[k]||'–'}${x.by[k]?`<small>${pct(x.by[k],x.n)}</small>`:''}</td>`, dn=(x.by.finalized||0)+(x.by.complete||0);
+      return `<tr class="${x.total?'onb-total':''}"><td>${x.total?'<strong>All onboarders</strong>':`<button type="button" class="link-btn" data-onb-pick="${escapeHtml(x.o)}">${escapeHtml(x.o)}</button>`}</td><td class="num"><strong>${fmtNum(x.n)}</strong></td>${c('finalized')}${c('complete')}<td class="mr-share"><span class="mr-bar done"><i style="width:${x.n?Math.round(dn/x.n*100):0}%"></i></span><small>${pct(dn,x.n)}</small></td>${c('in_process')}${c('lvm')}${c('no_response')}<td class="num">${fmt1(x.avgCalls)}</td><td class="num">${fmt1(x.avgDur)}</td><td class="num">${x.avgDays==null?'–':fmt1(x.avgDays)}</td></tr>`; }).join('')}
+    </tbody></table></div>`;
+  const activityHtml=()=>`<p class="hint mr-tabhint">Calls → different people called → people reached → people who finalized / completed with them. Click <b>Explain</b> for a plain-English summary.</p>
     ${ex?`<div class="onb-explain">${explain(ex)}<button type="button" class="link-btn" data-onb-explain="">Close</button></div>`:''}
-    <div class="onb-scroll"><table class="users-table onb-table" id="onbVol"><thead><tr><th>Onboarder</th>${assign.length?`<th class="num">Assigned</th>`:''}<th class="num">Calls</th><th class="num">People called</th><th class="num">Reached</th><th class="num">Not reached</th><th class="num">Completed</th><th class="num">% of reached</th><th class="num">Days</th><th class="num">Calls / day</th><th class="num">People / day</th><th class="num">Calls / person</th><th></th></tr></thead><tbody>
+    <div class="onb-scroll"><table class="users-table onb-table" id="onbRep"><thead><tr><th>Onboarder</th>${assign.length?`<th class="num">Assigned</th>`:''}<th class="num">Calls</th><th class="num">People called</th><th class="num">Reached</th><th class="num">Not reached</th><th class="num">Completed</th><th class="num">% of reached</th><th class="num">Days</th><th class="num">Calls / day</th><th class="num">People / day</th><th class="num">Calls / person</th><th></th></tr></thead><tbody>
     ${vol.map(v=>`<tr><td><button type="button" class="link-btn" data-onb-pick="${escapeHtml(v.o)}">${escapeHtml(v.o)}</button></td>${assign.length?`<td class="num" title="${escapeHtml(Object.entries(v.assigned).filter(([,n])=>n).map(([t,n])=>t+': '+n).join(' · '))}">${v.aTot||'–'}</td>`:''}<td class="num"><strong>${fmtNum(v.calls)}</strong></td><td class="num">${fmtNum(v.people)}</td><td class="num">${fmtNum(v.reached)}<small>${pct(v.reached,v.people)}</small></td><td class="num">${fmtNum(v.notReached)}<small>${pct(v.notReached,v.people)}</small></td><td class="num"><strong>${fmtNum(v.completed)}</strong></td><td class="num">${pct(v.completed,v.reached)}</td><td class="num">${v.callDays||'–'}</td><td class="num">${fmt1(v.perDay)}</td><td class="num">${fmt1(v.peoplePerDay)}</td><td class="num">${fmt1(v.callsPerPerson)}</td><td><button type="button" class="link-btn" data-onb-explain="${escapeHtml(v.o)}">Explain</button></td></tr>`).join('')}
     <tr class="onb-total"><td><strong>All onboarders</strong></td>${assign.length?`<td class="num">${fmtNum(vol.reduce((a,v)=>a+v.aTot,0))}</td>`:''}<td class="num">${fmtNum(totCalls)}</td><td class="num">${fmtNum(totPeople)}</td><td class="num">${fmtNum(vol.reduce((a,v)=>a+v.reached,0))}</td><td class="num">${fmtNum(vol.reduce((a,v)=>a+v.notReached,0))}</td><td class="num">${fmtNum(vol.reduce((a,v)=>a+v.completed,0))}</td><td class="num">${pct(vol.reduce((a,v)=>a+v.completed,0),vol.reduce((a,v)=>a+v.reached,0))}</td><td></td><td></td><td></td><td class="num">${totPeople?fmt1(totCalls/totPeople):'–'}</td><td></td></tr>
-    </tbody></table></div></section>`:''}
-   ${assign.length?`<section class="panel"><div class="panel-head"><div><h3>Assignments in these dates</h3><span class="hint">From Log calls — each candidate counts once, on their first call, for the onboarder who made it. Pick a stage to see only candidates whose latest status is in it.</span></div>${copyBtnHtml('onbAsgTot')}</div>
+    </tbody></table></div>`;
+  const assignHtml2=()=>`<p class="hint mr-tabhint">From Log calls — each candidate counts once, on their first call, for the onboarder who made it. Pick a stage to see only candidates whose latest status is in it.</p>
     <div class="onb-quick onb-aq" role="tablist" aria-label="Filter assignments by stage">${[['','All'],['pending','Pending'],['finalized','Finalized'],['complete','Onboarding complete'],['in_process','In between stages'],['lvm','LVM / No answer'],['no_response','Never responded']].map(([k,l])=>`<button type="button" data-onb-aq="${k}" class="${aCat===k?'on':''} ${k?CAT_CLS[k]||'q-pending':''}" aria-pressed="${aCat===k}"><span>${l}</span><b>${fmtNum(aCnt(k))}</b></button>`).join('')}</div>
     ${aCat?`<p class="hint onb-aq-note">Showing only <strong>${aCat==='pending'?'Pending':escapeHtml(CAT_LBL[aCat])}</strong> candidates (latest status), counted from Log calls. Typed totals are left out while a stage is picked.</p>`:''}
-    <div class="onb-scroll"><table class="users-table onb-table" id="onbAsgTot"><thead><tr><th>Onboarder</th>${types.map(t=>`<th class="num">${escapeHtml(tLbl(t))}</th>`).join('')}<th class="num">Total</th></tr></thead><tbody>
+    <div class="onb-scroll"><table class="users-table onb-table" id="onbRep"><thead><tr><th>Onboarder</th>${types.map(t=>`<th class="num">${escapeHtml(tLbl(t))}</th>`).join('')}<th class="num">Total</th></tr></thead><tbody>
     ${volA.filter(v=>v.aTot).length?'':`<tr><td colspan="${types.length+2}" class="hint">No candidates in this stage for these dates.</td></tr>`}
     ${volA.filter(v=>v.aTot).map(v=>`<tr><td>${escapeHtml(v.o)}</td>${types.map(t=>`<td class="num">${v.assigned[t]||'–'}</td>`).join('')}<td class="num"><strong>${v.aTot}</strong></td></tr>`).join('')}
     <tr class="onb-total"><td><strong>Assigned to onboarders</strong></td>${types.map(t=>`<td class="num">${aTot[t]||0}</td>`).join('')}<td class="num">${types.filter(inSum).reduce((a,t)=>a+(aTot[t]||0),0)}</td></tr>
     ${!aCat&&types.some(t=>pool[t])?`<tr class="onb-total"><td><strong>Total (typed)</strong></td>${types.map(t=>`<td class="num">${pool[t]||'–'}${pool[t]&&aTot[t]!==pool[t]?`<small>${pool[t]-(aTot[t]||0)} not assigned</small>`:''}</td>`).join('')}<td class="num">${types.reduce((a,t)=>a+(pool[t]||0),0)||'–'}</td></tr>`:''}
-    </tbody></table></div></section>`:''}
-   ${per.length?`<section class="panel"><div class="panel-head"><div><h3>Where each onboarder’s candidates stand</h3><span class="hint">Candidates are credited to whoever made their latest call. % = share of that onboarder’s candidates.</span></div>${copyBtnHtml('onbPerf')}</div>
-    <div class="onb-scroll"><table class="users-table onb-table" id="onbPerf"><thead><tr><th>Onboarder</th><th class="num">Candidates</th><th class="num">Finalized</th><th class="num">Onb. complete</th><th class="num">In between</th><th class="num">LVM / No ans.</th><th class="num">Never resp.</th><th class="num">Calls / cand.</th><th class="num">Avg. min</th><th class="num">Days to complete</th></tr></thead><tbody>
-    ${[...per, (()=>{ const t=summary(candidates(rows), rows); return {o:'All onboarders', total:true, ...t}; })()].map(x=>{ const c=k=>`<td class="num">${x.by[k]||'–'}${x.by[k]?`<small>${pct(x.by[k],x.n)}</small>`:''}</td>`;
-      return `<tr class="${x.total?'onb-total':''}"><td>${x.total?'<strong>All onboarders</strong>':escapeHtml(x.o)}</td><td class="num"><strong>${fmtNum(x.n)}</strong></td>${c('finalized')}${c('complete')}${c('in_process')}${c('lvm')}${c('no_response')}<td class="num">${fmt1(x.avgCalls)}</td><td class="num">${fmt1(x.avgDur)}</td><td class="num">${x.avgDays==null?'–':fmt1(x.avgDays)}</td></tr>`; }).join('')}
-    </tbody></table></div></section>`:''}`;
+    </tbody></table></div>`;
+  const panel=tabs.length?`<section class="panel"><div class="panel-head"><div><h3>Onboarders</h3></div>
+    <div class="mr-head-tools"><div class="oe-group" role="tablist" aria-label="Show">${tabs.map(([k,l])=>`<button type="button" data-onb-rtab="${k}" class="${tab===k?'on':''}" aria-pressed="${tab===k}">${l}</button>`).join('')}</div>${copyBtnHtml('onbRep')}${Server.can('export')?downloadBtnHtml('onbRep','onboarding-'+tab+'.xlsx'):''}</div></div>
+    ${tab==='results'?resultsHtml():tab==='activity'?activityHtml():assignHtml2()}</section>`:'';
+  return `${filters(adm,onbs,true)}${hero}${panel}`;
  }
  // ---- daily assignment sheet: onboarder × assignment type, plus the pool totals; or paste the daily message ----
  function assignHtml(){
@@ -13281,6 +13379,7 @@ const Onboarding=(()=>{
    $('#onbFCat')?.addEventListener('change',e=>{ st.fCat=e.target.value; render(); });
    let t; $('#onbQ')?.addEventListener('input',e=>{ clearTimeout(t); t=setTimeout(()=>{ st.q=e.target.value; render(); const q=document.getElementById('onbQ'); if(q){ q.focus(); q.setSelectionRange(q.value.length,q.value.length); } },250); });
    host.querySelectorAll('[data-onb-aq]').forEach(b=>b.onclick=()=>{ st.aCat=b.dataset.onbAq; render(); });
+   host.querySelectorAll('[data-onb-rtab]').forEach(b=>b.onclick=()=>{ st.repTab=b.dataset.onbRtab; render(); });
    host.querySelectorAll('[data-onb-cat]').forEach(b=>b.onclick=()=>{ st.fCat=st.fCat===b.dataset.onbCat?'':b.dataset.onbCat; render(); });
    host.querySelectorAll('[data-onb-pick]').forEach(b=>b.onclick=()=>{ st.fOnb=b.dataset.onbPick; render(); }); };
   filt();
@@ -13487,9 +13586,9 @@ const OrderEntry=(()=>{
  const monthsBack=(t,n)=>{ const d=parse(monthStart(t)); d.setMonth(d.getMonth()-n); return iso(d); };
  const GROUPS={
   day:    {label:'Daily',     unit:'day',     key:s=>s,         end:s=>s,                      name:dayName,                                     def:t=>[add(t,-29),t]},
-  week:   {label:'Weekly',    unit:'week',    key:weekStart,    end:s=>add(weekStart(s),6),    name:k=>short(k)+' – '+short(add(k,6))+', '+add(k,6).slice(0,4), def:t=>[add(weekStart(t),-77),t]},
+  week:   {label:'Weekly',    unit:'week',    key:weekStart,    end:s=>add(weekStart(s),6),    name:k=>short(k)+' – '+short(add(k,6))+', '+add(k,6).slice(0,4), def:t=>[weekStart(add(t,-89)),t]},
   month:  {label:'Monthly',   unit:'month',   key:monthStart,   end:monthEnd,                  name:k=>monthLabel(k),                            def:t=>[monthsBack(t,11),t]},
-  quarter:{label:'Quarterly', unit:'quarter', key:qStart,       end:qEnd,                      name:k=>quarterLabel(k),                          def:t=>[monthsBack(qStart(t),9),t]}};
+  quarter:{label:'Quarterly', unit:'quarter', key:qStart,       end:qEnd,                      name:k=>quarterLabel(k),                          def:t=>[qStart(monthsBack(t,11)),t]}};
  const SRC=[['rc','Recruitment Cloud','RC'],['crm','CRM','CRM']];
  // ---- agent list (admins) ----
  const lists=()=>{ const v=KV.get('oeLists'); return {agents:Array.isArray(v&&v.agents)?v.agents.filter(a=>a&&a.label):[]}; };
@@ -13517,7 +13616,7 @@ const OrderEntry=(()=>{
  }
  // the data covers both the report range and the last two weeks before the entry day
  async function ensure(force){
-  range(); const a=[st.from, add(st.day,-13)].sort()[0], b=[st.to, st.day].sort().pop();
+  range(); const a=[prevRange()[0], st.from, add(st.day,-13)].sort()[0], b=[st.to, st.day].sort().pop();
   if(!force&&st.rows&&st.lf<=a&&st.lt>=b) return;
   await load(force||!st.rows?a:[a,st.lf].sort()[0], force||!st.rows?b:[b,st.lt].sort().pop());
  }
@@ -13598,66 +13697,105 @@ const OrderEntry=(()=>{
      return `<tr class="${dd===st.day?'oe-cur':''}"><td><button type="button" class="link-btn" data-oe-go="${dd}">${escapeHtml(dayName(dd))}</button></td><td class="num">${m.size?fmtNum(rc):'–'}</td><td class="num">${m.size?fmtNum(crm):'–'}</td><td class="num"><strong>${m.size?fmtNum(rc+crm):'–'}</strong></td><td class="num">${m.size} of ${roster().length}</td><td class="oe-miss">${miss.length?escapeHtml(miss.join(', ')):'<span class="hint">Everyone</span>'}</td></tr>`; }).join('')||'<tr><td colspan="6" class="hint">Nothing saved yet.</td></tr>'}
    </tbody></table></div></section>`;
  }
+ // the same number of days just before the picked dates — used for "vs before" on the summary
+ function prevRange(){ const n=Math.round((parse(st.to)-parse(st.from))/864e5)+1; return [add(st.from,-n), add(st.from,-1), n]; }
+ const isWd=s=>{ const w=parse(s).getDay(); return w>0&&w<6; };
  function reportHtml(){
   range();
   const G=GROUPS[st.group], rows=inRange(), P=periods(rows), A=byAgent(rows);
-  const T={rc:rows.reduce((a,r)=>a+(r.rc||0),0), crm:rows.reduce((a,r)=>a+(r.crm||0),0)}; T.total=T.rc+T.crm;
-  const days=new Set(rows.map(r=>r.day)).size, agentDays=new Set(rows.map(r=>r.day+'|'+r.agent)).size;
+  const sum=list=>{ const t={rc:list.reduce((a,r)=>a+(r.rc||0),0), crm:list.reduce((a,r)=>a+(r.crm||0),0)}; t.total=t.rc+t.crm; t.days=new Set(list.map(r=>r.day)).size; return t; };
+  const T=sum(rows), days=T.days;
+  const [pF,pT,nDays]=prevRange(), havePrev=st.lf&&st.lf<=pF;
+  const PR0=havePrev?sum((st.rows||[]).filter(r=>r.day>=pF&&r.day<=pT&&(!st.agent||r.agent===st.agent))):null;
+  // compare only when the days before are filled in about as well (otherwise "up 1600%" just means no history)
+  const PR=PR0&&PR0.days>=Math.max(1,days*.6)?PR0:null;
   const full=P.filter(p=>!p.partial&&p.total), best=full.slice().sort((a,b)=>b.total-a.total)[0];
   const names=[...new Set([...roster(), ...(st.rows||[]).map(r=>r.agent)])].sort();
-  const tile=(l,v,s,c)=>`<div class="onb-tile ${c||''}"><span>${l}</span><strong>${v}</strong>${s?`<em>${s}</em>`:''}</div>`;
   const per=G.unit, cnt=P.filter(p=>p.total).length;
-  // agent × period grid (newest period first), in the chosen view
-  const gp=P.slice().reverse(), cell=(a,p)=>{ const rs=rows.filter(r=>r.agent===a&&G.key(r.day)===p.k); if(!rs.length) return st.view==='split'?'<td class="num">–</td><td class="num oe-sep">–</td>':'<td class="num">–</td>';
-   const rc=rs.reduce((x,r)=>x+(r.rc||0),0), crm=rs.reduce((x,r)=>x+(r.crm||0),0);
-   return st.view==='split'?`<td class="num">${fmtNum(rc)}</td><td class="num oe-sep">${fmtNum(crm)}</td>`:`<td class="num">${fmtNum(st.view==='rc'?rc:st.view==='crm'?crm:rc+crm)}</td>`; };
-  const colTot=p=>st.view==='split'?`<td class="num">${fmtNum(p.rc)}</td><td class="num oe-sep">${fmtNum(p.crm)}</td>`:`<td class="num">${fmtNum(st.view==='rc'?p.rc:st.view==='crm'?p.crm:p.total)}</td>`;
-  const views=[['total','Total'],['rc','RC only'],['crm','CRM only'],['split','RC + CRM side by side']];
+  // ---- summary ----
+  const label=st.custom?`${short(st.from)} – ${dayName(st.to)}`:{day:'Last 30 days',week:'Last 90 days',month:'Last 12 months',quarter:'Last 12 months'}[st.group];
+  const before=st.custom?`the ${fmtNum(nDays)} days before`:{day:'the 30 days before',week:'the 90 days before',month:'the 12 months before',quarter:'the 12 months before'}[st.group];
+  const chg=(c,p)=>p==null||!p?null:(c-p)/p*100;
+  const chip=(c,p,unit)=>{ if(!PR) return ''; const d=chg(c,p); if(d==null) return '';
+   return `<span class="mr-d ${d>=.5?'up':d<=-.5?'down':''}" title="${escapeHtml(before)}: ${fmtNum(p)}${unit||''}">${d>=.5?'▲':d<=-.5?'▼':'●'} ${Math.abs(Math.round(d))}%</span>`; };
+  const ptsChip=(c,p)=>{ if(p==null) return ''; const d=Math.round(c-p); if(!d) return ''; return `<span class="mr-d ${d>0?'up':d<0?'down':''}" title="${escapeHtml(before)}: ${Math.round(p)}%">${d>0?'▲':d<0?'▼':'●'} ${Math.abs(d)} pts</span>`; };
+  const rcP=T.total?T.rc/T.total*100:0, crmP=T.total?T.crm/T.total*100:0;
+  const prc=PR&&PR.total?PR.rc/PR.total*100:null, pcrm=PR&&PR.total?PR.crm/PR.total*100:null;
+  const perDay=days?T.total/days:null, pPerDay=PR&&PR.days?PR.total/PR.days:null;
+  const d0=PR?chg(T.total,PR.total):null;
+  const headline=T.total?`${fmtNum(T.total)} orders${perDay!=null?` · ${f1(perDay)} a day`:''}`:'No orders entered in these dates';
+  const subline=!T.total?'Pick other dates, or add the day’s numbers on Order Entry → Daily entry.'
+   :d0==null?(PR0&&!PR?'Not enough entries in '+escapeHtml(before)+' to compare with.':'')
+   :`${d0>=.5?'Up':d0<=-.5?'Down':'Level'} ${Math.abs(Math.round(d0))}% on ${escapeHtml(before)} (${fmtNum(PR.total)})`;
+  const kpi=(l,v,sub,extra,cls)=>`<div class="mr-kpi ${cls||''}"><span>${l}</span><strong>${v}</strong>${extra||''}${sub?`<em>${sub}</em>`:''}</div>`;
+  const top=A[0], low=A.length>1?A[A.length-1]:null;
+  const notes=[];
+  if(T.total){
+   notes.push(`<b>Recruitment Cloud ${Math.round(rcP)}%</b>, CRM ${Math.round(crmP)}% of all orders${pcrm!=null&&Math.abs(crmP-pcrm)>=1?` — CRM’s share is ${crmP>pcrm?'up':'down'} ${Math.abs(Math.round(crmP-pcrm))} pts`:''}.`);
+   if(!st.agent&&top&&low) notes.push(`<b>${escapeHtml(top.a)}</b> entered the most (${fmtNum(top.total)}, ${pct(top.total,T.total)} of the team); <b>${escapeHtml(low.a)}</b> the fewest (${fmtNum(low.total)}).`);
+   if(best&&cnt>1) notes.push(`Best ${per}: <b>${escapeHtml(G.name(best.k))}</b> with ${fmtNum(best.total)} orders.`);
+   // missing entries in the last two weeks (weekdays before today)
+   const yday=add(today(),-1), lo=[st.from, add(today(),-14)].sort().pop(), hi=[st.to, yday].sort()[0], who=st.agent?[st.agent]:roster(), miss=new Map();
+   if(lo<=hi&&who.length){ const have=new Set((st.rows||[]).map(r=>r.day+'|'+r.agent)); for(let d=lo; d<=hi; d=add(d,1)){ if(!isWd(d)) continue; who.forEach(a=>{ if(!have.has(d+'|'+a)) miss.set(a,(miss.get(a)||0)+1); }); } }
+   if(miss.size){ const tot=[...miss.values()].reduce((a,b)=>a+b,0); notes.push(`<span class="mr-warn">${fmtNum(tot)} missing ${tot===1?'entry':'entries'}</span> in the last two weeks: ${[...miss.entries()].sort((a,b)=>b[1]-a[1]).slice(0,4).map(([a,n])=>`${escapeHtml(a)} (${n} day${n===1?'':'s'})`).join(', ')}${miss.size>4?' and '+(miss.size-4)+' more':''}.`); }
+  }
+  const hero=`<section class="mr-hero">
+    <div class="mr-top"><div><span class="mr-eyebrow">${escapeHtml(label)}${st.agent?' · '+escapeHtml(st.agent):''}</span><h3 class="mr-headline">${headline}</h3>${subline?`<p class="mr-sub">${subline}</p>`:''}</div></div>
+    <div class="mr-kpis">
+     ${kpi('Total orders',fmtNum(T.total),fmtNum(days)+' day'+(days===1?'':'s')+' with entries',chip(T.total,PR&&PR.total))}
+     ${kpi('Per day',f1(perDay),'average on days with entries',chip(perDay||0,pPerDay))}
+     ${kpi('Recruitment Cloud',fmtNum(T.rc),Math.round(rcP)+'% of orders',chip(T.rc,PR&&PR.rc),'rc')}
+     ${kpi('CRM',fmtNum(T.crm),Math.round(crmP)+'% of orders',chip(T.crm,PR&&PR.crm),'crm')}
+     ${st.agent?kpi('Days entered',fmtNum(days),'by '+escapeHtml(st.agent)):kpi('Top agent',top?escapeHtml(top.a):'–',top?fmtNum(top.total)+' orders · '+pct(top.total,T.total)+' of the team':'No entries yet','','name')}
+    </div>
+    ${T.total?`<div class="mr-mix" title="Recruitment Cloud ${Math.round(rcP)}% · CRM ${Math.round(crmP)}%"><i style="flex:${T.rc||0}"></i><b style="flex:${T.crm||0}"></b></div><div class="mr-mix-key"><span><i class="rc"></i>Recruitment Cloud ${Math.round(rcP)}%${prc!=null?' '+ptsChip(rcP,prc):''}</span><span><i class="crm"></i>CRM ${Math.round(crmP)}%${pcrm!=null?' '+ptsChip(crmP,pcrm):''}</span></div>`:''}
+    ${notes.length?`<ul class="mr-notes">${notes.map(n=>`<li><span>${n}</span></li>`).join('')}</ul>`:''}
+   </section>`;
+  // ---- agents: totals, plus each period when switched on ----
+  const gp=P.slice().reverse(), split=st.view==='split';
+  const cellV=(rc,crm)=>split?`<td class="num">${fmtNum(rc)}</td><td class="num oe-sep">${fmtNum(crm)}</td>`:`<td class="num">${fmtNum(st.view==='rc'?rc:st.view==='crm'?crm:rc+crm)}</td>`;
+  const cell=(a,p)=>{ const rs=rows.filter(r=>r.agent===a&&G.key(r.day)===p.k); if(!rs.length) return split?'<td class="num oe-nil">–</td><td class="num oe-sep oe-nil">–</td>':'<td class="num oe-nil">–</td>';
+   return cellV(rs.reduce((x,r)=>x+(r.rc||0),0), rs.reduce((x,r)=>x+(r.crm||0),0)); };
+  const views=[['total','Total'],['rc','RC'],['crm','CRM'],['split','RC + CRM']];
+  const showP=!!st.showPer&&gp.length>0, rs2=showP&&split?'rowspan="2"':'';
+  const shareBar=(n)=>`<span class="mr-bar"><i style="width:${T.total?Math.max(2,Math.round(n/T.total*100)):0}%"></i></span>`;
+  const agents=`<section class="panel"><div class="panel-head"><div><h3>Agents</h3><span class="hint">Everything each agent entered in these dates.${showP?` Then each ${per}, newest first.`:''}</span></div>
+    <div class="mr-head-tools"><label class="rtl-chk"><button type="button" class="switch" role="switch" id="oeShowPer" aria-checked="${showP}"><i></i></button>Each ${per}</label>
+    ${showP?`<div class="oe-group oe-view" role="tablist" aria-label="Show">${views.map(([k,l])=>`<button type="button" data-oe-view="${k}" class="${st.view===k?'on':''}" aria-pressed="${st.view===k}">${l}</button>`).join('')}</div>`:''}
+    ${copyBtnHtml('oeAg')}${Server.can('export')?downloadBtnHtml('oeAg','order-entry-agents.xlsx'):''}</div></div>
+    <div class="onb-scroll"><table class="users-table onb-table oe-ag ${showP?'oe-grid':''}" id="oeAg"><thead>
+     <tr><th ${rs2}>Agent</th><th class="num" ${rs2}>Total</th><th class="num" ${rs2}>Recruitment Cloud</th><th class="num" ${rs2}>CRM</th><th ${rs2}>Share of team</th><th class="num" ${rs2}>Days</th><th class="num" ${rs2}>Per day</th><th class="num" ${rs2}>RC %</th><th class="num" ${rs2}>CRM %</th>${showP?gp.map(p=>`<th class="num oe-pcol" ${split?'colspan="2"':''}>${escapeHtml(st.group==='day'?short(p.k):G.name(p.k))}</th>`).join(''):''}</tr>
+     ${showP&&split?`<tr>${gp.map(()=>'<th class="num">RC</th><th class="num oe-sep">CRM</th>').join('')}</tr>`:''}</thead><tbody>
+    ${A.map(a=>`<tr><td><button type="button" class="link-btn" data-oe-pick="${escapeHtml(a.a)}" title="Show only ${escapeHtml(a.a)}">${escapeHtml(a.a)}</button></td><td class="num"><strong>${fmtNum(a.total)}</strong></td><td class="num">${fmtNum(a.rc)}</td><td class="num">${fmtNum(a.crm)}</td><td class="mr-share">${shareBar(a.total)}<small>${pct(a.total,T.total)}</small></td><td class="num">${a.days.size}</td><td class="num">${f1(a.days.size?a.total/a.days.size:null)}</td><td class="num">${pct(a.rc,a.total)}</td><td class="num">${pct(a.crm,a.total)}</td>${showP?gp.map(p=>cell(a.a,p)).join(''):''}</tr>`).join('')||`<tr><td colspan="9" class="hint">No entries in these dates.</td></tr>`}
+    ${A.length?`<tr class="onb-total"><td><strong>All agents</strong></td><td class="num"><strong>${fmtNum(T.total)}</strong></td><td class="num">${fmtNum(T.rc)}</td><td class="num">${fmtNum(T.crm)}</td><td class="mr-share"><small>100%</small></td><td class="num">${days}</td><td class="num">${f1(days?T.total/days:null)}</td><td class="num">${pct(T.rc,T.total)}</td><td class="num">${pct(T.crm,T.total)}</td>${showP?gp.map(p=>cellV(p.rc,p.crm)).join(''):''}</tr>`:''}
+    </tbody></table></div></section>`;
   return `<div class="onb-tools oe-tools">
     <div class="oe-group" role="tablist" aria-label="Group by">${Object.entries(GROUPS).map(([k,g])=>`<button type="button" data-oe-group="${k}" class="${st.group===k?'on':''}" aria-pressed="${st.group===k}">${g.label}</button>`).join('')}</div>
     <div class="onb-range"><div class="dpr-field"><span>Dates</span>${dateRangeBtn('oeFrom','oeTo',st.from,st.to)}</div></div>
     ${st.custom?'<button type="button" class="link-btn" id="oeDefRange" title="Back to the usual dates for this view">Default dates</button>':''}
     <label class="cand-field"><span>Agent</span><select id="oeAgent"><option value="">Everyone</option>${names.map(n=>`<option ${st.agent===n?'selected':''}>${escapeHtml(n)}</option>`).join('')}</select></label>
    </div>
-   <div class="oe-tiles">
-    ${tile('Total orders',fmtNum(T.total),fmtNum(days)+' day'+(days===1?'':'s')+' with entries')}
-    ${tile('Recruitment Cloud',fmtNum(T.rc),pct(T.rc,T.total)+' of the total','oe-rc')}
-    ${tile('CRM',fmtNum(T.crm),pct(T.crm,T.total)+' of the total','oe-crm')}
-    ${tile('Per day',f1(days?T.total/days:null),'RC '+f1(days?T.rc/days:null)+' · CRM '+f1(days?T.crm/days:null))}
-    ${tile('Per agent per day',f1(agentDays?T.total/agentDays:null),fmtNum(A.length)+' agent'+(A.length===1?'':'s')+' entered')}
-    ${tile('Best '+per,best?fmtNum(best.total):'–',best?escapeHtml(G.name(best.k)):'No complete '+per+' yet','good')}
-   </div>
-   <section class="panel"><div class="panel-head"><div><h3>${G.label} orders — RC and CRM</h3><span class="hint">Each bar is one ${per}: Recruitment Cloud and CRM stacked, so the bar’s height is the total.${P.some(p=>p.partial)?' Periods cut off by the dates you picked are marked “part”.':''}</span></div></div>
+   ${hero}
+   <section class="panel"><div class="panel-head"><div><h3>${G.label} orders</h3><span class="hint">The number on each bar is the total — point at a bar to see Recruitment Cloud and CRM.${P.some(p=>p.partial)?' Periods cut off by the dates are marked “part”.':''}</span></div><div class="mr-legend"><span><i class="rc"></i>Recruitment Cloud</span><span><i class="crm"></i>CRM</span></div></div>
     <div class="oe-chart"><canvas id="oeChart" aria-label="${G.label} orders chart" role="img"></canvas></div></section>
-   <section class="panel"><div class="panel-head"><div><h3>${G.label} totals</h3><span class="hint">${cnt} ${per}${cnt===1?'':'s'} with orders. Change is against the ${per} before (only full ${per}s).</span></div>${copyBtnHtml('oePer')}${Server.can('export')?downloadBtnHtml('oePer','order-entry-'+st.group+'.xlsx'):''}</div>
-    <div class="onb-scroll"><table class="users-table onb-table" id="oePer"><thead><tr><th>${G.label.replace(/ly$/,'').replace('Dai','Day')}</th><th class="num">Recruitment Cloud</th><th class="num">CRM</th><th class="num">Total</th><th class="num">RC %</th><th class="num">CRM %</th><th class="num">Agents</th><th class="num">Per agent</th>${st.group==='day'?'':'<th class="num">Per day</th>'}<th class="num">Change</th></tr></thead><tbody>
-    ${P.slice().reverse().map(p=>`<tr class="${p.total?'':'oe-zero'}"><td>${escapeHtml(G.name(p.k))}${p.partial?' <span class="oe-part" title="Only part of this '+per+' is inside the dates you picked">part</span>':p.running?' <span class="oe-part run" title="This '+per+' is still going">so far</span>':''}</td><td class="num">${p.n?fmtNum(p.rc):'–'}</td><td class="num">${p.n?fmtNum(p.crm):'–'}</td><td class="num"><strong>${p.n?fmtNum(p.total):'–'}</strong></td><td class="num">${pct(p.rc,p.total)}</td><td class="num">${pct(p.crm,p.total)}</td><td class="num">${p.agents.size||'–'}</td><td class="num">${f1(p.agents.size?p.total/p.agents.size:null)}</td>${st.group==='day'?'':`<td class="num">${f1(p.days.size?p.total/p.days.size:null)}</td>`}<td class="num">${delta(p)}</td></tr>`).join('')}
-    <tr class="onb-total"><td><strong>All</strong></td><td class="num">${fmtNum(T.rc)}</td><td class="num">${fmtNum(T.crm)}</td><td class="num"><strong>${fmtNum(T.total)}</strong></td><td class="num">${pct(T.rc,T.total)}</td><td class="num">${pct(T.crm,T.total)}</td><td class="num">${A.length}</td><td class="num">${f1(A.length?T.total/A.length:null)}</td>${st.group==='day'?'':`<td class="num">${f1(days?T.total/days:null)}</td>`}<td></td></tr>
-    </tbody></table></div></section>
-   <section class="panel"><div class="panel-head"><div><h3>By agent</h3><span class="hint">Everything in these dates for each agent, split into Recruitment Cloud and CRM.</span></div>${copyBtnHtml('oeAg')}${Server.can('export')?downloadBtnHtml('oeAg','order-entry-agents.xlsx'):''}</div>
-    <div class="onb-scroll"><table class="users-table onb-table" id="oeAg"><thead><tr><th>Agent</th><th class="num">Recruitment Cloud</th><th class="num">CRM</th><th class="num">Total</th><th class="num">RC %</th><th class="num">Share of team</th><th class="num">Days entered</th><th class="num">Per day</th></tr></thead><tbody>
-    ${A.map(a=>`<tr><td><button type="button" class="link-btn" data-oe-pick="${escapeHtml(a.a)}">${escapeHtml(a.a)}</button></td><td class="num">${fmtNum(a.rc)}</td><td class="num">${fmtNum(a.crm)}</td><td class="num"><strong>${fmtNum(a.total)}</strong></td><td class="num">${pct(a.rc,a.total)}</td><td class="num">${pct(a.total,T.total)}</td><td class="num">${a.days.size}</td><td class="num">${f1(a.days.size?a.total/a.days.size:null)}</td></tr>`).join('')||'<tr><td colspan="8" class="hint">No entries in these dates.</td></tr>'}
-    ${A.length?`<tr class="onb-total"><td><strong>All agents</strong></td><td class="num">${fmtNum(T.rc)}</td><td class="num">${fmtNum(T.crm)}</td><td class="num"><strong>${fmtNum(T.total)}</strong></td><td class="num">${pct(T.rc,T.total)}</td><td class="num">100%</td><td class="num">${days}</td><td class="num">${f1(days?T.total/days:null)}</td></tr>`:''}
-    </tbody></table></div></section>
-   ${A.length?`<section class="panel"><div class="panel-head"><div><h3>Agents by ${per}</h3><span class="hint">Newest ${per} first. Pick what each cell shows.</span></div>
-     <div class="oe-group oe-view" role="tablist" aria-label="Show">${views.map(([k,l])=>`<button type="button" data-oe-view="${k}" class="${st.view===k?'on':''}" aria-pressed="${st.view===k}">${l}</button>`).join('')}</div>${copyBtnHtml('oeGrid')}${Server.can('export')?downloadBtnHtml('oeGrid','order-entry-agents-by-'+per+'.xlsx'):''}</div>
-    <div class="onb-scroll"><table class="users-table onb-table oe-grid" id="oeGrid"><thead>
-     <tr><th ${st.view==='split'?'rowspan="2"':''}>Agent</th>${gp.map(p=>`<th class="num" ${st.view==='split'?'colspan="2"':''}>${escapeHtml(st.group==='day'?short(p.k):G.name(p.k))}</th>`).join('')}<th class="num" ${st.view==='split'?'colspan="2"':''}>All</th></tr>
-     ${st.view==='split'?`<tr>${[...gp,0].map(()=>'<th class="num">RC</th><th class="num oe-sep">CRM</th>').join('')}</tr>`:''}</thead><tbody>
-     ${A.map(a=>`<tr><td>${escapeHtml(a.a)}</td>${gp.map(p=>cell(a.a,p)).join('')}${st.view==='split'?`<td class="num"><strong>${fmtNum(a.rc)}</strong></td><td class="num oe-sep"><strong>${fmtNum(a.crm)}</strong></td>`:`<td class="num"><strong>${fmtNum(st.view==='rc'?a.rc:st.view==='crm'?a.crm:a.total)}</strong></td>`}</tr>`).join('')}
-     <tr class="onb-total"><td><strong>All agents</strong></td>${gp.map(colTot).join('')}${colTot(T)}</tr>
-    </tbody></table></div></section>`:''}`;
+   ${agents}
+   <section class="panel"><div class="panel-head"><div><h3>${G.label} totals</h3><span class="hint">${cnt} ${per}${cnt===1?'':'s'} with orders. Change is against the ${per} before (full ${per}s only).</span></div>${copyBtnHtml('oePer')}${Server.can('export')?downloadBtnHtml('oePer','order-entry-'+st.group+'.xlsx'):''}</div>
+    <div class="onb-scroll"><table class="users-table onb-table" id="oePer"><thead><tr><th>${G.label.replace(/ly$/,'').replace('Dai','Day')}</th><th class="num">Total</th><th class="num">Recruitment Cloud</th><th class="num">CRM</th><th class="num">Agents</th><th class="num">Per agent</th>${st.group==='day'?'':'<th class="num">Per day</th>'}<th class="num">Change</th><th class="num">RC %</th><th class="num">CRM %</th></tr></thead><tbody>
+    ${P.slice().reverse().map(p=>`<tr class="${p.total?'':'oe-zero'}"><td>${escapeHtml(G.name(p.k))}${p.partial?' <span class="oe-part" title="Only part of this '+per+' is inside the dates you picked">part</span>':p.running?' <span class="oe-part run" title="This '+per+' is still going">so far</span>':''}</td><td class="num"><strong>${p.n?fmtNum(p.total):'–'}</strong></td><td class="num">${p.n?fmtNum(p.rc):'–'}</td><td class="num">${p.n?fmtNum(p.crm):'–'}</td><td class="num">${p.agents.size||'–'}</td><td class="num">${f1(p.agents.size?p.total/p.agents.size:null)}</td>${st.group==='day'?'':`<td class="num">${f1(p.days.size?p.total/p.days.size:null)}</td>`}<td class="num">${p.n?delta(p):'<span class="oe-d">–</span>'}</td><td class="num">${pct(p.rc,p.total)}</td><td class="num">${pct(p.crm,p.total)}</td></tr>`).join('')}
+    <tr class="onb-total"><td><strong>All</strong></td><td class="num"><strong>${fmtNum(T.total)}</strong></td><td class="num">${fmtNum(T.rc)}</td><td class="num">${fmtNum(T.crm)}</td><td class="num">${A.length}</td><td class="num">${f1(A.length?T.total/A.length:null)}</td>${st.group==='day'?'':`<td class="num">${f1(days?T.total/days:null)}</td>`}<td></td><td class="num">${pct(T.rc,T.total)}</td><td class="num">${pct(T.crm,T.total)}</td></tr>
+    </tbody></table></div></section>`;
  }
  function drawChart(){
   const c=document.getElementById('oeChart'); if(!c) return;
   const G=GROUPS[st.group], P=periods(inRange());
   const lbl=p=>(st.group==='day'?short(p.k):st.group==='week'?short(p.k):G.name(p.k))+(p.partial?' (part)':'');
   OrderEntry._chart=safeChart(c,{type:'bar', data:{labels:P.map(lbl), datasets:[
-    {label:'Recruitment Cloud', data:P.map(p=>p.rc), backgroundColor:'#2563eb', stack:'o'},
-    {label:'CRM', data:P.map(p=>p.crm), backgroundColor:'#14b8a6', stack:'o'}]},
-   options:{responsive:true, maintainAspectRatio:false, interaction:{mode:'index', intersect:false},
-    plugins:{legend:{position:'top', align:'end'}, tooltip:{callbacks:{footer:items=>'Total: '+fmtNum(items.reduce((a,i)=>a+(i.raw||0),0))}}},
-    scales:{x:{stacked:true, grid:{display:false}, ticks:{maxRotation:0, autoSkip:true}}, y:{stacked:true, beginAtZero:true, ticks:{precision:0}}}}});
+    {label:'Recruitment Cloud', data:P.map(p=>p.rc), backgroundColor:'#2563eb', stack:'o', maxBarThickness:56},
+    {label:'CRM', data:P.map(p=>p.crm), backgroundColor:'#14b8a6', stack:'o', maxBarThickness:56}]},
+   plugins:[stackTotalLabels],
+   options:{responsive:true, maintainAspectRatio:false, interaction:{mode:'index', intersect:false}, layout:{padding:{top:20}},
+    plugins:{noValueLabels:true, legend:{display:false}, tooltip:{callbacks:{footer:items=>'Total: '+fmtNum(items.reduce((a,i)=>a+(i.raw||0),0))}}},
+    scales:{x:{stacked:true, grid:{display:false}, ticks:{maxRotation:0, autoSkip:true}}, y:{stacked:true, beginAtZero:true, ticks:{precision:0}, grid:{color:'#eef2f6'}, border:{display:false}}}}});
  }
  // ---- events ----
  function sums(host){
@@ -13702,7 +13840,8 @@ const OrderEntry=(()=>{
    st.busy=false; render();
   });
   // report
-  host.querySelectorAll('[data-oe-group]').forEach(b=>b.onclick=async()=>{ st.group=b.dataset.oeGroup; await ensure(); render(); });
+  host.querySelectorAll('[data-oe-group]').forEach(b=>b.onclick=async()=>{ st.group=b.dataset.oeGroup; st.custom=false; await ensure(); render(); });
+  $('#oeShowPer')?.addEventListener('click',()=>{ st.showPer=!st.showPer; render(); });
   host.querySelectorAll('[data-oe-view]').forEach(b=>b.onclick=()=>{ st.view=b.dataset.oeView; render(); });
   const rng=async()=>{ const a=$('#oeFrom').value, b=$('#oeTo').value; if(!a||!b) return; st.from=a; st.to=b; st.custom=true; await ensure(); render(); };
   let rt; ['#oeFrom','#oeTo'].forEach(s=>$(s)?.addEventListener('change',()=>{ clearTimeout(rt); rt=setTimeout(rng,30); }));
