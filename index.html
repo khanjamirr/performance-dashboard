@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.75.1</title>
+<title>Performance Dashboard · v4.76.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2073,6 +2073,39 @@ button.mr-kpi:not(:disabled):hover{border-color:#c7d2e3;box-shadow:0 4px 14px #0
 .refresh-stamp.top{display:none!important}
 body.side-collapsed .refresh-stamp:not(.top){display:none!important}
 @media(max-width:800px){.sidebar .refresh-stamp:not(.top){display:none!important}.refresh-stamp.top:not([hidden]){display:flex!important;flex-direction:row;flex-wrap:wrap;gap:2px 10px;margin:4px 0 0;padding:0;background:none;border:0;color:#5b6b82}.refresh-stamp.top b{color:#5b6b82;margin:0}.refresh-stamp.top em{color:#5b6b82}.refresh-stamp.top time{color:#13264a}}
+</style>
+<style>
+.hi-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:4px 0 12px}
+.hi-card{font:inherit;text-align:left;cursor:pointer;background:#fff;border:1px solid #e3e8ef;border-top:4px solid #94a3b8;border-radius:11px;padding:12px 14px;display:flex;flex-direction:column;gap:3px;min-width:0;transition:box-shadow .15s}
+.hi-card:hover{box-shadow:0 4px 14px #0a1f4412}.hi-card.on{box-shadow:0 0 0 2px #0a1f44 inset;background:#f8fafd}
+.hi-card.bad{border-top-color:#c8102e}.hi-card.good{border-top-color:#15803d}.hi-card.warn{border-top-color:#d97706}.hi-card.top{border-top-color:#1d4ed8}
+.hi-card>span{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#64748b}
+.hi-card>strong{font-size:28px;line-height:1.1;color:#0a1f44}.hi-card.bad>strong{color:#c8102e}.hi-card.good>strong{color:#15803d}.hi-card.warn>strong{color:#b45309}
+.hi-card>strong.hi-card-top{font-size:18px;line-height:1.4;color:#1d4ed8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.hi-card>em{font-style:normal;font-size:12px;color:#475569;line-height:1.35}
+.hi-detail{border:1px solid #e3e8ef;border-radius:11px;padding:14px 16px;background:#fff}
+.hi-detail .hi-head{display:flex;align-items:flex-start;gap:12px;justify-content:space-between;margin-bottom:8px}
+.hi-what{margin:0;font-size:13.5px;color:#13264a;line-height:1.45;max-width:820px}
+.hi-legend{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:12px;color:#64748b;margin:0 0 10px;padding:7px 10px;background:#f6f8fb;border-radius:8px}
+.hi-legend b{font-weight:600;padding:0 6px;border-radius:4px;color:#fff;font-size:11px}.hi-legend b.g{background:#15803d}.hi-legend b.a{background:#7aa95c}.hi-legend b.w{background:#e48a1b}.hi-legend b.r{background:#c8102e}
+.hi-tbl-wrap{overflow:auto;max-height:520px}
+.hi-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.hi-tbl th{position:sticky;top:0;background:#f6f8fb;text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#64748b;padding:8px 10px;border-bottom:1px solid #e3e8ef;white-space:nowrap}
+.hi-tbl td{padding:8px 10px;border-bottom:1px solid #eef2f6;vertical-align:middle}.hi-tbl tr:hover td{background:#fafbfd}
+.hi-tbl .num{text-align:right;white-space:nowrap}.hi-tbl small{color:#94a3b8;font-size:11px}.hi-tbl td.hi-br{color:#64748b;font-size:12px;max-width:260px}
+.hi-tbl b.g{color:#15803d}.hi-tbl b.a{color:#4d7c0f}.hi-tbl b.w{color:#c2410c}.hi-tbl b.r{color:#c8102e}
+.hi-pill{display:inline-block;padding:2px 9px;border-radius:999px;font-weight:700;font-size:12px}.hi-pill.bad{background:#fee2e2;color:#991b1b}.hi-pill.good{background:#dcfce7;color:#166534}.hi-pill.warn{background:#fef3c7;color:#92400e}
+.hi-spark{position:relative;display:inline-flex;align-items:flex-end;gap:3px;height:38px;padding:0 2px;vertical-align:middle;border-bottom:1px solid #cbd5e1}
+.hi-spark i{display:block;width:13px;border-radius:2px 2px 0 0}.hi-spark i.g{background:#15803d}.hi-spark i.a{background:#7aa95c}.hi-spark i.w{background:#e48a1b}.hi-spark i.r{background:#c8102e}
+.hi-spark u{position:absolute;left:0;right:0;bottom:80%;border-top:1.5px dashed #0a1f44;opacity:.55;text-decoration:none;pointer-events:none}
+.hi-spark.demo{height:20px;border:0}.hi-spark.demo i{width:7px}
+.hi-more{margin-top:8px}
+.hi-rank2{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:8px}
+.hi-rank2 li{display:grid;grid-template-columns:26px minmax(160px,260px) 1fr auto;align-items:center;gap:12px;padding:6px 4px;border-bottom:1px solid #eef2f6}
+.hi-rk-name{display:flex;flex-direction:column}.hi-rk-name small{color:#64748b;font-size:11.5px}
+.hi-rk-bar{height:8px;border-radius:99px;background:#eef2f6;overflow:hidden}.hi-rk-bar i{display:block;height:100%;background:#1d4ed8;border-radius:99px}
+.hi-rank2 strong{font-size:13px;color:#0a1f44;white-space:nowrap}
+@media(max-width:900px){.hi-cards{grid-template-columns:1fr 1fr}.hi-rank2 li{grid-template-columns:26px 1fr auto}.hi-rk-bar{display:none}}
 </style>
 </head>
 <body class="locked">
@@ -10630,7 +10663,7 @@ function alertsHighlights(weekEnd, rows, inProgress){
     // consistency over the last 8 completed weeks they worked
     const last=done.slice(-8).map(w=>({w:w.weekEndDate, r:recOf(w,n), g:goalOf(w.weekEndDate,n)})).filter(x=>x.r&&((x.r.schedules||0)+(x.r.scheduledDateOf||0))>0&&x.g>0);
     if(last.length>=4){ const v=last.map(x=>x.r.schedules||0), mean=v.reduce((a,b)=>a+b,0)/v.length, sd=Math.sqrt(v.reduce((a,b)=>a+(b-mean)**2,0)/v.length), cv=mean?sd/mean:9;
-      const hit=last.filter(x=>(x.r.schedules||0)>=x.g*0.8).length, info={row, weeks:last.length, hit, mean:Math.round(mean), min:Math.min(...v), max:Math.max(...v), cv:Math.round(cv*100), pcts:last.map(x=>Math.round((x.r.schedules||0)/x.g*100))};
+      const hit=last.filter(x=>(x.r.schedules||0)>=x.g*0.8).length, info={row, wks:last.map(x=>x.w), weeks:last.length, hit, mean:Math.round(mean), min:Math.min(...v), max:Math.max(...v), cv:Math.round(cv*100), pcts:last.map(x=>Math.round((x.r.schedules||0)/x.g*100))};
       if(cv<=0.35&&hit>=Math.ceil(last.length*0.75)) steady.push(info);
       else if(cv>=0.5) swing.push(info); }
   });
@@ -10649,23 +10682,47 @@ function alertsHighlights(weekEnd, rows, inProgress){
   return {streak, steady, swing, top, completed:done.length};
 }
 function alertsHighlightsHtml(h, weekEnd, inProgress){
-  const st=alertsState, nm=r=>`<button type="button" class="hi-name" data-hi-name="${escapeHtml(r.name)}">${escapeHtml(r.name)}</button>`;
-  const sub=r=>`<span class="hi-sub">${escapeHtml(r.branch||r.division||'')}</span>`;
-  const chips=p=>`<span class="hi-chips">${p.map(v=>`<i class="${v>=100?'g':v>=80?'a':v>=50?'w':'r'}" title="${v}% of goal">${v}</i>`).join('')}</span>`;
+  const st=alertsState, nm=r=>`<button type="button" class="hi-name" data-hi-name="${escapeHtml(r.name)}" title="Open ${escapeHtml(r.name)}’s remarks">${escapeHtml(r.name)}</button>`;
+  const where=r=>escapeHtml(r.branch||r.division||'–');
+  const band=p=>p>=100?'g':p>=80?'a':p>=50?'w':'r';
+  const wkLbl=d=>'Wk '+weekOfDate(d).number+' (ending '+fmtDate(d)+')';
+  // each week as a small bar: height = % of goal (the line is the goal), colour = how close
+  const spark=list=>`<span class="hi-spark" role="img" aria-label="${list.map(x=>x.p+'%').join(', ')}">${list.map(x=>`<i class="${band(x.p)}" style="height:${Math.max(6,Math.min(100,Math.round(x.p/125*100)))}%" title="${escapeHtml(wkLbl(x.w))}: ${x.p}% of goal${x.sc!=null?' · '+fmtNum(x.sc)+' schedules':''}"></i>`).join('')}<u title="Goal (100%)"></u></span>`;
+  const secs=[
+   {k:'streak', cls:'bad', n:h.streak.length, title:'Below goal 3+ weeks running', say:'missed their schedule goal 3 or more weeks in a row'},
+   {k:'steady', cls:'good', n:h.steady.length, title:'Consistently at goal', say:'hit 80%+ of goal in most of their last 8 weeks, with steady numbers'},
+   {k:'swing', cls:'warn', n:h.swing.length, title:'Up and down', say:'swing a lot from week to week'},
+   {k:'top', cls:'top', n:(h.top[0]&&h.top[0].list.length)||0, title:'Top this week', say:h.top[0]&&h.top[0].list[0]?`#1 ${escapeHtml(h.top[0].list[0].row.name)} · ${escapeHtml(h.top[0].list[0].t)}`:'no results yet'}];
+  if(!secs.some(s=>s.k===st.hiSec)) st.hiSec='streak';
   if(!st.hiCat||!h.top.some(c=>c.key===st.hiCat)) st.hiCat=(h.top[0]||{}).key;
+  const cards=`<div class="hi-cards" role="tablist">${secs.map(s=>`<button type="button" role="tab" class="hi-card ${s.cls} ${st.hiSec===s.k?'on':''}" data-hi-sec="${s.k}" aria-selected="${st.hiSec===s.k}"><span>${s.title}</span>${s.k==='top'?`<strong class="hi-card-top">${h.top[0]&&h.top[0].list[0]?escapeHtml(h.top[0].list[0].row.name):'–'}</strong><em>${h.top[0]&&h.top[0].list[0]?escapeHtml(h.top[0].list[0].t)+' — best this week':'no results yet'}</em>`:`<strong>${fmtNum(s.n)}</strong><em>recruiter${s.n===1?'':'s'} ${s.say}</em>`}</button>`).join('')}</div>`;
+  const LIM=12, all=!!st.hiAll, cut=list=>all?list:list.slice(0,LIM);
+  const more=list=>list.length>LIM?`<button type="button" class="link-btn hi-more" data-hi-all>${all?'Show fewer':`Show all ${list.length}`}</button>`:'';
+  const legend=`<div class="hi-legend"><span class="hi-spark demo"><i class="r" style="height:30%"></i><i class="w" style="height:45%"></i><i class="a" style="height:58%"></i><i class="g" style="height:80%"></i><u></u></span> Each bar is one week’s schedules as a % of that week’s goal, oldest → newest. The line is the goal. <b class="g">at goal</b> <b class="a">80–99%</b> <b class="w">50–79%</b> <b class="r">under 50%</b>. Point at a bar for the week.</div>`;
   const empty=t=>`<p class="hint hi-empty">${t}</p>`;
-  return `<div class="panel-head"><div><h3><span class="al-dot info"></span>Highlights</h3><span class="hint">${inProgress?'Streaks and consistency use completed weeks only — the week in progress isn’t judged yet. ':''}Click a name for their remarks.</span></div></div>
-  <div class="hi-grid">
-   <div class="hi-box bad"><div class="hi-head"><h4>Below goal 3+ weeks in a row <span class="al-count">${h.streak.length}</span></h4>${h.streak.length?'<button type="button" class="btn btn-secondary btn-sm" data-hi-copy="1" title="Copy these recruiters with their remarks">📋 Copy remarks</button>':''}</div>
-    ${h.streak.length?`<ol class="hi-list">${h.streak.map(x=>`<li><div>${nm(x.row)}${sub(x.row)}</div><div class="hi-right"><strong class="bad">${x.n} weeks</strong>${chips(x.weeks.slice().reverse().map(w=>w.pct))}</div></li>`).join('')}</ol>`:empty('Nobody has missed their schedule goal 3 weeks running. 🎉')}</div>
-   <div class="hi-box top"><div class="hi-head"><h4>Top this week</h4></div>
+  let body='';
+  if(st.hiSec==='streak'){
+   const L=h.streak;
+   body=`<div class="hi-head"><p class="hi-what"><b>${fmtNum(L.length)}</b> recruiter${L.length===1?' has':'s have'} been below their weekly schedule goal for 3 or more completed weeks in a row. Longest run first.</p>${L.length?'<button type="button" class="btn btn-secondary btn-sm" data-hi-copy="1" title="Copy these recruiters with their remarks — paste into email or Excel">📋 Copy remarks</button>':''}</div>
+    ${L.length?`${legend}<div class="hi-tbl-wrap"><table class="hi-tbl"><thead><tr><th>Recruiter</th><th>Branch</th><th class="num">Weeks below goal</th><th class="num">Average in that time</th><th class="num">Last week</th><th>Week by week</th></tr></thead><tbody>
+    ${cut(L).map(x=>{ const wk=x.weeks.slice().reverse(), last=x.weeks[0]; return `<tr><td>${nm(x.row)}</td><td class="hi-br">${where(x.row)}</td><td class="num"><span class="hi-pill bad">${x.n} weeks</span></td><td class="num"><b class="${band(x.avg)}">${x.avg}%</b> <small>of goal</small></td><td class="num">${last?`${fmtNum(last.sc)} of ${fmtNum(last.g)}`:'–'}</td><td>${spark(wk.map(w=>({w:w.w,p:w.pct,sc:w.sc})))}</td></tr>`; }).join('')}</tbody></table></div>${more(L)}`:empty('Nobody has missed their schedule goal 3 weeks running. 🎉')}`;
+  } else if(st.hiSec==='steady'){
+   const L=h.steady;
+   body=`<div class="hi-head"><p class="hi-what"><b>${fmtNum(L.length)}</b> recruiter${L.length===1?' was':'s were'} at 80% or more of goal in at least 3 of every 4 weeks they worked (last 8 completed weeks), without big swings. Most reliable first.</p></div>
+    ${L.length?`${legend}<div class="hi-tbl-wrap"><table class="hi-tbl"><thead><tr><th>Recruiter</th><th>Branch</th><th class="num">Weeks at 80%+ of goal</th><th class="num">Schedules a week</th><th class="num">Lowest – highest</th><th>Week by week</th></tr></thead><tbody>
+    ${cut(L).map(x=>`<tr><td>${nm(x.row)}</td><td class="hi-br">${where(x.row)}</td><td class="num"><span class="hi-pill good">${x.hit} of ${x.weeks}</span></td><td class="num"><b>${fmtNum(x.mean)}</b> <small>avg</small></td><td class="num">${fmtNum(x.min)} – ${fmtNum(x.max)}</td><td>${spark(x.pcts.map((p,i)=>({w:(x.wks||[])[i]||weekEnd,p})))}</td></tr>`).join('')}</tbody></table></div>${more(L)}`:empty(h.completed<4?'Needs at least 4 completed weeks of data.':'Nobody is steadily at goal over the last 8 weeks.')}`;
+  } else if(st.hiSec==='swing'){
+   const L=h.swing;
+   body=`<div class="hi-head"><p class="hi-what"><b>${fmtNum(L.length)}</b> recruiter${L.length===1?'’s':'s’'} weekly schedules change a lot from one week to the next (last 8 completed weeks) — good weeks and bad weeks. Biggest swings first.</p></div>
+    ${L.length?`${legend}<div class="hi-tbl-wrap"><table class="hi-tbl"><thead><tr><th>Recruiter</th><th>Branch</th><th class="num">Lowest – highest week</th><th class="num">Weeks at goal</th><th class="num">Schedules a week</th><th>Week by week</th></tr></thead><tbody>
+    ${cut(L).map(x=>`<tr><td>${nm(x.row)}</td><td class="hi-br">${where(x.row)}</td><td class="num"><span class="hi-pill warn">${fmtNum(x.min)} – ${fmtNum(x.max)}</span></td><td class="num">${x.pcts.filter(p=>p>=100).length} of ${x.weeks}</td><td class="num"><b>${fmtNum(x.mean)}</b> <small>avg</small></td><td>${spark(x.pcts.map((p,i)=>({w:(x.wks||[])[i]||weekEnd,p})))}</td></tr>`).join('')}</tbody></table></div>${more(L)}`:empty(h.completed<4?'Needs at least 4 completed weeks of data.':'Nobody swings much — schedules are steady across the team.')}`;
+  } else {
+   body=`<div class="hi-head"><p class="hi-what">The top 5 recruiters for <b>Wk ${weekOfDate(weekEnd).number}</b> (ending ${fmtDate(weekEnd)})${inProgress?' so far':''}. Pick what to rank by.</p></div>
     ${h.top.length?`<div class="hi-tabs" role="tablist">${h.top.map(c=>`<button type="button" data-hi-cat="${c.key}" class="${st.hiCat===c.key?'on':''}">${c.label}</button>`).join('')}</div>
-    ${h.top.map(c=>`<ol class="hi-list hi-rank" data-hi-list="${c.key}" ${st.hiCat===c.key?'':'hidden'}>${c.list.map((x,i)=>`<li><div><span class="hi-medal m${i+1}">${i+1}</span>${nm(x.row)}${sub(x.row)}</div><div class="hi-right"><strong>${escapeHtml(x.t)}</strong></div></li>`).join('')}</ol>`).join('')}`:empty('No results for this week yet.')}</div>
-   <div class="hi-box good"><div class="hi-head"><h4>Most consistent <span class="al-count">${h.steady.length}</span></h4><span class="hint">80%+ of goal in at least 3 of 4 weeks, steady numbers</span></div>
-    ${h.steady.length?`<ol class="hi-list">${h.steady.slice(0,8).map(x=>`<li><div>${nm(x.row)}${sub(x.row)}</div><div class="hi-right"><strong class="good">${x.hit}/${x.weeks} weeks</strong><span class="hi-sub">~${x.mean}/wk</span>${chips(x.pcts)}</div></li>`).join('')}</ol>`:empty(h.completed<4?'Needs at least 4 completed weeks of data.':'Nobody is steadily at goal over the last 8 weeks.')}</div>
-   <div class="hi-box warn"><div class="hi-head"><h4>Up and down <span class="al-count">${h.swing.length}</span></h4><span class="hint">Big swings week to week</span></div>
-    ${h.swing.length?`<ol class="hi-list">${h.swing.slice(0,8).map(x=>`<li><div>${nm(x.row)}${sub(x.row)}</div><div class="hi-right"><strong class="warn">${x.min}–${x.max}/wk</strong><span class="hi-sub">hit goal ${x.hit}/${x.weeks}</span>${chips(x.pcts)}</div></li>`).join('')}</ol>`:empty(h.completed<4?'Needs at least 4 completed weeks of data.':'Nobody swings much — schedules are steady across the team.')}</div>
-  </div>`;
+    ${h.top.map(c=>{ const mx=Math.max(1,...c.list.map(x=>x.v)); return `<ol class="hi-rank2" data-hi-list="${c.key}" ${st.hiCat===c.key?'':'hidden'}>${c.list.map((x,i)=>`<li><span class="hi-medal m${i+1}">${i+1}</span><div class="hi-rk-name">${nm(x.row)}<small>${where(x.row)}</small></div><div class="hi-rk-bar"><i style="width:${Math.round(x.v/mx*100)}%"></i></div><strong>${escapeHtml(x.t)}</strong></li>`).join('')}</ol>`; }).join('')}`:empty('No results for this week yet.')}`;
+  }
+  return `<div class="panel-head"><div><h3><span class="al-dot info"></span>Highlights</h3><span class="hint">${inProgress?'Runs and consistency use completed weeks only — the week in progress isn’t judged yet. ':''}Click a box to see the list · click a name for their remarks.</span></div></div>
+  ${cards}<div class="hi-detail ${secs.find(s=>s.k===st.hiSec).cls}">${body}</div>`;
 }
 async function renderAlertsView(){
   const host = document.getElementById('view-alerts'); if(!host) return;
@@ -10747,6 +10804,8 @@ async function renderAlertsView(){
   host.querySelectorAll('[data-band]').forEach(b=>b.onclick=()=>{ const k=b.dataset.band; st.bands=on(k)?st.bands.filter(x=>x!==k):[...st.bands,k]; st.band=st.bands[0]||''; renderAlertsView(); });
   host.querySelector('#alHiBtn')?.addEventListener('click',()=>{ st.hiOpen=!st.hiOpen; renderAlertsView(); if(st.hiOpen) setTimeout(()=>document.getElementById('alHighlights')?.scrollIntoView({behavior:'smooth',block:'start'}),50); });
   host.querySelectorAll('[data-hi-name]').forEach(b=>b.onclick=()=>openRemarksModal(b.dataset.hiName, st.week));
+  host.querySelectorAll('[data-hi-sec]').forEach(b=>b.onclick=()=>{ st.hiSec=b.dataset.hiSec; st.hiAll=false; renderAlertsView(); });
+  host.querySelector('[data-hi-all]')?.addEventListener('click',()=>{ st.hiAll=!st.hiAll; renderAlertsView(); });
   host.querySelectorAll('[data-hi-cat]').forEach(b=>b.onclick=()=>{ st.hiCat=b.dataset.hiCat; host.querySelectorAll('[data-hi-cat]').forEach(x=>x.classList.toggle('on',x===b)); host.querySelectorAll('[data-hi-list]').forEach(x=>x.hidden=x.dataset.hiList!==st.hiCat); });
   host.querySelector('[data-hi-copy]')?.addEventListener('click',e=>{ e.preventDefault(); copyRemarksTable(hiShown.streak.map(x=>x.row), st.week, 'below', today); });
   host.querySelector('#alBasisSw')?.addEventListener('click',e=>{ if(e.currentTarget.disabled) return; st.basis=st.basis==='today'?'week':'today'; renderAlertsView(); });
@@ -12133,7 +12192,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.75.1';   // shown only in the browser tab title
+const APP_VERSION = '4.76.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
