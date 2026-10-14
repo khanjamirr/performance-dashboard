@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.76.0</title>
+<title>Performance Dashboard · v4.76.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2067,8 +2067,8 @@ button.mr-kpi:not(:disabled):hover{border-color:#c7d2e3;box-shadow:0 4px 14px #0
 .basis-sw{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#13264a;text-transform:none!important;letter-spacing:0!important;white-space:nowrap;margin-top:4px}.basis-sw .switch:disabled{opacity:.45;cursor:not-allowed}
 .al-head{display:flex;align-items:flex-start;gap:4px}.al-head .al-pct{margin-left:auto}
 .al-rdot{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#c8102e;color:#fff;font-size:11px;font-weight:800;margin:1px 0 0 6px;box-shadow:0 0 0 3px #fff;flex:0 0 auto}
-.refresh-stamp{margin:auto 12px 10px;padding:9px 11px;border-radius:9px;background:#ffffff12;border:1px solid #ffffff1f;color:#dbe6f5;font-size:11px;line-height:1.5;display:flex;flex-direction:column;gap:1px}
-.refresh-stamp b{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#9fb3cf;margin-bottom:2px}.refresh-stamp em{font-style:normal;color:#9fb3cf}.refresh-stamp time{color:#fff;font-weight:600}.refresh-stamp:not(.top) time{display:block}
+.refresh-stamp{margin:auto 12px 6px;padding:6px 9px;border-radius:8px;background:#ffffff0d;border:1px solid #ffffff17;color:#dbe6f5;font-size:10.5px;line-height:1.45;display:flex;flex-direction:column;gap:0}.refresh-stamp:not([hidden])+.ribbon-actions{margin-top:0!important;padding-top:8px!important}.refresh-stamp span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.refresh-stamp b{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#8da3c2;margin-bottom:1px;font-weight:700}.refresh-stamp em{font-style:normal;color:#9fb3cf;display:inline-block;min-width:56px}.refresh-stamp time{color:#fff;font-weight:600}.rs-by{font-size:10px;color:#9fb3cf;white-space:normal}.refresh-stamp.top .rs-by{color:#5b6b82}
 .refresh-stamp[hidden]{display:none!important}
 .refresh-stamp.top{display:none!important}
 body.side-collapsed .refresh-stamp:not(.top){display:none!important}
@@ -2139,8 +2139,8 @@ body.side-collapsed .refresh-stamp:not(.top){display:none!important}
       <button data-view="pivot" class="nav-sub" data-group-of="rep" title="Build your own tables and charts"><span class="dot"></span>Report Builder</button>
       <button data-view="alerts" class="nav-main" title="Who needs attention this week, and remarks"><span class="dot"></span>Action Center</button>
     </nav>
-    <div class="refresh-stamp" id="refreshStamp" aria-live="polite" hidden></div>
     <div class="side-label side-label-tools">Tools</div>
+    <div class="refresh-stamp" id="refreshStamp" aria-live="polite" hidden></div>
     <div class="ribbon-actions">
       <button class="ribbon-btn hidden" id="accessModeBtn" title="Super admin: choose who can see or edit each part of this page, right here"><svg class="rb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span class="rb-label"><span class="rb-s">Access</span><span class="rb-l">Manage access</span></span></button>
       <button class="ribbon-btn" id="clearAllFiltersBtn" title="Reset filters — clear every filter and selection and go back to the latest week"><svg class="rb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8z"/><path d="M17 3l4 4M21 3l-4 4"/></svg><span class="rb-label"><span class="rb-s">Reset</span><span class="rb-l">Reset filters</span></span></button>
@@ -4555,9 +4555,11 @@ function renderRefreshStamp(){
  const saved=(typeof KV!=='undefined'&&KV.get('lastUploads'))||{}, log=uploadLogStamps||{};
  const latestWeek=[...weeksData].map(w=>w.savedAt).filter(Boolean).sort().pop();
  const when=src=>{ const x=saved[src]||log[src]; const d=new Date((x&&x.at)||latestWeek||''); return Number.isFinite(d.getTime())?d:null; };
- const fmt=d=>d.toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'});
+ const by=src=>{ const x=saved[src]||log[src]; return x&&x.by||''; }, bs=by('schedules'), bi=by('shows');
+ const whoLine=bs&&bi&&bs!==bi?`<small class="rs-by">by ${escapeHtml(bs)} (schedules) · ${escapeHtml(bi)} (interviews)</small>`:(bs||bi)?`<small class="rs-by">by ${escapeHtml(bs||bi)}</small>`:'';
+ const fmt=d=>d.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'}), full=d=>d.toLocaleString('en-US',{dateStyle:'full',timeStyle:'long'});
  const s=when('schedules'), i=when('shows');
- const html=`<b>Last refreshed on:</b><span><em>Schedules:</em> ${s?`<time datetime="${s.toISOString()}">${escapeHtml(fmt(s))}</time>`:'—'}</span><span><em>Interviews:</em> ${i?`<time datetime="${i.toISOString()}">${escapeHtml(fmt(i))}</time>`:'—'}</span>`;
+ const html=`<b>Last refreshed on:</b><span><em>Schedules</em> ${s?`<time datetime="${s.toISOString()}" title="${escapeHtml(full(s))}">${escapeHtml(fmt(s))}</time>`:'—'}</span><span><em>Interviews</em> ${i?`<time datetime="${i.toISOString()}" title="${escapeHtml(full(i))}">${escapeHtml(fmt(i))}</time>`:'—'}</span>${whoLine}`;
  [box,top].forEach(el=>{ if(el){ el.innerHTML=html; el.hidden=!(typeof Server!=='undefined'&&Server.user); } });
 }
 async function refreshUI(){
@@ -12192,7 +12194,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.76.0';   // shown only in the browser tab title
+const APP_VERSION = '4.76.2';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
