@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.74.0</title>
+<title>Performance Dashboard · v4.74.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2045,6 +2045,20 @@ button.mr-kpi:not(:disabled):hover{border-color:#c7d2e3;box-shadow:0 4px 14px #0
 .mr-step-bar{height:8px;border-radius:99px;background:#eef2f6;overflow:hidden}.mr-step-bar i{display:block;height:100%;background:#94a3b8;border-radius:99px}
 .mr-step.reach .mr-step-bar i{background:#2563eb}.mr-step.done .mr-step-bar i{background:#0f766e}.mr-step small{font-size:12px;color:#64748b}
 .mr-onbbar{height:10px!important;margin:0 0 8px}.mr-legend2{font-size:12px}.mr-rule{color:#94a3b8;margin-left:auto}
+.mr-funnel2{display:grid;grid-template-columns:minmax(0,1fr) 92px minmax(0,1fr) 92px minmax(0,1fr);align-items:stretch;gap:0}
+.mr-fs{border:1px solid #e6ebf2;border-radius:12px;padding:14px 16px;background:#fff;display:flex;flex-direction:column;gap:3px;border-top:4px solid #94a3b8}
+.mr-fs.reach{border-top-color:#2563eb}.mr-fs.done{border-top-color:#0f766e;background:#f3faf8}
+.mr-fs-l{font-size:12.5px;font-weight:700;color:#334155}
+.mr-fs>b{font-size:30px;line-height:1.1;color:#0a1f44;font-variant-numeric:tabular-nums}.mr-fs.done>b{color:#0f766e}
+.mr-fs>small{font-size:12px;color:#64748b}
+.mr-fs-bar{margin-top:8px;height:6px;border-radius:99px;background:#eef2f6;overflow:hidden}.mr-fs-bar i{display:block;height:100%;border-radius:99px;background:#94a3b8}.mr-fs.reach .mr-fs-bar i{background:#2563eb}.mr-fs.done .mr-fs-bar i{background:#0f766e}
+.mr-fa{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;position:relative;color:#475569;text-align:center;padding:0 6px}
+.mr-fa:before{content:'';position:absolute;left:8px;right:8px;top:50%;border-top:2px dashed #cbd5e1;z-index:0}
+.mr-fa:after{content:'';position:absolute;right:4px;top:calc(50% - 5px);border:5px solid transparent;border-left:7px solid #cbd5e1;border-right:0}
+.mr-fa b,.mr-fa span{position:relative;z-index:1;background:#fff;padding:0 4px}
+.mr-fa b{font-size:16px;color:#0a1f44}.mr-fa span{font-size:11px;line-height:1.2}
+.mr-unit{font-size:14px;font-weight:600;color:#64748b}
+@media(max-width:700px){.mr-funnel2{grid-template-columns:1fr}.mr-fa{flex-direction:row;padding:8px 0;gap:6px}.mr-fa:before,.mr-fa:after{display:none}}
 .mr-tabhint{margin:-4px 0 10px!important;font-size:12px!important;color:#64748b}.mr-kpis.onb-k{grid-template-columns:repeat(7,minmax(0,1fr))}@media(max-width:1250px){.mr-kpis.onb-k{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:700px){.mr-kpis.onb-k{grid-template-columns:1fr 1fr}.mr-hero{padding:16px}.mr-headline{font-size:19px}.mr-kpis{grid-template-columns:1fr 1fr}.mr-kpi>strong{font-size:22px}.mr-funnel{grid-template-columns:1fr;max-width:none}.mr-rule{margin-left:0}.mr-head-tools{margin-left:0}}
 </style>
@@ -12092,7 +12106,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.74.0';   // shown only in the browser tab title
+const APP_VERSION = '4.74.1';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -13216,11 +13230,14 @@ const Onboarding=(()=>{
   const headline=S.n?`${fmtNum(done)} of ${fmtNum(S.n)} candidates finalized or completed onboarding`:'No calls logged in these dates';
   const sub=!S.n?'Pick other dates, or log calls on Onboarding → Log calls.'
    :`${Math.round(doneR)}% of everyone called${pDoneR!=null&&P.n?` · ${pts(doneR,pDoneR)} vs ${escapeHtml(before)} (${Math.round(pDoneR)}%)`:PV.done||!P?'':' · comparing with the days before…'}`;
-  const step=(l,v,of,note,cls)=>`<div class="mr-step ${cls||''}"><div class="mr-step-top"><span>${l}</span><b>${fmtNum(v)}</b></div><div class="mr-step-bar"><i style="width:${of?Math.max(v?3:0,Math.round(v/of*100)):0}%"></i></div><small>${note}</small></div>`;
-  const funnel=S.n?`<div class="mr-funnel">
-    ${step('Called',S.n,S.n,fmtNum(S.calls)+' calls')}
-    ${step('Reached',S.reached,S.n,pct(S.reached,S.n)+' of called','reach')}
-    ${step('Finalized / complete',done,S.n,pct(done,S.reached)+' of reached','done')}
+  const stepC=(l,v,note,of,cls)=>`<div class="mr-fs ${cls||''}"><span class="mr-fs-l">${l}</span><b>${fmtNum(v)}</b><small>${note}</small><div class="mr-fs-bar" title="${pct(v,of)} of everyone called"><i style="width:${of?Math.max(v?2:0,Math.round(v/of*100)):0}%"></i></div></div>`;
+  const arrow=(p,l)=>`<div class="mr-fa"><b>${p}</b><span>${l}</span></div>`;
+  const funnel=S.n?`<div class="mr-funnel2" aria-label="Candidate funnel">
+    ${stepC('Candidates called',S.n,`${fmtNum(S.calls)} calls made`,S.n,'called')}
+    ${arrow(pct(S.reached,S.n),'were reached')}
+    ${stepC('Reached',S.reached,`${fmtNum(S.n-S.reached)} not reached`,S.n,'reach')}
+    ${arrow(pct(done,S.reached),'of reached finished')}
+    ${stepC('Finalized / complete',done,`${pct(done,S.n)} of everyone called`,S.n,'done')}
    </div>`:'';
   // takeaways in plain words
   const notes=[];
@@ -13233,15 +13250,17 @@ const Onboarding=(()=>{
    if(S.avgDays!=null) notes.push(S.avgDays<.5?`Finalized / completed candidates mostly finished <b>the same day</b> as their first call; ${fmt1(S.avgCalls)} calls per candidate on average.`:`Finalized / completed candidates took <b>${fmt1(S.avgDays)} days</b> on average from their first call; ${fmt1(S.avgCalls)} calls per candidate.`);
   }
   const hero=`<section class="mr-hero">
-    <div class="mr-top"><div class="mr-title"><span class="mr-eyebrow">${escapeHtml(label)}${st.fOnb?' · '+escapeHtml(st.fOnb):''}${st.fType?' · '+escapeHtml(st.fType):''}${st.fCat?' · '+escapeHtml(st.fCat==='pending'?'Pending':CAT_LBL[st.fCat]):''}</span><h3 class="mr-headline">${headline}</h3><p class="mr-sub">${sub}</p></div>${funnel}</div>
+    <div class="mr-top"><div class="mr-title"><span class="mr-eyebrow">${escapeHtml(label)}${st.fOnb?' · '+escapeHtml(st.fOnb):''}${st.fType?' · '+escapeHtml(st.fType):''}${st.fCat?' · '+escapeHtml(st.fCat==='pending'?'Pending':CAT_LBL[st.fCat]):''}</span><h3 class="mr-headline">${headline}</h3><p class="mr-sub">${sub}</p></div></div>
+    ${funnel}
     <div class="mr-kpis onb-k">
-     ${tile('Candidates reached',fmtNum(S.reached),'unique · '+pct(S.reached,S.n)+' of '+fmtNum(S.n)+' called','','',chip(S.reached,P&&P.reached))}
      ${tile('Finalized',fmtNum(S.by.finalized),pct(S.by.finalized,S.n)+' · EB / I9 complete','fin','finalized',chip(S.by.finalized,P&&P.by.finalized))}
      ${tile('Onboarding complete',fmtNum(S.by.complete),pct(S.by.complete,S.n),'good','complete',chip(S.by.complete,P&&P.by.complete))}
      ${tile('In between stages',fmtNum(S.by.in_process),pct(S.by.in_process,S.n),'ip','in_process',chip(S.by.in_process,P&&P.by.in_process,0))}
      ${tile('LVM / No answer',fmtNum(S.by.lvm),pct(S.by.lvm,S.n),'warn','lvm',chip(S.by.lvm,P&&P.by.lvm,-1))}
      ${tile('Never responded',fmtNum(S.by.no_response),pct(S.by.no_response,S.n),'bad','no_response',chip(S.by.no_response,P&&P.by.no_response,-1))}
-     ${tile('Avg. calls',fmt1(S.avgCalls),'per candidate'+(S.avgDur==null?'':' · '+fmt1(S.avgDur)+' min a call'))}
+     ${(()=>{ const ds=shownCalls.filter(r=>r.duration_min!=null&&r.duration_min!=='').map(r=>Number(r.duration_min)||0), tot=ds.reduce((a,b)=>a+b,0);
+       return tile('Avg. handling time',S.avgDur==null?'–':fmt1(S.avgDur)+'<small class="mr-unit"> min</small>',S.avgDur==null?'no call durations logged':`per call · ${tot>=60?fmt1(tot/60)+' hrs':fmtNum(Math.round(tot))+' min'} in total`,'','',P&&P.avgDur!=null&&S.avgDur!=null?chip(S.avgDur,P.avgDur,0):''); })()}
+     ${tile('Avg. calls',fmt1(S.avgCalls),'per candidate')}
     </div>
     ${S.n?`<div><div class="onb-bar mr-onbbar">${barKeys.map(k=>S.by[k]?`<i class="${CAT_CLS[k]}" style="flex:${S.by[k]}" title="${CAT_LBL[k]}: ${S.by[k]} (${pct(S.by[k],S.n)})"></i>`:'').join('')}</div>
      <div class="onb-legend mr-legend2">${barKeys.filter(k=>S.by[k]).map(k=>`<span><b class="${CAT_CLS[k]}"></b>${CAT_LBL[k]} <small>${pct(S.by[k],S.n)}</small></span>`).join('')}<span class="mr-rule">Each candidate counts once, by their latest call. Click a box above to filter.</span></div></div>`:''}
