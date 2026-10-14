@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.76.4</title>
+<title>Performance Dashboard · v4.79.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2107,6 +2107,50 @@ body.side-collapsed .refresh-stamp:not(.top){display:none!important}
 .hi-rank2 strong{font-size:13px;color:#0a1f44;white-space:nowrap}
 @media(max-width:900px){.hi-cards{grid-template-columns:1fr 1fr}.hi-rank2 li{grid-template-columns:26px 1fr auto}.hi-rk-bar{display:none}}
 </style>
+<style>
+.rv-tick{display:inline-flex;align-items:center;gap:7px;margin-top:6px;padding:3px 10px 3px 7px;border:1px solid #d6dee8;border-radius:999px;font-size:12px;font-weight:600;color:#334155;background:#fff;cursor:pointer;user-select:none;-webkit-user-select:none;white-space:nowrap}
+.rv-tick input{width:15px;height:15px;accent-color:#15803d;margin:0;cursor:pointer}.rv-tick small{font-weight:500;color:#64748b}
+.rv-tick.on{background:#ecfdf3;border-color:#a7e3bf;color:#166534}.rv-tick.ro{cursor:default}
+.al-rdot.done{background:#15803d}
+.rv-list{list-style:none;margin:0;padding:0;display:grid;gap:8px;max-height:520px;overflow:auto}
+.rv-item{display:flex;align-items:flex-start;gap:14px;justify-content:space-between;padding:10px 12px;border:1px solid #e6ebf2;border-left:4px solid #c8102e;border-radius:9px;background:#fff}
+.rv-item.is-done{border-left-color:#15803d;background:#fbfdfc}.rv-item.is-done .rv-text{color:#64748b}
+.rv-main{min-width:0;flex:1}.rv-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px}.rv-text{font-size:13px;color:#13264a;line-height:1.45;white-space:pre-wrap}
+.rv-meta .hint{font-size:12px!important;margin:0!important}.rv-pct{font-size:11px;font-weight:800;padding:0 7px;border-radius:999px}.rv-pct.bad{background:#fee2e2;color:#991b1b}.rv-pct.warn{background:#fef3c7;color:#92400e}.rv-pct.good{background:#dcfce7;color:#166534}
+.rv-item .rv-tick{margin-top:0;flex:0 0 auto}
+@media(max-width:700px){.rv-item{flex-direction:column}.rv-tick{white-space:normal}}
+</style>
+<style>
+.ex-wrap{display:grid;gap:14px;margin-bottom:14px}
+.ex-hero{margin:0}
+.ex-detail-sw{align-self:flex-start}
+.ex-goal{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:12.5px;color:#475569}
+.ex-goal-bar{position:relative;flex:1 1 320px;height:12px;border-radius:99px;background:#eef2f6;overflow:visible}
+.ex-goal-bar i{display:block;height:100%;border-radius:99px}.ex-goal-bar u{position:absolute;top:-3px;bottom:-3px;border-left:2px solid #0a1f44}
+.ex-bar{display:inline-block;width:100%;max-width:140px;height:8px;border-radius:99px;background:#eef2f6;overflow:hidden;vertical-align:middle}
+.ex-bar i,.ex-goal-bar i{background:#94a3b8}
+.ex-bar i.g,.ex-goal-bar i.g{background:#15803d}.ex-bar i.a,.ex-goal-bar i.a{background:#65a30d}.ex-bar i.w,.ex-goal-bar i.w{background:#e48a1b}.ex-bar i.r,.ex-goal-bar i.r{background:#c8102e}
+.ex-bar i{display:block;height:100%;border-radius:99px}
+b.g{color:#15803d}b.a{color:#4d7c0f}b.w{color:#c2410c}b.r{color:#c8102e}
+.ex-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px}
+.ex-grid .panel,.ex-div{margin:0}
+.ex-chart{position:relative;height:260px}
+.mr-legend i.goal{width:14px;height:0;border-top:2px dashed #0a1f44;border-radius:0}
+.ex-two{display:grid;grid-template-columns:1fr 1fr;gap:16px}.ex-two.one{grid-template-columns:1fr}
+.ex-h{margin:0 0 8px;font-size:11px;letter-spacing:.07em;text-transform:uppercase}.ex-h.good{color:#15803d}.ex-h.bad{color:#c8102e}
+.ex-rank{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+.ex-rank li{display:grid;grid-template-columns:minmax(0,1fr) 60px 42px;align-items:center;gap:8px;font-size:13px}
+.ex-rank li small{grid-column:1/-1;margin-top:-6px;color:#94a3b8;font-size:11px}
+.ex-rank li b{text-align:right;font-size:13px}
+.ex-rank .hi-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left}
+.ex-more{margin-top:8px}
+.ex-tbl .ex-gcell{display:flex;align-items:center;gap:10px;min-width:180px}.ex-tbl .ex-gcell b{min-width:40px}
+.ex-tbl td.ok{color:#15803d;font-weight:700}.ex-tbl td.bad{color:#c8102e;font-weight:700}
+.ex-tbl tr.ex-total td{background:#f6f8fb;font-weight:700;border-top:2px solid #e3e8ef}
+.mr-kpi[data-exec-detail]{cursor:pointer}.mr-kpi[data-exec-detail]:hover{border-color:#c7d2e3;box-shadow:0 4px 14px #0a1f4412}
+@media(max-width:1100px){.ex-grid{grid-template-columns:1fr}}
+@media(max-width:600px){.ex-two{grid-template-columns:1fr}.ex-tbl .ex-gcell{min-width:130px}}
+</style>
 </head>
 <body class="locked">
 <div id="appLoading" class="app-loading"><div class="spinner" aria-hidden="true"></div><p>Loading dashboard…</p></div>
@@ -2137,7 +2181,9 @@ body.side-collapsed .refresh-stamp:not(.top){display:none!important}
       <button type="button" class="nav-parent" data-group="rep" aria-expanded="true" title="Reports — division report and report builder"><svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="nav-full">Reports</span><svg class="nav-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
       <button data-view="divreport" class="nav-sub" data-group-of="rep" title="Pipeline by client and location, per division"><span class="dot"></span>Division Report</button>
       <button data-view="pivot" class="nav-sub" data-group-of="rep" title="Build your own tables and charts"><span class="dot"></span>Report Builder</button>
-      <button data-view="alerts" class="nav-main" title="Who needs attention this week, and remarks"><span class="dot"></span>Action Center</button>
+      <button type="button" class="nav-parent" data-group="act" aria-expanded="true" title="Action Center — who needs attention, and highlights"><svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9.5 16.5h-19z"/><path d="M12 10v4M12 17.5v.5"/></svg><span class="nav-full">Action Center</span><svg class="nav-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+      <button data-view="alerts" class="nav-sub" data-group-of="act" title="Who needs attention this week, and remarks"><span class="dot"></span>Needs attention</button>
+      <button data-view="highlights" class="nav-sub" data-group-of="act" title="Runs below goal, consistent performers, swings and top this week"><span class="dot"></span>Highlights</button>
     </nav>
     <div class="side-label side-label-tools">Tools</div>
     <div class="refresh-stamp" id="refreshStamp" aria-live="polite" hidden></div>
@@ -2228,6 +2274,7 @@ body.side-collapsed .refresh-stamp:not(.top){display:none!important}
         <div id="view-master" class="hidden"></div>
         <div id="view-candidates" class="hidden"></div>
         <div id="view-alerts" class="hidden"></div>
+        <div id="view-highlights" class="hidden"></div>
         <div id="view-pivot" class="hidden"></div>
         <div id="view-history" class="hidden"></div>
         <div id="view-divreport" class="hidden"></div>
@@ -4511,6 +4558,7 @@ const VIEW_META = {
   branches:{title:'Branch Results', sub:'Show rates and outcomes by branch'},
   candidates:{title:'Candidates', sub:'Who is counted in each category, by week'},
   alerts:{title:'Action Center', sub:'Who needs attention this week — below 50% of goal first'},
+  highlights:{title:'Highlights', sub:'Runs below goal, consistent performers, swings and top this week'},
   pivot:{title:'Report Builder', sub:'Drag fields into Rows, Columns, Values and Filters — the chart builds itself'},
   divreport:{title:'Division Report', sub:'Pipeline by client and location, per division'},
   onboarding:{title:'Onboarding', sub:'Onboarder call log — each EID linked to its schedule and interview'},
@@ -4601,13 +4649,13 @@ async function refreshUI(){
   document.getElementById('viewTitle').textContent = meta.title;
   document.getElementById('viewSub').textContent = showDashboardViews ? meta.sub : 'No data uploaded yet';
 
-  ['teams','leads','performance','recruiters','branches','master','candidates','alerts','pivot','history','divreport','onboarding','orderentry'].forEach(v=>{
+  ['teams','leads','performance','recruiters','branches','master','candidates','alerts','highlights','pivot','history','divreport','onboarding','orderentry'].forEach(v=>{
     document.getElementById('view-'+v).classList.toggle('hidden', v!==currentView);
   });
 
-  document.getElementById('topbarCenter').classList.toggle('hidden', !showDashboardViews || (()=>{ try{ return currentView==='performance'&&OverviewX.active(); }catch(e){ return false; } })() || ['teams','leads','candidates','alerts','pivot','history','divreport','onboarding','orderentry'].includes(currentView));
+  document.getElementById('topbarCenter').classList.toggle('hidden', !showDashboardViews || (()=>{ try{ return currentView==='performance'&&OverviewX.active(); }catch(e){ return false; } })() || ['teams','leads','candidates','alerts','highlights','pivot','history','divreport','onboarding','orderentry'].includes(currentView));
 
-  if(currentView!=='recruiters' && currentView!=='branches' && currentView!=='master' && currentView!=='candidates' && currentView!=='alerts' && currentView!=='pivot'){
+  if(currentView!=='recruiters' && currentView!=='branches' && currentView!=='master' && currentView!=='candidates' && currentView!=='alerts' && currentView!=='highlights' && currentView!=='pivot'){
     const extra = document.getElementById('topbarExtra');
     if(extra) extra.innerHTML = '';
   }
@@ -4615,7 +4663,7 @@ async function refreshUI(){
   renderPeriodPickerButton();
   closePeriodPicker();
   syncDedupeControls();
-  document.getElementById('periodPicker')?.classList.toggle('hidden', (()=>{ try{ return currentView==='performance'&&OverviewX.active(); }catch(e){ return false; } })() || currentView==='teams' || currentView==='leads' || currentView==='candidates' || currentView==='alerts' || currentView==='pivot' || currentView==='history' || currentView==='divreport' || currentView==='onboarding' || currentView==='orderentry');
+  document.getElementById('periodPicker')?.classList.toggle('hidden', (()=>{ try{ return currentView==='performance'&&OverviewX.active(); }catch(e){ return false; } })() || currentView==='teams' || currentView==='leads' || currentView==='candidates' || currentView==='alerts' || currentView==='highlights' || currentView==='pivot' || currentView==='history' || currentView==='divreport' || currentView==='onboarding' || currentView==='orderentry');
   ['weeklyDivisionSelect','weeklyDivisionSelectLbl'].forEach(id=>document.getElementById(id).classList.toggle('hidden',currentView!=='performance'));
   if(currentView==='teams'){ renderTeamGroups(); return; }
   if(currentView==='leads'){ renderLeadsView(); return; }
@@ -4636,6 +4684,7 @@ async function refreshUI(){
   else if(currentView==='master') renderMasterView();
   else if(currentView==='candidates') renderCandidatesView();
   else if(currentView==='alerts') renderAlertsView();
+  else if(currentView==='highlights') renderHighlightsView();
   else if(currentView==='pivot') renderPivotView();
   else if(currentView==='history') renderHistoryView();
 }
@@ -5153,6 +5202,76 @@ function scopeWeekToDivision(week, division){
   return {...week,byRecruiter,byBranch,totals};
 }
 let weeklyRenderRevision=0;
+/* ---- Overview → Recruiting: executive summary (default). The full detail is one switch away. ---- */
+let perfDetailOpen = lsGet('ipd_perf_detail')==='1';
+function execSummaryHtml(o){
+  const {t, goal, prevT, multi, label, hpr, prevHpr, pend, byRec, goals, scopeDiv} = o;
+  const sr = t.scheduledDateOf ? t.shows/t.scheduledDateOf*100 : null, psr = prevT&&prevT.scheduledDateOf ? prevT.shows/prevT.scheduledDateOf*100 : null;
+  const gp = goal>0 ? t.schedules/goal*100 : null;
+  const chip=(c,p,{pts=false,good=1}={})=>{ if(multi||p==null||c==null) return ''; const d=pts?c-p:(p?(c-p)/p*100:null); if(d==null) return '';
+    const r=Math.round(d); if(!r) return ''; const cls=(r>0)===(good>0)?'up':'down'; return `<span class="mr-d ${cls}" title="Prior week: ${pts?Math.round(p)+'%':fmtNum(p)}">${r>0?'▲':r<0?'▼':'●'} ${Math.abs(r)}${pts?' pts':'%'}</span>`; };
+  const band=v=>v==null?'':v>=100?'g':v>=80?'a':v>=50?'w':'r';
+  const kpi=(l,v,sub,extra,cls,detail)=>`<div class="mr-kpi ${cls||''}" ${detail?`data-exec-detail="${detail}" role="button" tabindex="0" title="Show the detail"`:''}><span>${l}</span><strong>${v}</strong>${extra||''}${sub?`<em>${sub}</em>`:''}</div>`;
+  // recruiters: top 5 and bottom 5 by % of goal (only people with a goal and activity)
+  const people=Object.values(byRec||{}).map(r=>{ const g=Number((goals||{})[r.name])||0; return {name:r.name, s:r.schedules||0, g, p:g?r.schedules/g*100:null, act:(r.schedules||0)+(r.scheduledDateOf||0)}; }).filter(x=>x.g>0&&x.act>0);
+  const few=people.length<=6, top=people.slice().sort((a,b)=>b.p-a.p||b.s-a.s).slice(0,few?6:5), topSet=new Set(top.map(x=>x.name)), low=few?[]:people.slice().sort((a,b)=>a.p-b.p||a.s-b.s).filter(x=>x.p<80&&!topSet.has(x.name)).slice(0,5);
+  const atGoal=people.filter(x=>x.p>=100).length, under50=people.filter(x=>x.p<50).length;
+  const notes=[];
+  if(gp!=null) notes.push(pend?`The week has only just started — numbers will fill in as the days go.`:`Schedules are at <b>${Math.round(gp)}% of goal</b> (${fmtNum(t.schedules)} of ${fmtNum(goal)}). <b>${atGoal}</b> of ${people.length} recruiters reached their goal${under50?`; <b class="r">${under50}</b> ${under50===1?'is':'are'} under half`:''}.`);
+  if(sr!=null) notes.push(`Show rate is <b>${sr.toFixed(1)}%</b> — ${sr>=70?'above':'<b class="r">below</b>'} the 70% minimum${psr!=null&&!multi?` (${sr>=psr?'up':'down'} ${Math.abs(sr-psr).toFixed(1)} pts on the prior week)`:''}.`.replace(/ \((up|down) 0\.0 pts on the prior week\)/,''));
+  if(hpr&&hpr.value!=null) notes.push(`<b>${fmtNum(hpr.hires)}</b> hires — ${hpr.value.toFixed(1)} per recruiter${multi?' per week':''} against the target of 15.`);
+  if(t.i9) notes.push(`<b>${fmtNum(t.placed||0)}</b> of ${fmtNum(t.i9)} hires (${Math.round((t.placed||0)/t.i9*100)}%) have been placed into jobs.`);
+  const list=(arr,cls)=>arr.length?`<ol class="ex-rank">${arr.map(x=>`<li><button type="button" class="hi-name" data-exec-rec="${escapeHtml(x.name)}">${escapeHtml(x.name)}</button><span class="ex-bar"><i class="${band(x.p)}" style="width:${Math.min(100,Math.round(x.p))}%"></i></span><b class="${band(x.p)}">${Math.round(x.p)}%</b><small>${fmtNum(x.s)} / ${fmtNum(x.g)}</small></li>`).join('')}</ol>`:`<p class="hint">${cls==='low'?'Everyone is at 80% of goal or more. 🎉':'No goals set for these weeks.'}</p>`;
+  return `<section class="ex-wrap" data-section="perf.kpis">
+   <div class="mr-hero ex-hero">
+    <div class="mr-top"><div class="mr-title"><span class="mr-eyebrow">${escapeHtml(label)}${scopeDiv?' · '+escapeHtml(Array.isArray(scopeDiv)?scopeDiv.join(', '):scopeDiv):' · All divisions'}</span>
+      <h3 class="mr-headline">${fmtNum(t.schedules)} schedules${gp!=null?` · ${Math.round(gp)}% of goal`:''}</h3>
+      <p class="mr-sub">${fmtNum(t.scheduledDateOf)} interviews · ${fmtNum(t.shows)} shows · ${fmtNum(t.i9)} hires · ${fmtNum(t.placed||0)} placed</p></div>
+      <label class="rtl-chk basis-sw ex-detail-sw" title="Show every chart and table (trends, leaderboards, divisions, history, recap)"><button type="button" class="switch" role="switch" id="perfDetailSw" aria-checked="${perfDetailOpen}"><i></i></button>Detailed view</label></div>
+    ${gp!=null?`<div class="ex-goal"><div class="ex-goal-bar"><i class="${band(gp)}" style="width:${Math.min(100,gp)}%"></i><u style="left:100%"></u></div><span>${fmtNum(t.schedules)} of ${fmtNum(goal)} schedule goal${goal>t.schedules?` · ${fmtNum(goal-t.schedules)} to go`:' · goal reached ✓'}</span></div>`:''}
+    <div class="mr-kpis">
+     ${kpi('Schedules',fmtNum(t.schedules),gp!=null?`${Math.round(gp)}% of the ${fmtNum(goal)} goal`:'no goal set',chip(t.schedules,prevT&&prevT.schedules),'rc','schedules')}
+     ${kpi('Interviews',fmtNum(t.scheduledDateOf),'scheduled for these dates',chip(t.scheduledDateOf,prevT&&prevT.scheduledDateOf),'','interviews')}
+     ${kpi('Show rate',sr==null?'–':sr.toFixed(1)+'%',`${fmtNum(t.shows)} showed · ${fmtNum(t.noShows)} no-shows · min 70%`,chip(sr,psr,{pts:true}),sr==null?'':sr>=70?'good':'bad','shows')}
+     ${kpi('Hires',fmtNum(t.i9),hpr&&hpr.value!=null?`${hpr.value.toFixed(1)} per recruiter · target 15`:'',pend?'':chip(t.i9,prevT&&prevT.i9),'fin','hires')}
+     ${kpi('Placed',fmtNum(t.placed||0),t.i9?`${Math.round((t.placed||0)/t.i9*100)}% of hires`:'',pend?'':chip(t.placed||0,prevT&&prevT.placed),'','placed')}
+    </div>
+    ${notes.length?`<ul class="mr-notes">${notes.map(n=>`<li><span>${n}</span></li>`).join('')}</ul>`:''}
+   </div>
+   <div class="ex-grid">
+    <section class="panel ex-trend"><div class="panel-head"><div><h3>Schedules vs goal</h3><span class="hint" id="execTrendNote">Each bar is one week · the dashed line is the goal</span></div><div class="mr-legend"><span><i class="rc"></i>Schedules</span><span><i class="goal"></i>Goal</span></div></div><div class="ex-chart"><canvas id="chartExecTrend" role="img" aria-label="Schedules vs goal by week"></canvas></div></section>
+    <section class="panel ex-people"><div class="panel-head"><div><h3>Recruiters</h3><span class="hint">% of their schedule goal${multi?' in these weeks':''} · click a name for details</span></div></div>
+     <div class="ex-two ${few?'one':''}"><div><h4 class="ex-h good">${few?'Everyone, best first':'Top 5'}</h4>${list(top,'top')}</div>${few?(under50?`<div><button type="button" class="link-btn ex-more" data-exec-go="alerts">See ${under50===1?'the 1 recruiter':'the '+under50} under 50% in Action Center →</button></div>`:''):`<div><h4 class="ex-h bad">Furthest from goal</h4>${list(low,'low')}${under50?`<button type="button" class="link-btn ex-more" data-exec-go="alerts">${under50===1?'See the 1 recruiter':'See all '+under50} under 50% in Action Center →</button>`:''}</div>`}</div></section>
+   </div>
+   <section class="panel ex-div" id="execDivisions"><div class="panel-head"><div><h3>By division</h3><span class="hint">Click a division to show only that division</span></div>${scopeDiv?'<button type="button" class="link-btn" data-exec-div="">Show all divisions</button>':''}</div><div id="execDivBody"><p class="hint">Loading…</p></div></section>
+  </section>`;
+}
+async function fillExecDivisions(weeksList, ref){
+  const host=document.getElementById('execDivBody'); if(!host) return;
+  const divs=[...DIVISIONS,'Unassigned'], rows=[];
+  for(const d of divs){ const sw=weeksList.map(w=>scopeWeekToDivision(w,d)), t=sumTotals(sw), people=new Set(sw.flatMap(w=>Object.keys(w.byRecruiter||{}))).size;
+    if(!(t.schedules||t.scheduledDateOf||people)) continue;
+    const g=(await computeGoalsForWeeks(weeksList, d, ref)).total; rows.push({d, t, g, people}); }
+  if(!document.getElementById('execDivBody')) return;
+  const band=v=>v==null?'':v>=100?'g':v>=80?'a':v>=50?'w':'r';
+  const T=sumTotals(weeksList.map(w=>scopeWeekToDivision(w,''))), G=rows.reduce((a,r)=>a+r.g,0), P=rows.reduce((a,r)=>a+r.people,0);
+  const tr=(name,t,g,people,cls,attr)=>{ const gp=g?t.schedules/g*100:null, sr=t.scheduledDateOf?t.shows/t.scheduledDateOf*100:null;
+    return `<tr class="${cls||''}" ${attr||''}><td>${name}</td><td class="num">${fmtNum(people)}</td><td class="num"><b>${fmtNum(t.schedules)}</b></td><td class="num">${g?fmtNum(g):'–'}</td><td class="ex-gcell"><span class="ex-bar"><i class="${band(gp)}" style="width:${gp==null?0:Math.min(100,Math.round(gp))}%"></i></span><b class="${band(gp)}">${gp==null?'–':Math.round(gp)+'%'}</b></td><td class="num">${fmtNum(t.scheduledDateOf)}</td><td class="num ${sr==null?'':sr>=70?'ok':'bad'}">${sr==null?'–':sr.toFixed(1)+'%'}</td><td class="num">${fmtNum(t.i9)}</td><td class="num">${fmtNum(t.placed||0)}</td></tr>`; };
+  host.innerHTML=rows.length?`<div class="hi-tbl-wrap"><table class="hi-tbl ex-tbl"><thead><tr><th>Division</th><th class="num">Recruiters</th><th class="num">Schedules</th><th class="num">Goal</th><th>% of goal</th><th class="num">Interviews</th><th class="num">Show rate</th><th class="num">Hires</th><th class="num">Placed</th></tr></thead><tbody>
+    ${rows.sort((a,b)=>b.t.schedules-a.t.schedules).map(r=>tr(`<button type="button" class="hi-name" data-exec-div="${escapeHtml(r.d)}">${escapeHtml(r.d)}</button>`,r.t,r.g,r.people,'','')).join('')}
+    ${rows.length>1?tr('<b>All divisions</b>',T,G,P,'ex-total'):''}</tbody></table></div>`:'<p class="hint">No activity in these weeks.</p>';
+  host.querySelectorAll('[data-exec-div]').forEach(b=>b.onclick=()=>{ universalDivision=b.dataset.execDiv||''; renderWeeklyView(); });
+}
+function drawExecTrend(weeks, goals){
+  const c=document.getElementById('chartExecTrend'); if(!c) return; destroyChart('chartExecTrend');
+  const lbl=weeks.map(w=>'Wk '+w.weekNumber);
+  charts['chartExecTrend']=safeChart(c,{type:'bar', data:{labels:lbl, datasets:[
+    {type:'bar', label:'Schedules', data:weeks.map(w=>w.totals.schedules||0), backgroundColor:weeks.map((w,i)=>goals[i]&&w.totals.schedules>=goals[i]?'#15803d':'#2563eb'), borderRadius:5, maxBarThickness:46, order:2},
+    {type:'line', label:'Goal target', data:goals.map(g=>g||null), borderColor:'#0a1f44', borderDash:[5,4], borderWidth:2, pointRadius:0, tension:0, order:1}]},
+   options:{responsive:true, maintainAspectRatio:false, layout:{padding:{top:18}}, interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false}, tooltip:{callbacks:{title:items=>{ const w=weeks[items[0].dataIndex]; return 'Week '+w.weekNumber+' · ending '+fmtDate(w.weekEndDate); }, footer:items=>{ const i=items[0].dataIndex, g=goals[i]; return g?Math.round((weeks[i].totals.schedules||0)/g*100)+'% of goal':''; }}}},
+    scales:{x:{grid:{display:false}}, y:{beginAtZero:true, grid:{color:'#eef2f6'}, border:{display:false}, ticks:{precision:0}}}}});
+}
 async function renderWeeklyView(){
   const revision=++weeklyRenderRevision;
   const container = document.getElementById('view-weekly');
@@ -5226,7 +5345,13 @@ async function renderWeeklyView(){
   divSel.classList.remove('hidden');
   document.getElementById('weeklyDivisionSelectLbl').classList.remove('hidden');
 
+  const execHtml = (()=>{ const pend=!isMultiWeekMode && weekIsFullyPending(week.weekEndDate);
+    const hpr=hiresPerRecruiter(scopedWeeksForSummary);
+    return execSummaryHtml({t, goal:teamGoal, prevT:isMultiWeekMode?null:prevT, multi:isMultiWeekMode, label:weekLabel, hpr, pend, byRec:filteredByRecruiter, goals:goalsForWeek, scopeDiv:universalDivision}); })();
   container.innerHTML = `
+    ${execHtml}
+    <div id="perfDetailWrap" ${perfDetailOpen?'':'hidden'}>
+    <div class="section-divider">Detailed view</div>
     ${universalDivision ? `<div class="hint" style="margin-bottom:10px;">Viewing <strong>${escapeHtml(universalDivision)}</strong> only</div>` : ''}
 
     <div class="kpi-grid mk-grid" data-section="perf.kpis">${(()=>{
@@ -5271,7 +5396,18 @@ async function renderWeeklyView(){
       <div class="panel-head"><h3>Recruiting Intelligence</h3><div style="display:flex;align-items:center;gap:10px;"><span class="hint">${isMultiWeekMode?'Auto-generated insights across '+(isAllWeeks?'all weeks':'the selected weeks'):'Auto-generated insights for this week'}</span><button class="btn btn-secondary btn-sm" data-copy-list="weeklyInsights" title="Copy this performance recap to clipboard">&#128203; Copy recap</button></div></div>
       <div class="insight-list" id="weeklyInsights"></div>
     </div></section>
+    </div>
   `;
+  // executive summary: switch, clicks, chart and division table
+  container.querySelector('#perfDetailSw')?.addEventListener('click',()=>{ perfDetailOpen=!perfDetailOpen; lsSet('ipd_perf_detail',perfDetailOpen?'1':'0'); renderWeeklyView(); });
+  container.querySelectorAll('[data-exec-detail]').forEach(el=>el.addEventListener('click',()=>{ if(!perfDetailOpen){ perfDetailOpen=true; lsSet('ipd_perf_detail','1'); renderWeeklyView(); } setTimeout(()=>document.getElementById('perfDetailWrap')?.scrollIntoView({behavior:'smooth',block:'start'}),120); }));
+  container.querySelectorAll('[data-exec-rec]').forEach(b=>b.onclick=()=>{ try{ openRemarksModal(b.dataset.execRec, isMultiWeekMode?(weeksForAggregate.at(-1)||{}).weekEndDate:week.weekEndDate); }catch(e){} });
+  container.querySelectorAll('[data-exec-go]').forEach(b=>b.onclick=()=>{ alertsState.week=isMultiWeekMode?null:week.weekEndDate; document.querySelector('#navList button[data-view="alerts"]')?.click(); });
+  fillExecDivisions(isMultiWeekMode?weeksForAggregate:[week], referenceWeekForDivisions);
+  { const sorted=[...weeksData].sort((a,b)=>a.weekEndDate.localeCompare(b.weekEndDate));
+    const ew=(isMultiWeekMode?[...weeksForAggregate].sort((a,b)=>a.weekEndDate.localeCompare(b.weekEndDate)):sorted.filter(w=>w.weekEndDate<=week.weekEndDate).slice(-8)).slice(-26).map(w=>scopeWeekToDivision(w,universalDivision));
+    Promise.all(ew.map(w=>computeGoalsForWeeks([w],universalDivision,w.weekEndDate).then(g=>g.total))).then(g=>{ if(revision===weeklyRenderRevision&&currentView==='performance'){ drawExecTrend(ew,g); const n=document.getElementById('execTrendNote'); if(n) n.textContent=(isMultiWeekMode?ew.length+' selected weeks':'Last '+ew.length+' weeks')+' · green bar = goal reached · dashed line = goal'; } }); }
+  if(!perfDetailOpen) return;
 
   drawSnapshotTable('weeklyRecruiterMiniTable', true);
   drawSnapshotTable('weeklyBranchMiniTable', false);
@@ -8437,7 +8573,7 @@ const MODULES = [
   {key:'settings',    label:'Settings', hint:'Divisions, branch divisions, show/hide recruiters, saved weeks'},
   {key:'export',      label:'Download & share', hint:'Excel, PDF, Word, master sheet download, snapshots'},
 ];
-const VIEW_MODULE = {teams:'teams',leads:'teams',performance:'performance', recruiters:'recruiters', branches:'branches', master:'master', candidates:'candidate_hub', alerts:'alerts', pivot:'pivot', divreport:'divreport', onboarding:'onboarding', orderentry:'orderentry'};
+const VIEW_MODULE = {teams:'teams',leads:'teams',performance:'performance', recruiters:'recruiters', branches:'branches', master:'master', candidates:'candidate_hub', alerts:'alerts', highlights:'alerts', pivot:'pivot', divreport:'divreport', onboarding:'onboarding', orderentry:'orderentry'};
 
 function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
 // ---------- Reload keeps you on the same page (this tab) ----------
@@ -8456,7 +8592,7 @@ function saveNav(){
 async function restoreNav(){
   let nav=null; try{ nav=JSON.parse(sessionStorage.getItem(NAV_KEY())||'null'); }catch(e){}
   if(!nav||!nav.view) return false;
-  const ok=v=>v==='settings'?false:v==='history'?true:v==='leads'?canViewLeads():VIEW_MODULE[v]&&Server.can(VIEW_MODULE[v]);
+  const ok=v=>v==='settings'?false:v==='history'?true:v==='leads'?canViewLeads():v==='highlights'?Server.can('alerts')&&canSeeSection('alerts.highlights'):VIEW_MODULE[v]&&Server.can(VIEW_MODULE[v]);
   if(!ok(nav.view)) return false;
   if(nav.perf){ if(nav.perf.week) currentWeekEndDate=nav.perf.week; if(Array.isArray(nav.perf.sel)) selectedWeekEndDates=nav.perf.sel.filter(d=>weeksData.some(w=>w.weekEndDate===d)); if(typeof nav.perf.div==='string') universalDivision=nav.perf.div; }
   if(nav.lt){ Object.assign(ltState,{owner:String(Server.user.id),viewingId:Server.isAdmin()?(nav.lt.viewingId||String(Server.user.id)):String(Server.user.id),rangeMode:nav.lt.rangeMode||null,anchor:nav.lt.anchor||null,division:nav.lt.division||'',tab:nav.lt.tab,brTab:nav.lt.brTab}); }
@@ -8476,7 +8612,7 @@ async function restoreNav(){
 }
 window.addEventListener('beforeunload',()=>saveNav());
 // Default page: the person's own choice (this browser) → the one an admin set for them → first page they can open.
-const DEFAULT_VIEW_LABELS = {performance:'Performance Overview', teams:'My Team', leads:'Team Leads (admins)', recruiters:'Recruiter Scorecards', branches:'Branch Results', alerts:'Action Center', candidates:'Candidates', master:'Candidates — master sheet', pivot:'Report Builder', divreport:'Division Report', onboarding:'Onboarding', orderentry:'Order Entry'};
+const DEFAULT_VIEW_LABELS = {performance:'Performance Overview', teams:'My Team', leads:'Team Leads (admins)', recruiters:'Recruiter Scorecards', branches:'Branch Results', alerts:'Action Center', highlights:'Highlights', candidates:'Candidates', master:'Candidates — master sheet', pivot:'Report Builder', divreport:'Division Report', onboarding:'Onboarding', orderentry:'Order Entry'};
 function adminDefaultViews(){ return KV.get('userDefaultViews')||{}; }
 function defaultViewOptions(u){ const can=v=>v==='teams'&&(u?u.role!=='user':Server.isAdmin())?false:v==='leads'?(u?(u.role!=='user'||(u.hidden_sections||[]).includes('grant.leads')):canViewLeads()):(!u||u.role!=='user'||v==='teams'||(u.modules||[]).includes(VIEW_MODULE[v])); return Object.keys(DEFAULT_VIEW_LABELS).filter(v=>VIEW_MODULE[v]&&can(v)).map(v=>[v,DEFAULT_VIEW_LABELS[v]]); }
 function myDefaultViewKey(){ return 'ipd_default_view:'+(Server.user?.id||''); }
@@ -8789,7 +8925,7 @@ const Server = {
         chunk.forEach(k=>{ if(!seen.has(k) && !k.endsWith(LISTS_SUFFIX)) KV.delete(k); });
       }
     }
-    if(remarks){ await Remarks.load().catch(()=>{}); if(currentView==='alerts') renderAlertsView(); if(currentView==='history') renderHistoryView(); }
+    if(remarks){ await Remarks.load().catch(()=>{}); if(currentView==='alerts') renderAlertsView(); if(currentView==='highlights') renderHighlightsView(); if(currentView==='history') renderHistoryView(); }
     if(users){
       try{ const me = await this.rpc('dash_me'); const changed = JSON.stringify(me.modules)!==JSON.stringify(this.user.modules) || JSON.stringify(me.hidden_sections||[])!==JSON.stringify(this.user.hidden_sections||[]) || me.name!==this.user.name; this.user=me; if(changed){ applyPermissions(); refreshUI(); showToast('Your access rights were updated.'); } }catch(e){}
       if(settingsModalOpen && !document.getElementById('settingsPane-users')?.classList.contains('hidden')) renderUsersAdmin();
@@ -8896,7 +9032,7 @@ function applyPermissions(){
   if(!(Server.user&&Server.isSuperAdmin())) setAccessMode(false);
   setupAccessHelpers();
   const u = Server.user; if(!u) return;
-  const viewOk = v=>v==='leads' ? canViewLeads() : Server.can(VIEW_MODULE[v]);
+  const viewOk = v=>v==='leads' ? canViewLeads() : v==='highlights' ? Server.can('alerts')&&canSeeSection('alerts.highlights') : Server.can(VIEW_MODULE[v]);
   // Admins reach every team through Team Leads, so they don't need a separate My Team entry.
   document.querySelectorAll('#navList button[data-view]').forEach(b=>{ b.classList.toggle('hidden', !viewOk(b.dataset.view) || (b.dataset.view==='teams' && Server.isAdmin())); });
   layoutNav();
@@ -9717,7 +9853,19 @@ async function removeFolderSync(){
 /* ------------------------------------------ REMARKS ------------------------------------------ */
 const Remarks = {
   list:[], ownIds:new Set(),
-  async load(){ this.list = (Server.can('recruiters')||Server.can('remarks')||Server.can('alerts')||Server.can('remarks_approve')) ? (await Server.rpc('dash_remarks_list'))||[] : []; },
+  async load(){ this.list = (Server.can('recruiters')||Server.can('remarks')||Server.can('alerts')||Server.can('remarks_approve')) ? (await Server.rpc('dash_remarks_list'))||[] : []; await this.loadReviews(); },
+  // "Reviewed" ticks (admins) live in their own table — the remark itself is never changed or copied
+  reviews:new Map(), reviewsDemo:false,
+  async loadReviews(){ try{ const l=await Server.rpc('dash_remark_reviews_list')||[]; this.reviews=new Map(l.map(x=>[String(x.id),x])); this.reviewsDemo=false; }
+    catch(e){ if(!/Could not find|schema cache|does not exist|PGRST202/i.test(String(e&&e.message||e))&&Server.token) return; this.reviewsDemo=true; try{ this.reviews=new Map(Object.entries(JSON.parse(localStorage.getItem('ipd_remark_reviews')||'{}'))); }catch(e2){} } },
+  reviewOf(id){ return this.reviews.get(String(id))||null; },
+  canMarkReviewed(){ return !!(Server.user&&Server.isAdmin()); },
+  async markReviewed(id, on){ id=String(id); let r=null;
+    if(!this.reviewsDemo){ try{ r=await Server.rpc('dash_remark_review_mark',{p_id:id, p_on:!!on}); }catch(e){ if(!/Could not find|schema cache|does not exist|PGRST202/i.test(String(e&&e.message||e))) throw e; this.reviewsDemo=true; } }
+    if(this.reviewsDemo) r=on?{id, by:Server.user.name, at:new Date().toISOString()}:null;
+    if(on&&r) this.reviews.set(id,r); else this.reviews.delete(id);
+    if(this.reviewsDemo){ try{ localStorage.setItem('ipd_remark_reviews', JSON.stringify(Object.fromEntries(this.reviews))); }catch(e){} }
+    return r; },
   canAdd(){ return Server.can('remarks') || Server.can('remarks_approve'); },
   canApprove(){ return Server.can('remarks_approve'); },
   pending(){ return this.list.filter(r=>r.status==='pending'); },
@@ -9788,6 +9936,7 @@ async function saveRemarkFromModal(){
     showToast(Remarks.canApprove() ? 'Remark saved.' : 'Remark sent for approval.');
     if(document.getElementById('entityDrawer')) renderEntityDrawer();
     if(currentView==='alerts') renderAlertsView();
+    if(currentView==='highlights') renderHighlightsView();
     if(currentView==='history') renderHistoryView();
   }catch(e){ showToast('Could not save the remark: '+cleanErr(e)); }
   finally{ btn.disabled=false; }
@@ -9804,8 +9953,9 @@ function renderRemarksModalBody(){
   let last=null;
   host.innerHTML = items.map(r=>{
     const head = r.week_end_date!==last ? `<div class="remark-week">Wk ${isoWeekNumber(new Date(r.week_end_date+'T00:00:00'))} · week ending ${fmtDate(r.week_end_date)}</div>` : ''; last=r.week_end_date;
-    return head+`<div class="remark-item" data-id="${escapeHtml(r.id)}"><div class="remark-meta"><strong>${fmtDate(r.remark_date)}</strong>${r.author?' · '+escapeHtml(r.author):''}${r.updated_at && r.created_at && r.updated_at.slice(0,16)!==r.created_at.slice(0,16)?' · edited':''}</div>${remarkStatusHtml(r)}<div class="remark-text">${escapeHtml(r.remark)}</div>${(Remarks.canApprove() && r.status!=='approved') || Remarks.canEdit(r) ? `<div class="remark-actions">${Remarks.canApprove() && r.status!=='approved'?'<button class="link-btn ok" data-approve>Approve</button>':''}${Remarks.canApprove() && r.status==='pending'?'<button class="link-btn danger" data-reject>Reject</button>':''}${Remarks.canEdit(r)?'<button class="link-btn" data-edit>Edit</button><button class="link-btn danger" data-del>Delete</button>':''}</div>`:''}</div>`;
+    return head+`<div class="remark-item" data-id="${escapeHtml(r.id)}"><div class="remark-meta"><strong>${fmtDate(r.remark_date)}</strong>${r.author?' · '+escapeHtml(r.author):''}${r.updated_at && r.created_at && r.updated_at.slice(0,16)!==r.created_at.slice(0,16)?' · edited':''}</div>${remarkStatusHtml(r)}<div class="remark-text">${escapeHtml(r.remark)}</div>${remarkReviewHtml(r)}${(Remarks.canApprove() && r.status!=='approved') || Remarks.canEdit(r) ? `<div class="remark-actions">${Remarks.canApprove() && r.status!=='approved'?'<button class="link-btn ok" data-approve>Approve</button>':''}${Remarks.canApprove() && r.status==='pending'?'<button class="link-btn danger" data-reject>Reject</button>':''}${Remarks.canEdit(r)?'<button class="link-btn" data-edit>Edit</button><button class="link-btn danger" data-del>Delete</button>':''}</div>`:''}</div>`;
   }).join('');
+  wireRemarkReviews(host, ()=>{ renderRemarksModalBody(); if(currentView==='alerts') renderAlertsView(); });
   host.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>{
     const r = Remarks.list.find(x=>x.id===b.closest('.remark-item').dataset.id); if(!r) return;
     st.editing=r.id; st.week=r.week_end_date;
@@ -9822,6 +9972,18 @@ function renderRemarksModalBody(){
     try{ await Remarks.remove(b.closest('.remark-item').dataset.id); renderRemarksModalBody(); if(currentView==='recruiters') renderPeopleView('recruiters'); if(currentView==='history') renderHistoryView(); }
     catch(e){ showToast('Could not delete: '+cleanErr(e)); }
   }));
+}
+function remarkReviewHtml(r){
+  if((r.status||'approved')!=='approved') return '';
+  const v=Remarks.reviewOf(r.id), when=v&&v.at?new Date(v.at).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'';
+  if(Remarks.canMarkReviewed()) return `<label class="rv-tick ${v?'on':''}" aria-hidden="false" title="${v?'Reviewed by '+escapeHtml(v.by||'')+(when?' · '+when:'')+' — untick to undo':'Tick when you have read this remark'}"><input type="checkbox" data-rv="${escapeHtml(r.id)}" ${v?'checked':''}><span>${v?`Reviewed by ${escapeHtml(v.by||'')}${when?` <small>· ${escapeHtml(when)}</small>`:''}`:'Mark reviewed'}</span></label>`;
+  return v?`<span class="rv-tick on ro"><span>✓ Reviewed by ${escapeHtml(v.by||'')}${when?` <small>· ${escapeHtml(when)}</small>`:''}</span></span>`:'';
+}
+function wireRemarkReviews(host, after){
+  host.querySelectorAll('[data-rv]').forEach(cb=>cb.addEventListener('change', async ()=>{ cb.disabled=true;
+    try{ await Remarks.markReviewed(cb.dataset.rv, cb.checked); showToast(cb.checked?'Marked as reviewed.':'Review removed.'); }
+    catch(e){ cb.checked=!cb.checked; showToast('Could not update: '+cleanErr(e)); }
+    cb.disabled=false; if(after) after(); }));
 }
 function remarkStatusHtml(r){
   const st = r.status||'approved';
@@ -10738,6 +10900,47 @@ function alertsHighlightsHtml(h, weekEnd, inProgress){
   return `<div class="panel-head"><div><h3><span class="al-dot info"></span>Highlights</h3><span class="hint">${inProgress?'Runs and consistency use completed weeks only — the week in progress isn’t judged yet. ':''}Click a box to see the list · click a name for their remarks.</span></div></div>
   ${cards}<div class="hi-detail ${secs.find(s=>s.k===st.hiSec).cls}">${body}</div>`;
 }
+/* ---- Highlights: its own page under Action Center (runs, consistency, swings, top this week) ---- */
+const hlState={week:null, search:''};
+function renderHighlightsView(){
+  const host=document.getElementById('view-highlights'); if(!host) return;
+  const weeks=[...weeksData].map(w=>w.weekEndDate).sort().reverse();
+  if(!weeks.length){ host.innerHTML='<div class="panel"><p class="hint" style="margin:0;">No weeks yet — upload data first.</p></div>'; return; }
+  const st=hlState; if(!st.week||!weeks.includes(st.week)) st.week=alertsState.week&&weeks.includes(alertsState.week)?alertsState.week:(defaultWeekEnd()||weeks[0]);
+  const extra=document.getElementById('topbarExtra');
+  if(extra&&!document.getElementById('hlSearch')){
+    extra.innerHTML=`<div class="header-search"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input type="search" id="hlSearch" aria-label="Search recruiter" placeholder="Search recruiter or branch…" autocomplete="off"></div>`;
+    const sIn=document.getElementById('hlSearch'); sIn.value=st.search;
+    let t; sIn.addEventListener('input',()=>{ clearTimeout(t); t=setTimeout(()=>{ st.search=sIn.value; renderHighlightsView(); },200); });
+  }
+  const {rows, inProgress}=alertsGoalRows(st.week);
+  rows.forEach(r=>{ r.score=inProgress?(r.pace??0):(r.pct??0); });
+  const q=st.search.trim().toLowerCase(), match=r=>!q||r.name.toLowerCase().includes(q)||String(r.branch||'').toLowerCase().includes(q);
+  const hi=alertsHighlights(st.week, rows, inProgress);
+  const shown={...hi, streak:hi.streak.filter(x=>match(x.row)), steady:hi.steady.filter(x=>match(x.row)), swing:hi.swing.filter(x=>match(x.row)), top:hi.top.map(c=>({...c, list:c.list.filter(x=>match(x.row))}))};
+  host.innerHTML=`<div class="al-toolbar"><label class="cand-field"><span>Week ending</span><select id="hlWeek">${weeks.map(d=>`<option value="${d}" ${d===st.week?'selected':''}>Wk ${weekOfDate(d).number} · ending ${fmtDate(d)}${d===toIsoDateOnly(saturdayOnOrAfter(new Date()))?' (this week)':''}</option>`).join('')}</select></label></div>
+   <section class="panel al-section al-hi" id="alHighlights" data-section="alerts.highlights">${alertsHighlightsHtml(shown, st.week, inProgress)}</section>`;
+  const as=alertsState;
+  host.querySelector('#hlWeek').onchange=e=>{ st.week=e.target.value; renderHighlightsView(); };
+  host.querySelectorAll('[data-hi-sec]').forEach(b=>b.onclick=()=>{ as.hiSec=b.dataset.hiSec; as.hiAll=false; renderHighlightsView(); });
+  host.querySelector('[data-hi-all]')?.addEventListener('click',()=>{ as.hiAll=!as.hiAll; renderHighlightsView(); });
+  host.querySelectorAll('[data-hi-cat]').forEach(b=>b.onclick=()=>{ as.hiCat=b.dataset.hiCat; host.querySelectorAll('[data-hi-cat]').forEach(x=>x.classList.toggle('on',x===b)); host.querySelectorAll('[data-hi-list]').forEach(x=>x.hidden=x.dataset.hiList!==as.hiCat); });
+  host.querySelectorAll('[data-hi-name]').forEach(b=>b.onclick=()=>openRemarksModal(b.dataset.hiName, st.week));
+  host.querySelector('[data-hi-copy]')?.addEventListener('click',e=>{ e.preventDefault(); copyRemarksTable(shown.streak.map(x=>x.row), st.week, 'below', inProgress); });
+}
+// Action Center → remarks for the selected week, newest first, with the admins' "Reviewed" tick
+function alertsRemarksSectionHtml(st, rows, q){
+  const names=new Set(rows.map(r=>r.name));
+  const all=Remarks.list.filter(r=>r.week_end_date===st.week&&(r.status||'approved')==='approved'&&(!q||String(r.recruiter).toLowerCase().includes(q)))
+    .sort((a,b)=>String(b.remark_date).localeCompare(String(a.remark_date))||String(b.created_at).localeCompare(String(a.created_at)));
+  const todo=all.filter(r=>!Remarks.reviewOf(r.id)), done=all.filter(r=>Remarks.reviewOf(r.id));
+  const f=st.rvf||'todo', list=f==='todo'?todo:f==='done'?done:all, open=st.rvOpen!==false;
+  const row=r=>{ const x=rows.find(y=>y.name===r.recruiter);
+    return `<li class="rv-item ${Remarks.reviewOf(r.id)?'is-done':''}"><div class="rv-main"><div class="rv-meta"><button type="button" class="hi-name" data-rv-open="${escapeHtml(r.recruiter)}">${escapeHtml(r.recruiter)}</button>${x?`<span class="rv-pct ${x.score<50?'bad':x.score<80?'warn':'good'}">${Math.round(x.score)}%</span>`:''}<span class="hint">${fmtDate(r.remark_date)}${r.author?' · '+escapeHtml(r.author):''}</span></div><div class="rv-text">${escapeHtml(r.remark)}</div></div>${remarkReviewHtml(r)}</li>`; };
+  return `<section class="panel al-section" id="alRemarks" data-section="alerts.remarks"><div class="panel-head"><div><h3>💬 Remarks this week <span class="al-count">${all.length}</span></h3><span class="hint">${Remarks.canMarkReviewed()?'Tick <b>Mark reviewed</b> once you have read a remark — everyone sees who reviewed it.':'Remarks for the selected week; ✓ shows an admin has reviewed it.'}</span></div>
+    <div class="mr-head-tools"><div class="oe-group" role="tablist"><button type="button" data-rvf="todo" class="${f==='todo'?'on':''}">To review · ${todo.length}</button><button type="button" data-rvf="done" class="${f==='done'?'on':''}">Reviewed · ${done.length}</button><button type="button" data-rvf="all" class="${f==='all'?'on':''}">All</button></div><button type="button" class="link-btn" id="alRvOpen">${open?'Hide':'Show'}</button></div></div>
+    ${open?(list.length?`<ul class="rv-list">${list.map(row).join('')}</ul>`:`<p class="hint" style="margin:0">${f==='todo'?(all.length?'Everything this week has been reviewed. ✓':'No remarks for this week yet.'):f==='done'?'Nothing reviewed yet this week.':'No remarks for this week yet.'}</p>`):''}</section>`;
+}
 async function renderAlertsView(){
   const host = document.getElementById('view-alerts'); if(!host) return;
   const st = alertsState;
@@ -10768,7 +10971,7 @@ async function renderAlertsView(){
   const w = weekOfDate(st.week);
   const bar = r=>{ const v=Math.min(100, today?(r.pace||0):(r.pct||0)); return `<div class="al-bar" title="${fmtNum(r.sched)} of ${fmtNum(r.goal)} schedules"><i style="width:${v}%"></i>${inProgress&&!today?`<u style="left:${Math.min(100, elapsed/5*100)}%" title="Where they should be by today"></u>`:''}<b style="left:50%"></b></div>`; };
   const card = (r, sev)=>`<div class="al-card ${sev}" data-al-card="${escapeHtml(r.name)}" tabindex="0" role="button" aria-label="Open remarks for ${escapeHtml(r.name)}">
-      <div class="al-head"><button type="button" class="al-name" data-al-remarks="${escapeHtml(r.name)}">${escapeHtml(r.name)}</button>${(()=>{ const n=Remarks.forWeek(r.name, st.week).filter(x=>(x.status||'approved')!=='rejected').length; return n?`<span class="al-rdot" title="${n} remark${n===1?'':'s'} this week — click the card to read">${n}</span>`:''; })()}<span class="al-pct" title="${today?'Schedules vs goal so far':'Schedules vs weekly goal'}">${Math.round(r.score)}%<small>${today?'of goal so far':'of weekly goal'}</small></span></div>
+      <div class="al-head"><button type="button" class="al-name" data-al-remarks="${escapeHtml(r.name)}">${escapeHtml(r.name)}</button>${(()=>{ const l=Remarks.forWeek(r.name, st.week).filter(x=>(x.status||'approved')!=='rejected'), n=l.length, todo=l.filter(x=>(x.status||'approved')==='approved'&&!Remarks.reviewOf(x.id)).length; return n?`<span class="al-rdot ${todo?'':'done'}" title="${n} remark${n===1?'':'s'} this week${todo?` · ${todo} not reviewed yet`:' · all reviewed'} — click the card to read">${todo?n:'✓ '+n}</span>`:''; })()}<span class="al-pct" title="${today?'Schedules vs goal so far':'Schedules vs weekly goal'}">${Math.round(r.score)}%<small>${today?'of goal so far':'of weekly goal'}</small></span></div>
       <div class="al-sub">${escapeHtml(r.division)}${r.branch?' · '+escapeHtml(r.branch):''}</div>
       ${bar(r)}
       <div class="al-facts"><span><strong>${fmtNum(r.sched)}</strong> / ${fmtNum(r.target)} schedules${today?' so far':''}</span>${inProgress?(today?`<span>weekly goal ${fmtNum(r.goal)} · on track for ~${fmtNum(r.projected)}</span>`:`<span>on track for ~${fmtNum(r.projected)} · ${fmtNum(Math.round(r.expected))} due by today</span>`):`<span>${fmtNum(r.shows)} shows · ${fmtNum(r.hires)} hires</span>`}</div>
@@ -10793,12 +10996,12 @@ async function renderAlertsView(){
       <button type="button" class="al-tile warn ${on('watch')?'sel':''}" data-band="watch" aria-pressed="${on('watch')}"><span>50–79% of goal</span><strong>${watch.length}<small class="al-pct-of">${rows.length?Math.round(watch.length/rows.length*100):0}% of ${rows.length}</small></strong><em>keep an eye on</em></button>
       <button type="button" class="al-tile good ${on('good')?'sel':''}" data-band="good" aria-pressed="${on('good')}"><span>On track (80%+)</span><strong>${onTrack.length}<small class="al-pct-of">${rows.length?Math.round(onTrack.length/rows.length*100):0}% of ${rows.length}</small></strong><em>of ${rows.length} recruiters</em></button>
     </div>
-    <div class="al-multi-row"><p class="hint al-multi-hint">Click cards to show or hide them — pick as many as you like.</p><button type="button" class="btn btn-sm al-hi-btn ${st.hiOpen?'on':''}" id="alHiBtn" aria-expanded="${!!st.hiOpen}" data-section="alerts.highlights">✦ ${st.hiOpen?'Hide highlights':'Show highlights'}${hi.streak.length?` <span class="al-hi-badge" title="Below goal 3+ weeks running">${hi.streak.length}</span>`:''}</button></div>
+    <div class="al-multi-row"><p class="hint al-multi-hint">Click cards to show or hide them — pick as many as you like.</p><button type="button" class="btn btn-sm al-hi-btn" id="alHiBtn" data-section="alerts.highlights" title="Open Action Center → Highlights">✦ Highlights →${hi.streak.length?` <span class="al-hi-badge" title="Below goal 3+ weeks running">${hi.streak.length}</span>`:''}</button></div>
     <div>
     </div>
     ${pending.length?`<section class="panel al-section" id="alApprovals" data-section="alerts.approvals"><div class="panel-head"><div><h3>Remarks awaiting approval</h3><span class="hint">Only you and the author can see these until they’re approved.</span></div></div>
       <div class="al-approvals">${pending.map(r=>`<div class="al-appr" data-id="${escapeHtml(r.id)}"><div class="al-appr-meta"><strong>${escapeHtml(r.recruiter)}</strong> · Wk ${weekOfDate(r.week_end_date).number} · by ${escapeHtml(r.author||'')} · ${new Date(r.created_at).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</div><div class="al-appr-text">${escapeHtml(r.remark)}</div><div class="al-actions"><button class="btn btn-primary btn-sm" data-appr="1">Approve</button><button class="btn btn-secondary btn-sm" data-appr="0">Reject</button><button class="link-btn" data-appr-edit="${escapeHtml(r.recruiter)}" data-week="${r.week_end_date}">Edit…</button></div></div>`).join('')}</div></section>`:''}
-    <section class="panel al-section al-hi" id="alHighlights" data-section="alerts.highlights" ${st.hiOpen?'':'hidden'}>${alertsHighlightsHtml(hiShown, st.week, inProgress)}</section>
+    ${alertsRemarksSectionHtml(st, rows, q)}
     ${st.bands.length?'':'<div class="panel"><p class="hint" style="margin:0">No card selected — click one or more cards above.</p></div>'}
     <section class="panel al-section" id="alBelow" data-section="alerts.below" ${on('below')?'':'hidden'}>
       <div class="panel-head"><div><h3><span class="al-dot bad"></span>Below 50% of goal <span class="al-count">${belowShown.length}</span></h3><span class="hint">Lowest first. Click a card for the remark history.</span></div>${belowShown.length?'<button type="button" class="btn btn-secondary btn-sm al-copy" data-al-copy="below" title="Copy a table of these recruiters and their remarks — paste into email or Excel">📋 Copy remarks</button>':''}</div>
@@ -10816,7 +11019,7 @@ async function renderAlertsView(){
   host.querySelector('#alWeek').onchange = e=>{ st.week=e.target.value; renderAlertsView(); };
   host.querySelector('#alGroup').onchange = e=>{ st.group=e.target.value; lsSet('ipd_alerts_group2', st.group); renderAlertsView(); };
   host.querySelectorAll('[data-band]').forEach(b=>b.onclick=()=>{ const k=b.dataset.band; st.bands=on(k)?st.bands.filter(x=>x!==k):[...st.bands,k]; st.band=st.bands[0]||''; renderAlertsView(); });
-  host.querySelector('#alHiBtn')?.addEventListener('click',()=>{ st.hiOpen=!st.hiOpen; renderAlertsView(); if(st.hiOpen) setTimeout(()=>document.getElementById('alHighlights')?.scrollIntoView({behavior:'smooth',block:'start'}),50); });
+  host.querySelector('#alHiBtn')?.addEventListener('click',()=>{ hlState.week=st.week; hlState.search=st.search; document.querySelector('#navList button[data-view="highlights"]')?.click(); });
   host.querySelectorAll('[data-hi-name]').forEach(b=>b.onclick=()=>openRemarksModal(b.dataset.hiName, st.week));
   host.querySelectorAll('[data-hi-sec]').forEach(b=>b.onclick=()=>{ st.hiSec=b.dataset.hiSec; st.hiAll=false; renderAlertsView(); });
   host.querySelector('[data-hi-all]')?.addEventListener('click',()=>{ st.hiAll=!st.hiAll; renderAlertsView(); });
@@ -10831,6 +11034,10 @@ async function renderAlertsView(){
     c.addEventListener('click',e=>{ if(e.target.closest('button,a,input,select,textarea,.acc-chip')) return; if(String(window.getSelection?.()||'').length) return; open(); });
     c.addEventListener('keydown',e=>{ if(e.target===c&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); open(); } }); });
   host.querySelectorAll('[data-al-add]').forEach(b=>b.onclick=()=>{ const r = rows.find(x=>x.name===b.dataset.alAdd); openRemarksModal(b.dataset.alAdd, st.week, b.dataset.suggest || (r ? `${r.sched} of ${r.goal} schedules (${Math.round(r.pct)}%)${inProgress?' after '+elapsed+' day'+(elapsed===1?'':'s'):''}. Reason / plan: ` : '')); });
+  wireRemarkReviews(host, ()=>renderAlertsView());
+  host.querySelectorAll('[data-rvf]').forEach(b=>b.onclick=()=>{ st.rvf=b.dataset.rvf; renderAlertsView(); });
+  host.querySelector('#alRvOpen')?.addEventListener('click',()=>{ st.rvOpen=!st.rvOpen; renderAlertsView(); });
+  host.querySelectorAll('[data-rv-open]').forEach(b=>b.onclick=()=>openRemarksModal(b.dataset.rvOpen, st.week));
   host.querySelectorAll('[data-appr]').forEach(b=>b.onclick=async ()=>{ const id=b.closest('.al-appr').dataset.id; b.disabled=true; try{ await Remarks.review(id, b.dataset.appr==='1'); showToast(b.dataset.appr==='1'?'Remark approved.':'Remark rejected.'); }catch(e){ showToast('Could not update: '+cleanErr(e)); } renderAlertsView(); });
   host.querySelectorAll('[data-appr-edit]').forEach(b=>b.onclick=()=>openRemarksModal(b.dataset.apprEdit, b.dataset.week));
 }
@@ -12206,7 +12413,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.76.4';   // shown only in the browser tab title
+const APP_VERSION = '4.79.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -12254,7 +12461,7 @@ document.addEventListener('keydown', e=>{
   const search=document.querySelector('#topbarExtra input[type="search"]'); if(search){ e.preventDefault(); search.focus(); }
 });
 // ---------- Manage access in place (super admin) ----------
-const PAGE_MODULE = {performance:'performance', recruiters:'recruiters', branches:'branches', candidates:'candidates', master:'master', alerts:'alerts', pivot:'pivot', divreport:'divreport', onboarding:'onboarding', orderentry:'orderentry'};
+const PAGE_MODULE = {performance:'performance', recruiters:'recruiters', branches:'branches', candidates:'candidates', master:'master', alerts:'alerts', highlights:'alerts', pivot:'pivot', divreport:'divreport', onboarding:'onboarding', orderentry:'orderentry'};
 const PAGE_EDIT = {performance:['upload','export','grant.ov_onb','grant.ov_oe'], recruiters:['remarks','export','grant.manual_edit','grant.attendance'], onboarding:['grant.onb_report','grant.onb_all','grant.onb_lists'], orderentry:['grant.oe_bulk','grant.oe_agents'], branches:['export','grant.branch_merge'], candidates:['master_edit','export'], master:['master_edit','export'], alerts:['remarks','remarks_approve'], pivot:['export'], teams:['grant.team_names','grant.break_image'], leads:[], divreport:['upload','candidates']};
 const EDIT_LABEL = {'grant.attendance':'Mark attendance', 'grant.manual_edit':'Adjust numbers by hand', 'grant.onb_report':'See everyone’s onboarding numbers', 'grant.onb_all':'Manage everyone’s calls', 'grant.onb_lists':'Manage onboarding dropdowns', 'grant.oe_bulk':'Bulk upload past days', 'grant.oe_agents':'Manage agent names', 'grant.ov_onb':'Overview → Onboarding tab', 'grant.ov_oe':'Overview → Order Entry tab', 'grant.branch_merge':'Merge branches', 'grant.break_image':'Copy third-break list as image', 'grant.team_names':'See their team’s candidate names', candidates:'See all candidate names'};
 let accessMode=false, accessObs=null;
@@ -12378,7 +12585,7 @@ function layoutNav(){
   });
   if(label) label.classList.toggle('hidden',!any);
   const vis=[...nav.querySelectorAll('button[data-view]')].filter(b=>!b.classList.contains('hidden'));
-  const PRIO=['performance','onboarding','orderentry','alerts','teams','leads','recruiters','branches','divreport','pivot'], rank=b=>{ const i=PRIO.indexOf(b.dataset.view); return i<0?99:i; };
+  const PRIO=['performance','onboarding','orderentry','alerts','highlights','teams','leads','recruiters','branches','divreport','pivot'], rank=b=>{ const i=PRIO.indexOf(b.dataset.view); return i<0?99:i; };
   let main=vis.slice().sort((a,b)=>rank(a)-rank(b)).slice(0,4); const act=vis.find(b=>b.classList.contains('active'));
   if(vis.length>5&&act&&!main.includes(act)) main=[...main.slice(0,3),act];
   const extra=vis.length>5?vis.filter(b=>!main.includes(b)):[];
@@ -12417,12 +12624,13 @@ function toggleNavMore(force){ const on=force===undefined?!document.body.classLi
     branches:'<path d="M3 21V9l9-5 9 5v12"/><path d="M9 21v-6h6v6"/>',
     master:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10"/>',
     alerts:'<path d="M12 3l9.5 16.5h-19z"/><path d="M12 10v4M12 17.5v.5"/>',
+    highlights:'<path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/>',
     pivot:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/><path d="M13 17v-3M16 17v-5M19 17v-2" stroke-width="1.6"/>',
     divreport:'<path d="M4 4h16v4H4zM4 10h7v10H4zM13 10h7v4h-7zM13 16h7v4h-7z"/>',
     onboarding:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/>',
     orderentry:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/>',
     candidates:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2.2"/><path d="M5.8 16c.6-1.6 1.8-2.4 3.2-2.4s2.6.8 3.2 2.4M14.5 10h4M14.5 13.5h3"/>'};
-  const short = {teams:'My Team', leads:'Leads', performance:'Overview', recruiters:'Recruiters', branches:'Branches', master:'Master', candidates:'Names', alerts:'Alerts', pivot:'Pivot', divreport:'Divisions', onboarding:'Onboard', orderentry:'Orders'};
+  const short = {teams:'My Team', leads:'Leads', performance:'Overview', recruiters:'Recruiters', branches:'Branches', master:'Master', candidates:'Names', alerts:'Alerts', highlights:'Highlights', pivot:'Pivot', divreport:'Divisions', onboarding:'Onboard', orderentry:'Orders'};
   document.querySelectorAll('#navList button[data-view]').forEach(b=>{
     const v=b.dataset.view; if(!icons[v]) return;
     [...b.childNodes].forEach(n=>{ if(n.nodeType===3 && n.textContent.trim()){ const s=document.createElement('span'); s.className='nav-full'; s.textContent=n.textContent; b.replaceChild(s,n); } });
