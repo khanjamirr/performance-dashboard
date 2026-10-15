@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Performance Dashboard · v4.92.1</title>
+<title>Performance Dashboard · v4.92.3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2635,8 +2635,16 @@ html body .toast,html body #toast{border-radius:14px!important;background:rgba(3
 .rm-top input:focus{outline:2px solid rgba(0,122,255,.45);background:#fff}
 .rm-table thead th{position:sticky;top:-1px;background:#fff;z-index:1}
 .uf-role-sel{width:100%;max-width:460px}.uf-role-note{margin:6px 0 0}.uf-role-note:empty{display:none}
-.uf-access.role-locked .uf-start{display:none}
+.uf-access.role-locked .uf-start{display:none}.uf-body.uf-has-role .uf-access,.uf-body.uf-has-role .uf-home{display:none}.ua-role-sel{min-width:170px;max-width:220px;height:32px;padding:0 10px;border:0;border-radius:9px;background:rgba(118,118,128,.12);font:inherit;font-size:13px;font-weight:600;color:#1c1c1e}.ua-rolecell{white-space:nowrap}
 @media (max-width:700px){.rm-top{grid-template-columns:1fr}.roles-head{flex-direction:column}.roles-head .btn{margin-left:0}}
+</style>
+<style>
+#ovModeBar .ovx-row{display:flex;align-items:center;gap:12px}
+#ovModeBar .rtl-top{margin-left:auto;display:flex;align-items:center;gap:8px}
+#ovModeBar .rtl-top>span{font-size:12px;font-weight:600;color:#8e8e93;text-transform:uppercase;letter-spacing:.04em}
+#ovModeBar .rtl-top #rtlToggle{display:inline-flex;padding:3px;border-radius:12px;background:rgba(118,118,128,.12);gap:0;margin:0!important}
+#ovModeBar .rtl-top #rtlToggle button{border:0!important;background:transparent;font:inherit;font-size:14px!important;font-weight:600;color:#3a3a3c;padding:7px 18px!important;border-radius:9px!important;cursor:pointer;box-shadow:none}
+#ovModeBar .rtl-top #rtlToggle button.on{background:#fff;color:#1c1c1e;box-shadow:0 1px 3px rgba(0,0,0,.14),0 0 0 .5px rgba(0,0,0,.04)}
 </style>
 </head>
 <body class="locked">
@@ -5728,6 +5736,7 @@ function renderSubNav(){
     host.querySelectorAll('[data-subv]').forEach(x=>{ x.classList.toggle('on',x===a); x.setAttribute('aria-selected',String(x===a)); }); place(a,true);
     setTimeout(()=>document.querySelector(`#navList button[data-view="${a.dataset.subv}"]`)?.click(),170); });
   ovxStickySetup();
+  placeRtlToggle();
   return true;
 }
 // menu: clicking Recruiting / Reports / Action Center opens the last page used in that group (or the first)
@@ -7528,10 +7537,19 @@ const recTl={grain:'day', from:null, to:null, key:'', vsGoal:true, sort:'total',
 function wireRecTimelineToggle(){
   const sw=document.getElementById('rtlToggle'); if(!sw) return;
   if(!canSeeSection('rec.timeline')) recTl.open=false;
-  const panel=sw.closest('.panel'); panel.classList.toggle('rtl-open',recTl.open);
+  const panel=document.getElementById('recTimeline')?.closest('.panel')||sw.closest('.panel'); if(!panel) return; panel.classList.toggle('rtl-open',recTl.open);
   sw.querySelectorAll('[data-rtlv]').forEach(b=>{ b.classList.toggle('on',(b.dataset.rtlv==='1')===!!recTl.open); b.onclick=()=>{ const want=b.dataset.rtlv==='1'; if(want===!!recTl.open) return;
    recTl.open=want; sw.querySelectorAll('[data-rtlv]').forEach(x=>{ x.classList.toggle('on',x===b); x.setAttribute('aria-selected',String(x===b)); }); panel.classList.toggle('rtl-open',recTl.open); try{ localStorage.setItem('ipd_rtl_open',recTl.open?'1':'0'); }catch(e){}
    peopleRerender.recruiters&&peopleRerender.recruiters(); }; });
+  placeRtlToggle();
+}
+// Table | Day / week sits in the top bar with the page switcher (like the other pages); without that bar it stays in the panel
+function placeRtlToggle(){
+  if(currentView!=='recruiters') return;
+  const sw=document.getElementById('rtlToggle'), row=document.querySelector('#ovModeBar:not(.hidden) .ovx-row'); if(!sw||!row||innerWidth<=800) return;
+  row.querySelectorAll('.rtl-top').forEach(x=>{ if(!x.contains(sw)) x.remove(); });
+  if(sw.closest('.rtl-top')) return;
+  const w=document.createElement('div'); w.className='rtl-top'; w.innerHTML='<span>View</span>'; w.appendChild(sw); row.appendChild(w);
 }
 async function renderRecruiterTimeline(names){
   const host=document.getElementById('recTimeline'); if(!host) return;
@@ -11689,7 +11707,7 @@ async function renderUsersAdmin(){
   const modLabel = k=> (MODULES.find(m=>m.key===k)||{label:k}).label;
   const pageName=k=>{ const pg=UF_PAGES.find(x=>x.mod===k); return pg?pg.label:null; };
   const summary=u=>{ if(u.role!=='user') return '<span class="ua-all">Full access'+(u.role==='admin'?' · manages users':'')+'</span>';
-    const rl=roleOfUser(u.id); if(rl) return `<span class="role-chip" title="Rights come from this role">${escapeHtml(rl.name)}</span>`+roleSummary(rl).pages.slice(0,5).map(x=>`<span class="mod-chip">${escapeHtml(x)}</span>`).join('')+(roleSummary(rl).pages.length>5?`<span class="ua-more">+${roleSummary(rl).pages.length-5} more</span>`:'');
+    const rl=roleOfUser(u.id); if(rl) return roleSummary(rl).pages.slice(0,5).map(x=>`<span class="mod-chip">${escapeHtml(x)}</span>`).join('')+(roleSummary(rl).pages.length>5?`<span class="ua-more">+${roleSummary(rl).pages.length-5} more</span>`:'');
     const pages=[...((u.hidden_sections||[]).includes('grant.no_team')?[]:['My Team']), ...(u.modules||[]).map(pageName).filter(Boolean)], extras=(u.modules||[]).filter(k=>!pageName(k)).map(k=>UF_EXTRA_LABEL[k]||modLabel(k)), hid=(u.hidden_sections||[]).filter(k=>!k.startsWith('grant.')&&k!=='copy.tables').length;
     return (pages.length?pages.map(x=>`<span class="mod-chip">${escapeHtml(x)}</span>`).join(''):'<span class="hint">No pages yet</span>')
       +((extras.length||hid)?`<span class="ua-more">${extras.length?escapeHtml(extras.length+' extra right'+(extras.length===1?'':'s')):''}${extras.length&&hid?' · ':''}${hid?hid+' section'+(hid===1?'':'s')+' hidden':''}</span>`:''); };
@@ -11702,13 +11720,14 @@ async function renderUsersAdmin(){
     <div id="uaPeople" ${window.__uaTab==='roles'?'hidden':''}>
     <div class="ua-bar"><input type="search" id="uaSearch" name="ua-find-person" placeholder="Search people" aria-label="Search people" autocomplete="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore data-form-type="other" readonly onfocus="this.removeAttribute('readonly')" value="${escapeHtml(window.__uaQ||'')}"><div class="ua-filter" role="tablist">${[['all','Everyone'],['admin','Admins'],['user','Users'],['off','Disabled']].map(([k,l])=>`<button type="button" data-ua-f="${k}" class="${(window.__uaF||'all')===k?'on':''}">${l} <b>${counts[k]}</b></button>`).join('')}</div></div>
     <div id="userForm"></div>
-    <div style="overflow-x:auto"><table class="users-table ua-table"><thead><tr><th>Person</th><th>Can open</th><th>Status</th><th>Last sign-in</th><th></th></tr></thead><tbody>
+    <div style="overflow-x:auto"><table class="users-table ua-table"><thead><tr><th>Person</th><th>Role</th><th>Can open</th><th>Status</th><th>Last sign-in</th><th></th></tr></thead><tbody>
     ${usersCache.map(u=>`<tr data-ua-name="${escapeHtml(String(u.name||'').toLowerCase())}" data-ua-role="${u.role==='user'?'user':'admin'}" data-ua-off="${u.active?0:1}">
       <td><div class="ua-person"><span class="ua-av ${u.role!=='user'?'adm':''}">${escapeHtml(ini(u.name))}</span><div><strong>${escapeHtml(u.name)}</strong>${window.DV_MODE&&u.email?`<span class="ua-email">${escapeHtml(u.email)}</span>`:''}${u.online?' <span class="online-dot" title="Online now"></span>':''}<span class="ua-role">${u.role==='super_admin'?'Super admin':u.role==='admin'?'Admin':'User'}</span></div></div></td>
+      <td class="ua-rolecell">${u.role!=='user'?'<span class="hint" title="Admins and the super admin can use everything">—</span>':Server.isSuperAdmin()?`<select class="ua-role-sel" data-ua-role-sel="${escapeHtml(String(u.id))}" aria-label="Role for ${escapeHtml(u.name)}"><option value="">No role</option>${rolesData().roles.map(r=>`<option value="${escapeHtml(r.id)}" ${roleOfUser(u.id)&&roleOfUser(u.id).id===r.id?'selected':''}>${escapeHtml(r.name)}</option>`).join('')}</select>`:roleOfUser(u.id)?`<span class="role-chip">${escapeHtml(roleOfUser(u.id).name)}</span>`:'<span class="hint">No role</span>'}</td>
       <td class="mod-chips">${summary(u)}</td>
       <td>${u.active?'<span class="ua-status on">Active</span>':'<span class="ua-status">Disabled</span>'}</td>
       <td class="ua-when" title="${u.last_login_at?escapeHtml(new Date(u.last_login_at).toLocaleString()):''}">${when(u.last_login_at)}</td>
-      <td class="ua-actions">${Server.isSuperAdmin() || u.role==='user' || u.id===Server.user.id ? `<button class="btn btn-primary btn-sm" data-edit-user="${u.id}">Edit access</button>` : '<span class="hint">Super admin only</span>'}
+      <td class="ua-actions">${Server.isSuperAdmin() || u.role==='user' || u.id===Server.user.id ? `<button class="btn btn-secondary btn-sm" data-edit-user="${u.id}" title="Name, password, active, user type${u.role==='user'?' and role':''}">Edit</button>` : '<span class="hint">Super admin only</span>'}
         <button class="btn btn-secondary btn-sm" data-team-user="${u.id}" title="Choose which recruiters are on this person’s team">Team</button>
         ${u.role==='user'?`<button class="btn btn-secondary btn-sm" data-dup-user="${u.id}" title="New user with the same rights">Duplicate</button>`:''}
         ${u.role==='super_admin' || u.id===Server.user.id || (!Server.isSuperAdmin() && u.role!=='user')?'':`<button class="btn btn-link-danger btn-sm" data-del-user="${u.id}" title="Delete ${escapeHtml(u.name)}">Delete</button>`}</td>
@@ -11725,6 +11744,15 @@ async function renderUsersAdmin(){
   [60,400,1200].forEach(ms=>setTimeout(()=>{ if(uaS.isConnected&&uaS.value!==(window.__uaQ||'')&&document.activeElement!==uaS){ uaS.value=window.__uaQ||''; applyUa(); } },ms));
   host.querySelectorAll('[data-ua-f]').forEach(b=>b.onclick=()=>{ window.__uaF=b.dataset.uaF; host.querySelectorAll('[data-ua-f]').forEach(x=>x.classList.toggle('on',x===b)); applyUa(); });
   applyUa();
+  host.querySelectorAll('[data-ua-role-sel]').forEach(sel=>{ const prev=sel.value; sel.onchange=async()=>{
+    const u=usersCache.find(x=>String(x.id)===sel.dataset.uaRoleSel), r=rolesData().roles.find(x=>x.id===sel.value); if(!u) return;
+    if(r&&!confirm(`Give ${u.name} the “${r.name}” role? Their pages, rights and sections are replaced by the role’s.`)){ sel.value=prev; return; }
+    if(!r&&!confirm(`Remove ${u.name}’s role? They keep their current rights, set by hand from now on (Edit → page switches).`)){ sel.value=prev; return; }
+    sel.disabled=true; const x=rolesData();
+    if(r){ const res=await roleApplyTo(r,[u]); if(res.fail.length){ showToast('Not changed: '+res.fail.join(', ')); sel.value=prev; sel.disabled=false; return; } x.assign[String(u.id)]=r.id; }
+    else delete x.assign[String(u.id)];
+    if(await rolesSave(x)) showToast(r?`${u.name} now has the “${r.name}” role.`:`${u.name} has no role now — rights are set by hand.`);
+    renderUsersAdmin(); }; });
   host.querySelectorAll('[data-team-user]').forEach(b=>b.onclick=()=>ltAdminOpen(usersCache.find(u=>String(u.id)===b.dataset.teamUser)));
   host.querySelector('#addUserBtn').onclick=()=>{ userFormPreset=null; editingUserId='new'; drawUserForm(); };
   host.querySelectorAll('[data-dup-user]').forEach(b=>b.onclick=()=>{ const src=usersCache.find(x=>String(x.id)===b.dataset.dupUser); if(!src) return; userFormPreset={...rightsOf(src), from:src.name}; editingUserId='new'; drawUserForm(); document.getElementById('userForm')?.scrollIntoView({block:'start'}); });
@@ -12031,7 +12059,7 @@ function drawUserForm(){
       <section class="uf-sec"><div class="uf-sec-head"><h5>Pages they can open</h5><span class="hint" id="ufPageCount"></span></div><div class="uf-pages">${pagesHtml}</div></section>
       <section class="uf-sec"><h5>Tools</h5><div class="uf-pages">${toolsHtml}</div></section>
      </div>
-     <section class="uf-sec"><h5>Home page</h5><div class="field"><label for="ufDefaultView">Page they see when they sign in</label><select id="ufDefaultView"><option value="">First page they can open</option>${defaultViewOptions(u).map(([v,l])=>`<option value="${v}" ${adminDefaultViews()[u.id]===v?'selected':''}>${escapeHtml(l)}</option>`).join('')}</select><span class="hint">They can still change it in Settings → My account.</span></div></section>`}
+     <section class="uf-sec uf-home"><h5>Home page</h5><div class="field"><label for="ufDefaultView">Page they see when they sign in</label><select id="ufDefaultView"><option value="">First page they can open</option>${defaultViewOptions(u).map(([v,l])=>`<option value="${v}" ${adminDefaultViews()[u.id]===v?'selected':''}>${escapeHtml(l)}</option>`).join('')}</select><span class="hint">They can still change it in Settings → My account.</span></div></section>`}
     </div>
     <footer class="uf-foot"><p class="auth-msg" id="ufMsg" role="alert"></p><button class="btn btn-secondary" id="ufCancel">Cancel</button><button class="btn btn-primary" id="ufSave">${isNew?'Create user':'Save changes'}</button></footer>
   </div>`;
@@ -12068,8 +12096,8 @@ function drawUserForm(){
   const applyRoleUi=fill=>{ const r=roleSel&&roleSel.value?rolesData().roles.find(x=>x.id===roleSel.value):null;
     if(r&&fill){ const cur=readFormRights(host); applyFormRights(host,{...rightsWithRole(cur,r), defaultView:r.defaultView||cur.defaultView}); }
     host.querySelectorAll(lockSel).forEach(el=>el.disabled=!!r);
-    host.querySelector('.uf-access')?.classList.toggle('role-locked',!!r);
-    const n=host.querySelector('#ufRoleNote'); if(n) n.innerHTML=r?`Rights come from the role <b>${escapeHtml(r.name)}</b> — the switches below show them and are locked. ${Server.isSuperAdmin()?'Change the role’s rights under Users → <b>Roles</b>, or pick “No role” to set them by hand.':'Only the super admin can change roles.'} The sections they see inside each page come from the role too.`:''; };
+    host.querySelector('.uf-access')?.classList.toggle('role-locked',!!r); host.querySelector('.uf-body')?.classList.toggle('uf-has-role',!!r);
+    const n=host.querySelector('#ufRoleNote'); if(n) n.innerHTML=r?`Pages, rights, sections and home page all come from the role <b>${escapeHtml(r.name)}</b>. ${Server.isSuperAdmin()?'Change them under Users → <b>Roles</b>, or pick “No role” to set them by hand here.':'Only the super admin can change roles.'}`:''; };
   roleSel?.addEventListener('change',()=>applyRoleUi(true)); applyRoleUi(false);
   host.querySelector('#ufCancel').onclick=closeForm;
   host.querySelector('#ufSave').onclick=async ()=>{
@@ -13222,7 +13250,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.92.1';   // shown only in the browser tab title
+const APP_VERSION = '4.92.3';   // shown only in the browser tab title
 // Everyone gets the latest look: the page checks the published file for a newer version — right after it opens
 // (switches straight over) and every few minutes / when the tab comes back (offers an Update button).
 const AppUpdate=(()=>{
