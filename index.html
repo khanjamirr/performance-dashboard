@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.80.1</title>
+<title>Performance Dashboard · v4.81.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2182,7 +2182,7 @@ b.g{color:#15803d}b.a{color:#4d7c0f}b.w{color:#c2410c}b.r{color:#c8102e}
 </style>
 <style>
 /* frozen Overview tabs */
-#ovModeBar:not(.hidden){position:sticky;top:var(--ovx-top,0px);z-index:58}
+#ovModeBar:not(.hidden){position:sticky;top:var(--ovx-top,0px);z-index:61;display:block!important;padding:16px 36px 10px;background:var(--bg,#f2f5f6);margin:0!important}
 #ovModeBar:not(.hidden)::before{content:'';position:absolute;z-index:-1;top:0;bottom:0;left:calc(-1 * var(--bl,0px));right:calc(-1 * var(--br,0px));background:transparent;transition:background .25s,box-shadow .25s}
 #ovModeBar.stuck::before{background:rgba(244,247,251,.95);-webkit-backdrop-filter:saturate(1.6) blur(12px);backdrop-filter:saturate(1.6) blur(12px);box-shadow:0 10px 20px -14px #0a1f4455,inset 0 -1px 0 #dfe5ee}
 #ovModeBar.stuck .ovx-tabs{border-bottom-color:transparent}
@@ -2243,7 +2243,7 @@ b.g{color:#15803d}b.a{color:#4d7c0f}b.w{color:#c2410c}b.r{color:#c8102e}
 #ovModeBar .ovx-ink::after{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg,#ffffff2e,transparent 55%);pointer-events:none}
 /* frozen: glass dock, no full-width strip */
 #ovModeBar.stuck::before{display:none}
-#ovModeBar.stuck{padding-top:6px}
+#ovModeBar.stuck{padding-top:8px;padding-bottom:6px;box-shadow:0 1px 0 #dfe5ee}
 #ovModeBar.stuck .ovx-tabs{padding:4px;border-radius:16px;background:rgba(255,255,255,.78);-webkit-backdrop-filter:saturate(1.8) blur(14px);backdrop-filter:saturate(1.8) blur(14px);border-color:#ffffffb3;box-shadow:0 12px 32px -12px #0a1f4459,0 2px 6px #0a1f4414,inset 0 0 0 1px #0a1f440d}
 #ovModeBar.stuck .ovx-tabs a{padding:6px 14px 6px 7px}
 #ovModeBar.stuck .ovx-ink{top:4px;bottom:4px}
@@ -2251,6 +2251,26 @@ b.g{color:#15803d}b.a{color:#4d7c0f}b.w{color:#c2410c}b.r{color:#c8102e}
 #ovModeBar.stuck .ovx-t b{font-size:13.5px}
 @media(max-width:700px){#ovModeBar .ovx-tabs{display:flex;width:100%;overflow:visible}#ovModeBar .ovx-tabs a{flex:1 1 0;min-width:0;flex-direction:column;justify-content:center;gap:4px;padding:7px 4px}#ovModeBar .ovx-ico{width:26px;height:26px;border-radius:8px}#ovModeBar .ovx-t{align-items:center}#ovModeBar .ovx-t b{font-size:12.5px}
  #ovModeBar.stuck .ovx-ico{display:none!important}#ovModeBar.stuck .ovx-tabs a{padding:8px 4px}}
+</style>
+<style>
+#ovModeBar .ovx-row{display:flex;align-items:center;justify-content:space-between;gap:12px 18px;flex-wrap:wrap}
+.ovx-date{display:inline-flex;align-items:stretch;border:1px solid #e3e8f0;border-radius:16px;background:linear-gradient(180deg,#fff,#f7f9fc);box-shadow:0 1px 2px #0a1f440d,0 8px 24px -16px #0a1f4433;padding:4px;gap:2px}
+.ovx-dstep{border:0;background:transparent;width:30px;border-radius:11px;font-size:20px;line-height:1;color:#475569;cursor:pointer}
+.ovx-dstep:hover:not(:disabled){background:#eef2f7;color:#0a1f44}.ovx-dstep:disabled{opacity:.3;cursor:default}
+.ovx-dbtn{display:inline-flex;align-items:center;gap:10px;border:0;background:transparent;padding:6px 12px 6px 8px;border-radius:12px;cursor:pointer;font:inherit;color:#0a1f44;text-align:left}
+.ovx-dbtn:hover{background:#f1f4f9}
+.ovx-dbtn svg{width:32px;height:32px;padding:7px;border-radius:10px;background:linear-gradient(135deg,#0a1f44,#1d4ed8);color:#fff;box-shadow:0 6px 14px -6px #1d4ed899}
+.ovx-dbtn span{display:flex;flex-direction:column;line-height:1.2}.ovx-dbtn small{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#94a3b8}.ovx-dbtn b{font-size:13.5px;font-weight:700;white-space:nowrap}
+#ovModeBar.stuck .ovx-date{padding:3px}#ovModeBar.stuck .ovx-dbtn{padding:3px 10px 3px 5px}#ovModeBar.stuck .ovx-dbtn svg{width:26px;height:26px;padding:5px;border-radius:8px}#ovModeBar.stuck .ovx-dbtn small{display:none}
+body.ov-bar .topbar{border-top:0}
+@media(max-width:1100px){#ovModeBar:not(.hidden){padding-left:24px;padding-right:24px}}
+@media(max-width:700px){#ovModeBar:not(.hidden){padding:10px 12px 8px}.ovx-date{width:100%}.ovx-dbtn{flex:1;justify-content:center}#ovModeBar.stuck .ovx-date{display:none}}
+</style>
+<style>
+#ovModeBar.stuck:not(.hidden){padding:8px 36px 8px}
+#ovModeBar.stuck .ovx-tabs a{padding:6px 14px 6px 7px!important;flex:0 0 auto}
+@media(max-width:1100px){#ovModeBar.stuck:not(.hidden){padding-left:24px;padding-right:24px}}
+@media(max-width:700px){#ovModeBar.stuck:not(.hidden){padding:6px 12px}#ovModeBar.stuck .ovx-tabs{width:100%!important}#ovModeBar.stuck .ovx-tabs a{flex:1 1 0;padding:7px 4px!important}}
 </style>
 </head>
 <body class="locked">
@@ -2299,6 +2319,7 @@ b.g{color:#15803d}b.a{color:#4d7c0f}b.w{color:#c2410c}b.r{color:#c8102e}
   </header>
 
   <main class="main">
+    <div id="ovModeBar" class="hidden"></div>
     <div class="topbar">
       <div>
         <button type="button" class="top-back hidden" id="topBack"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg><span></span></button>
@@ -2362,7 +2383,6 @@ b.g{color:#15803d}b.a{color:#4d7c0f}b.w{color:#c2410c}b.r{color:#c8102e}
 
       <div id="dashboardViews" class="hidden">
       <div id="view-performance" class="hidden">
-        <div id="ovModeBar" class="hidden"></div>
         <div id="view-ovx" class="hidden"></div>
         <div id="view-weekly"></div>
         <div id="view-monthly" class="hidden"></div>
@@ -4757,7 +4777,8 @@ async function refreshUI(){
     document.getElementById('view-'+v).classList.toggle('hidden', v!==currentView);
   });
 
-  document.getElementById('topbarCenter').classList.toggle('hidden', !showDashboardViews || (()=>{ try{ return currentView==='performance'&&OverviewX.active(); }catch(e){ return false; } })() || ['teams','leads','candidates','alerts','highlights','pivot','history','divreport','onboarding','orderentry'].includes(currentView));
+  if(currentView!=='performance'){ document.getElementById('ovModeBar')?.classList.add('hidden'); document.body.classList.remove('ov-bar'); const tb=document.querySelector('.topbar'); if(tb) tb.style.removeProperty('top'); }
+  document.getElementById('topbarCenter').classList.toggle('hidden', !showDashboardViews || (()=>{ try{ return currentView==='performance'&&(OverviewX.active()||OverviewX.barOn()); }catch(e){ return false; } })() || ['teams','leads','candidates','alerts','highlights','pivot','history','divreport','onboarding','orderentry'].includes(currentView));
 
   if(currentView!=='recruiters' && currentView!=='branches' && currentView!=='master' && currentView!=='candidates' && currentView!=='alerts' && currentView!=='highlights' && currentView!=='pivot'){
     const extra = document.getElementById('topbarExtra');
@@ -5021,6 +5042,7 @@ function showOverviewX(){
   OverviewX.render();
 }
 function renderPerformanceView(){
+  try{ OverviewX.syncFromRecruiting(); }catch(e){}
   OverviewX.bar(); document.getElementById('view-ovx').classList.add('hidden');
   renderPeriodPickerButton();
   const meta = PERFORMANCE_TYPE_META[performancePeriodType];
@@ -5308,16 +5330,14 @@ function scopeWeekToDivision(week, division){
 let weeklyRenderRevision=0;
 /* ---- Overview tabs stay frozen under the page heading while scrolling ---- */
 function ovxStickyUpdate(){
-  const bar=document.getElementById('ovModeBar'); if(!bar||bar.classList.contains('hidden')||!bar.offsetParent) return;
-  const tb=document.querySelector('.topbar'), side=document.querySelector('.sidebar');
-  let top=0;
-  if(tb&&getComputedStyle(tb).position==='sticky') top=Math.max(0,tb.getBoundingClientRect().bottom);
-  else if(side&&['sticky','fixed'].includes(getComputedStyle(side).position)) top=Math.max(0,side.getBoundingClientRect().bottom);
-  bar.style.setProperty('--ovx-top',Math.round(top)+'px');
-  // the frosted strip reaches the edges of the page column
-  const main=document.querySelector('.main'), r=bar.getBoundingClientRect(), mr=main?main.getBoundingClientRect():{left:0,right:innerWidth};
-  bar.style.setProperty('--bl',Math.max(0,Math.round(r.left-mr.left))+'px'); bar.style.setProperty('--br',Math.max(0,Math.round(mr.right-r.right))+'px');
-  const was=bar.classList.contains('stuck'), now=r.top<=top+1 && scrollY>4;
+  const bar=document.getElementById('ovModeBar'), tb=document.querySelector('.topbar'); if(!bar) return;
+  if(bar.classList.contains('hidden')||!bar.offsetParent){ if(tb) tb.style.removeProperty('top'); return; }
+  const side=document.querySelector('.sidebar'), sideCs=side&&getComputedStyle(side);
+  // on a phone the menu bar sits across the top; on a computer the menu is on the left
+  const top=side&&['sticky','fixed'].includes(sideCs.position)&&side.getBoundingClientRect().width>=innerWidth-2?Math.max(0,Math.round(side.getBoundingClientRect().bottom)):0;
+  bar.style.setProperty('--ovx-top',top+'px');
+  if(tb){ if(getComputedStyle(tb).position==='sticky') tb.style.setProperty('top',(top+bar.offsetHeight)+'px','important'); else tb.style.removeProperty('top'); }
+  const was=bar.classList.contains('stuck'), now=scrollY>4;
   if(was!==now){ bar.classList.toggle('stuck', now);
     // tabs change size when frozen — move the underline with them
     setTimeout(()=>{ const a=bar.querySelector('[data-ovx].on'), i=bar.querySelector('.ovx-ink'); if(a&&i){ i.style.width=a.offsetWidth+'px'; i.style.transform=`translateX(${a.offsetLeft}px)`; } },270); }
@@ -12548,7 +12568,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.80.1';   // shown only in the browser tab title
+const APP_VERSION = '4.81.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -13595,7 +13615,7 @@ const Onboarding=(()=>{
  }
  function filters(adm, onbs, withCat){
   return `<div class="onb-tools">
-    <div class="onb-range"><div class="dpr-field"><span>Dates</span>${dateRangeBtn('onbFrom','onbTo',st.from,st.to)}</div></div>
+    ${st.embed&&st.page==='report'?'':`<div class="onb-range"><div class="dpr-field"><span>Dates</span>${dateRangeBtn('onbFrom','onbTo',st.from,st.to)}</div></div>`}
     ${adm?`<label class="cand-field"><span>Onboarder</span><select id="onbFOnb"><option value="">Everyone</option>${onbs.map(o=>`<option ${st.fOnb===o?'selected':''}>${escapeHtml(o)}</option>`).join('')}</select></label>`:''}
     <label class="cand-field"><span>Call type</span><select id="onbFType"><option value="">All</option>${callTypes().map(c=>`<option ${st.fType===c?'selected':''}>${escapeHtml(c)}</option>`).join('')}</select></label>
     ${withCat?`<label class="cand-field"><span>Latest status</span><select id="onbFCat"><option value="">All</option><option value="pending" ${st.fCat==='pending'?'selected':''}>Pending (not complete yet)</option>${VIEW_CATS.map(([k,l])=>`<option value="${k}" ${st.fCat===k?'selected':''}>${l}</option>`).join('')}</select></label>
@@ -14016,9 +14036,10 @@ const Onboarding=(()=>{
   render();
  }
  // Overview → Onboarding shows this page's report (same filters, tiles and tables)
- async function showReport(el){
+ async function showReport(el, from, to){
   st.embed=el; st.page='report';
-  if(st.rows==null){ el.innerHTML='<div class="panel"><p class="hint" style="margin:0">Loading onboarding calls…</p></div>'; await load(); }
+  const moved=from&&to&&(st.from!==from||st.to!==to); if(moved){ st.from=from; st.to=to; }
+  if(st.rows==null||moved){ if(st.rows==null) el.innerHTML='<div class="panel"><p class="hint" style="margin:0">Loading onboarding calls…</p></div>'; await load(); }
   if(st.embed!==el||!el.isConnected) return;
   render();
  }
@@ -14237,8 +14258,8 @@ const OrderEntry=(()=>{
     </tbody></table></div></section>`;
   return `<div class="onb-tools oe-tools">
     <div class="oe-group" role="tablist" aria-label="Group by">${Object.entries(GROUPS).map(([k,g])=>`<button type="button" data-oe-group="${k}" class="${st.group===k?'on':''}" aria-pressed="${st.group===k}">${g.label}</button>`).join('')}</div>
-    <div class="onb-range"><div class="dpr-field"><span>Dates</span>${dateRangeBtn('oeFrom','oeTo',st.from,st.to)}</div></div>
-    ${st.custom?'<button type="button" class="link-btn" id="oeDefRange" title="Back to the usual dates for this view">Default dates</button>':''}
+    ${st.embed?'':`<div class="onb-range"><div class="dpr-field"><span>Dates</span>${dateRangeBtn('oeFrom','oeTo',st.from,st.to)}</div></div>
+    ${st.custom?'<button type="button" class="link-btn" id="oeDefRange" title="Back to the usual dates for this view">Default dates</button>':''}`}
     <label class="cand-field"><span>Agent</span><select id="oeAgent"><option value="">Everyone</option>${names.map(n=>`<option ${st.agent===n?'selected':''}>${escapeHtml(n)}</option>`).join('')}</select></label>
    </div>
    ${hero}
@@ -14306,7 +14327,7 @@ const OrderEntry=(()=>{
    st.busy=false; render();
   });
   // report
-  host.querySelectorAll('[data-oe-group]').forEach(b=>b.onclick=async()=>{ st.group=b.dataset.oeGroup; st.custom=false; await ensure(); render(); });
+  host.querySelectorAll('[data-oe-group]').forEach(b=>b.onclick=async()=>{ st.group=b.dataset.oeGroup; if(!st.embed) st.custom=false; await ensure(); render(); });
   $('#oeShowPer')?.addEventListener('click',()=>{ st.showPer=!st.showPer; render(); });
   host.querySelectorAll('[data-oe-view]').forEach(b=>b.onclick=()=>{ st.view=b.dataset.oeView; render(); });
   const rng=async()=>{ const a=$('#oeFrom').value, b=$('#oeTo').value; if(!a||!b) return; st.from=a; st.to=b; st.custom=true; await ensure(); render(); };
@@ -14577,8 +14598,10 @@ const OrderEntry=(()=>{
   render();
  }
  // Overview → Order Entry shows this page's report
- async function showReport(el){
+ async function showReport(el, from, to){
   st.embed=el; st.page='report';
+  if(from&&to&&(st.from!==from||st.to!==to||!st.custom)){ const n=Math.round((parse(to)-parse(from))/864e5)+1;
+    st.from=from; st.to=to; st.custom=true; st.group=n<=45?'day':n<=140?'week':n<=400?'month':'quarter'; }
   if(st.rows==null){ el.innerHTML='<div class="panel"><p class="hint" style="margin:0">Loading order entry numbers…</p></div>'; }
   await ensure();
   if(st.embed!==el||!el.isConnected) return;
@@ -14600,7 +14623,27 @@ const OverviewX=(()=>{
  const weekEnd=s=>{ const d=parse(s); d.setDate(d.getDate()+(6-d.getDay())); return iso(d); };
  const short=s=>parse(s).toLocaleDateString(undefined,{month:'short',day:'numeric'});
  const span=(a,b)=>short(a)+' – '+short(b)+', '+b.slice(0,4);
- const st={mode:null, quick:'picker', cFrom:null, cTo:null, cache:new Map(), charts:[]};
+ const st={mode:null, quick:'picker', cFrom:null, cTo:null, cache:new Map(), charts:[], range:null};
+ // ---- one date range for Recruiting, Onboarding and Order Entry ----
+ const wkStart=s=>add(weekEnd(s),-6);
+ function recruitingSpan(){ const ws=(selectedWeekEndDates.length?selectedWeekEndDates.slice():currentWeekEndDate==='all-weeks'?weeksData.map(w=>w.weekEndDate):currentWeekEndDate?[currentWeekEndDate]:[]).sort();
+   if(!ws.length){ const t=ltToday(); return {from:wkStart(t), to:t}; } const t=ltToday(), to=ws[ws.length-1]; return {from:add(ws[0],-6), to:to>t?t:to}; }
+ const recSig=()=>(selectedWeekEndDates.length?selectedWeekEndDates.slice().sort():[currentWeekEndDate||'']).join();
+ // apply the shared dates to Recruiting (its uploaded weeks that overlap); remember what we set
+ function applyRecruiting(a,b){ const ws=weeksIn(a,b); if(ws.length){ selectedWeekEndDates=ws.length>1?ws:[]; currentWeekEndDate=ws[ws.length-1]; } st.recSig=recSig(); }
+ // default: the week running now (Sunday → today)
+ function range(){ if(!st.range){ const t=ltToday(); st.range={from:wkStart(t), to:t}; applyRecruiting(st.range.from, st.range.to); } return st.range; }
+ // the uploaded weeks that overlap a date range
+ const weeksIn=(a,b)=>weeksData.map(w=>w.weekEndDate).filter(we=>add(we,-6)<=b&&we>=a).sort();
+ function setRange(a,b){ if(!a) return; b=b||a; if(b<a) [a,b]=[b,a]; const t=ltToday(); if(b>t) b=t; if(a>b) a=b;
+   st.range={from:a,to:b}; applyRecruiting(a,b);
+   refreshUI(); }
+ // Recruiting changed its own weeks (e.g. a row clicked) — follow it
+ function syncFromRecruiting(){ range(); if(recSig()!==st.recSig){ st.range=recruitingSpan(); st.recSig=recSig(); } }
+ function stepRange(dir){ const r=range(), n=Math.round((parse(r.to)-parse(r.from))/864e5)+1, t=ltToday();
+   let a=add(r.from,dir*n), b=add(r.to,dir*n); if(a>t) return; if(b>t) b=t; setRange(a,b); }
+ function dateCtl(){ const r=range(), t=ltToday();
+   return `<div class="ovx-date" role="group" aria-label="Dates for every section"><button type="button" class="ovx-dstep" data-ovd="-1" aria-label="Earlier" title="Earlier">‹</button><button type="button" class="ovx-dbtn" id="ovxDateBtn" title="One date range for Recruiting, Onboarding and Order Entry"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span><small>Dates</small><b>${escapeHtml(dateRangeLabel(r.from,r.to))}</b></span></button><button type="button" class="ovx-dstep" data-ovd="1" aria-label="Later" title="Later" ${r.to>=t?'disabled':''}>›</button></div>`; }
  const dayLabel=s=>parse(s).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'});
  const modes=()=>[['recruiting','Recruiting'], ...(canOnb()?[['onboarding','Onboarding']]:[]), ...(canOe()?[['orderentry','Order Entry']]:[])];
  // who sees the extra tabs: admins; users given the Overview right for that tab (Settings → Users → Overview);
@@ -14640,13 +14683,14 @@ const OverviewX=(()=>{
  const card=(l,v,sub,d,cls)=>`<div class="ovx-card ${cls||''}"><span>${l}</span><strong>${v}</strong>${sub?`<small>${sub}</small>`:''}${d||''}</div>`;
  function bar(){
   const host=document.getElementById('ovModeBar'); if(!host) return;
-  const ms=modes(); if(ms.length<2){ host.innerHTML=''; host.classList.add('hidden'); return; }
+  const ms=modes(); if(ms.length<2){ host.innerHTML=''; host.classList.add('hidden'); document.body.classList.remove('ov-bar'); return; }
   host.classList.remove('hidden'); const m=mode();
   const OVX_ICO={recruiting:'<circle cx="9" cy="8" r="3.2"/><path d="M3 19.5c.7-3.3 3.1-5.2 6-5.2s5.3 1.9 6 5.2"/><path d="M16 4.8a3 3 0 0 1 0 6.2M18.2 14.6c1.6.6 2.6 2.2 3 4.9"/>',
    onboarding:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/>',
    orderentry:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/>'};
   const OVX_SUB={recruiting:'Schedules, shows & hires', onboarding:'Calls & completions', orderentry:'RC & CRM orders'};
-  host.innerHTML=`<nav class="ovx-tabs" role="tablist" aria-label="Overview">${ms.map(([k,l])=>`<a href="#" role="tab" data-ovx="${k}" class="ovx-${k} ${m===k?'on':''}" aria-selected="${m===k}"><span class="ovx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${OVX_ICO[k]||''}</svg></span><span class="ovx-t"><b>${l}</b><small>${OVX_SUB[k]||''}</small></span></a>`).join('')}<i class="ovx-ink ink-${m}" aria-hidden="true"></i></nav>
+  document.body.classList.add('ov-bar');
+  host.innerHTML=`<div class="ovx-row"><nav class="ovx-tabs" role="tablist" aria-label="Overview">${ms.map(([k,l])=>`<a href="#" role="tab" data-ovx="${k}" class="ovx-${k} ${m===k?'on':''}" aria-selected="${m===k}"><span class="ovx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${OVX_ICO[k]||''}</svg></span><span class="ovx-t"><b>${l}</b><small>${OVX_SUB[k]||''}</small></span></a>`).join('')}<i class="ovx-ink ink-${m}" aria-hidden="true"></i></nav>${dateCtl()}</div>
    ${true?'':`<div class="ovx-quick" role="group" aria-label="Weeks">${[['today','Today'],['yesterday','Yesterday'],['week','This week'],['lastweek','Last week'],['w4','Last 4 weeks'],['w13','Last 13 weeks']].map(([k,l])=>`<button type="button" data-ovq="${k}" class="${st.quick===k?'on':''}" title="${k==='picker'?'Use the weeks chosen in the Period picker at the top':''}">${l}</button>`).join('')}<button type="button" class="ovx-refresh" data-ovr title="Get the latest numbers">↻</button></div>`}`;
   // the underline slides to the picked tab, then the page switches
   const nav=host.querySelector('.ovx-tabs'), ink=host.querySelector('.ovx-ink');
@@ -14658,6 +14702,9 @@ const OverviewX=(()=>{
     host.querySelectorAll('[data-ovx]').forEach(x=>{ x.classList.toggle('on',x===b); x.setAttribute('aria-selected',String(x===b)); }); if(ink) ink.className='ovx-ink ink-'+b.dataset.ovx; place(b,true);
     st.mode=b.dataset.ovx; try{ localStorage.setItem(LS,st.mode); }catch(e){} setTimeout(refreshUI,180); });
   host.querySelectorAll('[data-ovq]').forEach(b=>b.onclick=()=>{ st.quick=b.dataset.ovq; refreshUI(); });
+  host.querySelector('#ovxDateBtn')?.addEventListener('click',e=>{ const r=range(), t=ltToday();
+    DatePick.open(e.currentTarget,{mode:'range', from:r.from, to:r.to, max:t, title:'Dates for Recruiting, Onboarding and Order Entry', onPick:([a,b])=>setRange(a,b)}); });
+  host.querySelectorAll('[data-ovd]').forEach(b=>b.onclick=()=>stepRange(+b.dataset.ovd));
   host.querySelector('[data-ovr]')?.addEventListener('click',()=>{ st.cache.clear(); refreshUI(); });
 
  }
@@ -14675,7 +14722,8 @@ const OverviewX=(()=>{
   const m=mode();
   document.getElementById('viewTitle').textContent=m==='onboarding'?'Onboarding Report':'Order Entry Report';
   document.getElementById('viewSub').textContent=m==='onboarding'?'Candidates reached, finalized, onboarding complete and follow-ups — pick the dates below':'Recruitment Cloud and CRM orders — daily, weekly, monthly and quarterly';
-  try{ if(m==='onboarding') await Onboarding.showReport(host); else await OrderEntry.showReport(host); }
+  const r=range();
+  try{ if(m==='onboarding') await Onboarding.showReport(host, r.from, r.to); else await OrderEntry.showReport(host, r.from, r.to); }
   catch(e){ host.innerHTML=`<div class="onb-demo bad">Could not load: ${escapeHtml(cleanErr(e))}</div>`; }
  }
  // ---------- onboarding ----------
@@ -14753,7 +14801,7 @@ const OverviewX=(()=>{
     scales:{x:{stacked:true, grid:{display:false}}, y:{stacked:true, beginAtZero:true, ticks:{precision:0}}}}});
   if(ch) st.charts.push(ch);
  }
- return {bar, render, mode, active:()=>mode()!=='recruiting', has:k=>modes().some(([x])=>x===k), setMode:k=>{ st.mode=k; }, pickerLabel, openPicker, step, canStep};
+ return {bar, render, mode, active:()=>mode()!=='recruiting', has:k=>modes().some(([x])=>x===k), setMode:k=>{ st.mode=k; }, pickerLabel, openPicker, step, canStep, barOn:()=>modes().length>1, syncFromRecruiting};
 })();
 function renderDivReportView(){ DivReport.show(); }
 
