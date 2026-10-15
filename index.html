@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.85.1</title>
+<title>Performance Dashboard · v4.85.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2480,6 +2480,11 @@ html body .toast,html body #toast{border-radius:14px!important;background:rgba(3
  html body .nav button.active{color:var(--ios-blue)!important;background:transparent!important;box-shadow:none!important}
  html body .nav button.active .nav-ico{color:var(--ios-blue)!important}
 }
+</style>
+<style>
+.ld-st{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+.ld-st.ok{background:#e3f8e9;color:#15803d}.ld-st.no{background:#fff1e0;color:#b45309}.ld-st.wait{background:rgba(118,118,128,.12);color:#6e6e73}
+.ld-brk-table td b{font-weight:600}
 </style>
 </head>
 <body class="locked">
@@ -12545,11 +12550,15 @@ function ltLeadsBreakHtml(p,cutoff,mode,today,division){
    return {tm, lists, n:checks.length}; }).filter(Boolean).sort((a,b)=>b.lists.eligible.length/b.n-a.lists.eligible.length/a.n);
  if(!teams.length) return '';
  const E=teams.reduce((a,t)=>a+t.lists.eligible.length,0), N=teams.reduce((a,t)=>a+t.lists.notyet.length,0), U=teams.reduce((a,t)=>a+t.lists.unknown.length,0);
- const person=(x,ok)=>`<li><span><b>${escapeHtml(x.name)}</b>${x.branch?`<small>${escapeHtml(x.branch)}</small>`:''}</span><span class="${ok?'ok':'no'}">${tgNumber(x.cum)} / ${tgNumber(x.required)}<small>${ok?(x.cum>x.required?tgNumber(x.cum-x.required)+' above':'on target'):tgNumber(Math.max(0,x.required-x.cum))+' more needed'}</small></span></li>`;
- return `<section class="panel ta ld-break" data-section="team.goals"><div class="lt-section-head"><h3>☕ Third break · ${fmtDate(checkDay)}</h3><span class="hint">Eligible when schedules so far this week reach a fifth of the weekly goal per working day (goal 50: Mon 10 · Tue 20 · Wed 30 · Thu 40 · Fri 50) · ${E} eligible · ${N} not yet${U?' · '+U+' awaiting data':''}</span><button type="button" class="btn btn-secondary btn-sm" id="ldBrkAll" style="margin-left:auto">${ltLeadsBreak.__open?'Collapse all':'Expand all'}</button></div>
-  <div class="ld-brk-grid">${teams.map(t=>{ const e=t.lists.eligible.length, ny=t.lists.notyet.length, pc=Math.round(e/t.n*100);
-   return `<details class="ld-brk" ${ltLeadsBreak.__open?'open':''}><summary><span class="ld-brk-name"><b>${escapeHtml(t.tm.lead)}</b><small>${escapeHtml(t.tm.a.team_name||'')}</small></span><span class="ld-brk-bar" title="${e} of ${t.n} eligible"><i style="width:${pc}%"></i></span><span class="pill good">${e} eligible</span><span class="pill warn">${ny} not yet</span><button type="button" class="btn btn-secondary btn-sm" data-ld-brk-img="${escapeHtml(t.tm.id)}" title="Copy this team’s third-break list as an image">🖼 Copy</button></summary>
-    <div class="ld-brk-lists"><div><h5>✓ Eligible · ${e}</h5><ul>${t.lists.eligible.map(x=>person(x,true)).join('')||'<li class="hint">Nobody yet.</li>'}</ul></div><div><h5>⏳ Not yet · ${ny}</h5><ul>${t.lists.notyet.map(x=>person(x,false)).join('')||'<li class="hint">Everyone is eligible. 🎉</li>'}</ul></div></div></details>`; }).join('')}</div></section>`;
+ // one table: every recruiter with their team lead, sorted by team lead, eligible first
+ const rows=teams.flatMap(t=>[...t.lists.eligible.map(x=>({x,st:'yes'})),...t.lists.notyet.map(x=>({x,st:'no'})),...t.lists.unknown.map(x=>({x,st:'wait'}))].map(r=>({...r,lead:t.tm.lead})))
+   .sort((a,b)=>a.lead.localeCompare(b.lead)||({yes:0,no:1,wait:2}[a.st]-{yes:0,no:1,wait:2}[b.st])||String(a.x.name).localeCompare(String(b.x.name)));
+ const stCell=r=>r.st==='yes'?`<span class="ld-st ok">✓ Eligible</span>`:r.st==='no'?`<span class="ld-st no">${tgNumber(Math.max(0,r.x.required-r.x.cum))} more needed</span>`:'<span class="ld-st wait">No data yet</span>';
+ return `<section class="panel ta ld-break" data-section="team.goals"><div class="panel-head"><div><h3>☕ Third break · ${fmtDate(checkDay)}</h3><span class="hint">Eligible when schedules so far this week reach a fifth of the weekly goal per working day (goal 50: Mon 10 · Tue 20 · Wed 30 · Thu 40 · Fri 50).</span></div>
+  <div class="mr-head-tools"><div class="oe-group" role="tablist" aria-label="Show">${[['all','All · '+rows.length],['yes','Eligible · '+E],['no','Not yet · '+N]].map(([k,l])=>`<button type="button" data-ldf="${k}" class="${k==='all'?'on':''}">${l}</button>`).join('')}</div>${copyBtnHtml('ldBrkTable')}</div></div>
+  <div class="onb-scroll"><table class="users-table onb-table ld-brk-table" id="ldBrkTable"><thead><tr><th>Recruiter</th><th>Team lead</th><th class="num">Schedules this week</th><th class="num">Needed by ${escapeHtml(new Date(checkDay+'T12:00:00Z').toLocaleDateString('en-US',{weekday:'short',timeZone:'UTC'}))}</th><th>Third break</th></tr></thead><tbody>
+  ${rows.map(r=>`<tr data-st="${r.st}"><td><b>${escapeHtml(r.x.name)}</b></td><td>${escapeHtml(r.lead)}</td><td class="num">${r.st==='wait'?'–':tgNumber(r.x.cum)}</td><td class="num">${r.st==='wait'?'–':tgNumber(r.x.required)}</td><td>${stCell(r)}</td></tr>`).join('')}
+  </tbody></table></div></section>`;
 }
 function ltLeadsHtmlBuild(p,cutoff,mode,today,division){
  if(!canViewLeads()) return '';
@@ -12642,6 +12651,7 @@ function renderLeadsView(){
  host.querySelector('#ltLeadsRefresh')?.addEventListener('click',()=>{ltLoadLeads(true);});
  host.querySelector('#ltBasisSw')?.addEventListener('click',e=>{ if(e.currentTarget.disabled) return; leadsState.basis=leadsState.basis==='today'?'week':'today'; renderLeadsView(); });
  host.querySelectorAll('[data-ld-brk-img]').forEach(b=>b.onclick=e=>{ e.preventDefault(); e.stopPropagation(); const x=ltLeadsBreak[b.dataset.ldBrkImg]; if(x) ltCopyBreakImage(x.lists,{team:x.team, dayLabel:x.lists.dayLabel, day:x.lists.day}); });
+ host.querySelectorAll('[data-ldf]').forEach(b=>b.onclick=()=>{ const k=b.dataset.ldf; host.querySelectorAll('[data-ldf]').forEach(x=>x.classList.toggle('on',x===b)); host.querySelectorAll('#ldBrkTable tbody tr').forEach(tr=>tr.hidden=k!=='all'&&tr.dataset.st!==k); });
  host.querySelector('#ldBrkAll')?.addEventListener('click',()=>{ ltLeadsBreak.__open=!ltLeadsBreak.__open; host.querySelectorAll('details.ld-brk').forEach(d=>d.open=ltLeadsBreak.__open); host.querySelector('#ldBrkAll').textContent=ltLeadsBreak.__open?'Collapse all':'Expand all'; });
  host.querySelectorAll('[data-lt-lead]').forEach(b=>b.onclick=()=>{
   Object.assign(ltState,{owner:String(Server.user.id),viewingId:b.dataset.ltLead,assignment:null,loaded:false,loading:false,error:'',division:leadsState.division,rangeMode:leadsState.mode,anchor:leadsState.anchor,from:leadsState.from,to:leadsState.to});ltState.requestSeq++;
@@ -12782,7 +12792,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.85.1';   // shown only in the browser tab title
+const APP_VERSION = '4.85.2';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
