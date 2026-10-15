@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.82.0</title>
+<title>Performance Dashboard · v4.82.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -12623,7 +12623,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.82.0';   // shown only in the browser tab title
+const APP_VERSION = '4.82.1';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -14769,7 +14769,6 @@ const OverviewX=(()=>{
   host.querySelector('#ovxDateBtn')?.addEventListener('click',e=>{ const r=range(), t=ltToday();
     DatePick.open(e.currentTarget,{mode:'range', from:r.from, to:r.to, max:t, title:'Dates for Recruiting, Onboarding and Order Entry', onPick:([a,b])=>setRange(a,b)}); });
   host.querySelectorAll('[data-ovd]').forEach(b=>b.onclick=()=>stepRange(+b.dataset.ovd));
-  fillStats(host);
   host.querySelector('[data-ovr]')?.addEventListener('click',()=>{ st.cache.clear(); refreshUI(); });
 
  }
