@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.95.2</title>
+<title>Performance Dashboard · v4.96.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- fonts load without holding up the page (the system font shows for a moment) -->
@@ -2655,6 +2655,26 @@ html body .toast,html body #toast{border-radius:14px!important;background:rgba(3
 </style>
 <style id="ios-settings">
 #myAccountBtn,#accessModeBtn{display:none!important}
+.ms-modal{max-width:880px;width:calc(100vw - 32px)}
+.ms-top{display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:12px;margin-bottom:14px;align-items:end}
+.ms-top label,.ms-week>span{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:#6e6e73}
+.ms-top input{height:38px;padding:0 12px;border:0;border-radius:10px;background:rgba(118,118,128,.12);font:inherit;font-size:14px;color:#1c1c1e}
+.ms-week>div{display:flex;align-items:center;gap:8px;height:38px}.ms-week b{font-size:14px;color:#1c1c1e;white-space:nowrap}
+.ms-table th,.ms-table td{text-align:center;padding:6px!important}.ms-table tbody th{text-align:left;white-space:nowrap;font-weight:600;color:#1c1c1e}
+.ms-table thead th small{display:block;font-weight:500;color:#8e8e93}.ms-table th.ms-today{color:#007aff}
+.ms-table input{width:64px;height:36px;text-align:center;border:0;border-radius:9px;background:rgba(118,118,128,.1);font:inherit;font-size:15px;font-weight:600;color:#1c1c1e}
+.ms-table input:focus{outline:2px solid rgba(0,122,255,.5);background:#fff}.ms-table input:disabled{opacity:.35}
+.ms-table input::-webkit-outer-spin-button,.ms-table input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}.ms-table input{-moz-appearance:textfield}
+.ms-tot{font-weight:700;color:#0a3d91;min-width:56px;vertical-align:middle!important;font-size:15px}.ms-table td,.ms-table th{vertical-align:middle!important}.ms-table input::placeholder{color:#c7c7cc;font-weight:500}.ms-tools .hint{font-size:12px!important}
+.ms-tools{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:10px}.ms-tools .hint{margin-left:auto}
+@media (max-width:700px){.ms-top{grid-template-columns:1fr}}
+.rtl-attc{position:relative}
+.rtl-attc .rtl-ab{position:absolute;top:50%;right:4px;transform:translateY(-50%);width:22px;height:22px;border:0;border-radius:7px;background:#1c1c1e;color:#fff;font:700 11px/22px inherit;cursor:pointer;opacity:0;transition:opacity .12s;padding:0}
+.rtl-attc:hover .rtl-ab,.rtl-attc .rtl-ab:focus-visible{opacity:.9}
+.rtl-attc.abs .rtl-ab{background:#fff;color:#0a3d91;box-shadow:0 0 0 1px #c7d7f5}
+@media (hover:none){.rtl-attc .rtl-ab{opacity:.55;width:18px;height:18px;line-height:18px;font-size:10px}}
+.rtl-att-tip{font-style:normal;color:#8e8e93;margin-left:10px}.rtl-legend .rtl-att-tip b{display:inline-block;width:auto!important;height:auto!important;padding:1px 6px!important;margin:0 2px!important;border:0!important;border-radius:5px!important;background:#1c1c1e!important;color:#fff!important;font-size:10.5px;line-height:1.4;vertical-align:1px}
+.rtl-table th.rtl-sum small{display:block;font-size:10.5px;font-weight:500;color:#8e8e93;text-transform:none;letter-spacing:0}
 html body.on-settings #ovModeBar{display:none!important}
 @media (min-width:900px){
  html body .settings-page{grid-template-columns:250px minmax(0,1fr)!important;gap:26px!important}
@@ -7533,7 +7553,7 @@ async function renderPeopleView(mode){
     <div class="people-layout-grid">
       <div>
         <div class="panel" data-section="${mode==='recruiters'?'rec.table':'br.table'}">
-          <div class="panel-head"><h3>${mode==='recruiters'?'Recruiter':'Branch'} Detail</h3><div style="display:flex;align-items:center;gap:10px;">${mode==='recruiters'?`<div class="oe-group rtl-seg" role="tablist" aria-label="View" data-section="rec.timeline" id="rtlToggle" title="Table, or schedules by day / by week, recruiter against recruiter"><button type="button" role="tab" data-rtlv="0" class="${recTl.open?'':'on'}" aria-selected="${!recTl.open}">Table</button><button type="button" role="tab" data-rtlv="1" class="${recTl.open?'on':''}" aria-selected="${!!recTl.open}">Day / week</button></div>`:''}${mode==='recruiters'&&canManualEdit()?`<button type="button" class="btn btn-secondary btn-sm" data-open-manual title="Add or take away schedules, interviews, shows or hires by hand">＋ Adjust numbers</button>`:''}${mode==='branches'&&canMergeBranches()?`<button type="button" class="btn btn-secondary btn-sm" data-merge-open data-merge-table>${(selectedPieTargets.branches||[]).length>=2?`⇄ Merge ${(selectedPieTargets.branches||[]).length} selected`:`⇄ Merge branches${branchMergeList().length?' · '+branchMergeList().length:''}`}</button>`:''}<span class="rtl-hide" style="display:contents">${copyBtnHtml('peopleTable_'+mode)}${downloadBtnHtml('peopleTable_'+mode, (mode==='recruiters'?'recruiter':'branch')+'-performance.xlsx')}</span></div></div>
+          <div class="panel-head"><h3>${mode==='recruiters'?'Recruiter':'Branch'} Detail</h3><div style="display:flex;align-items:center;gap:10px;">${mode==='recruiters'?`<div class="oe-group rtl-seg" role="tablist" aria-label="View" data-section="rec.timeline" id="rtlToggle" title="Table, or the goal tracker — schedules by day or week, recruiter against recruiter"><button type="button" role="tab" data-rtlv="0" class="${recTl.open?'':'on'}" aria-selected="${!recTl.open}">Table</button><button type="button" role="tab" data-rtlv="1" class="${recTl.open?'on':''}" aria-selected="${!!recTl.open}">Goal tracker</button></div>`:''}${mode==='recruiters'&&canManualEdit()?`<button type="button" class="btn btn-secondary btn-sm" data-open-manual title="Add or take away schedules, interviews, shows or hires by hand">＋ Adjust numbers</button>`:''}${mode==='branches'&&canMergeBranches()?`<button type="button" class="btn btn-secondary btn-sm" data-merge-open data-merge-table>${(selectedPieTargets.branches||[]).length>=2?`⇄ Merge ${(selectedPieTargets.branches||[]).length} selected`:`⇄ Merge branches${branchMergeList().length?' · '+branchMergeList().length:''}`}</button>`:''}<span class="rtl-hide" style="display:contents">${copyBtnHtml('peopleTable_'+mode)}${downloadBtnHtml('peopleTable_'+mode, (mode==='recruiters'?'recruiter':'branch')+'-performance.xlsx')}</span></div></div>
           <table id="peopleTable_${mode}" class="rtl-hide"></table>
           ${mode==='recruiters'?'<div id="recTimeline"></div>':''}
         </div>
@@ -7597,13 +7617,14 @@ async function renderPeopleView(mode){
 /* ============== Recruiters page: schedules by day / by week, recruiter against recruiter ============== */
 // Uses the name-free daily counts saved with each week (branchDays), or the candidate lists when those
 // aren't there yet. Rows follow the Recruiter Detail table's search, division and column filters.
-const recTl={grain:'day', from:null, to:null, key:'', vsGoal:true, sort:'total', busy:0, open:lsGet('ipd_rtl_open')==='1'};
+const recTl={grain:'day', from:null, to:null, key:'', vsGoal:true, sort:'total', busy:0, open:lsGet('ipd_rtl_open')==='1', soFar:lsGet('ipd_rtl_sofar')!=='0'};
 // the switch in the Recruiter Detail header swaps the table for the day / week comparison
 function wireRecTimelineToggle(){
   const sw=document.getElementById('rtlToggle'); if(!sw) return;
   if(!canSeeSection('rec.timeline')) recTl.open=false;
   const panel=document.getElementById('recTimeline')?.closest('.panel')||sw.closest('.panel'); if(!panel) return; panel.classList.toggle('rtl-open',recTl.open);
   sw.querySelectorAll('[data-rtlv]').forEach(b=>{ b.classList.toggle('on',(b.dataset.rtlv==='1')===!!recTl.open); b.onclick=()=>{ const want=b.dataset.rtlv==='1'; if(want===!!recTl.open) return;
+   if(!want&&recTl.attDirty){ recTl.attDirty=false; }
    recTl.open=want; sw.querySelectorAll('[data-rtlv]').forEach(x=>{ x.classList.toggle('on',x===b); x.setAttribute('aria-selected',String(x===b)); }); panel.classList.toggle('rtl-open',recTl.open); try{ localStorage.setItem('ipd_rtl_open',recTl.open?'1':'0'); }catch(e){}
    peopleRerender.recruiters&&peopleRerender.recruiters(); }; });
   placeRtlToggle();
@@ -7637,12 +7658,16 @@ async function renderRecruiterTimeline(names){
   const colOf=d=>grain==='day'?d:weekOfDate(d).weekEnd;
   const daysOf=c=>{ if(grain==='day') return [c]; const ws=weekOfDate(c).weekStart; return tgDays(ws>from?ws:from, c<to?c:to); };
   const by={}; rows.forEach(c=>{ const r=by[c.recruiter]||(by[c.recruiter]={}), k=colOf(c.date); r[k]=(r[k]||0)+(c.n||1); });
-  // target: weekly goal ÷ 5 for each weekday they are present (an absent day has no target)
-  const target=(n,c)=>daysOf(c).filter(isWd).reduce((a,d)=>a+ltDailyGoal(n,d),0);
-  const people=names.map(n=>{ const r=by[n]||{}, vals=cols.map(c=>r[c]||0); return {n, vals, total:vals.reduce((a,b)=>a+b,0), tgt:cols.reduce((a,c)=>a+target(n,c),0)}; })
+  // target: a fifth of the weekly goal for each working day — an absent day's target is taken off.
+  // "Goal so far (today)" on (default): only the working days up to today · off: the whole week's goal
+  const soFar=recTl.soFar!==false, gEnd=soFar?(to<today?to:today):null;
+  const goalDays=c=>{ if(grain==='day') return [c]; const w=weekOfDate(c); return soFar?tgDays(w.weekStart>from?w.weekStart:from, c<gEnd?c:gEnd):tgDays(w.weekStart,w.weekEnd); };
+  const target=(n,c)=>goalDays(c).filter(isWd).reduce((a,d)=>a+ltDailyGoal(n,d),0);
+  const totalGoal=n=>{ const days=soFar?(gEnd>=from?tgDays(from,gEnd):[]):[...new Set(tgDays(from,to).map(d=>weekOfDate(d).weekEnd))].flatMap(we=>tgDays(weekOfDate(we).weekStart,we)); return days.filter(isWd).reduce((a,d)=>a+ltDailyGoal(n,d),0); };
+  const people=names.map(n=>{ const r=by[n]||{}, vals=cols.map(c=>r[c]||0); return {n, vals, total:vals.reduce((a,b)=>a+b,0), tgt:totalGoal(n)}; })
    .filter(p=>p.total||names.length<=40).sort((a,b)=>b.total-a.total||a.n.localeCompare(b.n));
   const colTot=cols.map((c,i)=>people.reduce((a,p)=>a+p.vals[i],0)), grand=colTot.reduce((a,b)=>a+b,0), tgtAll=people.reduce((a,p)=>a+p.tgt,0);
-  const canAtt=canMarkAttendance()&&grain==='day', attMode=canAtt&&recTl.att;
+  const canAtt=canMarkAttendance()&&grain==='day';
   const one=v=>(Math.round(v*10)/10).toLocaleString();
   const band=(v,t)=>!t?'':v/t>=1?'g':v/t>=.5?'a':'r';
   const d1=s=>new Date(s+'T12:00:00Z');
@@ -7651,7 +7676,8 @@ async function renderRecruiterTimeline(names){
   const cell=(p,i)=>{ const v=p.vals[i], c=cols[i], abs=grain==='day'&&isAbsent(p.n,c), t=target(p.n,c);
    const tip=`${p.n} · ${fmtDate(c)}: ${fmtNum(v)}${abs?' · absent':t?' of '+one(t):''}`;
    const body=abs?'A':(v?fmtNum(v):'·');
-   if(attMode&&isWd(c)) return `<td class="rtl-c ${abs?'abs':band(v,t)} rtl-att"><button type="button" data-att="${escapeHtml(p.n)}|${c}" title="${escapeHtml(tip)} — click to mark ${abs?'present':'absent'}">${body}</button></td>`;
+   // people who may mark attendance: hover a weekday → a small button marks it absent (or present again) in one click
+   if(canAtt&&isWd(c)) return `<td class="rtl-c ${abs?'abs':band(v,t)} rtl-attc" data-v="${v}" title="${escapeHtml(tip)}"><span class="rtl-v">${body}</span><button type="button" class="rtl-ab" data-att="${escapeHtml(p.n)}|${c}" aria-label="${abs?'Mark '+escapeHtml(p.n)+' present':'Mark '+escapeHtml(p.n)+' absent'} on ${fmtDate(c)}">${abs?'↺':'A'}</button></td>`;
    return `<td class="rtl-c ${abs?'abs':band(v,t)}" title="${escapeHtml(tip)}">${body}</td>`; };
   // same-branch list for the picked recruiter
   const focus=recTl.focus&&names.includes(recTl.focus)?recTl.focus:(recTl.focus=null);
@@ -7668,25 +7694,34 @@ async function renderRecruiterTimeline(names){
    <div class="rtl-tools">
     <div class="oe-group rtl-seg2" role="tablist" aria-label="Show by" title="${span>62?'More than 62 days — weeks only':''}"><button type="button" data-rtlg="day" class="${grain==='day'?'on':''}" ${span>62?'disabled':''}>By day</button><button type="button" data-rtlg="week" class="${grain==='week'?'on':''}">By week</button></div>
     ${dateRangeBtn('rtlFrom','rtlTo',from,to,today)}
-    ${canAtt?`<label class="rtl-chk" title="Everyone is present by default"><button type="button" class="switch" role="switch" id="rtlAtt" aria-checked="${attMode}"><i></i></button>Mark absent</label>`:''}
-    <span class="rtl-legend"><b class="g"></b>At goal <b class="a"></b>Half way <b class="r"></b>Under half${grain==='day'?' <b class="abs">A</b>Absent':''}</span>
+    <label class="rtl-chk basis-sw" title="On: the goal for the working days up to today · Off: the whole week’s goal. Absent days are taken off either way."><button type="button" class="switch" role="switch" id="rtlSoFar" aria-checked="${soFar}"><i></i></button>Goal so far (today)</label>
+
+    <span class="rtl-legend"><b class="g"></b>At goal <b class="a"></b>Half way <b class="r"></b>Under half${grain==='day'?' <b class="abs">A</b>Absent':''}${canAtt?'<em class="rtl-att-tip">Point at a day and click <b>A</b> to mark someone absent — click again to undo</em>':''}</span>
     <span class="rtl-sp"></span>${copyBtnHtml('recTlTable')}
    </div>
-   ${attMode?'<p class="rtl-att-note">Click a day to mark it <b>A</b> (absent) — click again to undo. That day’s target is removed.</p>':''}
    ${peers}
-   ${!src?'<p class="hint">Daily counts for these weeks aren’t ready yet — they appear after the next upload.</p>':people.length?`<div class="rtl-scroll"><table class="users-table rtl-table" id="recTlTable"><thead><tr><th class="rtl-name">Recruiter</th>${cols.map(c=>`<th class="rtl-h">${head(c)}</th>`).join('')}<th class="rtl-sum">Total</th><th class="rtl-sum">Goal</th><th class="rtl-sum">%</th></tr></thead><tbody>
-    ${people.map(p=>`<tr class="${p.n===focus?'rtl-focus':''}"><td class="rtl-name"><button type="button" class="rtl-pick" data-rtl-peer="${escapeHtml(p.n)}" title="Who works at the same branches">${escapeHtml(p.n)}</button></td>${cols.map((c,i)=>cell(p,i)).join('')}<td class="rtl-sum"><strong>${fmtNum(p.total)}</strong></td><td class="rtl-sum">${one(p.tgt)}</td><td class="rtl-sum rtl-pct ${band(p.total,p.tgt)}">${p.tgt?Math.round(p.total/p.tgt*100)+'%':'–'}</td></tr>`).join('')}
-    <tr class="rtl-tot"><td class="rtl-name">Total</td>${colTot.map(v=>`<td class="rtl-c">${fmtNum(v)}</td>`).join('')}<td class="rtl-sum"><strong>${fmtNum(grand)}</strong></td><td class="rtl-sum">${one(tgtAll)}</td><td class="rtl-sum">${tgtAll?Math.round(grand/tgtAll*100)+'%':'–'}</td></tr>
+   ${!src?'<p class="hint">Daily counts for these weeks aren’t ready yet — they appear after the next upload.</p>':people.length?`<div class="rtl-scroll"><table class="users-table rtl-table" id="recTlTable"><thead><tr><th class="rtl-name">Recruiter</th>${cols.map(c=>`<th class="rtl-h">${head(c)}</th>`).join('')}<th class="rtl-sum">Total</th><th class="rtl-sum">Goal<small>${soFar?'so far':'whole week'}</small></th><th class="rtl-sum">%</th></tr></thead><tbody>
+    ${people.map(p=>`<tr class="${p.n===focus?'rtl-focus':''}" data-rtl-row="${escapeHtml(p.n)}"><td class="rtl-name"><button type="button" class="rtl-pick" data-rtl-peer="${escapeHtml(p.n)}" title="Who works at the same branches">${escapeHtml(p.n)}</button></td>${cols.map((c,i)=>cell(p,i)).join('')}<td class="rtl-sum"><strong>${fmtNum(p.total)}</strong></td><td class="rtl-sum rtl-goalc">${one(p.tgt)}</td><td class="rtl-sum rtl-pct rtl-pctc ${band(p.total,p.tgt)}">${p.tgt?Math.round(p.total/p.tgt*100)+'%':'–'}</td></tr>`).join('')}
+    <tr class="rtl-tot"><td class="rtl-name">Total</td>${colTot.map(v=>`<td class="rtl-c">${fmtNum(v)}</td>`).join('')}<td class="rtl-sum"><strong>${fmtNum(grand)}</strong></td><td class="rtl-sum" id="rtlGoalAll">${one(tgtAll)}</td><td class="rtl-sum" id="rtlPctAll">${tgtAll?Math.round(grand/tgtAll*100)+'%':'–'}</td></tr>
    </tbody></table></div><p class="hint rtl-foot">Click a name to see who else works at their branches.</p>`:'<p class="hint">No schedules in these dates.</p>'}
   </div>`;
   const $=s=>host.querySelector(s);
   host.querySelectorAll('[data-rtlg]').forEach(b=>b.onclick=()=>{ if(b.disabled||b.dataset.rtlg===grain) return; recTl.grain=b.dataset.rtlg; renderRecruiterTimeline(names); });
   $('#rtlTo')?.addEventListener('change',()=>{ const a=$('#rtlFrom').value, b=$('#rtlTo').value; if(!a||!b) return; recTl.from=a<b?a:b; recTl.to=a<b?b:a; renderRecruiterTimeline(names); });
-  $('#rtlAtt')?.addEventListener('click',()=>{ recTl.att=!recTl.att; renderRecruiterTimeline(names); });
+  $('#rtlSoFar')?.addEventListener('click',()=>{ recTl.soFar=!soFar; lsSet('ipd_rtl_sofar',recTl.soFar?'1':'0'); renderRecruiterTimeline(names); });
   $('#rtlPeerClose')?.addEventListener('click',()=>{ recTl.focus=null; renderRecruiterTimeline(names); });
   host.querySelectorAll('[data-rtl-peer]').forEach(b=>b.onclick=()=>{ const n=b.dataset.rtlPeer; recTl.focus=recTl.focus===n?null:n; renderRecruiterTimeline(names); });
-  host.querySelectorAll('[data-att]').forEach(b=>b.onclick=async()=>{ const [n,d]=b.dataset.att.split('|'), on=!isAbsent(n,d); b.disabled=true;
-   if(!(await setAbsent(n,d,on))){ b.disabled=false; return; } if(currentView==='recruiters') renderPeopleView('recruiters'); else renderRecruiterTimeline(names); });
+  // one click: the change shows at once (cell, goal, %, totals); saving happens in the background, several clicks in one go
+  const tbl=host.querySelector('#recTlTable');
+  const refreshRow=n=>{ const tr=tbl&&[...tbl.querySelectorAll('tr[data-rtl-row]')].find(x=>x.dataset.rtlRow===n); const p=people.find(x=>x.n===n); if(!tr||!p) return;
+   p.tgt=totalGoal(n); tr.querySelector('.rtl-goalc').textContent=one(p.tgt); const pc=tr.querySelector('.rtl-pctc'); pc.className='rtl-sum rtl-pct rtl-pctc '+band(p.total,p.tgt); pc.textContent=p.tgt?Math.round(p.total/p.tgt*100)+'%':'–';
+   const all=people.reduce((a,x)=>a+x.tgt,0); const g=host.querySelector('#rtlGoalAll'), q=host.querySelector('#rtlPctAll'); if(g) g.textContent=one(all); if(q) q.textContent=all?Math.round(grand/all*100)+'%':'–'; };
+  tbl?.addEventListener('click',e=>{ const b=e.target.closest('[data-att]'); if(!b) return; e.stopPropagation();
+   const [n,d]=b.dataset.att.split('|'), on=!isAbsent(n,d), td=b.closest('td');
+   attQueueToggle(n,d,on);
+   const v=+td.dataset.v||0; td.className='rtl-c rtl-attc '+(on?'abs':band(v,target(n,d)));
+   td.querySelector('.rtl-v').textContent=on?'A':(v?fmtNum(v):'·'); b.textContent=on?'↺':'A'; b.setAttribute('aria-label',(on?'Mark '+n+' present':'Mark '+n+' absent')+' on '+fmtDate(d));
+   refreshRow(n); });
 }
 let entityPopoverRevision=0;
 let entityPopoverAnchor=null;
@@ -9643,7 +9678,7 @@ const PAGE_SECTIONS = {
                 ['perf.detail.part.trend','Card details — 12-week trend'],['perf.detail.part.divisions','Card details — division split'],['perf.detail.part.recruiters','Card details — recruiter ranking'],['perf.detail.part.branches','Card details — branch ranking'],['perf.detail.all_people','Card details — all recruiters & branches (untick = only their assigned team)'],
                 ['perf.trends','Trends charts'],['perf.leaderboards','Leaderboards (recruiter & branch snapshots)'],['perf.divisions','Division breakdown'],['perf.history','Previous 6 weeks table'],['perf.insights','Insights'],['perf.composition','Composition pies (monthly / quarterly)']],
   teams:[['team.summary','Team — summary cards'],['team.analytics','Team highlights'],['team.analytics.wins','· Winning list'],['team.analytics.attention','· Needs attention list'],['team.analytics.branches','Team — Branches: team vs other recruiters'],['team.leads','Team Leads page — comparison table (admins)'],['team.recruiters','Team — recruiter table'],['team.goals','· Today & third-break columns (they can also hide these themselves)'],['team.daily','Team — Daily tab'],['team.charts','· Daily chart'],['team.candidates','Team — Candidates tab'],['team.multibranch','Team — Branches: recruiters at several branches'],['team.kpi.schedules','· Schedules vs goal card'],['team.kpi.goal_reach','·· Goal reach % line'],['team.kpi.interviews','· Interviews card'],['team.kpi.shows','·· Shows + show rate line'],['team.kpi.no_shows','·· No shows + no-show rate line'],['team.kpi.hires','· Hires per recruiter card'],['team.kpi.hire_rate','·· Hire rate line'],['team.kpi.placed','· Placed card']],
-  recruiters:[['rec.table','Recruiter table'],['rec.timeline','Day / week comparison switch'],['hist.kpis','History page — summary tiles (recruiter & branch)'],['hist.trend','History page — week-by-week chart'],['hist.goal','History page — schedules vs goal chart'],['hist.weeks','History page — every-week table'],['hist.remarks','History page — remarks'],['hist.candidates','History page — candidates']],
+  recruiters:[['rec.table','Recruiter table'],['rec.timeline','Goal tracker (schedules by day or week vs goal)'],['hist.kpis','History page — summary tiles (recruiter & branch)'],['hist.trend','History page — week-by-week chart'],['hist.goal','History page — schedules vs goal chart'],['hist.weeks','History page — every-week table'],['hist.remarks','History page — remarks'],['hist.candidates','History page — candidates']],
   branches:[['br.table','Branch table'],['hist.team','History page — recruiters in the branch']],
   candidates:[['cand.list','Category boxes and candidate list'],['cand.explain','“How are these counted?” breakdown']],
   pivot:[['pivot.chart','Chart'],['pivot.table','Pivot table']],
@@ -10918,9 +10953,74 @@ async function deleteManualEntry(id){
   await commitManualAdj(list.filter(x=>x.id!==id), 'Adjustment deleted');
 }
 // {} = new · {adj} = edit · {recruiter, date} = prefill
+/* Weekly sheet: one person's hand-entered numbers for a whole week, day by day (e.g. someone whose numbers aren't in the uploads).
+   Saving replaces that person's manual numbers for the week — one adjustment per day — so re-typing a day never doubles it. */
+function openManualSheet(opts){
+  if(!canManualEdit()){ showToast('Only admins can adjust numbers.'); return; }
+  opts=opts||{};
+  const names=[...new Set([...weeksData.flatMap(w=>Object.keys(w.byRecruiter||{})), ...manualAdjList().map(a=>a.recruiter)])].filter(n=>n&&n!=='Unassigned').sort();
+  const branches=[...new Set(weeksData.flatMap(w=>Object.keys(w.byBranch||{})))].filter(b=>b&&b!=='Unassigned').sort();
+  const lastBranch=n=>{ const m=manualAdjList().filter(a=>a.recruiter===n&&a.branch).sort((x,y)=>String(y.date).localeCompare(String(x.date)))[0]; if(m) return m.branch; for(let i=weeksData.length-1;i>=0;i--){ const r=(weeksData[i].byRecruiter||{})[n]; if(r&&r.branch&&r.branch!=='Unassigned') return r.branch; } return ''; };
+  const st={who:opts.recruiter||lsGet('ipd_me_person')||'', we:weekOfDate(opts.date||ltToday()).weekEnd, wkend:false, vals:{}, dirty:false};
+  const days=()=>tgDays(weekOfDate(st.we).weekStart, st.we);
+  const shown=()=>days().filter(d=>{ const w=new Date(d+'T12:00:00Z').getUTCDay(); return st.wkend||(w>0&&w<6); });
+  const load=()=>{ st.vals={}; manualAdjList().filter(a=>a.recruiter===st.who&&weekOfDate(a.date).weekEnd===st.we).forEach(a=>{ const v=st.vals[a.date]||(st.vals[a.date]={}); ADJ_FIELDS.forEach(([k])=>{ v[k]=(v[k]||0)+(Number(a[k])||0); }); });
+   if(days().some(d=>{ const w=new Date(d+'T12:00:00Z').getUTCDay(); return (w===0||w===6)&&st.vals[d]&&ADJ_FIELDS.some(([k])=>st.vals[d][k]); })) st.wkend=true; st.dirty=false; };
+  document.getElementById('meDialog')?.remove();
+  const wrap=document.createElement('div'); wrap.className='modal-overlay'; wrap.id='meDialog';
+  const d1=s=>new Date(s+'T12:00:00Z');
+  const draw=()=>{
+    const cols=shown(), today=ltToday();
+    const tot=k=>cols.reduce((a,d)=>a+((st.vals[d]||{})[k]||0),0);
+    wrap.innerHTML=`<div class="modal me-modal ms-modal" role="dialog" aria-modal="true" aria-labelledby="msTitle"><div class="modal-header"><h3 id="msTitle">Adjust numbers · weekly sheet</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div>
+     <div class="modal-body">
+      <div class="ms-top">
+       <label>Person<input id="msWho" list="msWhoList" value="${escapeHtml(st.who)}" placeholder="Type a name" autocomplete="off"><datalist id="msWhoList">${names.map(n=>`<option value="${escapeHtml(n)}">`).join('')}</datalist></label>
+       <label>Branch<input id="msBr" list="msBrList" value="${escapeHtml(lastBranch(st.who))}" placeholder="Their branch" autocomplete="off"><datalist id="msBrList">${branches.map(n=>`<option value="${escapeHtml(n)}">`).join('')}</datalist></label>
+       <div class="ms-week"><span>Week</span><div><button type="button" class="btn btn-secondary btn-sm" id="msPrev" aria-label="Previous week">‹</button><b>Week ${weekOfDate(st.we).number} · ${fmtDate(weekOfDate(st.we).weekStart).replace(/, \d{4}$/,'')} – ${fmtDate(st.we)}</b><button type="button" class="btn btn-secondary btn-sm" id="msNext" aria-label="Next week" ${st.we>=weekOfDate(today).weekEnd?'disabled':''}>›</button></div></div>
+      </div>
+      ${st.who?`<div class="onb-scroll"><table class="users-table ms-table"><thead><tr><th></th>${cols.map(d=>`<th class="${d===today?'ms-today':''}">${d1(d).toLocaleDateString(undefined,{weekday:'short',timeZone:'UTC'})}<small>${d1(d).toLocaleDateString(undefined,{month:'short',day:'numeric',timeZone:'UTC'})}</small></th>`).join('')}<th>Week</th></tr></thead>
+       <tbody>${ADJ_FIELDS.map(([k,,l])=>`<tr><th>${l}</th>${cols.map(d=>`<td><input type="number" inputmode="numeric" step="1" data-d="${d}" data-k="${k}" value="${(st.vals[d]||{})[k]||''}" placeholder="0" ${d>today?'disabled title="Future day"':''}></td>`).join('')}<td class="ms-tot" data-tot="${k}">${fmtNum(tot(k))}</td></tr>`).join('')}</tbody></table></div>
+      <div class="ms-tools"><label class="rtl-chk"><button type="button" class="switch" role="switch" id="msWkend" aria-checked="${st.wkend}"><i></i></button>Weekend days</label><button type="button" class="link-btn" id="msCopy">Copy last week</button><button type="button" class="link-btn" id="msClear">Clear this week</button><span class="hint">Enter moves down · numbers are ${(weeksData.some(w=>(w.byRecruiter||{})[st.who]&&!(w.byRecruiter[st.who].adjusted)))?'added to their uploaded numbers':'their numbers for the dashboard'}</span></div>`
+      :'<p class="hint">Pick the person whose numbers you want to enter.</p>'}
+      <p class="me-err" id="meErr" role="alert"></p>
+     </div>
+     <div class="modal-footer"><button type="button" class="link-btn" id="msSingle" style="margin-right:auto">One-off adjustment instead</button><button class="btn btn-secondary" data-close>Cancel</button><button class="btn btn-primary" id="msSave" ${st.who?'':'disabled'}>Save week</button></div></div>`;
+    const $=s=>wrap.querySelector(s);
+    wrap.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>{ if(st.dirty&&!confirm('Close without saving this week?')) return; wrap.remove(); });
+    $('#msWho').addEventListener('change',e=>{ const v=e.target.value.trim(); if(v===st.who) return; if(st.dirty&&!confirm('Switch person without saving?')){ e.target.value=st.who; return; } st.who=v; if(v) lsSet('ipd_me_person',v); load(); draw(); });
+    const go=n=>{ if(st.dirty&&!confirm('Change week without saving?')) return; st.we=tgShift(st.we,7*n); load(); draw(); };
+    $('#msPrev').onclick=()=>go(-1); $('#msNext').onclick=()=>go(1);
+    $('#msSingle').onclick=()=>openManualEntryDialog({recruiter:st.who, single:true});
+    $('#msWkend')?.addEventListener('click',()=>{ st.wkend=!st.wkend; draw(); });
+    $('#msClear')?.addEventListener('click',()=>{ st.vals={}; st.dirty=true; draw(); });
+    $('#msCopy')?.addEventListener('click',()=>{ const pw=tgShift(st.we,-7), src={}; manualAdjList().filter(a=>a.recruiter===st.who&&weekOfDate(a.date).weekEnd===pw).forEach(a=>{ const d=tgShift(a.date,7), v=src[d]||(src[d]={}); ADJ_FIELDS.forEach(([k])=>{ v[k]=(v[k]||0)+(Number(a[k])||0); }); });
+      if(!Object.keys(src).length){ showToast('Nothing entered for '+st.who+' last week.'); return; } st.vals=src; st.dirty=true; draw(); });
+    const inputs=[...wrap.querySelectorAll('.ms-table input')];
+    inputs.forEach(i=>{ i.addEventListener('input',()=>{ const v=i.value.trim(), o=st.vals[i.dataset.d]||(st.vals[i.dataset.d]={}); o[i.dataset.k]=v===''?0:Math.round(Number(v)||0); st.dirty=true;
+      const c=$(`[data-tot="${i.dataset.k}"]`); if(c) c.textContent=fmtNum(shown().reduce((a,d)=>a+((st.vals[d]||{})[i.dataset.k]||0),0)); });
+     i.addEventListener('keydown',e=>{ if(e.key!=='Enter') return; e.preventDefault(); const td=i.closest('td'), idx=[...td.parentNode.children].indexOf(td), nx=td.parentNode.nextElementSibling?.children[idx]?.querySelector('input'); (nx||$('#msSave')).focus(); nx&&nx.select(); });
+     i.addEventListener('focus',()=>i.select()); });
+    $('#msSave').onclick=async()=>{
+      const err=t=>{ $('#meErr').textContent=t; };
+      if(!st.who) return err('Pick the person.');
+      const br=$('#msBr').value.trim()||lastBranch(st.who)||'';
+      const keep=manualAdjList().filter(a=>!(a.recruiter===st.who&&weekOfDate(a.date).weekEnd===st.we));
+      const now=new Date().toISOString(), add=[];
+      days().forEach(d=>{ const v=st.vals[d]||{}; if(!ADJ_FIELDS.some(([k])=>v[k])) return;
+        add.push({id:'adj:'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), date:d, recruiter:st.who, branch:br, ...Object.fromEntries(ADJ_FIELDS.map(([k])=>[k,v[k]||0])), note:'Weekly sheet', sheet:true, by:Server.user.name, at:now}); });
+      $('#msSave').disabled=true; wrap.remove();
+      lsSet('ipd_me_person',st.who);
+      await commitManualAdj([...keep, ...add], `${st.who} · Week ${weekOfDate(st.we).number} saved (${add.length} day${add.length===1?'':'s'})`);
+    };
+    setTimeout(()=>{ const f=inputs.find(i=>!i.disabled&&i.dataset.d===ltToday())||inputs.find(i=>!i.disabled); (st.who?f:$('#msWho'))?.focus(); },30);
+  };
+  document.body.appendChild(wrap); load(); draw();
+}
 function openManualEntryDialog(opts){
   if(!canManualEdit()){ showToast('Only admins can adjust numbers.'); return; }
   opts=opts||{}; const a=opts.adj||{};
+  if(!opts.adj&&!opts.single) return openManualSheet(opts);   // the weekly sheet is the quick way; one-off adjustments are one click away
   const names=[...new Set(weeksData.flatMap(w=>Object.keys(w.byRecruiter||{})))].filter(n=>n&&n!=='Unassigned').sort();
   const branches=[...new Set(weeksData.flatMap(w=>Object.keys(w.byBranch||{})))].filter(b=>b&&b!=='Unassigned').sort();
   const lastBranch=n=>{ for(let i=weeksData.length-1;i>=0;i--){ const r=(weeksData[i].byRecruiter||{})[n]; if(r&&r.branch&&r.branch!=='Unassigned') return r.branch; } return ''; };
@@ -12679,6 +12779,20 @@ function attMap(){ const a=KV.getRaw('attendance'); return a&&typeof a==='object
 function isAbsent(name,d){ const a=attMap()[name]; return !!(a&&a[d]==='A'); }
 function absentWeekdays(name,weekEnd){ const a=attMap()[name]; if(!a) return 0; const ws=tgShift(weekEnd,-6); let n=0; for(let i=1;i<=5;i++) if(a[tgShift(ws,i)]==='A') n++; return n; }
 function canMarkAttendance(){ return hasRight('grant.attendance'); }
+// attendance clicks: applied at once in this browser, saved together a moment later (undone if the save fails)
+const attQ={timer:null, before:null, n:0};
+function attQueueToggle(name,d,on){
+  if(!attQ.before) attQ.before=JSON.parse(JSON.stringify(attMap()));
+  const all=JSON.parse(JSON.stringify(attMap())), r=all[name]||(all[name]={}); if(on) r[d]='A'; else delete r[d]; if(!Object.keys(r).length) delete all[name];
+  KV.set('attendance',all); attQ.n++; recTl.attDirty=true;
+  clearTimeout(attQ.timer); attQ.timer=setTimeout(attFlush,700);
+}
+async function attFlush(){
+  const before=attQ.before, n=attQ.n; attQ.before=null; attQ.n=0; attQ.timer=null; if(!before) return;
+  const ok=await storageSet('attendance',attMap());
+  if(ok===null){ KV.set('attendance',before); showToast('Attendance not saved — your last '+(n===1?'change was':n+' changes were')+' undone.'); if(currentView==='recruiters') renderPeopleView('recruiters'); return; }
+  showToast(n===1?'Attendance saved.':n+' attendance changes saved.');
+}
 async function setAbsent(name,d,on){ const all=JSON.parse(JSON.stringify(attMap())), r=all[name]||(all[name]={}); if(on) r[d]='A'; else delete r[d]; if(!Object.keys(r).length) delete all[name];
   const ok=await storageSet('attendance',all); if(ok===null) return false; KV.set('attendance',all); return true; }
 function ltWeeklyGoal(name,date){const g=KV.get('goals:'+weekOfDate(date).weekEnd)||{},v=g[name];return v!==undefined&&v!==null&&v!==''&&Number.isFinite(Number(v))?Number(v):DEFAULT_WEEKLY_GOAL;}
@@ -13340,7 +13454,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.95.2';   // shown only in the browser tab title
+const APP_VERSION = '4.96.0';   // shown only in the browser tab title
 // Everyone gets the latest look: the page checks the published file for a newer version — right after it opens
 // (switches straight over) and every few minutes / when the tab comes back (offers an Update button).
 const AppUpdate=(()=>{
