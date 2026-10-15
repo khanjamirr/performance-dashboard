@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.86.6</title>
+<title>Performance Dashboard · v4.86.7</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2519,7 +2519,13 @@ html body .toast,html body #toast{border-radius:14px!important;background:rgba(3
  html body #topbarExtra .division-chip{padding:5px 10px!important;min-width:0!important}
 }
 </style>
-<style>[data-ta-wins][hidden]{display:none!important}</style>
+<style>[data-ta-wins][hidden]{display:none!important}
+.ta-wins-bar{display:flex;align-items:center;gap:18px;width:100%;margin:4px 0 14px;padding:10px 14px;border:0;border-radius:12px;background:rgba(118,118,128,.08);font:inherit;font-size:13.5px;color:#1c1c1e;cursor:pointer;text-align:left}
+.ta-wins-bar:hover{background:rgba(118,118,128,.14)}
+.ta-wins-bar b{display:inline-block;min-width:22px;padding:0 7px;margin-left:4px;border-radius:999px;background:#fff;font-size:12px;text-align:center}
+.ta-wins-bar em{margin-left:auto;font-style:normal;font-weight:600;color:#007aff}
+.ta-wins-bar svg{width:16px;height:16px;color:#007aff;transition:transform .2s}
+.ta-wins-bar[aria-expanded="true"] svg{transform:rotate(180deg)}</style>
 </head>
 <body class="locked">
 <div id="appLoading" class="app-loading"><div class="spinner" aria-hidden="true"></div><p>Loading dashboard…</p></div>
@@ -12626,7 +12632,7 @@ function ltLeadsBreakHtml(p,cutoff,mode,today,division){
 }
 function ltLeadsHtmlBuild(p,cutoff,mode,today,division){
  if(!canViewLeads()) return '';
- const head=`<div class="lt-section-head"><h3>How each team is doing</h3><span class="hint">Every lead’s team for the same ${mode} and division · schedules vs goal, interviews (shows vs no shows) and hires</span><button type="button" class="link-btn ta-wins-tog" id="ltWinsTog" style="margin-left:auto" title="Leading teams and teams needing attention">Show highlights</button><label class="rtl-chk basis-sw" title="${p.to>today?'On: goal for the working days so far · Off: the goal for the whole '+mode:'Only while the '+mode+' is still going'}"><button type="button" class="switch" role="switch" id="ltBasisSw" aria-checked="${leadsState.basis==='today'&&p.to>today}" ${p.to>today?'':'disabled'}><i></i></button>Goal so far (today)</label><button class="btn btn-secondary btn-sm" id="ltLeadsRefresh">↻ Refresh</button></div>`;
+ const head=`<div class="lt-section-head"><h3>How each team is doing</h3><span class="hint">Every lead’s team for the same ${mode} and division · schedules vs goal, interviews (shows vs no shows) and hires</span><label class="rtl-chk basis-sw" style="margin-left:auto" title="${p.to>today?'On: goal for the working days so far · Off: the goal for the whole '+mode:'Only while the '+mode+' is still going'}"><button type="button" class="switch" role="switch" id="ltBasisSw" aria-checked="${leadsState.basis==='today'&&p.to>today}" ${p.to>today?'':'disabled'}><i></i></button>Goal so far (today)</label><button class="btn btn-secondary btn-sm" id="ltLeadsRefresh">↻ Refresh</button></div>`;
  if(ltLeads.owner!==String(Server.user.id)||!ltLeads.teams){ setTimeout(()=>ltLoadLeads(),0); return `<section class="panel ta" data-section="team.leads">${head}<p class="hint">${ltLeads.error?'Could not load teams: '+escapeHtml(ltLeads.error):'Loading every team…'}</p></section>`; }
  if(!ltLeads.teams.length) return `<section class="panel ta" data-section="team.leads">${head}<p class="hint">No teams have been assigned yet.</p></section>`;
  // goal: the whole period's goal (default) or only the working days so far
@@ -12677,6 +12683,7 @@ function ltLeadsHtmlBuild(p,cutoff,mode,today,division){
  const sorted=rows.slice().sort((a,b)=>(b.goal??-1)-(a.goal??-1));
  const clashes=ltAllConflicts(ltLeads.teams).filter(c=>c.from<=p.to&&ltEnd(c.to)>=p.from);
  return `<section class="panel ta" data-section="team.leads">${head}${clashes.length?`<div class="warn-note la-conflicts" role="alert"><strong>${clashes.length} recruiter${clashes.length===1?' is':'s are'} on more than one team in this period</strong> — their numbers count twice. Fix in Settings → Users → Team assignments.<ul>${clashes.map(c=>`<li><b>${escapeHtml(c.name)}</b>: ${escapeHtml(c.lead)} and ${escapeHtml(c.other)} · ${escapeHtml(ltRangeText(c.from,c.to))}</li>`).join('')}</ul></div>`:''}
+ <button type="button" class="ta-wins-bar" id="ltWinsTog" aria-expanded="false"><span>🏆 Leading teams <b>${W.length}</b></span><span>⚠️ Teams needing attention <b>${A.length}</b></span><em data-ta-lbl>Show</em><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
  <div class="ta-cols" data-ta-wins hidden>
   <div class="ta-box ta-win"><h4>🏆 Leading teams <span class="pill good">${W.length}</span></h4>${W.length?`<ul>${W.map(x=>`<li><div>${lead(x.r)}</div>${x.items.map(t=>`<span>${t}</span>`).join('')}</li>`).join('')}</ul>`:'<p class="hint">No team is ahead on a measured target yet.</p>'}</div>
   <div class="ta-box ta-att"><h4>⚠️ Teams needing attention <span class="pill warn">${A.length}</span></h4>${A.length?`<ul>${A.map(x=>`<li><div>${lead(x.r)}</div>${x.items.map(t=>`<span class="ta-sev2">${t}</span>`).join('')}</li>`).join('')}</ul>`:'<p class="hint">Every team is within range. 🎉</p>'}</div>
@@ -12713,8 +12720,8 @@ function renderLeadsView(){
  host.querySelector('#ldDiv').onchange=e=>{leadsState.division=e.target.value;go();};
  function bindLeadsBody(){
  host.querySelector('#ltLeadsRefresh')?.addEventListener('click',()=>{ltLoadLeads(true);});
- { const box=host.querySelector('[data-ta-wins]'), tg=host.querySelector('#ltWinsTog'); if(box&&tg){ box.hidden=!leadsState.showWins; tg.textContent=leadsState.showWins?'Hide highlights':'Show highlights';
-   tg.onclick=()=>{ leadsState.showWins=!leadsState.showWins; box.hidden=!leadsState.showWins; tg.textContent=leadsState.showWins?'Hide highlights':'Show highlights'; }; } }
+ { const box=host.querySelector('[data-ta-wins]'), tg=host.querySelector('#ltWinsTog'); if(box&&tg){ box.hidden=!leadsState.showWins; const sync=()=>{ box.hidden=!leadsState.showWins; tg.setAttribute('aria-expanded',String(!!leadsState.showWins)); const l=tg.querySelector('[data-ta-lbl]'); if(l) l.textContent=leadsState.showWins?'Hide':'Show'; }; sync();
+   tg.onclick=()=>{ leadsState.showWins=!leadsState.showWins; sync(); }; } }
  host.querySelector('#ltBasisSw')?.addEventListener('click',e=>{ if(e.currentTarget.disabled) return; leadsState.basis=leadsState.basis==='today'?'week':'today'; renderLeadsView(); });
  host.querySelectorAll('[data-ld-brk-img]').forEach(b=>b.onclick=e=>{ e.preventDefault(); e.stopPropagation(); const x=ltLeadsBreak[b.dataset.ldBrkImg]; if(x) ltCopyBreakImage(x.lists,{team:x.team, dayLabel:x.lists.dayLabel, day:x.lists.day}); });
  host.querySelectorAll('[data-ldf]').forEach(b=>b.onclick=()=>{ const k=b.dataset.ldf; host.querySelectorAll('[data-ldf]').forEach(x=>x.classList.toggle('on',x===b)); host.querySelectorAll('#ldBrkTable tbody tr').forEach(tr=>tr.hidden=k!=='all'&&tr.dataset.st!==k); });
@@ -12858,7 +12865,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.86.6';   // shown only in the browser tab title
+const APP_VERSION = '4.86.7';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
