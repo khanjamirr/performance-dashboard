@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.86.3</title>
+<title>Performance Dashboard · v4.86.4</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2505,6 +2505,7 @@ html body .toast,html body #toast{border-radius:14px!important;background:rgba(3
 .panel-head:has(#rtlToggle).is-stuck{box-shadow:0 8px 14px -12px rgba(0,0,0,.25)}
 .panel:has(#rtlToggle){overflow:visible!important}
 </style>
+<style>.panel-head:has(#rtlToggle){justify-content:flex-start!important;gap:16px}.panel-head:has(#rtlToggle)>h3{min-width:150px;margin:0}.panel-head:has(#rtlToggle) .rtl-seg{margin-left:0}.panel-head:has(#rtlToggle)>div:last-child{flex:1 1 auto;display:flex!important;justify-content:flex-start}.panel-head:has(#rtlToggle) #rtlToggle{margin-right:auto!important}</style>
 </head>
 <body class="locked">
 <div id="appLoading" class="app-loading"><div class="spinner" aria-hidden="true"></div><p>Loading dashboard…</p></div>
@@ -7326,7 +7327,7 @@ async function renderPeopleView(mode){
     <div class="people-layout-grid">
       <div>
         <div class="panel" data-section="${mode==='recruiters'?'rec.table':'br.table'}">
-          <div class="panel-head"><h3>${mode==='recruiters'?'Recruiter':'Branch'} Detail</h3><div style="display:flex;align-items:center;gap:10px;">${mode==='recruiters'?`<div class="oe-group rtl-seg" role="tablist" aria-label="View" data-section="rec.timeline" id="rtlToggle" title="Table, or schedules by day / by week, recruiter against recruiter"><button type="button" role="tab" data-rtlv="0" class="${recTl.open?'':'on'}" aria-selected="${!recTl.open}">Table</button><button type="button" role="tab" data-rtlv="1" class="${recTl.open?'on':''}" aria-selected="${!!recTl.open}">Day / week</button></div>`:''}<span class="hint rtl-hide">Click a row for its trend · Ctrl/Cmd-click to compare · click a column to sort · &#9660; to filter${mode==='recruiters'?' · Remarks are saved per week':''}</span>${mode==='recruiters'&&canManualEdit()?`<button type="button" class="btn btn-secondary btn-sm" data-open-manual title="Add or take away schedules, interviews, shows or hires by hand">＋ Adjust numbers</button>`:''}${mode==='branches'&&canMergeBranches()?`<button type="button" class="btn btn-secondary btn-sm" data-merge-open data-merge-table>${(selectedPieTargets.branches||[]).length>=2?`⇄ Merge ${(selectedPieTargets.branches||[]).length} selected`:`⇄ Merge branches${branchMergeList().length?' · '+branchMergeList().length:''}`}</button>`:''}<span class="rtl-hide" style="display:contents">${copyBtnHtml('peopleTable_'+mode)}${downloadBtnHtml('peopleTable_'+mode, (mode==='recruiters'?'recruiter':'branch')+'-performance.xlsx')}</span></div></div>
+          <div class="panel-head"><h3>${mode==='recruiters'?'Recruiter':'Branch'} Detail</h3><div style="display:flex;align-items:center;gap:10px;">${mode==='recruiters'?`<div class="oe-group rtl-seg" role="tablist" aria-label="View" data-section="rec.timeline" id="rtlToggle" title="Table, or schedules by day / by week, recruiter against recruiter"><button type="button" role="tab" data-rtlv="0" class="${recTl.open?'':'on'}" aria-selected="${!recTl.open}">Table</button><button type="button" role="tab" data-rtlv="1" class="${recTl.open?'on':''}" aria-selected="${!!recTl.open}">Day / week</button></div>`:''}${mode==='recruiters'&&canManualEdit()?`<button type="button" class="btn btn-secondary btn-sm" data-open-manual title="Add or take away schedules, interviews, shows or hires by hand">＋ Adjust numbers</button>`:''}${mode==='branches'&&canMergeBranches()?`<button type="button" class="btn btn-secondary btn-sm" data-merge-open data-merge-table>${(selectedPieTargets.branches||[]).length>=2?`⇄ Merge ${(selectedPieTargets.branches||[]).length} selected`:`⇄ Merge branches${branchMergeList().length?' · '+branchMergeList().length:''}`}</button>`:''}<span class="rtl-hide" style="display:contents">${copyBtnHtml('peopleTable_'+mode)}${downloadBtnHtml('peopleTable_'+mode, (mode==='recruiters'?'recruiter':'branch')+'-performance.xlsx')}</span></div></div>
           <table id="peopleTable_${mode}" class="rtl-hide"></table>
           ${mode==='recruiters'?'<div id="recTimeline"></div>':''}
         </div>
@@ -12843,7 +12844,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.86.3';   // shown only in the browser tab title
+const APP_VERSION = '4.86.4';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
