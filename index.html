@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.83.0</title>
+<title>Performance Dashboard · v4.84.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2352,6 +2352,50 @@ body.ov-bar .topbar{border-top:0}
 @media(max-width:700px){#ovModeBar.ovx-seg:not(.hidden),#ovModeBar.ovx-seg.stuck:not(.hidden){padding:8px 12px!important}#ovModeBar.ovx-seg .ovx-row{flex-direction:column;align-items:stretch;gap:8px}
  #ovModeBar.ovx-seg .ovx-tabs{display:flex!important;width:100%!important}#ovModeBar.ovx-seg .ovx-tabs a{flex:1 1 0!important;justify-content:center;padding:8px 4px!important}#ovModeBar.ovx-seg .ovx-t{align-items:center}#ovModeBar.ovx-seg .ovx-t b{font-size:13.5px}
  #ovModeBar.ovx-seg .ovx-date{width:100%}#ovModeBar.ovx-seg.stuck .ovx-date{display:none}}
+</style>
+<style>
+/* iOS-style sidebar (computer screens): light frosted panel, white rounded pill for the open page — same language as the Overview switcher */
+@media (min-width:801px){
+ html body .sidebar{background:linear-gradient(180deg,#f7f9fc 0%,#eef2f7 100%)!important;color:#0a1f44!important;border-right:1px solid #e1e7ef!important;border-bottom:0!important;box-shadow:none!important}
+ html body .sidebar::before{display:none!important}
+ html body .sidebar .brand h1,html body .sidebar .brand-text h1,html body .sidebar #dashboardTitle{color:#0a1f44!important;letter-spacing:-.01em}
+ html body .sidebar .brand p,html body .sidebar .brand-text p{color:#64748b!important}
+ html body .sidebar .brand-mark{background:linear-gradient(135deg,#3b82f6,#0a1f44)!important;color:#fff!important;border-radius:11px!important;box-shadow:0 6px 14px -6px #1d4ed899!important;border:0!important}
+ html body .sidebar .side-collapse{color:#94a3b8!important;background:transparent!important;border-radius:8px}
+ html body .sidebar .side-collapse:hover{background:#e6ebf2!important;color:#0a1f44!important}
+ html body .sidebar .side-label,html body .nav .nav-group-label{color:#94a3b8!important;font-size:11px!important;font-weight:600!important;letter-spacing:.04em!important;text-transform:none!important}
+ html body .nav button,html body .nav .nav-parent{color:#334155!important;background:transparent!important;border:0!important;border-radius:11px!important;box-shadow:none!important;font-weight:550}
+ html body .nav button:hover:not(.active){background:#e6ebf2!important;color:#0a1f44!important}
+ html body .nav button.active{background:#fff!important;color:#0a1f44!important;font-weight:650!important;box-shadow:0 1px 3px #0a1f4422,0 1px 1px #0a1f440d,0 0 0 .5px #0a1f4414!important}
+ html body .nav button.active::before{display:none!important}
+ html body .nav .nav-ico{color:#64748b!important;opacity:1!important}
+ html body .nav button.active .nav-ico{color:#1d4ed8!important}
+ html body .nav .nav-parent.has-active{color:#0a1f44!important}
+ html body .nav .nav-parent.has-active .nav-ico{color:#1d4ed8!important}
+ html body .nav .nav-chev{color:#94a3b8!important}
+ html body .nav .dot{display:none!important}
+ html body .nav-sub::after{background:#d9e1ec!important}
+ html body .sidebar .refresh-stamp{border-top-color:#e1e7ef!important;color:#64748b!important}
+ html body .sidebar .refresh-stamp b{color:#94a3b8!important}html body .sidebar .refresh-stamp em{color:#94a3b8!important}html body .sidebar .refresh-stamp time{color:#0a1f44!important}
+ html body .sidebar .ribbon-actions{border-top-color:#e1e7ef!important}
+ html body .sidebar .ribbon-btn{background:#fff!important;color:#334155!important;border:1px solid #e3e8ef!important;border-radius:12px!important;box-shadow:0 1px 2px #0a1f440d!important}
+ html body .sidebar .ribbon-btn:hover{background:#f8fafc!important;color:#0a1f44!important;border-color:#cfd8e4!important}
+ html body .sidebar .ribbon-btn .rb-ico{color:#1d4ed8!important}
+ html body .sidebar .user-chip,html body .sidebar .user-chip-wrap{color:#0a1f44!important;background:transparent!important;border-color:#e1e7ef!important}
+ html body .sidebar .user-chip:hover{background:#e6ebf2!important}
+ html body .sidebar .user-chip .user-role,html body .sidebar .user-chip small{color:#64748b!important}
+ html body .sidebar .user-chip .avatar,html body .sidebar .user-chip .user-avatar{background:linear-gradient(135deg,#3b82f6,#0a1f44)!important;color:#fff!important}
+ html body .sidebar #accountMenu{border-top-color:#e1e7ef!important}
+ html body .sidebar #downloadDropdownBtn,html body .sidebar #accessModeBtn,html body .sidebar #clearAllFiltersBtn{background:#fff!important;color:#334155!important;border:1px solid #e3e8ef!important}
+ html body .sidebar #userChip,html body .sidebar #userChip .user-name b,html body .sidebar #userChip b{color:#0a1f44!important;background:transparent!important;border-color:transparent!important;box-shadow:none!important}
+ html body .sidebar #userChip:hover{background:#e6ebf2!important}
+ html body .sidebar #userChip small{color:#64748b!important}
+ html body .sidebar #userChip .user-dot{background:linear-gradient(135deg,#3b82f6,#0a1f44)!important;color:#fff!important}
+ html body .sidebar #userChip .user-caret{color:#94a3b8!important}
+ html body .sidebar #accountMenu .ribbon-btn{background:transparent!important;border:0!important;box-shadow:none!important;color:#334155!important}
+ html body .sidebar #accountMenu .ribbon-btn:hover{background:#e6ebf2!important}
+ html body.side-collapsed .nav .nav-group-label{font-size:0!important;height:1px;margin:8px 10px!important;background:#e1e7ef}
+}
 </style>
 </head>
 <body class="locked">
@@ -12649,7 +12693,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.83.0';   // shown only in the browser tab title
+const APP_VERSION = '4.84.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
