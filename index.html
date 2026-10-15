@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Performance Dashboard · v4.90.1</title>
+<title>Performance Dashboard · v4.91.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -12507,6 +12507,7 @@ function renderTeamGroups(){
  ${ltState.directoryError?`<p class="warn-note">User list unavailable: ${escapeHtml(ltState.directoryError)} <button class="btn btn-secondary" id="ltDirectoryRetry">Retry</button></p>`:''}
  ${AN.highlights}
  ${AN.table}
+ ${AN.breakHtml||''}
  <section class="panel lt-tabs-panel">
   <div class="lt-tabs" role="tablist" aria-label="More team detail">
    <button role="tab" data-lt-tab="daily" data-section="team.daily">Daily</button>
@@ -12523,7 +12524,8 @@ function renderTeamGroups(){
   <div class="lt-pane" data-lt-pane="cands" data-section="team.candidates" id="ltScheduledCandidates"></div>
  </section><div id="ltPersonHost"></div>`;
  ltRenderScheduledCandidates(g);
- host.querySelector('#ltBrkToggle')?.addEventListener('click',()=>{ ltSetBreakVisible(!ltBreakVisible()); renderTeamGroups(); });
+ { const box=host.querySelector('[data-ta-wins]'), tg=host.querySelector('#ltMtWinsTog'); if(box&&tg) tg.onclick=()=>{ ltState.showWins=!ltState.showWins; box.hidden=!ltState.showWins; tg.setAttribute('aria-expanded',String(ltState.showWins)); const l=tg.querySelector('[data-ta-lbl]'); if(l) l.textContent=ltState.showWins?'Hide':'Show'; }; }
+ host.querySelectorAll('[data-ltf]').forEach(b=>b.onclick=()=>{ const k=b.dataset.ltf; host.querySelectorAll('[data-ltf]').forEach(x=>x.classList.toggle('on',x===b)); host.querySelectorAll('#ltBrkTable tbody tr').forEach(tr=>tr.hidden=k!=='all'&&tr.dataset.st!==k); });
  host.querySelector('#ltBrkImg')?.addEventListener('click',()=>{ if(!canCopyBreakImage()) return; ltCopyBreakImage(AN.breakLists, {team:a.team_name, dayLabel:AN.breakLists.dayLabel, day:AN.breakLists.day}); });
  ltBindTeamPicker(host);
  if(Server.isAdmin()||(canViewLeads()&&String(ltState.viewingId||'')!==String(Server.user.id))){ document.querySelectorAll('#navList button[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view==='leads')); layoutNav(); }
@@ -12623,18 +12625,36 @@ function ltAnalytics(g,p,cutoff,mode,today,self,checks=[],checkDay=cutoff){
   <div class="ta-box ta-att" data-section="team.analytics.attention"><h4>⚠️ Needs attention <span class="pill warn">${att.length}</span></h4>${att.length?capList(att.map(x=>`<li><div>${who(x.r)}${where(x.r)}</div>${x.issues.sort((m,n)=>n.sev-m.sev).map(i=>`<span class="ta-sev${i.sev}">${i.t}</span>`).join('')}</li>`)):'<p class="hint">Nobody is below the minimums. 🎉</p>'}</div>
  </div></section>`;
  const sorted=rows.slice().sort((a,b)=>(b.goal??-1)-(a.goal??-1));
- const table=`<section class="panel ta" data-section="team.recruiters"><div class="lt-section-head ta-rec-head"><h3>Recruiters</h3><span class="hint">${rows.length} on the team${work.length?'':' · no working days yet'}</span><div class="ta-tools">${checks.length&&canSeeSection('team.goals')?`<div class="ta-brk-ctl" data-section="team.goals">${showBrk?`<span class="pill ${elig?'good':'pending'}">${elig} of ${checks.length} eligible · ${dayLbl}</span>${canCopyBreakImage()?`<button type="button" class="btn btn-secondary btn-sm" id="ltBrkImg" title="Copy eligible and not-yet-eligible recruiters as one image">📷 Copy as image</button>`:''}`:''}<button type="button" class="switch-chip" id="ltBrkToggle" role="switch" aria-checked="${showBrk}"><i></i>Third break</button></div>`:''}${copyBtnHtml('ltRecruiterTable')}</div></div>
- <div class="hp-table-wrap"><table class="ep-table rt-table" id="ltRecruiterTable"><thead><tr>
-  <th>Recruiter</th><th class="num">Schedules<small>${mode==='day'?'today':'so far'} vs goal</small></th>${showBrk?`<th class="num">${dayLbl}<small>daily goal</small></th><th>Third break</th>`:''}<th class="num">Interviews</th><th class="num">Shows</th><th class="num">No shows</th><th class="num">Hires</th></tr></thead>
- <tbody>${sorted.map(r=>{ const c=ck.get(r.name), x=r.x;
-   const rate=(v,k)=>v==null?'':`<span class="rt-pct rt-${band[k](v)||'n'}">${pc(v)}</span>`;
-   const today=!showBrk?'':!c||c.daily==null?'<td class="num rt-n">–</td>':`<td class="num"><span class="rt-${c.daily>=c.dg?'g':c.daily>=c.dg*.5?'a':'r'}">${tgNumber(c.daily)}</span><span class="rt-of">/ ${tgNumber(c.dg)}</span></td>`;
-   const brk=!showBrk?'':!c||!c.known?'<td class="rt-n">–</td>':c.eligible?'<td><span class="rt-ok">✓ Eligible</span></td>':`<td><span class="rt-more">${tgNumber(Math.max(0,c.required-c.cum))} more</span></td>`;
-   return `<tr${r.name===self?' class="lt-mine"':''}><td><div class="rt-name">${who(r)} ${tier(r)}</div>${r.branch?`<small class="rt-branch">${escapeHtml(r.branch)}</small>`:''}</td>
-   <td class="num"><span class="rt-dot rt-bg-${band.goal(r.goal)||'n'}"></span><b>${num0(x.schedules)}</b><span class="rt-of">/ ${tgNumber(r.pace)}</span></td>${today}${brk}
-   <td class="num">${num0(x.scheduledDateOf)}</td><td class="num"><b>${num0(x.shows)}</b>${rate(r.show,'show')}</td><td class="num"><b>${num0(x.noShows)}</b>${rate(r.noshow,'noshow')}</td><td class="num"><b>${num0(x.i9)}</b></td></tr>`; }).join('')||'<tr><td colspan="8">No team members in this selection.</td></tr>'}</tbody>
- <tfoot><tr><td>Team</td><td class="num"><b>${fmtNum(T.schedules||0)}</b><span class="rt-of">/ ${tgNumber(rows.reduce((a,r)=>a+r.pace,0))}</span> <span class="rt-pct">${pc(team.goal)}</span></td>${showBrk?'<td></td><td></td>':''}<td class="num">${num0(T.scheduledDateOf)}</td><td class="num"><b>${num0(T.shows)}</b><span class="rt-pct">${pc(team.show)}</span></td><td class="num"><b>${num0(T.noShows)}</b><span class="rt-pct">${pc(team.noshow)}</span></td><td class="num"><b>${num0(T.i9)}</b></td></tr></tfoot></table></div>
- <details class="ta-legend"><summary>How to read this</summary><p class="hint">Dot: green at 90%+ of the schedule goal so far, amber 50–89%, red under 50%. Show rate is green at 70%+, no-show rate green under 20%. Emoji: 🤬 under 50% · 🫡 50–80% · 🫰 81–100% · 🤩 above 100% of goal. Third break needs the daily goal × working days so far this week.</p></details></section>`;
+ // ---- recruiters: same look as the Team Leads page (one row per recruiter, coloured cells) ----
+ const wkN=mode==='day'?1:Math.max(1,Math.round((work.length||ltWorkdays(p.from,cutoff).length)/5*10)/10), perWk=mode!=='day';
+ const bandH=v=>v==null?'':v>=15?'g':v>=12?'a':'r';
+ const mcell=(k,v,sub)=>`<td class="ta-cell ta-${band[k](v)||'n'}">${pc(v)}${sub?`<small>${sub}</small>`:''}</td>`;
+ const hireCell=(i9,h)=>`<td class="ta-cell ta-${band.hire(h)||'n'}">${i9==null?'–':fmtNum(i9)}<small>${h==null?'':pc(h)+' of shows'}</small></td>`;
+ const hpwCell=v=>`<td class="ta-cell ta-${bandH(v)||'n'}">${v==null?'–':v.toFixed(1)}</td>`;
+ const hpw=x=>x.i9==null?null:x.i9/wkN;
+ const winsBar=canSeeSection('team.analytics')?`<button type="button" class="ta-wins-bar" id="ltMtWinsTog" aria-expanded="${!!ltState.showWins}" data-section="team.analytics"><span data-section="team.analytics.wins">🏆 Winning <b>${nWin}</b></span><span data-section="team.analytics.attention">⚠️ Needs attention <b>${att.length}</b></span><em data-ta-lbl>${ltState.showWins?'Hide':'Show'}</em><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+ <div class="ta-cols" data-ta-wins data-section="team.analytics" ${ltState.showWins?'':'hidden'}>
+  <div class="ta-box ta-win" data-section="team.analytics.wins"><h4>🏆 Winning <span class="pill good">${nWin}</span></h4>${winBy.length?capList(winBy.map(x=>`<li><div>${who(x.r)}${where(x.r)}</div>${x.items.map(h=>`<span>${h}</span>`).join('')}</li>`)):'<p class="hint">Nobody is above the minimums yet in this period.</p>'}</div>
+  <div class="ta-box ta-att" data-section="team.analytics.attention"><h4>⚠️ Needs attention <span class="pill warn">${att.length}</span></h4>${att.length?capList(att.map(x=>`<li><div>${who(x.r)}${where(x.r)}</div>${x.issues.sort((m,n)=>n.sev-m.sev).map(i=>`<span class="ta-sev${i.sev}">${i.t}</span>`).join('')}</li>`)):'<p class="hint">Nobody is below the minimums. 🎉</p>'}</div>
+ </div>`:'';
+ const soFarG=ltState.basis==='today'&&p.to>today, teamPace=rows.reduce((a,r)=>a+r.pace,0), teamHpw=T.i9==null||!rows.length?null:T.i9/rows.length/wkN;
+ const table=`<section class="panel ta" data-section="team.recruiters"><div class="lt-section-head"><h3>How each recruiter is doing</h3><span class="hint">${rows.length} on the team · schedules vs goal, interviews (shows vs no shows) and hires${work.length?'':' · no working days yet'}</span><div class="ta-tools" style="margin-left:auto">${copyBtnHtml('ltRecruiterTable')}</div></div>
+ ${winsBar}
+ <div class="hp-table-wrap"><table class="ep-table ta-matrix" id="ltRecruiterTable"><thead><tr><th rowspan="2">#</th><th rowspan="2">Recruiter</th><th class="ta-grp">Schedules</th><th class="ta-grp" colspan="3">Interviews</th><th class="ta-grp" colspan="${perWk?2:1}">Hires</th></tr>
+ <tr><th>vs goal<small>${soFarG?'so far':(p.to>today?'whole '+mode:'')} · min 90%</small></th><th>Interviews</th><th>Shows<small>show rate · min 70%</small></th><th>No shows<small>no-show rate · under 20%</small></th><th>Hires<small>of shows · team ${pc(team.hire)}</small></th>${perWk?'<th>Per week<small>min 15 a week</small></th>':''}</tr></thead>
+ <tbody>${sorted.map((r,i)=>{ const x=r.x; return `<tr><td>${i+1}</td><td><div class="rt-name">${who(r)} ${tier(r)}</div>${r.branch?`<small class="ta-team">${escapeHtml(r.branch)}</small>`:''}</td>${mcell('goal',r.goal,`${num0(x.schedules)} / ${tgNumber(r.pace)}`)}<td class="ta-cell ta-n ta-plain">${num0(x.scheduledDateOf)}</td>${mcell('show',r.show,x.scheduledDateOf?`${fmtNum(x.shows||0)} shows`:'')}${mcell('noshow',r.noshow,x.scheduledDateOf?`${fmtNum(x.noShows||0)} no shows`:'')}${hireCell(x.i9,r.hire)}${perWk?hpwCell(hpw(x)):''}</tr>`; }).join('')||`<tr><td colspan="${perWk?8:7}" class="hint">No team members in this selection.</td></tr>`}</tbody>
+ <tfoot><tr><td></td><td>Team</td><td>${pc(team.goal)}<small class="hint"> ${fmtNum(T.schedules||0)} / ${tgNumber(teamPace)}</small></td><td>${num0(T.scheduledDateOf)}</td><td>${pc(team.show)}<small class="hint"> ${num0(T.shows)}</small></td><td>${pc(team.noshow)}<small class="hint"> ${num0(T.noShows)}</small></td><td>${num0(T.i9)}<small class="hint"> ${pc(team.hire)}</small></td>${perWk?`<td>${teamHpw==null?'–':teamHpw.toFixed(1)}</td>`:''}</tr></tfoot></table></div>
+ <details class="ta-legend"><summary>How to read this</summary><p class="hint">Schedules vs goal: green at 90%+ of the goal, amber 50–89%, red under 50%. Show rate is green at 70%+, no-show rate green under 20%. Hires are compared with the team’s hire rate. Emoji: 🤬 under 50% · 🫡 50–80% · 🫰 81–100% · 🤩 above 100% of goal. Click a recruiter to see their history.</p></details></section>`;
+ // ---- third break: this team only, its own table below ----
+ const brkRows=[...checks.filter(c=>c.eligible).map(c=>({c,st:'yes'})),...checks.filter(c=>c.known&&!c.eligible).map(c=>({c,st:'no'})),...checks.filter(c=>!c.known).map(c=>({c,st:'wait'}))]
+   .sort((x,y)=>({yes:0,no:1,wait:2}[x.st]-{yes:0,no:1,wait:2}[y.st])||(x.st==='no'?(y.c.cum/y.c.required)-(x.c.cum/x.c.required):0)||String(x.c.name).localeCompare(String(y.c.name)));
+ const nE=brkRows.filter(r=>r.st==='yes').length, nN=brkRows.filter(r=>r.st==='no').length;
+ const stCell=r=>r.st==='yes'?'<span class="ld-st ok">✓ Eligible</span>':r.st==='no'?`<span class="ld-st no">${tgNumber(Math.max(0,r.c.required-r.c.cum))} more needed</span>`:'<span class="ld-st wait">No data yet</span>';
+ const breakHtml=!checks.length||!canSeeSection('team.goals')?'':`<section class="panel ta ld-break" data-section="team.goals"><div class="panel-head"><div><h3>☕ Third break · ${fmtDate(checkDay)}</h3><span class="hint">Your team only. Eligible when schedules so far this week reach a fifth of the weekly goal per working day (goal 50: Mon 10 · Tue 20 · Wed 30 · Thu 40 · Fri 50).</span></div>
+  <div class="mr-head-tools"><div class="oe-group" role="tablist" aria-label="Show">${[['all','All · '+brkRows.length],['yes','Eligible · '+nE],['no','Not yet · '+nN]].map(([k,l])=>`<button type="button" data-ltf="${k}" class="${k==='all'?'on':''}">${l}</button>`).join('')}</div>${canCopyBreakImage()?'<button type="button" class="btn btn-secondary btn-sm" id="ltBrkImg" title="Copy eligible and not-yet-eligible recruiters as one image">📷 Copy as image</button>':''}${copyBtnHtml('ltBrkTable')}</div></div>
+  <div class="onb-scroll"><table class="users-table onb-table ld-brk-table" id="ltBrkTable"><thead><tr><th>Recruiter</th><th>Branch</th><th class="num">Schedules this week</th><th class="num">Needed by ${escapeHtml(new Date(checkDay+'T12:00:00Z').toLocaleDateString('en-US',{weekday:'short',timeZone:'UTC'}))}</th><th>Third break</th></tr></thead><tbody>
+  ${brkRows.map(r=>`<tr data-st="${r.st}"${r.c.name===self?' class="lt-mine"':''}><td><b>${escapeHtml(r.c.name)}</b>${r.c.name===self?' <span class="hint">(You)</span>':''}</td><td class="hint">${escapeHtml(ltBranchOf(r.c.name,p.from,cutoff)||'–')}</td><td class="num">${r.st==='wait'?'–':tgNumber(r.c.cum)}</td><td class="num">${r.st==='wait'?'–':tgNumber(r.c.required)}</td><td>${stCell(r)}</td></tr>`).join('')}
+  </tbody></table></div></section>`;
  // Others at the same branches (no names shown): everyone active in the period who isn't on this team.
  const teamNames=new Set(rows.map(r=>r.name));
  const everyone=[...new Set(weeksData.filter(w=>w.weekEndDate>=p.from&&tgShift(w.weekEndDate,-6)<=p.to).flatMap(w=>Object.keys(w.byRecruiter||{})))].filter(n=>!teamNames.has(n)&&!excludedRecruitersSet.has(n));
@@ -12662,7 +12682,7 @@ function ltAnalytics(g,p,cutoff,mode,today,self,checks=[],checkDay=cutoff){
   <tr class="bc-other"><td><span class="pill pending">Other recruiters</span></td>${x.other?`<td>${x.other.n}</td><td>${fmtNum(x.other.s)}</td>${cols.map(([k,,,f])=>plain(x.other,k,f)).join('')}<td>${fmtNum(x.other.i)}</td><td>${fmtNum(x.other.h)}</td>`:`<td colspan="${4+cols.length}" class="ta-n">No other recruiters at this branch in this period</td>`}</tr>`).join('')}
   </tbody></table></div>`;
  }
- return {highlights,table,branches,breakLists:{eligible:checks.filter(c=>c.eligible).map(c=>({...c,branch:ltBranchOf(c.name,p.from,cutoff)})),notyet:checks.filter(c=>c.known&&!c.eligible).map(c=>({...c,branch:ltBranchOf(c.name,p.from,cutoff)})).sort((a,b)=>(b.cum/b.required)-(a.cum/a.required)),dayLabel:fmtDate(checkDay),day:checkDay}};
+ return {highlights:'',table,breakHtml,branches,breakLists:{eligible:checks.filter(c=>c.eligible).map(c=>({...c,branch:ltBranchOf(c.name,p.from,cutoff)})),notyet:checks.filter(c=>c.known&&!c.eligible).map(c=>({...c,branch:ltBranchOf(c.name,p.from,cutoff)})).sort((a,b)=>(b.cum/b.required)-(a.cum/a.required)),dayLabel:fmtDate(checkDay),day:checkDay}};
 }
 // ---------- Team leads comparison (admins): every lead's team side by side ----------
 const ltLeads={owner:null,teams:null,loading:false,error:'',at:0};
@@ -12964,7 +12984,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.90.1';   // shown only in the browser tab title
+const APP_VERSION = '4.91.0';   // shown only in the browser tab title
 // Everyone gets the latest look: the page checks the published file for a newer version — right after it opens
 // (switches straight over) and every few minutes / when the tab comes back (offers an Update button).
 const AppUpdate=(()=>{
