@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Performance Dashboard · v4.93.0</title>
+<title>Performance Dashboard · v4.94.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2608,7 +2608,7 @@ html body .toast,html body #toast{border-radius:14px!important;background:rgba(3
 .role-card header{display:flex;gap:10px;align-items:flex-start}.role-card h4{margin:0;font-size:15px}.role-card header p{margin:2px 0 0;font-size:12.5px;color:#6e6e73}
 .role-ppl{margin-left:auto;white-space:nowrap;font-size:12px;font-weight:700;color:#0a3d91;background:rgba(0,122,255,.1);padding:3px 9px;border-radius:999px}
 .role-pages{display:flex;flex-wrap:wrap;gap:4px}.role-levels{display:flex;gap:6px;flex-wrap:wrap}.role-levels .lv{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:7px}
-.lv.v{background:#e8f1ff;color:#0a3d91}.lv.s{background:rgba(118,118,128,.12);color:#3a3a3c}.lv.e{background:#e7f8ee;color:#137a3d}.lv.d{background:#fdecec;color:#b42318}
+.lv.v{background:#e8f1ff;color:#0a3d91}.lv.s{background:rgba(118,118,128,.12);color:#3a3a3c}.role-builtin{background:linear-gradient(180deg,#f5f9ff,#fff)}.role-bi{font-size:10.5px;font-weight:700;color:#0a3d91;background:rgba(0,122,255,.12);padding:2px 7px;border-radius:999px;vertical-align:2px;margin-left:4px}.lv.e{background:#e7f8ee;color:#137a3d}.lv.d{background:#fdecec;color:#b42318}
 .role-card footer{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto;padding-top:6px;border-top:.5px solid #e5e5ea}
 .role-empty{display:flex;flex-direction:column;gap:6px;align-items:flex-start;padding:18px;border-radius:16px;background:rgba(118,118,128,.08)}.role-empty span{color:#6e6e73;font-size:13px}
 .role-custom{margin:12px 0 0}
@@ -2635,7 +2635,7 @@ html body .toast,html body #toast{border-radius:14px!important;background:rgba(3
 .rm-top input:focus{outline:2px solid rgba(0,122,255,.45);background:#fff}
 .rm-table thead th{position:sticky;top:-1px;background:#fff;z-index:1}
 .uf-role-sel{width:100%;max-width:460px}.uf-role-note{margin:6px 0 0}.uf-role-note:empty{display:none}
-.uf-access.role-locked .uf-start{display:none}.uf-body.uf-has-role .uf-access,.uf-body.uf-has-role .uf-home{display:none}.ua-role-sel{min-width:170px;max-width:220px;height:32px;padding:0 10px;border:0;border-radius:9px;background:rgba(118,118,128,.12);font:inherit;font-size:13px;font-weight:600;color:#1c1c1e}.ua-rolecell{white-space:nowrap}
+.uf-access.role-locked .uf-start{display:none}.uf-body.uf-has-role .uf-access,.uf-body.uf-has-role .uf-home{display:none}.uf-body.uf-is-admin .uf-access,.uf-body.uf-is-admin .admin-note{display:none!important}.uf-type{display:none!important}.ua-role-sel{min-width:170px;max-width:220px;height:32px;padding:0 10px;border:0;border-radius:9px;background:rgba(118,118,128,.12);font:inherit;font-size:13px;font-weight:600;color:#1c1c1e}.ua-rolecell{white-space:nowrap}
 @media (max-width:700px){.rm-top{grid-template-columns:1fr}.roles-head{flex-direction:column}.roles-head .btn{margin-left:0}}
 </style>
 <style>
@@ -2647,6 +2647,7 @@ html body .toast,html body #toast{border-radius:14px!important;background:rgba(3
 #ovModeBar .rtl-top #rtlToggle button.on{background:#fff;color:#1c1c1e;box-shadow:0 1px 3px rgba(0,0,0,.14),0 0 0 .5px rgba(0,0,0,.04)}
 </style>
 <style id="ios-settings">
+#myAccountBtn{display:none!important}
 html body.on-settings #ovModeBar{display:none!important}
 @media (min-width:900px){
  html body .settings-page{grid-template-columns:250px minmax(0,1fr)!important;gap:26px!important}
@@ -11780,7 +11781,7 @@ async function renderUsersAdmin(){
     <div style="overflow-x:auto"><table class="users-table ua-table"><thead><tr><th>Person</th><th>Role</th><th>Can open</th><th>Status</th><th>Last sign-in</th><th></th></tr></thead><tbody>
     ${usersCache.map(u=>`<tr data-ua-name="${escapeHtml(String(u.name||'').toLowerCase())}" data-ua-role="${u.role==='user'?'user':'admin'}" data-ua-off="${u.active?0:1}">
       <td><div class="ua-person"><span class="ua-av ${u.role!=='user'?'adm':''}">${escapeHtml(ini(u.name))}</span><div><strong>${escapeHtml(u.name)}</strong>${window.DV_MODE&&u.email?`<span class="ua-email">${escapeHtml(u.email)}</span>`:''}${u.online?' <span class="online-dot" title="Online now"></span>':''}<span class="ua-role">${u.role==='super_admin'?'Super admin':u.role==='admin'?'Admin':'User'}</span></div></div></td>
-      <td class="ua-rolecell">${u.role!=='user'?'<span class="hint" title="Admins and the super admin can use everything">—</span>':Server.isSuperAdmin()?`<select class="ua-role-sel" data-ua-role-sel="${escapeHtml(String(u.id))}" aria-label="Role for ${escapeHtml(u.name)}"><option value="">No role</option>${rolesData().roles.map(r=>`<option value="${escapeHtml(r.id)}" ${roleOfUser(u.id)&&roleOfUser(u.id).id===r.id?'selected':''}>${escapeHtml(r.name)}</option>`).join('')}</select>`:roleOfUser(u.id)?`<span class="role-chip">${escapeHtml(roleOfUser(u.id).name)}</span>`:'<span class="hint">No role</span>'}</td>
+      <td class="ua-rolecell">${u.role==='super_admin'?'<span class="role-chip">Super admin</span>':Server.isSuperAdmin()?`<select class="ua-role-sel" data-ua-role-sel="${escapeHtml(String(u.id))}" aria-label="Role for ${escapeHtml(u.name)}"><option value="__admin" ${u.role==='admin'?'selected':''}>Admin</option>${rolesData().roles.map(r=>`<option value="${escapeHtml(r.id)}" ${u.role==='user'&&roleOfUser(u.id)&&roleOfUser(u.id).id===r.id?'selected':''}>${escapeHtml(r.name)}</option>`).join('')}<option value="" ${u.role==='user'&&!roleOfUser(u.id)?'selected':''}>No role</option></select>`:u.role==='admin'?'<span class="role-chip">Admin</span>':roleOfUser(u.id)?`<span class="role-chip">${escapeHtml(roleOfUser(u.id).name)}</span>`:'<span class="hint">No role</span>'}</td>
       <td class="mod-chips">${summary(u)}</td>
       <td>${u.active?'<span class="ua-status on">Active</span>':'<span class="ua-status">Disabled</span>'}</td>
       <td class="ua-when" title="${u.last_login_at?escapeHtml(new Date(u.last_login_at).toLocaleString()):''}">${when(u.last_login_at)}</td>
@@ -11802,16 +11803,21 @@ async function renderUsersAdmin(){
   host.querySelectorAll('[data-ua-f]').forEach(b=>b.onclick=()=>{ window.__uaF=b.dataset.uaF; host.querySelectorAll('[data-ua-f]').forEach(x=>x.classList.toggle('on',x===b)); applyUa(); });
   applyUa();
   host.querySelectorAll('[data-ua-role-sel]').forEach(sel=>{ const prev=sel.value; sel.onchange=async()=>{
-    const u=usersCache.find(x=>String(x.id)===sel.dataset.uaRoleSel), r=rolesData().roles.find(x=>x.id===sel.value); if(!u) return;
-    if(r&&!confirm(`Give ${u.name} the “${r.name}” role? Their pages, rights and sections are replaced by the role’s.`)){ sel.value=prev; return; }
-    if(!r&&!confirm(`Remove ${u.name}’s role? They keep their current rights, set by hand from now on (Edit → page switches).`)){ sel.value=prev; return; }
+    const u=usersCache.find(x=>String(x.id)===sel.dataset.uaRoleSel), adm=sel.value==='__admin', r=adm?null:rolesData().roles.find(x=>x.id===sel.value); if(!u) return;
+    if(adm&&!confirm(`Make ${u.name} an Admin? Admins can use every page and right, approve remarks and manage users.`)){ sel.value=prev; return; }
+    if(r&&!confirm(`Give ${u.name} the “${r.name}” role? Their pages, rights and sections are replaced by the role’s.${u.role==='admin'?'\n\nThey stop being an Admin.':''}`)){ sel.value=prev; return; }
+    if(!adm&&!r&&!confirm(`${u.role==='admin'?`Remove ${u.name}’s Admin role? They keep only the pages already ticked for them`:`Remove ${u.name}’s role? They keep their current rights`}, set by hand from now on (Edit → page switches).`)){ sel.value=prev; return; }
     sel.disabled=true; const x=rolesData();
-    if(r){ const res=await roleApplyTo(r,[u]); if(res.fail.length){ showToast('Not changed: '+res.fail.join(', ')); sel.value=prev; sel.disabled=false; return; } x.assign[String(u.id)]=r.id; }
-    else delete x.assign[String(u.id)];
-    if(await rolesSave(x)) showToast(r?`${u.name} now has the “${r.name}” role.`:`${u.name} has no role now — rights are set by hand.`);
+    try{
+     if(r){ const res=await roleApplyTo(r,[u]); if(res.fail.length) throw new Error(res.fail.join(', ')); x.assign[String(u.id)]=r.id; }
+     else { await Server.rpc('dash_user_save',{p:{id:u.id,name:u.name,role:adm?'admin':'user',modules:u.modules||[],hidden_sections:u.hidden_sections||[],active:u.active}}); delete x.assign[String(u.id)]; }
+    }catch(e){ showToast('Not changed: '+cleanErr(e)); sel.value=prev; sel.disabled=false; return; }
+    await rolesSave(x);
+    showToast(adm?`${u.name} is now an Admin.`:r?`${u.name} now has the “${r.name}” role.`:`${u.name} has no role now — rights are set by hand.`);
     renderUsersAdmin(); }; });
   host.querySelectorAll('[data-team-user]').forEach(b=>b.onclick=()=>ltAdminOpen(usersCache.find(u=>String(u.id)===b.dataset.teamUser)));
-  host.querySelector('#addUserBtn').onclick=()=>{ userFormPreset=null; editingUserId='new'; drawUserForm(); };
+  const toPeople=()=>{ window.__uaTab='people'; host.querySelectorAll('[data-ua-tab]').forEach(x=>x.classList.toggle('on',x.dataset.uaTab==='people')); host.querySelector('#uaRoles').hidden=true; host.querySelector('#uaPeople').hidden=false; };
+  host.querySelector('#addUserBtn').onclick=()=>{ toPeople(); userFormPreset=null; editingUserId='new'; drawUserForm(); };
   host.querySelectorAll('[data-dup-user]').forEach(b=>b.onclick=()=>{ const src=usersCache.find(x=>String(x.id)===b.dataset.dupUser); if(!src) return; userFormPreset={...rightsOf(src), from:src.name}; editingUserId='new'; drawUserForm(); document.getElementById('userForm')?.scrollIntoView({block:'start'}); });
   host.querySelectorAll('[data-edit-user]').forEach(b=>b.onclick=()=>{ editingUserId=b.dataset.editUser; drawUserForm(); });
   host.querySelectorAll('[data-del-user]').forEach(b=>b.onclick=async ()=>{
@@ -11939,7 +11945,7 @@ const roleId=()=>'r'+Date.now().toString(36)+Math.random().toString(36).slice(2,
 async function roleApplyTo(role, users, step){
  let ok=0; const fail=[], dv={...adminDefaultViews()};
  for(const u of users){ step&&step(ok+fail.length+1, users.length); const r=rightsWithRole(u,role);
-  try{ await Server.rpc('dash_user_save',{p:{id:u.id,name:u.name,modules:r.modules,hidden_sections:r.hidden_sections,active:u.active}}); Object.assign(u,{modules:r.modules,hidden_sections:r.hidden_sections}); ok++; if(role.defaultView) dv[u.id]=role.defaultView; }
+  try{ await Server.rpc('dash_user_save',{p:{id:u.id,name:u.name,...(u.role==='admin'?{role:'user'}:{}),modules:r.modules,hidden_sections:r.hidden_sections,active:u.active}}); Object.assign(u,{role:'user',modules:r.modules,hidden_sections:r.hidden_sections}); ok++; if(role.defaultView) dv[u.id]=role.defaultView; }
   catch(e){ fail.push(u.name+' ('+cleanErr(e)+')'); } }
  if(ok&&role.defaultView&&await storageSet('userDefaultViews',dv)!==null) KV.set('userDefaultViews',dv);
  return {ok,fail};
@@ -11953,10 +11959,12 @@ function rolesPanelHtml(){
    <div class="role-pages">${s.pages.length?s.pages.map(x=>`<span class="mod-chip">${escapeHtml(x)}</span>`).join(''):'<span class="hint">No pages yet</span>'}</div>
    <div class="role-levels"><span class="lv v">View ${s.v}</span><span class="lv e">Edit ${s.e}</span><span class="lv d">Delete & manage ${s.d}</span>${roleSecs(r).length?`<span class="lv s">${roleSecs(r).length} section${roleSecs(r).length===1?'':'s'} hidden</span>`:'<span class="lv s">All sections shown</span>'}</div>
    ${sa?`<footer><button type="button" class="btn btn-primary btn-sm" data-role-ppl="${r.id}">👥 Assign people</button><button type="button" class="btn btn-secondary btn-sm" data-role-edit="${r.id}">Edit rights</button><button type="button" class="btn btn-secondary btn-sm" data-role-dup="${r.id}">Duplicate</button><button type="button" class="btn btn-link-danger btn-sm" data-role-del="${r.id}">Delete</button></footer>`:`<footer><button type="button" class="btn btn-secondary btn-sm" data-role-edit="${r.id}">View rights</button></footer>`}</article>`; }).join('');
+ const admins=(usersCache||[]).filter(u=>u.role==='admin');
+ const adminCard=`<article class="role-card role-builtin"><header><div><h4>Admin <span class="role-bi">Built in</span></h4><p>Every page and every right, approves remarks, manages users (not passwords).</p></div><span class="role-ppl" title="${escapeHtml(admins.map(u=>u.name).join(', '))}">${admins.length} ${admins.length===1?'person':'people'}</span></header><div class="role-levels"><span class="lv v">View all</span><span class="lv e">Edit all</span><span class="lv d">Delete & manage all</span></div><footer><span class="hint">Can’t be changed — pick it in the Role list on People.</span></footer></article>`;
  return `<div class="roles-head"><div><h4>Roles</h4><span class="hint">Set what each role can view, edit and delete once — then give people a role. ${sa?'Changing a role updates everyone who has it.':'Only the super admin can change roles or who has them.'}</span></div>${sa?'<button type="button" class="btn btn-primary" id="roleNew">＋ New role</button>':''}</div>
-  ${d.roles.length?`<div class="role-grid">${cards}</div>`:`<div class="role-empty"><strong>No roles yet.</strong><span>Start with the suggested roles — Viewer, Onboarder, Order entry, Team lead and Manager — and adjust them, or build your own.</span>${sa?'<button type="button" class="btn btn-primary" id="roleSeed">Add suggested roles</button>':''}</div>`}
+  ${d.roles.length?`<div class="role-grid">${adminCard}${cards}</div>`:`<div class="role-empty"><strong>No roles yet.</strong><span>Start with the suggested roles — Viewer, Onboarder, Order entry, Team lead and Manager — and adjust them, or build your own.</span>${sa?'<button type="button" class="btn btn-primary" id="roleSeed">Add suggested roles</button>':''}</div>`}
   ${custom.length&&d.roles.length?`<p class="hint role-custom">${custom.length} ${custom.length===1?'person has':'people have'} no role yet (rights set by hand): ${escapeHtml(custom.slice(0,8).map(u=>u.name).join(', '))}${custom.length>8?' and '+(custom.length-8)+' more':''}.</p>`:''}
-  <p class="hint">Roles are for the user type <b>User</b>. Admins and the super admin can always use everything.</p>`;
+  <p class="hint"><b>Admin</b> is a built-in role — every page and right, approves remarks, manages users. Give it from the Role list on the People tab. The super admin always has everything.</p>`;
 }
 function wireRolesPanel(host, rerender){
  const d=rolesData();
@@ -12036,9 +12044,9 @@ function openRoleEditor(role, done){
 }
 function openRoleAssign(role, done){
  if(!role||!Server.isSuperAdmin()) return;
- const d=rolesData(), pool=(usersCache||[]).filter(u=>u.role==='user').sort((a,b)=>a.name.localeCompare(b.name));
- if(!pool.length){ showToast('There are no users of type “User” yet.'); return; }
- const cur=u=>{ const r=roleOfUser(u.id); return r?r.name:'No role — set by hand'; };
+ const d=rolesData(), pool=(usersCache||[]).filter(u=>u.role!=='super_admin').sort((a,b)=>a.name.localeCompare(b.name));
+ if(!pool.length){ showToast('There is nobody to assign yet.'); return; }
+ const cur=u=>{ if(u.role==='admin') return 'Admin'; const r=roleOfUser(u.id); return r?r.name:'No role — set by hand'; };
  const wrap=document.createElement('div'); wrap.className='modal-overlay';
  wrap.innerHTML=`<div class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="raTitle"><div class="modal-header"><h3 id="raTitle">Who has “${escapeHtml(role.name)}”</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div>
   <div class="modal-body"><p class="hint" style="margin:0 0 8px">Ticked people get exactly this role’s rights, including the sections they see inside each page. Untick someone to keep their current rights and set them by hand.</p>
@@ -12096,18 +12104,18 @@ function drawUserForm(){
      <section class="uf-sec"><h5>Sign-in</h5>
       <div class="field-row">
        <div class="field"><label for="ufName">${window.DV_MODE?'Name':'Name (used to sign in)'}</label><input id="ufName" value="${escapeHtml(u.name)}" autocomplete="off"></div>
-       ${window.DV_MODE?`<div class="field"><label for="ufEmail">Work email (their Microsoft 365 sign-in)</label><input id="ufEmail" type="email" value="${escapeHtml(u.email||'')}" placeholder="name@company.com" autocomplete="off" ${sa&&!meSuper?'disabled':''}></div>`:`<div class="field"><label for="ufPw">${isNew?'Password':'New password'}</label><div class="pw-wrap"><input id="ufPw" type="text" autocomplete="new-password" placeholder="${isNew?'8+ characters, letters and numbers':'Leave blank to keep the current one'}" ${pwLocked?'disabled':''}><button type="button" class="pw-toggle" id="ufGen" ${pwLocked?'disabled':''}>Generate</button></div>${sa?'<span class="hint">Change your own password under My account.</span>':pwLocked?'<span class="hint">Only the super admin can change passwords.</span>':''}</div>`}
+       ${window.DV_MODE?`<div class="field"><label for="ufEmail">Work email (their Microsoft 365 sign-in)</label><input id="ufEmail" type="email" value="${escapeHtml(u.email||'')}" placeholder="name@company.com" autocomplete="off" ${sa&&!meSuper?'disabled':''}></div>`:`<div class="field"><label for="ufPw">${isNew?'Password':'New password'}</label><div class="pw-wrap"><input id="ufPw" type="text" autocomplete="new-password" placeholder="${isNew?'8+ characters, letters and numbers':'Type or generate a new one — leave blank to keep theirs'}" ${pwLocked?'disabled':''}><button type="button" class="pw-toggle" id="ufGen" ${pwLocked?'disabled':''}>Generate</button></div>${sa?'<span class="hint">Change your own password in Settings → My account.</span>':pwLocked?'<span class="hint">Only the super admin can change passwords.</span>':meSuper&&!isNew?'<span class="hint">Passwords are stored one-way scrambled, so the current one can’t be shown. Set a new one here and share it privately — they can change it later in Settings → My account.</span>':''}</div>`}
       </div>
       ${sa?'':`<label class="uf-tool uf-active"><span class="uf-switch"><input type="checkbox" id="ufActive" ${u.active?'checked':''}><i aria-hidden="true"></i></span><span class="uf-page-txt"><strong>Account active</strong><span>Turn off to block sign-in without deleting the account</span></span></label>`}
      </section>
-     ${!sa && meSuper ? `<section class="uf-sec"><h5>User type</h5><div class="role-pick" role="radiogroup" aria-label="User type">
-      <label class="role-opt"><input type="radio" name="ufRole" value="user" ${u.role!=='admin'?'checked':''}><span><strong>User</strong><em>Sees only the pages you turn on below</em></span></label>
+     ${!sa && meSuper ? `<section class="uf-sec uf-type"><h5>User type</h5><div class="role-pick" role="radiogroup" aria-label="User type">
+      <label class="role-opt"><input type="radio" name="ufRole" value="user" ${u.role!=='admin'?'checked':''}><span><strong>User</strong><em>Gets the pages and rights of their role</em></span></label>
       <label class="role-opt"><input type="radio" name="ufRole" value="admin" ${u.role==='admin'?'checked':''}><span><strong>Admin</strong><em>Every page; approves remarks and manages users (not passwords)</em></span></label></div></section>` : ''}
      ${sa?'<p class="hint uf-sa">The super admin always has every right.</p>':`
-     <p class="hint admin-note uf-note" ${u.role==='admin'?'':'hidden'}>Admins can use everything — the choices below only apply if you switch them back to User.</p>
-     ${rolesData().roles.length?`<section class="uf-sec uf-role-sec" ${u.role==='admin'?'hidden':''}><div class="uf-sec-head"><h5>Role</h5><span class="hint">Give them a role’s rights — or “No role” to set them by hand below.</span></div>
-      <select id="ufRoleSel" class="uf-role-sel" ${Server.isSuperAdmin()?'':'disabled'}><option value="">No role — set rights by hand</option>${rolesData().roles.map(r=>`<option value="${escapeHtml(r.id)}" ${!isNew&&roleOfUser(u.id)&&roleOfUser(u.id).id===r.id?'selected':''}>${escapeHtml(r.name)}${r.desc?' — '+escapeHtml(r.desc):''}</option>`).join('')}</select>
-      <p class="hint uf-role-note" id="ufRoleNote"></p></section>`:''}
+     <p class="hint admin-note uf-note" ${u.role==='admin'?'':'hidden'}>Admins can use every page and every right — there’s nothing to set here. Switch them to <b>User</b> to give them a role.</p>
+     <section class="uf-sec uf-role-sec"><div class="uf-sec-head"><h5>Role</h5><span class="hint">What they can open and do — pick a role, or “No role” to set it by hand below.</span></div>
+      <select id="ufRoleSel" class="uf-role-sel" ${Server.isSuperAdmin()?'':'disabled'}><option value="__admin" ${u.role==='admin'?'selected':''}>Admin — every page, approves remarks, manages users</option>${rolesData().roles.map(r=>`<option value="${escapeHtml(r.id)}" ${u.role==='user'&&!isNew&&roleOfUser(u.id)&&roleOfUser(u.id).id===r.id?'selected':''}>${escapeHtml(r.name)}${r.desc?' — '+escapeHtml(r.desc):''}</option>`).join('')}<option value="" ${u.role==='user'&&(isNew||!roleOfUser(u.id))?'selected':''}>No role — set rights by hand</option></select>
+      <p class="hint uf-role-note" id="ufRoleNote"></p></section>
      <div class="uf-access">
       <section class="uf-sec uf-start"><div class="uf-sec-head"><h5>Start from</h5><span class="hint">One click fills the page access below — adjust anything after.</span></div>
        <div class="uf-presets">${UF_PRESETS.map((p,i)=>`<button type="button" class="uf-preset" data-preset="${i}"><strong>${escapeHtml(p.name)}</strong><span>${escapeHtml(p.desc)}</span></button>`).join('')}</div>
@@ -12133,7 +12141,8 @@ function drawUserForm(){
   host.querySelector('#ufGen')?.addEventListener('click', ()=>{ const i=host.querySelector('#ufPw'); if(i) i.value = genPassword(); });
   host.querySelectorAll('input[name="ufRole"]').forEach(r=>r.addEventListener('change', ()=>{ const adm = host.querySelector('input[name="ufRole"]:checked').value==='admin'; host.querySelector('.admin-note')?.toggleAttribute('hidden', !adm); host.querySelectorAll('.uf-access').forEach(f=>f.classList.toggle('dimmed', adm)); }));
   if(u.role==='admin') host.querySelectorAll('.uf-access').forEach(f=>f.classList.add('dimmed'));
-  host.querySelectorAll('input[name="ufRole"]').forEach(r=>r.addEventListener('change',()=>{ const adm=host.querySelector('input[name="ufRole"]:checked').value==='admin'; const rs=host.querySelector('.uf-role-sec'); if(rs) rs.hidden=adm; }));
+  host.querySelector('.uf-body')?.classList.toggle('uf-is-admin', u.role==='admin');
+  host.querySelectorAll('input[name="ufRole"]').forEach(r=>r.addEventListener('change',()=>{ const adm=host.querySelector('input[name="ufRole"]:checked').value==='admin'; host.querySelector('.uf-body')?.classList.toggle('uf-is-admin',adm); }));
   const secCount = ()=>host.querySelectorAll('.sec-page').forEach(d=>{ const all=d.querySelectorAll('[data-sec]').length, on=d.querySelectorAll('[data-sec]:checked').length; d.querySelector('.sec-count').textContent = on===all ? 'everything' : on+' of '+all+' shown'; });
   host.querySelectorAll('input[data-mod]').forEach(cb=>cb.addEventListener('change', ()=>{ const d=host.querySelector('.sec-page[data-sec-mod="'+cb.value+'"]'); if(d) d.hidden=!cb.checked; const t=d&&d.closest('.uf-tool-sec'); if(t) t.hidden=!cb.checked; }));
   const LINE_PARENT={goal_reach:'schedules',shows:'interviews',no_shows:'interviews',hire_rate:'hires'};
@@ -12150,11 +12159,13 @@ function drawUserForm(){
   // role: its rights fill the switches below and lock them (sections inside pages stay adjustable)
   const roleSel=host.querySelector('#ufRoleSel');
   const lockSel='.uf-access input[data-mod], .uf-access input[data-grant], .uf-access input[data-grant-off], .uf-access [data-sec], .uf-access [data-preset], .uf-access #ufCopyFrom, .uf-access #ufApplyOthers';
-  const applyRoleUi=fill=>{ const r=roleSel&&roleSel.value?rolesData().roles.find(x=>x.id===roleSel.value):null;
+  const applyRoleUi=fill=>{ const adm=roleSel&&roleSel.value==='__admin', r=roleSel&&roleSel.value&&!adm?rolesData().roles.find(x=>x.id===roleSel.value):null;
+    // the role decides the account type: Admin → admin, anything else → user
+    const typeIn=host.querySelector(`input[name="ufRole"][value="${adm?'admin':'user'}"]`); if(typeIn&&!typeIn.checked&&fill){ typeIn.checked=true; typeIn.dispatchEvent(new Event('change')); }
     if(r&&fill){ const cur=readFormRights(host); applyFormRights(host,{...rightsWithRole(cur,r), defaultView:r.defaultView||cur.defaultView}); }
     host.querySelectorAll(lockSel).forEach(el=>el.disabled=!!r);
     host.querySelector('.uf-access')?.classList.toggle('role-locked',!!r); host.querySelector('.uf-body')?.classList.toggle('uf-has-role',!!r);
-    const n=host.querySelector('#ufRoleNote'); if(n) n.innerHTML=r?`Pages, rights, sections and home page all come from the role <b>${escapeHtml(r.name)}</b>. ${Server.isSuperAdmin()?'Change them under Users → <b>Roles</b>, or pick “No role” to set them by hand here.':'Only the super admin can change roles.'}`:''; };
+    const n=host.querySelector('#ufRoleNote'); if(n) n.innerHTML=adm?'Admins can use every page and every right, approve remarks and manage users (not passwords).':r?`Pages, rights, sections and home page all come from the role <b>${escapeHtml(r.name)}</b>. ${Server.isSuperAdmin()?'Change them under Users → <b>Roles</b>, or pick “No role” to set them by hand here.':'Only the super admin can change roles.'}`:''; };
   roleSel?.addEventListener('change',()=>applyRoleUi(true)); applyRoleUi(false);
   host.querySelector('#ufCancel').onclick=closeForm;
   host.querySelector('#ufSave').onclick=async ()=>{
@@ -12209,20 +12220,19 @@ function renderMyAccount(){
     <h3 style="margin:0 0 4px;">${escapeHtml(u.name)}</h3><p class="hint" style="margin:0 0 12px;">${u.role==='super_admin'?'Super admin':u.role==='admin'?'Admin':'User'} · access: ${escapeHtml(mods.join(', ')||'none')}</p>
     ${window.DV_MODE?`<p class="hint" style="margin:0">Signed in with Microsoft 365${u.email?' as <strong>'+escapeHtml(u.email)+'</strong>':''}.</p>`:'<button class="btn btn-secondary btn-sm" id="acctSignOut">Sign out</button>'}
   </div>
-  ${u.role==='super_admin'?backupPanelHtml():''}
   ${u.role!=='user' ? `<div class="panel"><h3 style="margin:0 0 4px;">Candidate names</h3>
     <p class="hint" style="margin:0 0 10px;">Candidate names are stored encrypted, and everyone sees a short code such as #7C1E09A4 instead. As an admin you can show the real names on this device only — they’re unlocked here and never shared.</p>
     <label class="uf-tool uf-active" style="margin:0"><span class="uf-switch"><input type="checkbox" id="acctShowNames" ${NamePolicy.show()?'checked':''}><i aria-hidden="true"></i></span><span class="uf-page-txt"><strong>Show candidate names</strong><span>Admins only · this browser only</span></span></label>
     <p class="auth-msg" id="acctNamesMsg" role="status"></p></div>` : ''}
-  ${window.DV_MODE ? '' : u.role==='super_admin' ? `<div class="panel">
+  ${window.DV_MODE ? '' : `<div class="panel">
     <h3 style="margin:0 0 4px;">Change my password</h3>
-    ${u.default_password?'<p class="warn-note">You are still using the setup password <strong>India@5618</strong>. Change it now — anyone who knows it could sign in as you.</p>':'<p class="hint">Only you can change the super-admin password. Other users’ passwords are set in Users &amp; Access.</p>'}
+    ${u.default_password?'<p class="warn-note">You are still using the setup password <strong>India@5618</strong>. Change it now — anyone who knows it could sign in as you.</p>':u.role==='super_admin'?'<p class="hint">Only you can change the super-admin password. Other people can change their own here, and you can set a new one for anyone in Users &amp; access.</p>':'<p class="hint">Choose a new password for yourself. If you forget it, the super admin can set a new one for you.</p>'}
     <div class="field-row"><div class="field"><label for="pwOld">Current password</label><input id="pwOld" type="password" autocomplete="current-password"></div>
     <div class="field"><label for="pwNew">New password</label><input id="pwNew" type="password" autocomplete="new-password" placeholder="8+ characters, letters and numbers"></div>
     <div class="field"><label for="pwNew2">Repeat new password</label><input id="pwNew2" type="password" autocomplete="new-password"></div></div>
     <p class="auth-msg" id="pwMsg" role="alert"></p>
     <button class="btn btn-primary btn-sm" id="pwSave">Change password</button>
-  </div>` : `<div class="panel"><p class="hint" style="margin:0;">Your password is managed by the super admin. Ask them if you need it reset.</p></div>`}`;
+  </div>`}`;
   host.querySelector('#acctSignOut')?.addEventListener('click', signOut); wireBackupPanel(host);
   host.querySelector('#acctShowNames')?.addEventListener('change', async e=>{ const on=e.target.checked; NamePolicy.setShow(on);
     if(on){ const k=await NamePolicy.getKey(); host.querySelector('#acctNamesMsg').textContent=k?'Names will show across the dashboard.':'Older uploads show names; newer ones need the name-protection key (run privacy.sql).'; }
@@ -12232,8 +12242,9 @@ function renderMyAccount(){
   if(save) save.onclick = async ()=>{
     const o=host.querySelector('#pwOld').value, n=host.querySelector('#pwNew').value, n2=host.querySelector('#pwNew2').value, msg=host.querySelector('#pwMsg');
     if(n!==n2){ msg.textContent='The new passwords don’t match.'; return; }
+    if(!o||!n){ msg.textContent='Fill in your current password and the new one.'; return; }
     try{ await Server.rpc('dash_change_my_password', {p_old:o, p_new:n}); Server.user = await Server.rpc('dash_me'); showToast('Password changed. Other devices were signed out.'); renderMyAccount(); }
-    catch(e){ msg.textContent = cleanErr(e); }
+    catch(e){ msg.textContent = /FORBIDDEN|super.?admin|not allowed|permission/i.test(String(e&&e.message||e)) ? 'Your account can’t change its own password yet — ask the super admin to set a new one for you (Settings → Users → Edit).' : cleanErr(e); }
   };
 }
 document.addEventListener('click',e=>{ if(e.target.closest&&e.target.closest('[data-open-manual]')) openManualEntryDialog({}); else if(e.target.closest&&e.target.closest('[data-merge-table]')) openBranchMergeFromTable(); });
@@ -13307,7 +13318,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.93.0';   // shown only in the browser tab title
+const APP_VERSION = '4.94.0';   // shown only in the browser tab title
 // Everyone gets the latest look: the page checks the published file for a newer version — right after it opens
 // (switches straight over) and every few minutes / when the tab comes back (offers an Update button).
 const AppUpdate=(()=>{
