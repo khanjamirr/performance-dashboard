@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.81.0</title>
+<title>Performance Dashboard · v4.82.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2271,6 +2271,61 @@ body.ov-bar .topbar{border-top:0}
 #ovModeBar.stuck .ovx-tabs a{padding:6px 14px 6px 7px!important;flex:0 0 auto}
 @media(max-width:1100px){#ovModeBar.stuck:not(.hidden){padding-left:24px;padding-right:24px}}
 @media(max-width:700px){#ovModeBar.stuck:not(.hidden){padding:6px 12px}#ovModeBar.stuck .ovx-tabs{width:100%!important}#ovModeBar.stuck .ovx-tabs a{flex:1 1 0;padding:7px 4px!important}}
+</style>
+<style>
+/* Overview switcher — dark command bar with live numbers */
+#ovModeBar.ovx-dark:not(.hidden){background:radial-gradient(120% 180% at 0% 0%,#1b3a75 0%,#0d2350 45%,#081733 100%)!important;padding:12px 28px 0!important;box-shadow:0 10px 30px -18px #081733cc;border-bottom:1px solid #ffffff14}
+#ovModeBar.ovx-dark::before{display:none!important}
+#ovModeBar.ovx-dark::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,transparent,#ffffff0a 40%,transparent 70%);opacity:.8}
+#ovModeBar.ovx-dark .ovx-row{align-items:flex-end;gap:10px 20px}
+#ovModeBar.ovx-dark .ovx-tabs{display:flex!important;width:auto!important;background:none!important;border:0!important;box-shadow:none!important;padding:0!important;border-radius:0!important;gap:6px;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;animation:none!important;overflow:visible}
+#ovModeBar.ovx-dark .ovx-tabs a{flex:0 0 auto!important;flex-direction:row!important;align-items:center;gap:12px;padding:12px 22px 16px 14px!important;margin:0!important;border-radius:14px 14px 0 0!important;color:#9fb3d1!important;background:transparent!important;transition:background .25s,color .2s}
+#ovModeBar.ovx-dark .ovx-tabs a:hover:not(.on){background:#ffffff0d!important;color:#e2e8f0!important}
+#ovModeBar.ovx-dark .ovx-tabs a.on{color:#fff!important;background:linear-gradient(180deg,#ffffff14,#ffffff05)!important}
+#ovModeBar.ovx-dark .ovx-ico{width:38px!important;height:38px!important;border-radius:12px!important;background:#ffffff12!important;color:#c7d4ea!important;box-shadow:inset 0 0 0 1px #ffffff1a!important;display:inline-flex!important}
+#ovModeBar.ovx-dark .ovx-recruiting.on .ovx-ico{background:linear-gradient(135deg,#60a5fa,#2563eb)!important;color:#fff!important;box-shadow:0 0 0 1px #93c5fd66,0 8px 22px -6px #3b82f6!important}
+#ovModeBar.ovx-dark .ovx-onboarding.on .ovx-ico{background:linear-gradient(135deg,#5eead4,#0d9488)!important;color:#fff!important;box-shadow:0 0 0 1px #5eead466,0 8px 22px -6px #14b8a6!important}
+#ovModeBar.ovx-dark .ovx-orderentry.on .ovx-ico{background:linear-gradient(135deg,#c4b5fd,#7c3aed)!important;color:#fff!important;box-shadow:0 0 0 1px #c4b5fd66,0 8px 22px -6px #8b5cf6!important}
+#ovModeBar.ovx-dark .ovx-t b{font-size:15.5px;letter-spacing:-.01em}
+#ovModeBar.ovx-dark .ovx-t small{display:block!important;max-height:18px;opacity:1;color:#7f93b5!important;font-size:12px;margin-top:3px}
+#ovModeBar.ovx-dark .ovx-t small b{font-size:12.5px;color:#e2e8f0;font-weight:800;letter-spacing:0}
+#ovModeBar.ovx-dark a.on .ovx-t small{color:#b8c7e0!important}#ovModeBar.ovx-dark a.on .ovx-t small b{color:#fff}
+#ovModeBar.ovx-dark .ovx-t small.live{animation:ovxFade .4s ease}
+@keyframes ovxFade{from{opacity:0;transform:translateY(2px)}to{opacity:1;transform:none}}
+#ovModeBar.ovx-dark .ovx-live{position:absolute;top:12px;right:10px;width:7px;height:7px;border-radius:50%;background:transparent}
+#ovModeBar.ovx-dark a.on .ovx-live{background:#4ade80;box-shadow:0 0 0 3px #4ade8033;animation:ovxPulse 2s infinite}
+@keyframes ovxPulse{0%,100%{box-shadow:0 0 0 3px #4ade8033}50%{box-shadow:0 0 0 6px #4ade8000}}
+/* glowing underline */
+#ovModeBar.ovx-dark .ovx-ink{top:auto!important;bottom:0!important;height:3px!important;border-radius:3px 3px 0 0!important;box-shadow:0 -2px 14px 1px currentColor!important}
+#ovModeBar.ovx-dark .ovx-ink::after{display:none}
+#ovModeBar.ovx-dark .ovx-ink.ink-recruiting{background:linear-gradient(90deg,#93c5fd,#3b82f6)!important;color:#3b82f6!important}
+#ovModeBar.ovx-dark .ovx-ink.ink-onboarding{background:linear-gradient(90deg,#5eead4,#14b8a6)!important;color:#14b8a6!important}
+#ovModeBar.ovx-dark .ovx-ink.ink-orderentry{background:linear-gradient(90deg,#c4b5fd,#8b5cf6)!important;color:#8b5cf6!important}
+/* dates on the dark bar */
+#ovModeBar.ovx-dark .ovx-date{margin-bottom:12px;background:#ffffff0f!important;border:1px solid #ffffff1f!important;box-shadow:none!important;border-radius:14px}
+#ovModeBar.ovx-dark .ovx-dbtn{color:#fff}#ovModeBar.ovx-dark .ovx-dbtn:hover{background:#ffffff12}
+#ovModeBar.ovx-dark .ovx-dbtn small{color:#8ea3c4}
+#ovModeBar.ovx-dark .ovx-dbtn svg{background:linear-gradient(135deg,#ffffff2e,#ffffff0d);box-shadow:inset 0 0 0 1px #ffffff26}
+#ovModeBar.ovx-dark .ovx-dstep{color:#c7d4ea}#ovModeBar.ovx-dark .ovx-dstep:hover:not(:disabled){background:#ffffff14;color:#fff}
+/* frozen: slimmer */
+#ovModeBar.ovx-dark.stuck:not(.hidden){padding:6px 28px 0!important}
+#ovModeBar.ovx-dark.stuck .ovx-tabs a{padding:8px 18px 11px 10px!important}
+#ovModeBar.ovx-dark.stuck .ovx-ico{width:28px!important;height:28px!important;border-radius:9px!important}
+#ovModeBar.ovx-dark.stuck .ovx-t small{max-height:0!important;opacity:0;margin:0}
+#ovModeBar.ovx-dark.stuck .ovx-live{top:8px}
+#ovModeBar.ovx-dark.stuck .ovx-date{margin-bottom:6px}
+@media(max-width:1100px){#ovModeBar.ovx-dark:not(.hidden){padding-left:16px!important;padding-right:16px!important}}
+@media(max-width:700px){#ovModeBar.ovx-dark:not(.hidden){padding:8px 8px 0!important}#ovModeBar.ovx-dark .ovx-row{flex-direction:column-reverse;align-items:stretch;gap:8px}
+ #ovModeBar.ovx-dark .ovx-tabs{width:100%!important}#ovModeBar.ovx-dark .ovx-tabs a{flex:1 1 0!important;flex-direction:column!important;gap:5px;padding:8px 4px 11px!important;min-width:0}
+ #ovModeBar.ovx-dark .ovx-t{align-items:center;text-align:center}#ovModeBar.ovx-dark .ovx-t b{font-size:13px}#ovModeBar.ovx-dark .ovx-t small{font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+ #ovModeBar.ovx-dark .ovx-ico{width:30px!important;height:30px!important}#ovModeBar.ovx-dark .ovx-date{margin:0;width:100%}
+ #ovModeBar.ovx-dark.stuck .ovx-ico{display:none!important}#ovModeBar.ovx-dark.stuck .ovx-tabs a{padding:9px 4px 11px!important}#ovModeBar.ovx-dark.stuck:not(.hidden){padding:4px 8px 0!important}}
+</style>
+<style>
+#ovModeBar.ovx-dark.stuck .ovx-tabs a.ovx-recruiting.on .ovx-ico{background:linear-gradient(135deg,#60a5fa,#2563eb)!important;color:#fff!important}
+#ovModeBar.ovx-dark.stuck .ovx-tabs a.ovx-onboarding.on .ovx-ico{background:linear-gradient(135deg,#5eead4,#0d9488)!important;color:#fff!important}
+#ovModeBar.ovx-dark.stuck .ovx-tabs a.ovx-orderentry.on .ovx-ico{background:linear-gradient(135deg,#c4b5fd,#7c3aed)!important;color:#fff!important}
+#ovModeBar.ovx-dark .ovx-tabs a.ovx-recruiting.on .ovx-ico,#ovModeBar.ovx-dark .ovx-tabs a.ovx-onboarding.on .ovx-ico,#ovModeBar.ovx-dark .ovx-tabs a.ovx-orderentry.on .ovx-ico{color:#fff!important}
 </style>
 </head>
 <body class="locked">
@@ -12568,7 +12623,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.81.0';   // shown only in the browser tab title
+const APP_VERSION = '4.82.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -14640,6 +14695,14 @@ const OverviewX=(()=>{
    refreshUI(); }
  // Recruiting changed its own weeks (e.g. a row clicked) — follow it
  function syncFromRecruiting(){ range(); if(recSig()!==st.recSig){ st.range=recruitingSpan(); st.recSig=recSig(); } }
+ // each tab shows its headline number for the picked dates
+ async function fillStats(host){ const r=range(), key=r.from+'|'+r.to, put=(k,html)=>{ const el=host.querySelector(`[data-ovx-stat="${k}"]`); if(el&&host.dataset.statKey===key){ el.innerHTML=html; el.classList.add('live'); } };
+  host.dataset.statKey=key;
+  const ws=new Set(weeksIn(r.from,r.to)), sched=weeksData.filter(w=>ws.has(w.weekEndDate)).reduce((a,w)=>a+((w.totals&&w.totals.schedules)||0),0);
+  put('recruiting', ws.size?`<b>${fmtNum(sched)}</b> schedules`:'Not uploaded yet');
+  if(canOnb()) get('onb',r.from,r.to).then(({rows})=>{ const C=Onboarding.candidates(rows), S=Onboarding.summary(C,rows); put('onboarding',`<b>${fmtNum((S.by.finalized||0)+(S.by.complete||0))}</b> completed · ${fmtNum(S.n)} called`); }).catch(()=>{});
+  if(canOe()) get('oe',r.from,r.to).then(({rows})=>{ const t=rows.reduce((a,x)=>a+(x.rc||0)+(x.crm||0),0); put('orderentry',`<b>${fmtNum(t)}</b> orders`); }).catch(()=>{});
+ }
  function stepRange(dir){ const r=range(), n=Math.round((parse(r.to)-parse(r.from))/864e5)+1, t=ltToday();
    let a=add(r.from,dir*n), b=add(r.to,dir*n); if(a>t) return; if(b>t) b=t; setRange(a,b); }
  function dateCtl(){ const r=range(), t=ltToday();
@@ -14690,7 +14753,8 @@ const OverviewX=(()=>{
    orderentry:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/>'};
   const OVX_SUB={recruiting:'Schedules, shows & hires', onboarding:'Calls & completions', orderentry:'RC & CRM orders'};
   document.body.classList.add('ov-bar');
-  host.innerHTML=`<div class="ovx-row"><nav class="ovx-tabs" role="tablist" aria-label="Overview">${ms.map(([k,l])=>`<a href="#" role="tab" data-ovx="${k}" class="ovx-${k} ${m===k?'on':''}" aria-selected="${m===k}"><span class="ovx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${OVX_ICO[k]||''}</svg></span><span class="ovx-t"><b>${l}</b><small>${OVX_SUB[k]||''}</small></span></a>`).join('')}<i class="ovx-ink ink-${m}" aria-hidden="true"></i></nav>${dateCtl()}</div>
+  host.classList.add('ovx-dark');
+  host.innerHTML=`<div class="ovx-row"><nav class="ovx-tabs" role="tablist" aria-label="Overview">${ms.map(([k,l])=>`<a href="#" role="tab" data-ovx="${k}" class="ovx-${k} ${m===k?'on':''}" aria-selected="${m===k}"><span class="ovx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${OVX_ICO[k]||''}</svg></span><span class="ovx-t"><b>${l}</b><small data-ovx-stat="${k}">${OVX_SUB[k]||''}</small></span><em class="ovx-live" aria-hidden="true"></em></a>`).join('')}<i class="ovx-ink ink-${m}" aria-hidden="true"></i></nav>${dateCtl()}</div>
    ${true?'':`<div class="ovx-quick" role="group" aria-label="Weeks">${[['today','Today'],['yesterday','Yesterday'],['week','This week'],['lastweek','Last week'],['w4','Last 4 weeks'],['w13','Last 13 weeks']].map(([k,l])=>`<button type="button" data-ovq="${k}" class="${st.quick===k?'on':''}" title="${k==='picker'?'Use the weeks chosen in the Period picker at the top':''}">${l}</button>`).join('')}<button type="button" class="ovx-refresh" data-ovr title="Get the latest numbers">↻</button></div>`}`;
   // the underline slides to the picked tab, then the page switches
   const nav=host.querySelector('.ovx-tabs'), ink=host.querySelector('.ovx-ink');
@@ -14705,6 +14769,7 @@ const OverviewX=(()=>{
   host.querySelector('#ovxDateBtn')?.addEventListener('click',e=>{ const r=range(), t=ltToday();
     DatePick.open(e.currentTarget,{mode:'range', from:r.from, to:r.to, max:t, title:'Dates for Recruiting, Onboarding and Order Entry', onPick:([a,b])=>setRange(a,b)}); });
   host.querySelectorAll('[data-ovd]').forEach(b=>b.onclick=()=>stepRange(+b.dataset.ovd));
+  fillStats(host);
   host.querySelector('[data-ovr]')?.addEventListener('click',()=>{ st.cache.clear(); refreshUI(); });
 
  }
@@ -15106,7 +15171,7 @@ const DatePick=(()=>{
 function dateRangeLabel(a,b){ if(!a) return 'Pick dates'; const P=s=>new Date(s+'T12:00:00'); b=b||a;
  if(a===b) return P(a).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'});
  const sameY=a.slice(0,4)===b.slice(0,4), n=Math.round((P(b)-P(a))/864e5)+1;
- return P(a).toLocaleDateString(undefined,{month:'short',day:'numeric',...(sameY?{}:{year:'numeric'})})+' – '+P(b).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})+' · '+n+' days'; }
+ return P(a).toLocaleDateString(undefined,{month:'short',day:'numeric',...(sameY?{}:{year:'numeric'})})+' – '+P(b).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})+' · '+(()=>{ let w=0; for(let d=P(a); d<=P(b); d.setDate(d.getDate()+1)) if(d.getDay()%6) w++; return w===1?'1 working day':w+' working days'; })(); }
 function dateRangeBtn(fromId,toId,from,to,max,simple){
  return `<span class="dpr"><input type="date" id="${fromId}" value="${from||''}" data-dp-no hidden><input type="date" id="${toId}" value="${to||''}" data-dp-no hidden><button type="button" class="dpr-btn" data-dpr="${fromId}|${toId}" data-max="${max||''}" ${simple?'data-simple="1"':''} aria-label="Dates: ${escapeHtml(dateRangeLabel(from,to))} — click to change"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>${escapeHtml(dateRangeLabel(from,to))}</span><i aria-hidden="true">▾</i></button></span>`; }
 document.addEventListener('click',e=>{
