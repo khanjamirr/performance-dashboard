@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Performance Dashboard · v4.92.3</title>
+<title>Performance Dashboard · v4.93.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2646,6 +2646,61 @@ html body .toast,html body #toast{border-radius:14px!important;background:rgba(3
 #ovModeBar .rtl-top #rtlToggle button{border:0!important;background:transparent;font:inherit;font-size:14px!important;font-weight:600;color:#3a3a3c;padding:7px 18px!important;border-radius:9px!important;cursor:pointer;box-shadow:none}
 #ovModeBar .rtl-top #rtlToggle button.on{background:#fff;color:#1c1c1e;box-shadow:0 1px 3px rgba(0,0,0,.14),0 0 0 .5px rgba(0,0,0,.04)}
 </style>
+<style id="ios-settings">
+html body.on-settings #ovModeBar{display:none!important}
+@media (min-width:900px){
+ html body .settings-page{grid-template-columns:250px minmax(0,1fr)!important;gap:26px!important}
+ /* sidebar = iOS grouped list */
+ html body .settings-page .settings-tabs{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;gap:0!important}
+ html body .settings-page .settings-group{font-size:12px!important;font-weight:500!important;letter-spacing:.02em!important;text-transform:uppercase;color:#8e8e93!important;padding:16px 14px 6px!important}
+ html body .settings-page .settings-group:first-child{padding-top:0!important}
+ html body .settings-page .settings-tab{position:relative;gap:12px!important;padding:8px 12px!important;border-radius:0!important;background:#fff!important;font-size:15px!important;font-weight:500!important;color:#1c1c1e!important;min-height:44px}
+ html body .settings-page .settings-group+.settings-tab{border-radius:12px 12px 0 0!important}
+ html body .settings-page .settings-tab:has(+.settings-group),html body .settings-page .settings-tab:last-child{border-radius:0 0 12px 12px!important}
+ html body .settings-page .settings-group+.settings-tab:has(+.settings-group),html body .settings-page .settings-group+.settings-tab:last-child{border-radius:12px!important}
+ html body .settings-page .settings-tab+.settings-tab::before{content:"";position:absolute;left:53px;right:0;top:0;height:.5px;background:#e5e5ea}
+ html body .settings-page .settings-tab::after{content:"";margin-left:auto;width:7px;height:7px;border-right:2px solid #c7c7cc;border-top:2px solid #c7c7cc;transform:rotate(45deg);flex:0 0 auto}
+ html body .settings-page .settings-tab:hover{background:#f7f7fa!important}
+ html body .settings-page .settings-tab.active{background:#007aff!important;color:#fff!important;font-weight:600!important}
+ html body .settings-page .settings-tab.active::after{border-color:rgba(255,255,255,.75)}
+ html body .settings-page .settings-tab.active::before,html body .settings-page .settings-tab.active+.settings-tab::before{display:none}
+ html body .settings-page .settings-tab .st-ico{width:29px!important;height:29px!important;padding:6px;border-radius:7px;background:var(--st,#8e8e93);color:#fff!important;opacity:1!important;flex:0 0 29px;box-sizing:border-box}
+ html body .settings-page .settings-tab.active .st-ico{box-shadow:0 0 0 1.5px rgba(255,255,255,.6)}
+}
+html body .settings-page .settings-tab[data-tab="sync"]{--st:#007aff}
+html body .settings-page .settings-tab[data-tab="fetched"]{--st:#5856d6}
+html body .settings-page .settings-tab[data-tab="candidates"]{--st:#af52de}
+html body .settings-page .settings-tab[data-tab="goals"]{--st:#ff3b30}
+html body .settings-page .settings-tab[data-tab="recruiters"]{--st:#ff9500}
+html body .settings-page .settings-tab[data-tab="divisions"]{--st:#34c759}
+html body .settings-page .settings-tab[data-tab="branches"]{--st:#00c7be}
+html body .settings-page .settings-tab[data-tab="users"]{--st:#0a84ff}
+html body .settings-page .settings-tab[data-tab="activity"]{--st:#ff2d55}
+html body .settings-page .settings-tab[data-tab="account"]{--st:#8e8e93}
+/* content = inset grouped cards */
+html body .settings-page .settings-tab-content .panel{border:0!important;border-radius:14px!important;box-shadow:none!important;background:#fff!important}
+html body .settings-page .settings-tab-content .panel>h3,html body .settings-page .set-title{font-size:17px!important;font-weight:600!important;letter-spacing:-.01em;color:#1c1c1e!important}
+html body .settings-page .set-row{min-height:44px;padding:11px 0!important;border-top:.5px solid #e5e5ea!important;border-bottom:0!important;align-items:center}
+html body .settings-page .set-row strong{font-size:15px;font-weight:500;color:#1c1c1e}
+html body .settings-page .set-row span{font-size:13px;color:#8e8e93}
+html body .settings-page details.set-details>summary,html body .settings-page .sd-sum{min-height:44px;font-size:15px}
+html body .settings-page .sd-title{font-weight:600;color:#1c1c1e}
+html body .settings-page .switch[aria-checked="true"]{background:#34c759!important;border-color:#34c759!important}
+html body .settings-page input[type=text],html body .settings-page input[type=search],html body .settings-page input[type=number],html body .settings-page input[type=email],html body .settings-page input[type=date],html body .settings-page input:not([type]),html body .settings-page select,html body .settings-page textarea{border:0!important;border-radius:10px!important;background:rgba(118,118,128,.12)!important;font-size:14px;box-shadow:none!important}
+html body .settings-page input:focus,html body .settings-page select:focus,html body .settings-page textarea:focus{outline:2px solid rgba(0,122,255,.45)!important;background:#fff!important}
+html body .settings-page .users-table thead th{background:transparent!important;color:#8e8e93!important;font-size:12px!important;font-weight:500!important;text-transform:uppercase;letter-spacing:.02em;border-bottom:.5px solid #e5e5ea!important}
+html body .settings-page .users-table td{border-bottom:.5px solid #e5e5ea!important}
+html body .settings-page .users-table tbody tr:hover td{background:#f7f7fa}
+html body .settings-page .btn-secondary{background:rgba(118,118,128,.12)!important;color:#007aff!important;border:0!important;box-shadow:none!important}
+html body .settings-page .btn-primary{background:#007aff!important;border-color:#007aff!important}
+html body .settings-page .ua-panel{padding-top:18px}
+html body .settings-page .ua-head h3{font-size:22px!important;font-weight:700!important;letter-spacing:-.02em}
+@media (max-width:899px){
+ html body .settings-page .settings-tabs{background:#fff!important;border-radius:12px!important}
+ html body .settings-page .settings-tab .st-ico{width:22px!important;height:22px!important;padding:4px;border-radius:6px;background:var(--st,#8e8e93);color:#fff!important;box-sizing:border-box}
+ html body .settings-page .settings-tab.active{background:#007aff!important;color:#fff!important;border-radius:9px!important}
+}
+</style>
 </head>
 <body class="locked">
 <div id="appLoading" class="app-loading"><div class="spinner" aria-hidden="true"></div><p>Loading dashboard…</p></div>
@@ -5125,6 +5180,8 @@ async function refreshUI(){
   document.getElementById('settingsNavBtn').classList.toggle('active', onSettings);
   document.body.classList.toggle('on-settings', onSettings);
   if(onSettings){
+    // Settings opens over the page you were on: its tab bar (e.g. Overview's Recruiting / Onboarding / Order Entry) doesn't belong here
+    document.getElementById('ovModeBar')?.classList.add('hidden'); document.body.classList.remove('ov-bar'); document.querySelector('.topbar')?.style.removeProperty('top');
     document.getElementById('emptyState').classList.add('hidden');
     document.getElementById('dashboardViews').classList.add('hidden');
     document.getElementById('topbarCenter').classList.add('hidden');
@@ -13250,7 +13307,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.92.3';   // shown only in the browser tab title
+const APP_VERSION = '4.93.0';   // shown only in the browser tab title
 // Everyone gets the latest look: the page checks the published file for a newer version — right after it opens
 // (switches straight over) and every few minutes / when the tab comes back (offers an Update button).
 const AppUpdate=(()=>{
