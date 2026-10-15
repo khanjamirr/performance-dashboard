@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.96.0</title>
+<title>Performance Dashboard · v4.97.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- fonts load without holding up the page (the system font shows for a moment) -->
@@ -2668,7 +2668,7 @@ html body .toast,html body #toast{border-radius:14px!important;background:rgba(3
 .ms-tot{font-weight:700;color:#0a3d91;min-width:56px;vertical-align:middle!important;font-size:15px}.ms-table td,.ms-table th{vertical-align:middle!important}.ms-table input::placeholder{color:#c7c7cc;font-weight:500}.ms-tools .hint{font-size:12px!important}
 .ms-tools{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:10px}.ms-tools .hint{margin-left:auto}
 @media (max-width:700px){.ms-top{grid-template-columns:1fr}}
-.rtl-attc{position:relative}
+.rtl-attc{position:relative}.rtl-metric{flex-wrap:wrap}.rtl-metric button{padding:6px 12px!important}
 .rtl-attc .rtl-ab{position:absolute;top:50%;right:4px;transform:translateY(-50%);width:22px;height:22px;border:0;border-radius:7px;background:#1c1c1e;color:#fff;font:700 11px/22px inherit;cursor:pointer;opacity:0;transition:opacity .12s;padding:0}
 .rtl-attc:hover .rtl-ab,.rtl-attc .rtl-ab:focus-visible{opacity:.9}
 .rtl-attc.abs .rtl-ab{background:#fff;color:#0a3d91;box-shadow:0 0 0 1px #c7d7f5}
@@ -5541,14 +5541,24 @@ function weeksInQuarter(label){ return weeksData.filter(w=> quarterLabel(w.weekE
 function isGroupFullySelected(weekEndDates){ return weekEndDates.length>0 && weekEndDates.every(d=> selectedWeekEndDates.includes(d)); }
 function periodPickerButtonLabel(){
   if(currentWeekEndDate==='all-weeks' && selectedWeekEndDates.length===0) return 'All Weeks';
+  const pr=activeRange(); if(pr){ const sh=d=>fmtDate(d).replace(/, \d{4}$/,''), q=quarterOfRange(pr.from,pr.to), m=pr.from.slice(0,7)===pr.to.slice(0,7)&&pr.from.endsWith('-01')&&(pr.to===monthEndIso(pr.from)||pr.to===ltToday());
+    return (q?q+' · ':m?new Date(pr.from+'T12:00:00Z').toLocaleDateString('en-US',{month:'short',year:'numeric',timeZone:'UTC'})+' · ':'')+sh(pr.from)+' – '+fmtDate(pr.to); }
   const n = selectedWeekEndDates.length;
   if(n===0){const w=weeksData.find(w=>w.weekEndDate===currentWeekEndDate);return w?'Week '+w.weekNumber+' · '+fmtDate(w.weekEndDate):'Select a period';}
   if(n===1){
     const w = weeksData.find(x=>x.weekEndDate===selectedWeekEndDates[0]);
     return w ? 'Week '+w.weekNumber+' \u00b7 '+fmtDate(w.weekEndDate) : 'Select a period';
   }
-  return n+' weeks selected';
+  // name the period when the weeks are exactly one month / quarter (by week-ending Saturday), otherwise show the dates
+  const ws=selectedWeekEndDates.slice().sort(), a=ws[0], b=ws[ws.length-1], sh=d=>fmtDate(d).replace(/, \d{4}$/,'');
+  const same=list=>list.length===ws.length&&list.every(d=>ws.includes(d));
+  if(monthLabel(a)===monthLabel(b)&&same(weeksInMonth(monthLabel(a)))) return monthLabel(a)+' · '+n+' weeks';
+  if(quarterLabel(a)===quarterLabel(b)&&same(weeksInQuarter(quarterLabel(a)))) return quarterLabel(a)+' · '+n+' weeks';
+  return n+' weeks · '+sh(addDaysIso(a,-6))+' – '+fmtDate(b);
 }
+function monthEndIso(d){ const x=new Date(d.slice(0,7)+'-01T12:00:00Z'); x.setUTCMonth(x.getUTCMonth()+1,0); return x.toISOString().slice(0,10); }
+function quarterOfRange(a,b){ const y=a.slice(0,4), m=+a.slice(5,7); if(!a.endsWith('-01')||(m-1)%3) return null; const end=monthEndIso(y+'-'+String(m+2).padStart(2,'0')+'-01'); return b===end||(b===ltToday()&&b<end&&b>=a)?'Q'+((m+2)/3)+' '+y:null; }
+function addDaysIso(d,n){ const x=new Date(d+'T12:00:00Z'); x.setUTCDate(x.getUTCDate()+n); return x.toISOString().slice(0,10); }
 function adjacentUploadedWeek(direction){
  const available=[...new Set(weeksData.map(w=>w.weekEndDate))].sort();
  const selected=selectedWeekEndDates.length?[...selectedWeekEndDates].sort():currentWeekEndDate&&currentWeekEndDate!=='all-weeks'?[currentWeekEndDate]:[];
@@ -5693,9 +5703,11 @@ document.getElementById('periodPickerBtn').addEventListener('click', (e)=>{
   // calendar: click a day to pick its week, click another day to cover several weeks; quick picks on the left
   const weeks=[...new Set(weeksData.map(w=>w.weekEndDate))].sort();
   const sel=selectedWeekEndDates.length?[...selectedWeekEndDates].sort():(currentWeekEndDate&&currentWeekEndDate!=='all-weeks'?[currentWeekEndDate]:[]);
-  DatePick.open(e.currentTarget,{mode:'period', weeks, from:sel.length?tgShift(sel[0],-6):null, to:sel.length?sel[sel.length-1]:null, all:currentWeekEndDate==='all-weeks'&&!selectedWeekEndDates.length, title:'Pick weeks',
-    onPick:v=>{ if(v==='all'){ selectPeriodAllWeeks(); return; } if(!v||!v.length) return;
+  const pr=activeRange();
+  DatePick.open(e.currentTarget,{mode:'period', weeks, from:pr?pr.from:sel.length?tgShift(sel[0],-6):null, to:pr?pr.to:sel.length?sel[sel.length-1]:null, all:currentWeekEndDate==='all-weeks'&&!selectedWeekEndDates.length, title:'Pick dates',
+    onPick:(v,rng)=>{ if(v==='all'){ periodRange=null; selectPeriodAllWeeks(); return; } if(!v||!v.length) return;
       if(v.length===1){ selectedWeekEndDates=[v[0]]; currentWeekEndDate=v[0]; } else { selectedWeekEndDates=v; currentWeekEndDate=null; }
+      setPeriodRange(rng&&rng.from, rng&&rng.to);
       applyPeriodSelection(); }});
 });
 document.getElementById('periodPickerPanel').addEventListener('click', (e)=> e.stopPropagation());
@@ -5921,11 +5933,11 @@ async function renderWeeklyView(){
   const isMultiSelectMode = selectedWeekEndDates.length>1;
   const isMultiWeekMode = isAllWeeks || isMultiSelectMode;
   const weeksForAggregate = isAllWeeks ? weeksData
-    : isMultiSelectMode ? selectedWeekEndDates.map(d=>weeksData.find(w=>w.weekEndDate===d)).filter(Boolean).sort((a,b)=>a.weekEndDate.localeCompare(b.weekEndDate))
+    : isMultiSelectMode ? selectedWeekEndDates.map(d=>weeksData.find(w=>w.weekEndDate===d)).filter(Boolean).map(clipWeek).sort((a,b)=>a.weekEndDate.localeCompare(b.weekEndDate))
     : null;
   const week = isAllWeeks ? buildAllWeeksPseudoRecord()
     : isMultiSelectMode ? buildWeeksSubsetPseudoRecord(weeksForAggregate.length?weeksForAggregate:weeksData.slice(-1), 'multi-select', 'Selected')
-    : weeksData.find(w=>w.weekEndDate===currentWeekEndDate);
+    : clipWeek(weeksData.find(w=>w.weekEndDate===currentWeekEndDate));
   if(!week){ container.innerHTML='<div class="muted-note">Week not found.</div>'; return; }
   const idx = isMultiWeekMode ? -1 : weeksData.findIndex(w=>w.weekEndDate===currentWeekEndDate);
   const prev = idx>0 ? weeksData[idx-1] : null;
@@ -7310,10 +7322,49 @@ function buildPeriodOptions(){
   [...weeksData].reverse().forEach(w=> opts.push({value:'week:'+w.weekEndDate, label:'Week '+w.weekNumber+' ('+fmtDate(w.weekEndDate)+')'}));
   return opts;
 }
+/* ---------- Exact date ranges (e.g. Jul 1 – Sep 30) ----------
+   The data is stored by Sunday–Saturday week. When the picked dates cut through a week, that week is trimmed to the
+   days inside the range using its day-by-day figures (and the candidate lists' dates), and its goals count only those
+   working days. periodRange is only used while the selected weeks are still the ones it was picked for. */
+let periodRange=null;   // {from, to, sig}
+const periodSig=()=>(selectedWeekEndDates.length?selectedWeekEndDates.slice().sort():[currentWeekEndDate||'']).join();
+function setPeriodRange(from,to){ const ws=selectedWeekEndDates.length?selectedWeekEndDates.slice().sort():[currentWeekEndDate].filter(Boolean);
+  if(!from||!to||!ws.length||(from===tgShift(ws[0],-6)&&to>=ws[ws.length-1])){ periodRange=null; return; }   // whole weeks: nothing to trim
+  periodRange={from,to,sig:periodSig()}; _clipCache.clear(); }
+function activeRange(){ if(!periodRange) return null; if(periodRange.sig!==periodSig()||currentWeekEndDate==='all-weeks'&&!selectedWeekEndDates.length){ periodRange=null; return null; } return periodRange; }
+const _clipCache=new Map();
+function clipEntity(r,inR){
+  if(!r||typeof r!=='object') return {o:r,ok:true};
+  const o={...r}; let ok=true;
+  TG_METRICS.forEach(([k,,,lk])=>{ let v=null;
+    if(r.daily&&Object.keys(r.daily).length){ const all=Object.values(r.daily).reduce((a,x)=>a+((x&&x[k])||0),0); if(all===(r[k]||0)) v=Object.entries(r.daily).reduce((a,[d,x])=>a+(inR(d)?((x&&x[k])||0):0),0); }
+    if(v==null&&Array.isArray(r[lk])&&r[lk].length===(r[k]||0)&&r[lk].every(c=>c&&c.date)) v=r[lk].filter(c=>inR(c.date)).length;
+    if(v==null){ ok=false; v=r[k]; }
+    o[k]=v; if(Array.isArray(r[lk])) o[lk]=r[lk].filter(c=>!c||!c.date||inR(c.date)); });
+  if(r.daily) o.daily=Object.fromEntries(Object.entries(r.daily).filter(([d])=>inR(d)));
+  return {o,ok};
+}
+function clipWeek(w){
+  const R=activeRange(); if(!w||!R) return w;
+  const ws=tgShift(w.weekEndDate,-6); if(ws>=R.from&&w.weekEndDate<=R.to) return w;
+  const key=w.weekEndDate+'|'+R.from+'|'+R.to+'|'+(w.savedAt||''); if(_clipCache.has(key)) return _clipCache.get(key);
+  const inR=d=>d>=R.from&&d<=R.to; let ok=true;
+  const by=obj=>Object.fromEntries(Object.entries(obj||{}).map(([n,r])=>{ const c=clipEntity(r,inR); if(!c.ok) ok=false; return [n,c.o]; }));
+  const byRecruiter=by(w.byRecruiter), byBranch=by(w.byBranch);
+  const totals={...(w.totals||{})}; TG_METRICS.forEach(([k])=>{ totals[k]=Object.values(byRecruiter).reduce((a,r)=>a+((r&&r[k])||0),0); });
+  const out={...w, byRecruiter, byBranch, totals, clipped:{from:ws>R.from?ws:R.from, to:w.weekEndDate<R.to?w.weekEndDate:R.to}, clipApprox:!ok};
+  _clipCache.set(key,out); return out;
+}
+// goals for a trimmed week: only its working days inside the range count (the pages that follow the period picker)
+function clipGoalFactor(we){
+  const R=activeRange(); if(!R||!['performance','recruiters','branches'].includes(currentView)) return 1;
+  const ws=tgShift(we,-6); if(ws>=R.from&&we<=R.to) return 1;
+  let n=0; for(let i=1;i<=5;i++){ const d=tgShift(ws,i); if(d>=R.from&&d<=R.to) n++; } return n/5;
+}
 function selectedPeriodWeeks(){
-  if(currentWeekEndDate==='all-weeks') return weeksData;
+  if(currentWeekEndDate==='all-weeks'&&!selectedWeekEndDates.length) return weeksData;
   const dates=selectedWeekEndDates.length?selectedWeekEndDates:[currentWeekEndDate];
-  return weeksData.filter(w=>dates.includes(w.weekEndDate));
+  return weeksData.filter(w=>dates.includes(w.weekEndDate)).map(clipWeek);
 }
 function weeksForPeriodValue(value){
   if(value==='all') return weeksData;
@@ -7617,7 +7668,18 @@ async function renderPeopleView(mode){
 /* ============== Recruiters page: schedules by day / by week, recruiter against recruiter ============== */
 // Uses the name-free daily counts saved with each week (branchDays), or the candidate lists when those
 // aren't there yet. Rows follow the Recruiter Detail table's search, division and column filters.
-const recTl={grain:'day', from:null, to:null, key:'', vsGoal:true, sort:'total', busy:0, open:lsGet('ipd_rtl_open')==='1', soFar:lsGet('ipd_rtl_sofar')!=='0'};
+// what the goal tracker counts: schedules (with goals and absences) or the other numbers, day by day
+const RTL_METRICS=[['schedules','Schedules'],['interviews','Interviews'],['shows','Shows'],['noShows','No shows'],['hires','Hires'],['placed','Placed']];
+function metricRowsBetween(metric, from, to){
+  const key={interviews:'scheduledDateOf', shows:'shows', noShows:'noShows', hires:'i9', placed:'placed'}[metric];
+  const list={scheduledDateOf:'interviewsList', shows:'showsList', noShows:'noShowsList', i9:'i9List', placed:'placedList'}[key];
+  const out=[];
+  weeksData.filter(w=>w.weekEndDate>=from&&tgShift(w.weekEndDate,-6)<=to).forEach(w=>Object.entries(w.byRecruiter||{}).forEach(([n,r])=>{ if(!r) return;
+    if(r.daily&&Object.keys(r.daily).length) Object.entries(r.daily).forEach(([d,v])=>{ const k=v&&v[key]; if(k&&d>=from&&d<=to) out.push({recruiter:n, date:d, n:k, branch:r.branch}); });
+    else (r[list]||[]).forEach(c=>{ if(c&&c.date>=from&&c.date<=to) out.push({recruiter:n, date:c.date, n:1, branch:c.branch||r.branch}); }); }));
+  return out;
+}
+const recTl={metric:lsGet('ipd_rtl_metric')||'schedules', grain:'day', from:null, to:null, key:'', vsGoal:true, sort:'total', busy:0, open:lsGet('ipd_rtl_open')==='1', soFar:lsGet('ipd_rtl_sofar')!=='0'};
 // the switch in the Recruiter Detail header swaps the table for the day / week comparison
 function wireRecTimelineToggle(){
   const sw=document.getElementById('rtlToggle'); if(!sw) return;
@@ -7650,7 +7712,9 @@ async function renderRecruiterTimeline(names){
   if(!host.querySelector('.rtl')) host.innerHTML='<div class="rtl"><p class="hint" style="margin:0">Loading…</p></div>';
   const wFrom=weekOfDate(from).weekStart, wTo=weekOfDate(to).weekEnd;
   let src=null;
-  try{ const c=scheduleCountsBetween(wFrom,wTo); src=c.have?c.rows:(canSeeCandidates()?await scheduleRowsBetween(wFrom,wTo):scheduleRowsFromSummary(wFrom,wTo)); }catch(e){ src=null; }
+  const metric=RTL_METRICS.some(m=>m[0]===recTl.metric)?recTl.metric:'schedules', isSch=metric==='schedules';
+  try{ if(!isSch) src=metricRowsBetween(metric,wFrom,wTo);
+   else { const c=scheduleCountsBetween(wFrom,wTo); src=c.have?c.rows:(canSeeCandidates()?await scheduleRowsBetween(wFrom,wTo):scheduleRowsFromSummary(wFrom,wTo)); } }catch(e){ src=null; }
   if(token!==recTl.busy||!host.isConnected) return;
   const inDates=(src||[]).filter(c=>c.date>=from&&c.date<=to), want=new Set(names), rows=inDates.filter(c=>want.has(c.recruiter));
   const isWd=d=>{ const w=new Date(d+'T12:00:00Z').getUTCDay(); return w>0&&w<6; };
@@ -7662,12 +7726,12 @@ async function renderRecruiterTimeline(names){
   // "Goal so far (today)" on (default): only the working days up to today · off: the whole week's goal
   const soFar=recTl.soFar!==false, gEnd=soFar?(to<today?to:today):null;
   const goalDays=c=>{ if(grain==='day') return [c]; const w=weekOfDate(c); return soFar?tgDays(w.weekStart>from?w.weekStart:from, c<gEnd?c:gEnd):tgDays(w.weekStart,w.weekEnd); };
-  const target=(n,c)=>goalDays(c).filter(isWd).reduce((a,d)=>a+ltDailyGoal(n,d),0);
-  const totalGoal=n=>{ const days=soFar?(gEnd>=from?tgDays(from,gEnd):[]):[...new Set(tgDays(from,to).map(d=>weekOfDate(d).weekEnd))].flatMap(we=>tgDays(weekOfDate(we).weekStart,we)); return days.filter(isWd).reduce((a,d)=>a+ltDailyGoal(n,d),0); };
+  const target=(n,c)=>!isSch?0:goalDays(c).filter(isWd).reduce((a,d)=>a+ltDailyGoal(n,d),0);
+  const totalGoal=n=>{ if(!isSch) return 0; const days=soFar?(gEnd>=from?tgDays(from,gEnd):[]):[...new Set(tgDays(from,to).map(d=>weekOfDate(d).weekEnd))].flatMap(we=>tgDays(weekOfDate(we).weekStart,we)); return days.filter(isWd).reduce((a,d)=>a+ltDailyGoal(n,d),0); };
   const people=names.map(n=>{ const r=by[n]||{}, vals=cols.map(c=>r[c]||0); return {n, vals, total:vals.reduce((a,b)=>a+b,0), tgt:totalGoal(n)}; })
    .filter(p=>p.total||names.length<=40).sort((a,b)=>b.total-a.total||a.n.localeCompare(b.n));
   const colTot=cols.map((c,i)=>people.reduce((a,p)=>a+p.vals[i],0)), grand=colTot.reduce((a,b)=>a+b,0), tgtAll=people.reduce((a,p)=>a+p.tgt,0);
-  const canAtt=canMarkAttendance()&&grain==='day';
+  const canAtt=canMarkAttendance()&&grain==='day'&&isSch;
   const one=v=>(Math.round(v*10)/10).toLocaleString();
   const band=(v,t)=>!t?'':v/t>=1?'g':v/t>=.5?'a':'r';
   const d1=s=>new Date(s+'T12:00:00Z');
@@ -7692,21 +7756,26 @@ async function renderRecruiterTimeline(names){
   }
   host.innerHTML=`<div class="rtl" data-section="rec.timeline">
    <div class="rtl-tools">
-    <div class="oe-group rtl-seg2" role="tablist" aria-label="Show by" title="${span>62?'More than 62 days — weeks only':''}"><button type="button" data-rtlg="day" class="${grain==='day'?'on':''}" ${span>62?'disabled':''}>By day</button><button type="button" data-rtlg="week" class="${grain==='week'?'on':''}">By week</button></div>
+    <div class="oe-group rtl-seg2 rtl-metric" role="tablist" aria-label="Number">${RTL_METRICS.map(([k,l])=>`<button type="button" data-rtlm="${k}" class="${metric===k?'on':''}">${l}</button>`).join('')}</div>
+    <div class="oe-group rtl-seg2" role="tablist" aria-label="Show by" title="${span>62?'By day shows up to 62 days — it switches to the last 4 weeks':''}"><button type="button" data-rtlg="day" class="${grain==='day'?'on':''}">By day</button><button type="button" data-rtlg="week" class="${grain==='week'?'on':''}">By week</button></div>
     ${dateRangeBtn('rtlFrom','rtlTo',from,to,today)}
-    <label class="rtl-chk basis-sw" title="On: the goal for the working days up to today · Off: the whole week’s goal. Absent days are taken off either way."><button type="button" class="switch" role="switch" id="rtlSoFar" aria-checked="${soFar}"><i></i></button>Goal so far (today)</label>
+    ${isSch?'':'<!--'}<label class="rtl-chk basis-sw" title="On: the goal for the working days up to today · Off: the whole week’s goal. Absent days are taken off either way."><button type="button" class="switch" role="switch" id="rtlSoFar" aria-checked="${soFar}"><i></i></button>Goal so far (today)</label>${isSch?'':'-->'}
 
-    <span class="rtl-legend"><b class="g"></b>At goal <b class="a"></b>Half way <b class="r"></b>Under half${grain==='day'?' <b class="abs">A</b>Absent':''}${canAtt?'<em class="rtl-att-tip">Point at a day and click <b>A</b> to mark someone absent — click again to undo</em>':''}</span>
+    <span class="rtl-legend" ${isSch?'':'style="display:none"'}><b class="g"></b>At goal <b class="a"></b>Half way <b class="r"></b>Under half${grain==='day'?' <b class="abs">A</b>Absent':''}${canAtt?'<em class="rtl-att-tip">Point at a day and click <b>A</b> to mark someone absent — click again to undo</em>':''}</span>
     <span class="rtl-sp"></span>${copyBtnHtml('recTlTable')}
    </div>
    ${peers}
-   ${!src?'<p class="hint">Daily counts for these weeks aren’t ready yet — they appear after the next upload.</p>':people.length?`<div class="rtl-scroll"><table class="users-table rtl-table" id="recTlTable"><thead><tr><th class="rtl-name">Recruiter</th>${cols.map(c=>`<th class="rtl-h">${head(c)}</th>`).join('')}<th class="rtl-sum">Total</th><th class="rtl-sum">Goal<small>${soFar?'so far':'whole week'}</small></th><th class="rtl-sum">%</th></tr></thead><tbody>
-    ${people.map(p=>`<tr class="${p.n===focus?'rtl-focus':''}" data-rtl-row="${escapeHtml(p.n)}"><td class="rtl-name"><button type="button" class="rtl-pick" data-rtl-peer="${escapeHtml(p.n)}" title="Who works at the same branches">${escapeHtml(p.n)}</button></td>${cols.map((c,i)=>cell(p,i)).join('')}<td class="rtl-sum"><strong>${fmtNum(p.total)}</strong></td><td class="rtl-sum rtl-goalc">${one(p.tgt)}</td><td class="rtl-sum rtl-pct rtl-pctc ${band(p.total,p.tgt)}">${p.tgt?Math.round(p.total/p.tgt*100)+'%':'–'}</td></tr>`).join('')}
-    <tr class="rtl-tot"><td class="rtl-name">Total</td>${colTot.map(v=>`<td class="rtl-c">${fmtNum(v)}</td>`).join('')}<td class="rtl-sum"><strong>${fmtNum(grand)}</strong></td><td class="rtl-sum" id="rtlGoalAll">${one(tgtAll)}</td><td class="rtl-sum" id="rtlPctAll">${tgtAll?Math.round(grand/tgtAll*100)+'%':'–'}</td></tr>
+   ${!src?'<p class="hint">Daily counts for these weeks aren’t ready yet — they appear after the next upload.</p>':people.length?`<div class="rtl-scroll"><table class="users-table rtl-table" id="recTlTable"><thead><tr><th class="rtl-name">Recruiter</th>${cols.map(c=>`<th class="rtl-h">${head(c)}</th>`).join('')}<th class="rtl-sum">Total</th>${isSch?`<th class="rtl-sum">Goal<small>${soFar?'so far':'whole week'}</small></th><th class="rtl-sum">%</th>`:''}</tr></thead><tbody>
+    ${people.map(p=>`<tr class="${p.n===focus?'rtl-focus':''}" data-rtl-row="${escapeHtml(p.n)}"><td class="rtl-name"><button type="button" class="rtl-pick" data-rtl-peer="${escapeHtml(p.n)}" title="Who works at the same branches">${escapeHtml(p.n)}</button></td>${cols.map((c,i)=>cell(p,i)).join('')}<td class="rtl-sum"><strong>${fmtNum(p.total)}</strong></td>${isSch?`<td class="rtl-sum rtl-goalc">${one(p.tgt)}</td><td class="rtl-sum rtl-pct rtl-pctc ${band(p.total,p.tgt)}">${p.tgt?Math.round(p.total/p.tgt*100)+'%':'–'}</td>`:''}</tr>`).join('')}
+    <tr class="rtl-tot"><td class="rtl-name">Total</td>${colTot.map(v=>`<td class="rtl-c">${fmtNum(v)}</td>`).join('')}<td class="rtl-sum"><strong>${fmtNum(grand)}</strong></td>${isSch?`<td class="rtl-sum" id="rtlGoalAll">${one(tgtAll)}</td><td class="rtl-sum" id="rtlPctAll">${tgtAll?Math.round(grand/tgtAll*100)+'%':'–'}</td>`:''}</tr>
    </tbody></table></div><p class="hint rtl-foot">Click a name to see who else works at their branches.</p>`:'<p class="hint">No schedules in these dates.</p>'}
   </div>`;
   const $=s=>host.querySelector(s);
-  host.querySelectorAll('[data-rtlg]').forEach(b=>b.onclick=()=>{ if(b.disabled||b.dataset.rtlg===grain) return; recTl.grain=b.dataset.rtlg; renderRecruiterTimeline(names); });
+  host.querySelectorAll('[data-rtlg]').forEach(b=>b.onclick=()=>{ const g=b.dataset.rtlg; if(g===grain) return; recTl.grain=g;
+    // By day covers up to 62 days: from a long range it shows that range's last 4 weeks
+    if(g==='day'&&span>62){ const f=tgShift(weekOfDate(to).weekStart,-21); recTl.from=f>from?f:from; showToast('By day shows the last 4 weeks of your dates — pick other dates any time.'); }
+    renderRecruiterTimeline(names); });
+  host.querySelectorAll('[data-rtlm]').forEach(b=>b.onclick=()=>{ if(b.dataset.rtlm===metric) return; recTl.metric=b.dataset.rtlm; lsSet('ipd_rtl_metric',recTl.metric); renderRecruiterTimeline(names); });
   $('#rtlTo')?.addEventListener('change',()=>{ const a=$('#rtlFrom').value, b=$('#rtlTo').value; if(!a||!b) return; recTl.from=a<b?a:b; recTl.to=a<b?b:a; renderRecruiterTimeline(names); });
   $('#rtlSoFar')?.addEventListener('click',()=>{ recTl.soFar=!soFar; lsSet('ipd_rtl_sofar',recTl.soFar?'1':'0'); renderRecruiterTimeline(names); });
   $('#rtlPeerClose')?.addEventListener('click',()=>{ recTl.focus=null; renderRecruiterTimeline(names); });
@@ -9356,15 +9425,20 @@ const KV = new Map();
 // goal (goals:<week>) is read as goal × present weekdays ÷ 5. KV.getRaw gives the goals exactly as saved.
 KV.getRaw=k=>Map.prototype.get.call(KV,k);
 const _attGoalCache=new Map();
-KV.get=function(k){ const v=Map.prototype.get.call(this,k);
-  if(typeof k!=='string'||!k.startsWith('goals:')) return v;
-  const att=Map.prototype.get.call(this,'attendance'); if(!att||typeof att!=='object'||!Object.keys(att).length) return v;
-  const we=k.slice(6), c=_attGoalCache.get(we); if(c&&c.v===v&&c.att===att) return c.out;
-  let out=v, any=false; const copy={...(v||{})};
-  Object.keys(att).forEach(n=>{ const ab=absentWeekdays(n,we); if(!ab) return; const raw=v&&v[n];
-    const base=raw!==undefined&&raw!==null&&raw!==''&&Number.isFinite(Number(raw))?Number(raw):DEFAULT_WEEKLY_GOAL;
-    copy[n]=Math.round(base*(5-ab)/5*10)/10; any=true; });
-  if(any) out=copy; _attGoalCache.set(we,{v,att,out}); return out; };
+KV.get=function(k){ const v0=Map.prototype.get.call(this,k);
+  if(typeof k!=='string'||!k.startsWith('goals:')) return v0;
+  const we=k.slice(6), f=typeof clipGoalFactor==='function'?clipGoalFactor(we):1;
+  const att=Map.prototype.get.call(this,'attendance'), hasAtt=!!(att&&typeof att==='object'&&Object.keys(att).length);
+  const baseOf=n=>{ const raw=v0&&v0[n]; return raw!==undefined&&raw!==null&&raw!==''&&Number.isFinite(Number(raw))?Number(raw):DEFAULT_WEEKLY_GOAL; };
+  if(f!==1){   // a week cut by an exact date range: goal ÷ 5 for each working day inside the range they were present
+    const R=activeRange(), ws=tgShift(we,-6), names=new Set([...Object.keys(v0||{}), ...Object.keys(((weeksData||[]).find(w=>w.weekEndDate===we)||{}).byRecruiter||{})]), o={};
+    names.forEach(n=>{ let d=0; for(let i=1;i<=5;i++){ const x=tgShift(ws,i); if(x>=R.from&&x<=R.to&&!(hasAtt&&isAbsent(n,x))) d++; } o[n]=Math.round(baseOf(n)*d/5*10)/10; });
+    return o; }
+  if(!hasAtt) return v0;
+  const c=_attGoalCache.get(we); if(c&&c.v===v0&&c.att===att) return c.out;
+  let out=v0, any=false; const copy={...(v0||{})};
+  Object.keys(att).forEach(n=>{ const ab=absentWeekdays(n,we); if(!ab) return; copy[n]=Math.round(baseOf(n)*(5-ab)/5*10)/10; any=true; });
+  if(any) out=copy; _attGoalCache.set(we,{v:v0,att,out}); return out; };
 const Server = {
   client:null, token:null, user:null, since:0, pollTimer:null, failures:0, own:new Map(), ownMasterUntil:0, status:'connecting',
   cfg:null,
@@ -13454,7 +13528,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.96.0';   // shown only in the browser tab title
+const APP_VERSION = '4.97.0';   // shown only in the browser tab title
 // Everyone gets the latest look: the page checks the published file for a newer version — right after it opens
 // (switches straight over) and every few minutes / when the tab comes back (offers an Update button).
 const AppUpdate=(()=>{
@@ -15580,11 +15654,11 @@ const OverviewX=(()=>{
  const st={mode:null, quick:'picker', cFrom:null, cTo:null, cache:new Map(), charts:[], range:null};
  // ---- one date range for Recruiting, Onboarding and Order Entry ----
  const wkStart=s=>add(weekEnd(s),-6);
- function recruitingSpan(){ const ws=(selectedWeekEndDates.length?selectedWeekEndDates.slice():currentWeekEndDate==='all-weeks'?weeksData.map(w=>w.weekEndDate):currentWeekEndDate?[currentWeekEndDate]:[]).sort();
+ function recruitingSpan(){ const pr=activeRange(); if(pr) return {from:pr.from, to:pr.to}; const ws=(selectedWeekEndDates.length?selectedWeekEndDates.slice():currentWeekEndDate==='all-weeks'?weeksData.map(w=>w.weekEndDate):currentWeekEndDate?[currentWeekEndDate]:[]).sort();
    if(!ws.length){ const t=ltToday(); return {from:wkStart(t), to:t}; } const t=ltToday(), to=ws[ws.length-1]; return {from:add(ws[0],-6), to:to>t?t:to}; }
  const recSig=()=>(selectedWeekEndDates.length?selectedWeekEndDates.slice().sort():[currentWeekEndDate||'']).join();
  // apply the shared dates to Recruiting (its uploaded weeks that overlap); remember what we set
- function applyRecruiting(a,b){ const ws=weeksIn(a,b); if(ws.length){ selectedWeekEndDates=ws.length>1?ws:[]; currentWeekEndDate=ws[ws.length-1]; } st.recSig=recSig(); }
+ function applyRecruiting(a,b){ const ws=weeksIn(a,b); if(ws.length){ selectedWeekEndDates=ws.length>1?ws:[]; currentWeekEndDate=ws[ws.length-1]; setPeriodRange(a,b); } st.recSig=recSig(); }
  // default: the week running now (Sunday → today)
  function range(){ if(!st.range){ const t=ltToday(); st.range={from:wkStart(t), to:t}; applyRecruiting(st.range.from, st.range.to); } return st.range; }
  // the uploaded weeks that overlap a date range
@@ -15836,10 +15910,10 @@ const DatePick=(()=>{
  function monthGrid(m,i,n){
   const first=parse(m), start=add(m,-first.getDay()), cells=[]; for(let k=0;k<42;k++) cells.push(add(start,k));
   const month=m.slice(0,7), t=today();
-  const inRange=d=>{ if(st.mode==='period'){ if(st.all) return st.weeks.includes(weekEnd(d)); const a=st.a, b=st.b||(st.a?(st.hover?weekEnd(st.hover):weekEnd(st.a)):null); if(!a||!b) return false; const lo=a<b?a:weekStart(b), hi=a<b?b:weekEnd(a); return d>=lo&&d<=hi; }
+  const inRange=d=>{ if(st.mode==='period'){ if(st.all) return st.weeks.includes(weekEnd(d)); const a=st.a, b=st.b||st.hover||st.a; if(!a||!b) return false; const lo=a<b?a:b, hi=a<b?b:a; return d>=lo&&d<=hi; }
    if(st.mode!=='range') return false; const a=st.a, b=st.b||(st.a&&st.hover?st.hover:null); if(!a||!b) return false; const lo=a<b?a:b, hi=a<b?b:a; return d>=lo&&d<=hi; };
   const ends=d=>{ if(st.mode==='range') return d===st.a||d===(st.b||st.a);
-   if(st.mode==='period'&&st.a&&!st.all){ const b=st.b||weekEnd(st.a); return d===st.a||d===b; } return false; };
+   if(st.mode==='period'&&st.a&&!st.all){ const b=st.b||st.a; return d===st.a||d===b; } return false; };
   const weekSel=d=>st.mode==='week'&&st.value&&weekEnd(d)===st.value;
   const weekOk=d=>(st.mode!=='week'&&st.mode!=='period')||st.weeks.includes(weekEnd(d));
   const head=['Su','Mo','Tu','We','Th','Fr','Sa'].map(x=>`<span class="dp-dow">${x}</span>`).join('');
@@ -15853,7 +15927,8 @@ const DatePick=(()=>{
  function canDone(){ if(!st) return false;
   if(st.mode==='range') return !!st.a; if(st.mode==='single') return !!st.value||(st.clearable&&st.value==='');
   if(st.mode==='week'||st.mode==='month') return !!st.value; return st.all||(!!st.a&&periodWeeks().length>0); }
- function periodWeeks(){ if(!st||!st.a) return []; const b=st.b||weekEnd(st.a); return st.weeks.filter(w=>w>=weekEnd(st.a)&&w<=b); }
+ // exact dates: every uploaded week that has at least one day inside them (the pages trim the edge weeks)
+ function periodWeeks(){ if(!st||!st.a) return []; const b=st.b||st.a; return st.weeks.filter(w=>w>=st.a&&add(w,-6)<=b); }
  const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
  const mLabel=v=>/^\d{4}-\d{2}$/.test(v||'')?parse(v+'-01').toLocaleDateString(undefined,{month:'long',year:'numeric'}):'';
  // month fields (input type=month): a year of months instead of days
@@ -15896,7 +15971,10 @@ const DatePick=(()=>{
   if(st.mode==='range') presets=tidy((st.presets==='simple'?SIMPLE_PRESETS():RANGE_PRESETS()).map(([l,a,b])=>{ if(l==='#') return H(a); const A=st.min&&a<st.min?st.min:a, B=st.max&&b>st.max?st.max:b; return A<=B?`<button type="button" data-pa="${A}" data-pb="${B}" class="${st.a===A&&st.b===B?'on':''}" title="${fmt(A)} – ${fmt(B)}">${l}</button>`:''; }).join(''));
   else if(st.mode==='single') presets=tidy(SINGLE_PRESETS().map(([l,d])=>l==='#'?H(d):clampOk(d,st.min,st.max)?`<button type="button" data-p1="${d}" class="${st.value===d?'on':''}" title="${fmt(d)}">${l}</button>`:'').join(''))+(st.clearable?'<button type="button" data-p1="" class="dp-clear">No date</button>':'');
   else if(st.mode==='period'){ const W=st.weeks.slice().sort(), t=today(), latest=W[W.length-1]||weekEnd(t), lastN=n=>W.slice(-n), y=t.slice(0,4), ly=String(+y-1);
-   const span=(a,b)=>{ const ws=W.filter(w=>w>=weekEnd(a)&&w<=weekEnd(b)); return ws.length?[weekStart(ws[0]),ws[ws.length-1]]:null; };
+   // a week belongs to the month / quarter / year its week-ending Saturday falls in (same as the Monthly and Quarterly rollups),
+   // so a week is never counted in two months and "Last quarter" is exactly that quarter's weeks
+   // months, quarters and years are their exact calendar dates (up to today), e.g. Last quarter = Jul 1 – Sep 30
+   const span=(a,b)=>{ if(b>t) b=t; return a<=b&&W.some(w=>w>=a&&add(w,-6)<=b)?[a,b]:null; };
    const lastNr=n=>lastN(n).length>=Math.min(n,W.length)&&W.length?[weekStart(lastN(n)[0]),latest]:null;
    const prev=W.length>1?W[W.length-2]:null, lm=add(monthStart(t),-1), lq=add(qStart(t),-1);
    const qs=[]; for(let n=qOf(t)-1;n>=1;n--){ const [qa,qb]=qN(y,n); qs.push(['Q'+n+' '+y,span(qa,qb)]); }
@@ -15906,7 +15984,8 @@ const DatePick=(()=>{
     ['#','Year'],['Year to date',span(yStart(t),t)],['Last 12 months',span(add(t,-364),t)],['Last year ('+ly+')',span(ly+'-01-01',ly+'-12-31')]];
    const seen=new Set();
    presets=tidy(list.map(([l,r])=>{ if(l==='#') return H(r); if(!r) return ''; const k=l+r[0]+r[1]; if(seen.has(k)) return ''; seen.add(k);
-     const n=W.filter(w=>w>=weekEnd(r[0])&&w<=r[1]).length; return `<button type="button" data-pa="${r[0]}" data-pb="${r[1]}" class="${st.a===r[0]&&st.b===r[1]?'on':''}" title="${fmt(r[0])} – ${fmt(r[1])}">${l}<small>${n} wk${n===1?'':'s'}</small></button>`; }).join(''))
+     const wk=r[0]===weekStart(r[0])&&r[1]===weekEnd(r[1]), n=wk?W.filter(w=>w>=r[0]&&add(w,-6)<=r[1]).length:Math.round((parse(r[1])-parse(r[0]))/864e5)+1;
+     return `<button type="button" data-pa="${r[0]}" data-pb="${r[1]}" class="${st.a===r[0]&&st.b===r[1]?'on':''}" title="${fmt(r[0])} – ${fmt(r[1])}">${l}<small>${n} ${wk?'wk'+(n===1?'':'s'):'days'}</small></button>`; }).join(''))
     +H('All')+`<button type="button" data-pall="1" class="${st.all?'on':''}">All weeks<small>${W.length}</small></button>`; }
   else { const t=today(), W=st.weeks.slice().filter(w=>/^\d{4}-\d{2}-\d{2}$/.test(w)).sort(), have=w=>!!w&&W.includes(w);
    const lastIn=(a,b)=>{ const ws=W.filter(w=>w>=a&&w<=b); return ws[ws.length-1]||null; }, firstIn=(a,b)=>W.find(w=>w>=a&&w<=b)||null;
@@ -15924,16 +16003,17 @@ const DatePick=(()=>{
     +((st.extra||[]).length?H('Other')+(st.extra||[]).map(o=>`<button type="button" data-pw="${escapeHtml(o.value)}" class="${st.value===o.value?'on':''}">${escapeHtml(o.label)}</button>`).join(''):''); }
   const anyOn=/class="[^"]*\bon\b/.test(presets);
   presets=`<button type="button" class="dp-custom ${anyOn?'':'on'}" data-custom="1">Custom ${st.mode==='single'?'date':st.mode==='week'?'week':'range'}</button>`+presets;
-  const sum=st.mode==='period'?(st.all?'All '+st.weeks.length+' uploaded weeks':st.a?(()=>{ const ws=periodWeeks(); const wn=w=>{ const x=(typeof weeksData!=='undefined'?weeksData:[]).find(y=>y.weekEndDate===w); return x&&x.weekNumber!=null?x.weekNumber:weekOfDate(w).number; }; return ws.length===1?'Week '+wn(ws[0])+' · ending '+fmt(ws[0]):ws.length?ws.length+' weeks · Week '+wn(ws[0])+' – Week '+wn(ws[ws.length-1]):'No uploaded weeks in these dates'; })()+(st.b?'':' — click another day to extend'):'Click a day to pick its week')
+  const sum=st.mode==='period'?(st.all?'All '+st.weeks.length+' uploaded weeks':st.a?(()=>{ const ws=periodWeeks(); const wn=w=>{ const x=(typeof weeksData!=='undefined'?weeksData:[]).find(y=>y.weekEndDate===w); return x&&x.weekNumber!=null?x.weekNumber:weekOfDate(w).number; }; const b=st.b||st.a, nd=Math.round((parse(b)-parse(st.a))/864e5)+1; let wd=0; for(let d=st.a; d<=b; d=add(d,1)){ const g=parse(d).getDay(); if(g&&g<6) wd++; }
+     return ws.length?fmt(st.a).replace(/, \d{4}$/,'')+' – '+fmt(b)+' · '+nd+' day'+(nd===1?'':'s')+' ('+wd+' working) · '+(ws.length===1?'Week '+wn(ws[0]):'Weeks '+wn(ws[0])+'–'+wn(ws[ws.length-1])):'No uploaded weeks in these dates'; })()+(st.b?'':' — click another day to extend'):'Click a day to pick its week')
    :st.mode==='range'?(st.a?(()=>{ const b=st.b||st.a, n=Math.round((parse(b)-parse(st.a))/864e5)+1; return n+' day'+(n===1?'':'s')+(st.b?'':' — click another day to extend'); })():'Click a start date')
    :st.mode==='week'?(st.value&&/^\d{4}/.test(st.value)?'Week '+weekOfDate(st.value).number+' · Sun '+fmt(weekStart(st.value))+' – Sat '+fmt(st.value):st.value?((st.extra||[]).find(o=>o.value===st.value)||{}).label||'':'Click any day of a week')
    :(st.value?parse(st.value).toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric',year:'numeric'}):st.clearable?'No date':'Click a date');
   const F=(lbl,val,key,ph)=>`<label class="dp-f"><span>${lbl}</span><input type="text" inputmode="numeric" autocomplete="off" spellcheck="false" data-fk="${key}" value="${val?mdy(val):''}" placeholder="${ph||'MM/DD/YYYY'}"></label>`;
   const dash='<span class="dp-dash" aria-hidden="true">–</span>';
   const isDate=v=>/^\d{4}-\d{2}-\d{2}$/.test(v||'');
-  const pa=st.all?(st.weeks.slice().sort()[0]?weekStart(st.weeks.slice().sort()[0]):''):st.a, pb=st.all?st.weeks.slice().sort().pop():(st.b||(st.a?weekEnd(st.a):''));
+  const pa=st.all?(st.weeks.slice().sort()[0]?weekStart(st.weeks.slice().sort()[0]):''):st.a, pb=st.all?st.weeks.slice().sort().pop():(st.b||st.a||'');
   const fields=st.mode==='range'?F('Day from',st.a,'a')+dash+F('Day to',st.b||'','b')
-   :st.mode==='period'?F('Week from',pa,'a')+dash+F('Week to',pb,'b')
+   :st.mode==='period'?F('From',pa,'a')+dash+F('To',pb,'b')
    :st.mode==='week'?F('Week from',isDate(st.value)?weekStart(st.value):'','w')+dash+F('Week to',isDate(st.value)?st.value:'','w')
    :F('Date',st.value,'v');
   const months=two?[st.view,next]:[st.view];
@@ -15946,11 +16026,11 @@ const DatePick=(()=>{
    b.onclick=()=>{ const d=b.dataset.d;
     if(st.mode==='single'){ st.value=d; draw(); return; }
     if(st.mode==='week'){ st.value=weekEnd(d); draw(); return; }
-    if(st.mode==='period'){ st.all=false; if(!st.a||st.b){ st.a=weekStart(d); st.b=null; } else { const e=weekEnd(d); if(e<st.a){ st.b=weekEnd(st.a); st.a=weekStart(d); } else st.b=e; } draw(); return; }
+    if(st.mode==='period'){ st.all=false; if(!st.a||st.b){ st.a=d; st.b=null; } else { if(d<st.a){ st.b=st.a; st.a=d; } else st.b=d; } draw(); return; }
     if(!st.a||st.b){ st.a=d; st.b=null; } else { if(d<st.a){ st.b=st.a; st.a=d; } else st.b=d; } draw(); };
    b.ondblclick=()=>{ if(st.mode==='single'||st.mode==='week') done(); else if(st.mode==='range'){ st.a=st.b=b.dataset.d; done(); } };
    if(st.mode==='range') b.onmouseenter=()=>{ if(st.a&&!st.b){ st.hover=b.dataset.d; pop.querySelectorAll('.dp-day').forEach(x=>{ const lo=st.a<st.hover?st.a:st.hover, hi=st.a<st.hover?st.hover:st.a; x.classList.toggle('in',x.dataset.d>=lo&&x.dataset.d<=hi); }); } };
-   if(st.mode==='period') b.onmouseenter=()=>{ if(st.a&&!st.b){ st.hover=b.dataset.d; const he=weekEnd(st.hover), lo=st.a<he?st.a:weekStart(st.hover), hi=st.a<he?he:weekEnd(st.a); pop.querySelectorAll('.dp-day').forEach(x=>x.classList.toggle('in',x.dataset.d>=lo&&x.dataset.d<=hi)); } };
+   if(st.mode==='period') b.onmouseenter=()=>{ if(st.a&&!st.b){ st.hover=b.dataset.d; const lo=st.a<st.hover?st.a:st.hover, hi=st.a<st.hover?st.hover:st.a; pop.querySelectorAll('.dp-day').forEach(x=>x.classList.toggle('in',x.dataset.d>=lo&&x.dataset.d<=hi)); } };
    if(st.mode==='week') b.onmouseenter=()=>{ const we=weekEnd(b.dataset.d); pop.querySelectorAll('.dp-day').forEach(x=>x.classList.toggle('hv',weekEnd(x.dataset.d)===we&&!x.disabled)); };
   });
   pop.querySelector('.dp-months').onmouseleave=()=>{ pop.querySelectorAll('.dp-day.hv').forEach(x=>x.classList.remove('hv')); };
@@ -15969,7 +16049,7 @@ const DatePick=(()=>{
     if(k==='v'){ if(!clampOk(d,st.min,st.max)) return bad(); st.value=d; }
     else if(k==='w'){ const we=weekEnd(d); if(!st.weeks.includes(we)) { inp.title='That week isn’t uploaded'; return bad(); } st.value=we; }
     else if(st.mode==='range'){ if(!clampOk(d,st.min,st.max)) return bad(); if(k==='a'){ st.a=d; if(st.b&&st.b<d) st.b=null; } else { if(!st.a||d<st.a){ st.b=st.a||d; st.a=d; } else st.b=d; } }
-    else { st.all=false; if(k==='a'){ st.a=weekStart(d); if(st.b&&st.b<st.a) st.b=null; } else { const e=weekEnd(d); if(!st.a||e<st.a){ st.a=weekStart(d); st.b=e; } else st.b=e; } }
+    else { st.all=false; if(k==='a'){ st.a=d; if(st.b&&st.b<st.a) st.b=null; } else { if(!st.a||d<st.a){ st.b=st.a||d; st.a=d; } else st.b=d; } }
     focusMonth(d); draw(); const again=pop&&pop.querySelector(`[data-fk="${k}"]`); if(again&&k!=='w') again.focus(); return true; };
    inp.addEventListener('change',()=>{ if(!inp._skip) commit(); inp._skip=false; });
    // Enter: From moves to To; anywhere else applies
@@ -15984,7 +16064,7 @@ const DatePick=(()=>{
   place();
  }
  function done(){ const s=st; if(!s) return;
-  if(s.mode==='period'){ close(); if(!s.onPick) return; if(s.all){ s.onPick('all'); return; } const b=s.b||weekEnd(s.a); s.onPick(s.weeks.filter(w=>w>=weekEnd(s.a)&&w<=b)); return; }
+  if(s.mode==='period'){ close(); if(!s.onPick) return; if(s.all){ s.onPick('all'); return; } const b=s.b||s.a; s.onPick(s.weeks.filter(w=>w>=s.a&&add(w,-6)<=b), {from:s.a, to:b}); return; }
   close(); if(!s.onPick) return;
   s.onPick(s.mode==='range'?[s.a,s.b||s.a]:s.value); }
  function finish(v){ if(st&&v!==undefined) st.value=v; done(); }
