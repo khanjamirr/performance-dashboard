@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.79.2</title>
+<title>Performance Dashboard · v4.80.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2067,7 +2067,7 @@ button.mr-kpi:not(:disabled):hover{border-color:#c7d2e3;box-shadow:0 4px 14px #0
 .basis-sw{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#13264a;text-transform:none!important;letter-spacing:0!important;white-space:nowrap;margin-top:4px}.basis-sw .switch:disabled{opacity:.45;cursor:not-allowed}
 .al-head{display:flex;align-items:flex-start;gap:4px}.al-head .al-pct{margin-left:auto}
 .al-rdot{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#c8102e;color:#fff;font-size:11px;font-weight:800;margin:1px 0 0 6px;box-shadow:0 0 0 3px #fff;flex:0 0 auto}
-.refresh-stamp{margin:auto 12px 6px;padding:6px 9px;border-radius:8px;background:#ffffff0d;border:1px solid #ffffff17;color:#dbe6f5;font-size:10.5px;line-height:1.45;display:flex;flex-direction:column;gap:0}.refresh-stamp:not([hidden])+.ribbon-actions{margin-top:0!important;padding-top:8px!important}.refresh-stamp span{display:block}
+.refresh-stamp{margin:auto 0 0;padding:10px 10px 8px;border-radius:0;background:none;border:0;border-top:1px solid #ffffff26;color:#dbe6f5;font-size:10.5px;line-height:1.45;display:flex;flex-direction:column;gap:0}.refresh-stamp:not([hidden])+.ribbon-actions{margin-top:0!important;padding-top:8px!important}.refresh-stamp:not(.top) span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em}.refresh-stamp:not(.top) b{white-space:nowrap}
 .refresh-stamp b{font-size:10.5px;color:#8da3c2;margin-bottom:1px;font-weight:700}.refresh-stamp em{font-style:normal;color:#9fb3cf}.refresh-stamp time{color:#fff;font-weight:600}.rs-by{font-size:10px;color:#9fb3cf;white-space:normal}.refresh-stamp.top .rs-by{color:#5b6b82}
 .refresh-stamp[hidden]{display:none!important}
 .refresh-stamp.top{display:none!important}
@@ -2170,6 +2170,88 @@ b.g{color:#15803d}b.a{color:#4d7c0f}b.w{color:#c2410c}b.r{color:#c8102e}
 #ovModeBar:not(.hidden){display:block!important;width:100%;margin-bottom:14px}.ovx-tabs{width:100%}
 @media(max-width:700px){.ovx-tabs a{padding:8px 10px 12px 2px;margin-right:6px;gap:8px}.ovx-t small{display:none}.ovx-ico{width:28px;height:28px;border-radius:8px}.ovx-t b{font-size:14px}}
 </style>
+<style>
+.ex-viewpick{position:relative;display:inline-grid;grid-template-columns:1fr 1fr;align-items:center;padding:3px;border-radius:999px;background:#eef2f7;box-shadow:inset 0 0 0 1px #e2e8f0;align-self:flex-start;isolation:isolate}
+.ex-viewpick a{position:relative;z-index:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:6px 14px;font-size:12.5px;font-weight:600;color:#64748b;text-decoration:none;border-radius:999px;white-space:nowrap;transition:color .2s;outline:none}
+.ex-viewpick a svg{width:15px;height:15px}
+.ex-viewpick a:hover{color:#0a1f44}
+.ex-viewpick a:focus-visible{box-shadow:0 0 0 2px #1d4ed8}
+.ex-viewpick>i{position:absolute;z-index:0;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);border-radius:999px;background:#fff;box-shadow:0 1px 3px #0a1f441f,0 1px 1px #0a1f440d;transition:transform .25s cubic-bezier(.3,.7,.2,1)}
+.ex-viewpick.det>i{transform:translateX(100%)}
+.ex-viewpick.sum a[data-pv=sum],.ex-viewpick.det a[data-pv=det]{color:#0a1f44}
+</style>
+<style>
+/* frozen Overview tabs */
+#ovModeBar:not(.hidden){position:sticky;top:var(--ovx-top,0px);z-index:58}
+#ovModeBar:not(.hidden)::before{content:'';position:absolute;z-index:-1;top:0;bottom:0;left:calc(-1 * var(--bl,0px));right:calc(-1 * var(--br,0px));background:transparent;transition:background .25s,box-shadow .25s}
+#ovModeBar.stuck::before{background:rgba(244,247,251,.95);-webkit-backdrop-filter:saturate(1.6) blur(12px);backdrop-filter:saturate(1.6) blur(12px);box-shadow:0 10px 20px -14px #0a1f4455,inset 0 -1px 0 #dfe5ee}
+#ovModeBar.stuck .ovx-tabs{border-bottom-color:transparent}
+#ovModeBar.stuck .ovx-tabs a{padding-top:7px;padding-bottom:10px}
+#ovModeBar.stuck .ovx-t small{max-height:0;opacity:0;margin:0}
+.ovx-t small{max-height:16px;transition:max-height .25s,opacity .2s,margin .25s;overflow:hidden}
+.ovx-tabs a{transition:padding .25s,color .2s}
+.ovx-ico{transition:background .25s,color .25s,box-shadow .25s,transform .25s,width .25s,height .25s}
+#ovModeBar.stuck .ovx-ico{width:28px;height:28px;border-radius:8px}
+.ovx-tabs a.ovx-recruiting.on .ovx-ico{background:linear-gradient(135deg,#2563eb,#0a1f44);box-shadow:0 6px 14px -6px #2563eb99}
+.ovx-tabs a.ovx-onboarding.on .ovx-ico{background:linear-gradient(135deg,#14b8a6,#0f766e);box-shadow:0 6px 14px -6px #14b8a699}
+.ovx-tabs a.ovx-orderentry.on .ovx-ico{background:linear-gradient(135deg,#8b5cf6,#5b21b6);box-shadow:0 6px 14px -6px #8b5cf699}
+.ovx-tabs a:hover .ovx-ico{transform:translateY(-1px)}
+.ovx-tabs a.ovx-recruiting:hover:not(.on) .ovx-ico{color:#2563eb;background:#e8efff}
+.ovx-tabs a.ovx-onboarding:hover:not(.on) .ovx-ico{color:#0f766e;background:#e0f5f2}
+.ovx-tabs a.ovx-orderentry:hover:not(.on) .ovx-ico{color:#6d28d9;background:#efe9fe}
+.ovx-ink.ink-recruiting{background:linear-gradient(90deg,#2563eb,#0a1f44)}
+.ovx-ink.ink-onboarding{background:linear-gradient(90deg,#14b8a6,#0f766e)}
+.ovx-ink.ink-orderentry{background:linear-gradient(90deg,#8b5cf6,#5b21b6)}
+.ovx-ink{transition:transform .28s cubic-bezier(.3,.7,.2,1),width .28s cubic-bezier(.3,.7,.2,1),background .3s}
+@media(max-width:700px){#ovModeBar.stuck .ovx-ico{display:none}#ovModeBar.stuck .ovx-tabs a{padding:8px 6px 10px}}
+</style>
+<style>
+/* frozen state: the tabs float as a glass capsule; the picked one sits on a coloured, sliding pill */
+#ovModeBar.stuck::before{background:linear-gradient(180deg,rgba(244,247,251,.96) 0%,rgba(244,247,251,.9) 60%,rgba(244,247,251,0) 100%)!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+#ovModeBar.stuck{padding:8px 0 12px}
+#ovModeBar.stuck .ovx-tabs{width:max-content!important;max-width:100%;gap:2px;padding:5px;border:1px solid #ffffffcc;border-radius:999px;background:rgba(255,255,255,.88);-webkit-backdrop-filter:saturate(1.8) blur(14px);backdrop-filter:saturate(1.8) blur(14px);box-shadow:0 12px 30px -14px #0a1f4459,0 2px 6px -2px #0a1f441f,inset 0 1px 0 #fff;animation:ovxDock .32s cubic-bezier(.3,.7,.2,1)}
+@keyframes ovxDock{from{transform:translateY(-8px) scale(.97);opacity:.4}to{transform:none;opacity:1}}
+#ovModeBar.stuck .ovx-tabs a{position:relative;z-index:1;margin:0;padding:7px 16px 7px 8px!important;gap:8px;border-radius:999px;color:#475569}
+#ovModeBar.stuck .ovx-tabs a:hover:not(.on){background:#f1f5f9}
+#ovModeBar.stuck .ovx-t b{font-size:13.5px}#ovModeBar.stuck .ovx-t small{display:none}body.scrolled .topbar{background:rgba(244,247,251,.97)!important}
+#ovModeBar.stuck .ovx-ico{width:26px!important;height:26px!important;border-radius:999px!important;background:#eef2f7;box-shadow:none!important}
+#ovModeBar.stuck .ovx-tabs a.on{color:#fff}
+#ovModeBar.stuck .ovx-tabs a.on .ovx-ico{background:rgba(255,255,255,.22)!important;color:#fff}
+#ovModeBar.stuck .ovx-ink{top:5px;bottom:5px;height:auto;border-radius:999px;z-index:0;box-shadow:0 6px 16px -6px rgba(10,31,68,.45)}
+#ovModeBar.stuck .ovx-ink.ink-recruiting{background:linear-gradient(135deg,#3b82f6,#1e3a8a)}
+#ovModeBar.stuck .ovx-ink.ink-onboarding{background:linear-gradient(135deg,#2dd4bf,#0f766e)}
+#ovModeBar.stuck .ovx-ink.ink-orderentry{background:linear-gradient(135deg,#a78bfa,#5b21b6)}
+@media(max-width:700px){#ovModeBar.stuck .ovx-tabs{width:100%!important;justify-content:space-between}#ovModeBar.stuck .ovx-tabs a{padding:7px 12px!important;flex:1;justify-content:center}#ovModeBar.stuck .ovx-ico{display:none}}
+</style>
+<style>
+/* Overview workspace switcher: a capsule with a sliding colour thumb; it floats as a glass dock when frozen */
+#ovModeBar .ovx-tabs{display:inline-flex;width:auto;max-width:100%;gap:2px;padding:5px;margin:0;border:1px solid #e3e8f0;border-bottom:1px solid #e3e8f0;border-radius:18px;background:linear-gradient(180deg,#ffffff,#f7f9fc);box-shadow:0 1px 2px #0a1f440d,0 8px 24px -16px #0a1f4433;transition:box-shadow .3s,background .3s,padding .25s,border-radius .25s}
+#ovModeBar .ovx-tabs a{position:relative;z-index:1;margin:0;padding:9px 18px 9px 10px;border-radius:13px;color:#475569}
+#ovModeBar .ovx-tabs a:hover:not(.on){background:#f1f4f9}
+#ovModeBar .ovx-tabs a.on{color:#fff}
+#ovModeBar .ovx-tabs a.on .ovx-t small{color:#ffffffcc}
+#ovModeBar .ovx-tabs a.on .ovx-ico{background:#ffffff26!important;color:#fff;box-shadow:inset 0 0 0 1px #ffffff33!important}
+#ovModeBar .ovx-ico{width:34px;height:34px;border-radius:10px}
+#ovModeBar .ovx-recruiting:not(.on) .ovx-ico{background:#e8efff;color:#2563eb}
+#ovModeBar .ovx-onboarding:not(.on) .ovx-ico{background:#dff5f1;color:#0f766e}
+#ovModeBar .ovx-orderentry:not(.on) .ovx-ico{background:#efe9fe;color:#6d28d9}
+/* the thumb */
+#ovModeBar .ovx-ink{top:5px;bottom:5px;height:auto;border-radius:13px;z-index:0;box-shadow:0 8px 18px -8px currentColor}
+#ovModeBar .ovx-ink.ink-recruiting{background:linear-gradient(135deg,#3b82f6 0%,#1d4ed8 45%,#0a1f44 100%);color:#2563eb99}
+#ovModeBar .ovx-ink.ink-onboarding{background:linear-gradient(135deg,#2dd4bf 0%,#0d9488 50%,#115e59 100%);color:#0d948899}
+#ovModeBar .ovx-ink.ink-orderentry{background:linear-gradient(135deg,#a78bfa 0%,#7c3aed 50%,#4c1d95 100%);color:#7c3aed99}
+#ovModeBar .ovx-ink::after{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg,#ffffff2e,transparent 55%);pointer-events:none}
+/* frozen: glass dock, no full-width strip */
+#ovModeBar.stuck::before{display:none}
+#ovModeBar.stuck{padding-top:6px}
+#ovModeBar.stuck .ovx-tabs{padding:4px;border-radius:16px;background:rgba(255,255,255,.78);-webkit-backdrop-filter:saturate(1.8) blur(14px);backdrop-filter:saturate(1.8) blur(14px);border-color:#ffffffb3;box-shadow:0 12px 32px -12px #0a1f4459,0 2px 6px #0a1f4414,inset 0 0 0 1px #0a1f440d}
+#ovModeBar.stuck .ovx-tabs a{padding:6px 14px 6px 7px}
+#ovModeBar.stuck .ovx-ink{top:4px;bottom:4px}
+#ovModeBar.stuck .ovx-ico{width:26px;height:26px;border-radius:8px}
+#ovModeBar.stuck .ovx-t b{font-size:13.5px}
+@media(max-width:700px){#ovModeBar .ovx-tabs{display:flex;width:100%;overflow:visible}#ovModeBar .ovx-tabs a{flex:1 1 0;min-width:0;flex-direction:column;justify-content:center;gap:4px;padding:7px 4px}#ovModeBar .ovx-ico{width:26px;height:26px;border-radius:8px}#ovModeBar .ovx-t{align-items:center}#ovModeBar .ovx-t b{font-size:12.5px}
+ #ovModeBar.stuck .ovx-ico{display:none!important}#ovModeBar.stuck .ovx-tabs a{padding:8px 4px}}
+</style>
 </head>
 <body class="locked">
 <div id="appLoading" class="app-loading"><div class="spinner" aria-hidden="true"></div><p>Loading dashboard…</p></div>
@@ -2202,7 +2284,7 @@ b.g{color:#15803d}b.a{color:#4d7c0f}b.w{color:#c2410c}b.r{color:#c8102e}
       <button data-view="pivot" class="nav-sub" data-group-of="rep" title="Build your own tables and charts"><span class="dot"></span>Report Builder</button>
       <button type="button" class="nav-parent" data-group="act" aria-expanded="true" title="Action Center — who needs attention, and highlights"><svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9.5 16.5h-19z"/><path d="M12 10v4M12 17.5v.5"/></svg><span class="nav-full">Action Center</span><svg class="nav-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
       <button data-view="alerts" class="nav-sub" data-group-of="act" title="Who needs attention this week, and remarks"><span class="dot"></span>Needs attention</button>
-      <button data-view="highlights" class="nav-sub" data-group-of="act" title="Runs below goal, consistent performers, swings and top this week"><span class="dot"></span>Highlights</button>
+      <button data-view="highlights" class="nav-sub" data-group-of="act" title="Runs below goal, consistent performers, swings and top this week"><span class="dot"></span>Performance Trends</button>
     </nav>
     <div class="side-label side-label-tools">Tools</div>
     <div class="refresh-stamp" id="refreshStamp" aria-live="polite" hidden></div>
@@ -4577,7 +4659,7 @@ const VIEW_META = {
   branches:{title:'Branch Results', sub:'Show rates and outcomes by branch'},
   candidates:{title:'Candidates', sub:'Who is counted in each category, by week'},
   alerts:{title:'Action Center', sub:'Who needs attention this week — below 50% of goal first'},
-  highlights:{title:'Highlights', sub:'Runs below goal, consistent performers, swings and top this week'},
+  highlights:{title:'Performance Trends', sub:'Who keeps missing goal, who is steady, who swings week to week, and this week’s top performers'},
   pivot:{title:'Report Builder', sub:'Drag fields into Rows, Columns, Values and Filters — the chart builds itself'},
   divreport:{title:'Division Report', sub:'Pipeline by client and location, per division'},
   onboarding:{title:'Onboarding', sub:'Onboarder call log — each EID linked to its schedule and interview'},
@@ -4628,6 +4710,9 @@ function renderRefreshStamp(){
  const line=(lbl,d,src)=>`<span><em>${lbl}:</em> ${d?`<time datetime="${d.toISOString()}" title="${escapeHtml(full(d))}">${escapeHtml(fmt(d))}</time>${by(src)}`:'—'}</span>`;
  const html=`<b>Last refreshed on:</b>${line('Schedules',s,'schedules')}${line('Interviews',i,'shows')}`;
  [box,top].forEach(el=>{ if(el){ el.innerHTML=html; el.hidden=!(typeof Server!=='undefined'&&Server.user); } });
+ // keep each line on one line: shrink the text a little until it fits the menu width
+ if(box&&!box.hidden) requestAnimationFrame(()=>{ let fs=10.5; box.style.fontSize=''; const over=()=>[...box.querySelectorAll('span')].some(x=>x.scrollWidth>x.clientWidth+1);
+   while(over()&&fs>7.6){ fs-=.3; box.style.fontSize=fs+'px'; } });
 }
 async function refreshUI(){
  saveNavSoon();
@@ -5221,12 +5306,39 @@ function scopeWeekToDivision(week, division){
   return {...week,byRecruiter,byBranch,totals};
 }
 let weeklyRenderRevision=0;
+/* ---- Overview tabs stay frozen under the page heading while scrolling ---- */
+function ovxStickyUpdate(){
+  const bar=document.getElementById('ovModeBar'); if(!bar||bar.classList.contains('hidden')||!bar.offsetParent) return;
+  const tb=document.querySelector('.topbar'), side=document.querySelector('.sidebar');
+  let top=0;
+  if(tb&&getComputedStyle(tb).position==='sticky') top=Math.max(0,tb.getBoundingClientRect().bottom);
+  else if(side&&['sticky','fixed'].includes(getComputedStyle(side).position)) top=Math.max(0,side.getBoundingClientRect().bottom);
+  bar.style.setProperty('--ovx-top',Math.round(top)+'px');
+  // the frosted strip reaches the edges of the page column
+  const main=document.querySelector('.main'), r=bar.getBoundingClientRect(), mr=main?main.getBoundingClientRect():{left:0,right:innerWidth};
+  bar.style.setProperty('--bl',Math.max(0,Math.round(r.left-mr.left))+'px'); bar.style.setProperty('--br',Math.max(0,Math.round(mr.right-r.right))+'px');
+  const was=bar.classList.contains('stuck'), now=r.top<=top+1 && scrollY>4;
+  if(was!==now){ bar.classList.toggle('stuck', now);
+    // tabs change size when frozen — move the underline with them
+    setTimeout(()=>{ const a=bar.querySelector('[data-ovx].on'), i=bar.querySelector('.ovx-ink'); if(a&&i){ i.style.width=a.offsetWidth+'px'; i.style.transform=`translateX(${a.offsetLeft}px)`; } },270); }
+}
+function ovxStickySetup(){
+  if(!window.__ovxSticky){ window.__ovxSticky=true; let q=0; const go=()=>{ if(q) return; q=requestAnimationFrame(()=>{ q=0; ovxStickyUpdate(); }); };
+    addEventListener('scroll',go,{passive:true}); addEventListener('resize',go); document.querySelector('.topbar')?.addEventListener('transitionend',go); }
+  requestAnimationFrame(ovxStickyUpdate);
+}
 /* ---- Overview → Recruiting: executive summary (default). The full detail is one switch away. ---- */
-let perfDetailOpen = lsGet('ipd_perf_detail')==='1';
+let perfDetailOpen = false;
+// Summary / Detailed: a small sliding picker (not a switch)
+function perfViewPickHtml(){
+  const ico={sum:'<rect x="3" y="4" width="18" height="6" rx="2"/><rect x="3" y="14" width="8" height="6" rx="2"/><rect x="13" y="14" width="8" height="6" rx="2"/>',
+    det:'<path d="M4 6h16M4 12h16M4 18h10"/>'};
+  return `<div class="ex-viewpick ${perfDetailOpen?'det':'sum'}" role="tablist" aria-label="View">${[['sum','Summary','The one-screen summary'],['det','Detailed','Every chart and table']].map(([k,l,t])=>`<a href="#" role="tab" data-pv="${k}" aria-selected="${(k==='det')===perfDetailOpen}" title="${t}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ico[k]}</svg>${l}</a>`).join('')}<i aria-hidden="true"></i></div>`;
+}   // starts off every time; stays on (until switched off) while the page is open
 function execSummaryHtml(o){
   const {t, goal, prevT, multi, label, hpr, prevHpr, pend, byRec, goals, scopeDiv} = o;
   // detailed view on: only the detail shows (plus this bar to switch back)
-  if(perfDetailOpen) return `<section class="ex-wrap ex-slim"><div class="ex-slimbar"><span class="mr-eyebrow">${escapeHtml(label)}${scopeDiv?' · '+escapeHtml(Array.isArray(scopeDiv)?scopeDiv.join(', '):scopeDiv):' · All divisions'} · Detailed view</span><label class="rtl-chk basis-sw ex-detail-sw" title="Turn off to go back to the summary"><button type="button" class="switch" role="switch" id="perfDetailSw" aria-checked="true"><i></i></button>Detailed view</label></div></section>`;
+  if(perfDetailOpen) return `<section class="ex-wrap ex-slim"><div class="ex-slimbar"><span class="mr-eyebrow">${escapeHtml(label)}${scopeDiv?' · '+escapeHtml(Array.isArray(scopeDiv)?scopeDiv.join(', '):scopeDiv):' · All divisions'} · Detailed view</span>${perfViewPickHtml()}</div></section>`;
   const sr = t.scheduledDateOf ? t.shows/t.scheduledDateOf*100 : null, psr = prevT&&prevT.scheduledDateOf ? prevT.shows/prevT.scheduledDateOf*100 : null;
   const gp = goal>0 ? t.schedules/goal*100 : null;
   const chip=(c,p,{pts=false,good=1}={})=>{ if(multi||p==null||c==null) return ''; const d=pts?c-p:(p?(c-p)/p*100:null); if(d==null) return '';
@@ -5248,7 +5360,7 @@ function execSummaryHtml(o){
     <div class="mr-top"><div class="mr-title"><span class="mr-eyebrow">${escapeHtml(label)}${scopeDiv?' · '+escapeHtml(Array.isArray(scopeDiv)?scopeDiv.join(', '):scopeDiv):' · All divisions'}</span>
       <h3 class="mr-headline">${fmtNum(t.schedules)} schedules${gp!=null?` · ${Math.round(gp)}% of goal`:''}</h3>
       <p class="mr-sub">${fmtNum(t.scheduledDateOf)} interviews · ${fmtNum(t.shows)} shows · ${fmtNum(t.i9)} hires · ${fmtNum(t.placed||0)} placed</p></div>
-      <label class="rtl-chk basis-sw ex-detail-sw" title="Show every chart and table (trends, leaderboards, divisions, history, recap)"><button type="button" class="switch" role="switch" id="perfDetailSw" aria-checked="${perfDetailOpen}"><i></i></button>Detailed view</label></div>
+      ${perfViewPickHtml()}</div>
     ${gp!=null?`<div class="ex-goal"><div class="ex-goal-bar"><i class="${band(gp)}" style="width:${Math.min(100,gp)}%"></i><u style="left:100%"></u></div><span>${fmtNum(t.schedules)} of ${fmtNum(goal)} schedule goal${goal>t.schedules?` · ${fmtNum(goal-t.schedules)} to go`:' · goal reached ✓'}</span></div>`:''}
     <div class="mr-kpis">
      ${kpi('Schedules',fmtNum(t.schedules),gp!=null?`${Math.round(gp)}% of the ${fmtNum(goal)} goal`:'no goal set',chip(t.schedules,prevT&&prevT.schedules),'rc','schedules')}
@@ -5419,8 +5531,10 @@ async function renderWeeklyView(){
     </div>
   `;
   // executive summary: switch, clicks, chart and division table
-  container.querySelector('#perfDetailSw')?.addEventListener('click',()=>{ perfDetailOpen=!perfDetailOpen; lsSet('ipd_perf_detail',perfDetailOpen?'1':'0'); renderWeeklyView(); });
-  container.querySelectorAll('[data-exec-detail]').forEach(el=>el.addEventListener('click',()=>{ if(!perfDetailOpen){ perfDetailOpen=true; lsSet('ipd_perf_detail','1'); renderWeeklyView(); window.scrollTo({top:0,behavior:'smooth'}); } }));
+  container.querySelectorAll('[data-pv]').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); const want=a.dataset.pv==='det'; if(want===perfDetailOpen) return;
+    const pick=a.closest('.ex-viewpick'); pick.classList.toggle('det',want); pick.classList.toggle('sum',!want);
+    perfDetailOpen=want; setTimeout(()=>{ renderWeeklyView(); if(want) window.scrollTo({top:0,behavior:'smooth'}); },200); }));
+  container.querySelectorAll('[data-exec-detail]').forEach(el=>el.addEventListener('click',()=>{ if(!perfDetailOpen){ perfDetailOpen=true; renderWeeklyView(); window.scrollTo({top:0,behavior:'smooth'}); } }));
   container.querySelectorAll('[data-exec-rec]').forEach(b=>b.onclick=()=>{ try{ openRemarksModal(b.dataset.execRec, isMultiWeekMode?(weeksForAggregate.at(-1)||{}).weekEndDate:week.weekEndDate); }catch(e){} });
   container.querySelectorAll('[data-exec-go]').forEach(b=>b.onclick=()=>{ alertsState.week=isMultiWeekMode?null:week.weekEndDate; document.querySelector('#navList button[data-view="alerts"]')?.click(); });
   if(!perfDetailOpen) fillExecDivisions(isMultiWeekMode?weeksForAggregate:[week], referenceWeekForDivisions);
@@ -8632,7 +8746,7 @@ async function restoreNav(){
 }
 window.addEventListener('beforeunload',()=>saveNav());
 // Default page: the person's own choice (this browser) → the one an admin set for them → first page they can open.
-const DEFAULT_VIEW_LABELS = {performance:'Performance Overview', teams:'My Team', leads:'Team Leads (admins)', recruiters:'Recruiter Scorecards', branches:'Branch Results', alerts:'Action Center', highlights:'Highlights', candidates:'Candidates', master:'Candidates — master sheet', pivot:'Report Builder', divreport:'Division Report', onboarding:'Onboarding', orderentry:'Order Entry'};
+const DEFAULT_VIEW_LABELS = {performance:'Performance Overview', teams:'My Team', leads:'Team Leads (admins)', recruiters:'Recruiter Scorecards', branches:'Branch Results', alerts:'Action Center', highlights:'Performance Trends', candidates:'Candidates', master:'Candidates — master sheet', pivot:'Report Builder', divreport:'Division Report', onboarding:'Onboarding', orderentry:'Order Entry'};
 function adminDefaultViews(){ return KV.get('userDefaultViews')||{}; }
 function defaultViewOptions(u){ const can=v=>v==='teams'&&(u?u.role!=='user':Server.isAdmin())?false:v==='leads'?(u?(u.role!=='user'||(u.hidden_sections||[]).includes('grant.leads')):canViewLeads()):(!u||u.role!=='user'||v==='teams'||(u.modules||[]).includes(VIEW_MODULE[v])); return Object.keys(DEFAULT_VIEW_LABELS).filter(v=>VIEW_MODULE[v]&&can(v)).map(v=>[v,DEFAULT_VIEW_LABELS[v]]); }
 function myDefaultViewKey(){ return 'ipd_default_view:'+(Server.user?.id||''); }
@@ -9037,7 +9151,7 @@ const PAGE_SECTIONS = {
   settings:[['set.sync','Uploads tab'],['set.fetched','Saved weeks tab'],['set.candidates','Candidates tab'],['set.goals','Goals tab'],['set.recruiters','Recruiters tab'],['set.divisions','Divisions tab'],['set.branches','Branches tab']],
   orderentry:[['oe.entry','Daily entry tab'],['oe.report','Report tab']],
   onboarding:[['onb.log','Log calls tab'],['onb.report','Report tab (with the report right)']],
-  alerts:[['alerts.summary','Summary tiles'],['alerts.highlights','Highlights (streaks, top performers, consistency)'],['alerts.below','Below 50% of goal'],['alerts.watch','50–79% of goal'],['alerts.approvals','Remarks awaiting approval (approvers only)']],
+  alerts:[['alerts.summary','Summary tiles'],['alerts.highlights','Performance Trends page (streaks, top performers, consistency)'],['alerts.below','Below 50% of goal'],['alerts.watch','50–79% of goal'],['alerts.approvals','Remarks awaiting approval (approvers only)']],
 };
 function applySectionAccess(){
   let st = document.getElementById('sectionAccessStyle');
@@ -10917,7 +11031,7 @@ function alertsHighlightsHtml(h, weekEnd, inProgress){
     ${h.top.length?`<div class="hi-tabs" role="tablist">${h.top.map(c=>`<button type="button" data-hi-cat="${c.key}" class="${st.hiCat===c.key?'on':''}">${c.label}</button>`).join('')}</div>
     ${h.top.map(c=>{ const mx=Math.max(1,...c.list.map(x=>x.v)); return `<ol class="hi-rank2" data-hi-list="${c.key}" ${st.hiCat===c.key?'':'hidden'}>${c.list.map((x,i)=>`<li><span class="hi-medal m${i+1}">${i+1}</span><div class="hi-rk-name">${nm(x.row)}<small>${where(x.row)}</small></div><div class="hi-rk-bar"><i style="width:${Math.round(x.v/mx*100)}%"></i></div><strong>${escapeHtml(x.t)}</strong></li>`).join('')}</ol>`; }).join('')}`:empty('No results for this week yet.')}`;
   }
-  return `<div class="panel-head"><div><h3><span class="al-dot info"></span>Highlights</h3><span class="hint">${inProgress?'Runs and consistency use completed weeks only — the week in progress isn’t judged yet. ':''}Click a box to see the list · click a name for their remarks.</span></div></div>
+  return `<div class="panel-head"><div><h3><span class="al-dot info"></span>Performance trends</h3><span class="hint">${inProgress?'Runs and consistency use completed weeks only — the week in progress isn’t judged yet. ':''}Click a box to see the list · click a name for their remarks.</span></div></div>
   ${cards}<div class="hi-detail ${secs.find(s=>s.k===st.hiSec).cls}">${body}</div>`;
 }
 /* ---- Highlights: its own page under Action Center (runs, consistency, swings, top this week) ---- */
@@ -10954,7 +11068,7 @@ function alertsRemarksSectionHtml(st, rows, q){
   const all=Remarks.list.filter(r=>r.week_end_date===st.week&&(r.status||'approved')==='approved'&&(!q||String(r.recruiter).toLowerCase().includes(q)))
     .sort((a,b)=>String(b.remark_date).localeCompare(String(a.remark_date))||String(b.created_at).localeCompare(String(a.created_at)));
   const todo=all.filter(r=>!Remarks.reviewOf(r.id)), done=all.filter(r=>Remarks.reviewOf(r.id));
-  const f=st.rvf||'todo', list=f==='todo'?todo:f==='done'?done:all, open=st.rvOpen!==false;
+  const f=st.rvf||'todo', list=f==='todo'?todo:f==='done'?done:all, open=st.rvOpen===true;
   const row=r=>{ const x=rows.find(y=>y.name===r.recruiter);
     return `<li class="rv-item ${Remarks.reviewOf(r.id)?'is-done':''}"><div class="rv-main"><div class="rv-meta"><button type="button" class="hi-name" data-rv-open="${escapeHtml(r.recruiter)}">${escapeHtml(r.recruiter)}</button>${x?`<span class="rv-pct ${x.score<50?'bad':x.score<80?'warn':'good'}">${Math.round(x.score)}%</span>`:''}<span class="hint">${fmtDate(r.remark_date)}${r.author?' · '+escapeHtml(r.author):''}</span></div><div class="rv-text">${escapeHtml(r.remark)}</div></div>${remarkReviewHtml(r)}</li>`; };
   return `<section class="panel al-section" id="alRemarks" data-section="alerts.remarks"><div class="panel-head"><div><h3>💬 Remarks this week <span class="al-count">${all.length}</span></h3><span class="hint">${Remarks.canMarkReviewed()?'Tick <b>Mark reviewed</b> once you have read a remark — everyone sees who reviewed it.':'Remarks for the selected week; ✓ shows an admin has reviewed it.'}</span></div>
@@ -11016,7 +11130,7 @@ async function renderAlertsView(){
       <button type="button" class="al-tile warn ${on('watch')?'sel':''}" data-band="watch" aria-pressed="${on('watch')}"><span>50–79% of goal</span><strong>${watch.length}<small class="al-pct-of">${rows.length?Math.round(watch.length/rows.length*100):0}% of ${rows.length}</small></strong><em>keep an eye on</em></button>
       <button type="button" class="al-tile good ${on('good')?'sel':''}" data-band="good" aria-pressed="${on('good')}"><span>On track (80%+)</span><strong>${onTrack.length}<small class="al-pct-of">${rows.length?Math.round(onTrack.length/rows.length*100):0}% of ${rows.length}</small></strong><em>of ${rows.length} recruiters</em></button>
     </div>
-    <div class="al-multi-row"><p class="hint al-multi-hint">Click cards to show or hide them — pick as many as you like.</p><button type="button" class="btn btn-sm al-hi-btn" id="alHiBtn" data-section="alerts.highlights" title="Open Action Center → Highlights">✦ Highlights →${hi.streak.length?` <span class="al-hi-badge" title="Below goal 3+ weeks running">${hi.streak.length}</span>`:''}</button></div>
+    <div class="al-multi-row"><p class="hint al-multi-hint">Click cards to show or hide them — pick as many as you like.</p></div>
     <div>
     </div>
     ${pending.length?`<section class="panel al-section" id="alApprovals" data-section="alerts.approvals"><div class="panel-head"><div><h3>Remarks awaiting approval</h3><span class="hint">Only you and the author can see these until they’re approved.</span></div></div>
@@ -11056,7 +11170,8 @@ async function renderAlertsView(){
   host.querySelectorAll('[data-al-add]').forEach(b=>b.onclick=()=>{ const r = rows.find(x=>x.name===b.dataset.alAdd); openRemarksModal(b.dataset.alAdd, st.week, b.dataset.suggest || (r ? `${r.sched} of ${r.goal} schedules (${Math.round(r.pct)}%)${inProgress?' after '+elapsed+' day'+(elapsed===1?'':'s'):''}. Reason / plan: ` : '')); });
   wireRemarkReviews(host, ()=>renderAlertsView());
   host.querySelectorAll('[data-rvf]').forEach(b=>b.onclick=()=>{ st.rvf=b.dataset.rvf; renderAlertsView(); });
-  host.querySelector('#alRvOpen')?.addEventListener('click',()=>{ st.rvOpen=!st.rvOpen; renderAlertsView(); });
+  host.querySelector('#alRvOpen')?.addEventListener('click',()=>{ st.rvOpen=!(st.rvOpen===true); renderAlertsView(); });
+  host.querySelectorAll('[data-rvf]').forEach(b=>b.addEventListener('click',()=>{ st.rvOpen=true; }, true));
   host.querySelectorAll('[data-rv-open]').forEach(b=>b.onclick=()=>openRemarksModal(b.dataset.rvOpen, st.week));
   host.querySelectorAll('[data-appr]').forEach(b=>b.onclick=async ()=>{ const id=b.closest('.al-appr').dataset.id; b.disabled=true; try{ await Remarks.review(id, b.dataset.appr==='1'); showToast(b.dataset.appr==='1'?'Remark approved.':'Remark rejected.'); }catch(e){ showToast('Could not update: '+cleanErr(e)); } renderAlertsView(); });
   host.querySelectorAll('[data-appr-edit]').forEach(b=>b.onclick=()=>openRemarksModal(b.dataset.apprEdit, b.dataset.week));
@@ -12433,7 +12548,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.79.2';   // shown only in the browser tab title
+const APP_VERSION = '4.80.1';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -12650,7 +12765,7 @@ function toggleNavMore(force){ const on=force===undefined?!document.body.classLi
     onboarding:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/>',
     orderentry:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/>',
     candidates:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2.2"/><path d="M5.8 16c.6-1.6 1.8-2.4 3.2-2.4s2.6.8 3.2 2.4M14.5 10h4M14.5 13.5h3"/>'};
-  const short = {teams:'My Team', leads:'Leads', performance:'Overview', recruiters:'Recruiters', branches:'Branches', master:'Master', candidates:'Names', alerts:'Alerts', highlights:'Highlights', pivot:'Pivot', divreport:'Divisions', onboarding:'Onboard', orderentry:'Orders'};
+  const short = {teams:'My Team', leads:'Leads', performance:'Overview', recruiters:'Recruiters', branches:'Branches', master:'Master', candidates:'Names', alerts:'Alerts', highlights:'Trends', pivot:'Pivot', divreport:'Divisions', onboarding:'Onboard', orderentry:'Orders'};
   document.querySelectorAll('#navList button[data-view]').forEach(b=>{
     const v=b.dataset.view; if(!icons[v]) return;
     [...b.childNodes].forEach(n=>{ if(n.nodeType===3 && n.textContent.trim()){ const s=document.createElement('span'); s.className='nav-full'; s.textContent=n.textContent; b.replaceChild(s,n); } });
@@ -14531,15 +14646,16 @@ const OverviewX=(()=>{
    onboarding:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/>',
    orderentry:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/>'};
   const OVX_SUB={recruiting:'Schedules, shows & hires', onboarding:'Calls & completions', orderentry:'RC & CRM orders'};
-  host.innerHTML=`<nav class="ovx-tabs" role="tablist" aria-label="Overview">${ms.map(([k,l])=>`<a href="#" role="tab" data-ovx="${k}" class="${m===k?'on':''}" aria-selected="${m===k}"><span class="ovx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${OVX_ICO[k]||''}</svg></span><span class="ovx-t"><b>${l}</b><small>${OVX_SUB[k]||''}</small></span></a>`).join('')}<i class="ovx-ink" aria-hidden="true"></i></nav>
+  host.innerHTML=`<nav class="ovx-tabs" role="tablist" aria-label="Overview">${ms.map(([k,l])=>`<a href="#" role="tab" data-ovx="${k}" class="ovx-${k} ${m===k?'on':''}" aria-selected="${m===k}"><span class="ovx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${OVX_ICO[k]||''}</svg></span><span class="ovx-t"><b>${l}</b><small>${OVX_SUB[k]||''}</small></span></a>`).join('')}<i class="ovx-ink ink-${m}" aria-hidden="true"></i></nav>
    ${true?'':`<div class="ovx-quick" role="group" aria-label="Weeks">${[['today','Today'],['yesterday','Yesterday'],['week','This week'],['lastweek','Last week'],['w4','Last 4 weeks'],['w13','Last 13 weeks']].map(([k,l])=>`<button type="button" data-ovq="${k}" class="${st.quick===k?'on':''}" title="${k==='picker'?'Use the weeks chosen in the Period picker at the top':''}">${l}</button>`).join('')}<button type="button" class="ovx-refresh" data-ovr title="Get the latest numbers">↻</button></div>`}`;
   // the underline slides to the picked tab, then the page switches
   const nav=host.querySelector('.ovx-tabs'), ink=host.querySelector('.ovx-ink');
   const place=(el,anim)=>{ if(!el||!ink) return; ink.style.transition=anim?'':'none'; ink.style.width=el.offsetWidth+'px'; ink.style.transform=`translateX(${el.offsetLeft}px)`; };
   requestAnimationFrame(()=>place(host.querySelector('[data-ovx].on'),false));
+  ovxStickySetup();
   if(!window.__ovxInkResize){ window.__ovxInkResize=true; addEventListener('resize',()=>{ const h=document.getElementById('ovModeBar'); const a=h&&h.querySelector('[data-ovx].on'), i=h&&h.querySelector('.ovx-ink'); if(a&&i){ i.style.transition='none'; i.style.width=a.offsetWidth+'px'; i.style.transform=`translateX(${a.offsetLeft}px)`; } }); }
   host.querySelectorAll('[data-ovx]').forEach(b=>b.onclick=e=>{ e.preventDefault(); if(b.classList.contains('on')) return;
-    host.querySelectorAll('[data-ovx]').forEach(x=>{ x.classList.toggle('on',x===b); x.setAttribute('aria-selected',String(x===b)); }); place(b,true);
+    host.querySelectorAll('[data-ovx]').forEach(x=>{ x.classList.toggle('on',x===b); x.setAttribute('aria-selected',String(x===b)); }); if(ink) ink.className='ovx-ink ink-'+b.dataset.ovx; place(b,true);
     st.mode=b.dataset.ovx; try{ localStorage.setItem(LS,st.mode); }catch(e){} setTimeout(refreshUI,180); });
   host.querySelectorAll('[data-ovq]').forEach(b=>b.onclick=()=>{ st.quick=b.dataset.ovq; refreshUI(); });
   host.querySelector('[data-ovr]')?.addEventListener('click',()=>{ st.cache.clear(); refreshUI(); });
