@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.97.0</title>
+<title>Performance Dashboard · v4.97.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- fonts load without holding up the page (the system font shows for a moment) -->
@@ -5356,7 +5356,7 @@ function renderGoalsEditor(){
   const canEdit = Server.can('settings') || Server.can('upload');
   const w = weekOfDate(st.week);
   host.innerHTML = `<div class="panel">
-    <div class="panel-head"><div><h3 style="margin:0 0 4px;">Recruiter goals (schedules per week)</h3><span class="hint">Recruiters without a goal for a week use the default of <strong>${DEFAULT_WEEKLY_GOAL}</strong>. Goal Reach % = Schedules ÷ goal.</span></div></div>
+    <div class="panel-head"><div><h3 style="margin:0 0 4px;">Recruiter goals (schedules per week)</h3><span class="hint">A goal carries forward to the following weeks until you change it — a blank box uses their last goal (shown in grey), or the default of <strong>${DEFAULT_WEEKLY_GOAL}</strong> if none was ever set. Absent days take a fifth off each. Goal Reach % = Schedules ÷ goal.</span></div></div>
     <div class="goals-tools">
       <label class="cand-field"><span>Week ending (Saturday)</span><select id="geWeek">${weeks.map(d=>`<option value="${d}" ${d===st.week?'selected':''}>Sat ${fmtDate(d)} · Week ${weekOfDate(d).number}${d===thisSat?' (this week)':''}${KV.has('goals:'+d)?' · goals set':''}</option>`).join('')}</select></label>
       ${canEdit?`<div class="goals-bulk"><label class="cand-field"><span>Set every recruiter to</span><input type="number" id="geAll" min="0" step="1" value="${DEFAULT_WEEKLY_GOAL}"></label><button class="btn btn-secondary btn-sm" id="geApplyAll">Apply</button><button class="btn btn-secondary btn-sm" id="geCopyPrev">Copy previous week</button></div>`:''}
@@ -5366,7 +5366,7 @@ function renderGoalsEditor(){
       <span class="hint">Week ${w.number}: Sun ${fmtDate(w.weekStart)} – Sat ${fmtDate(w.weekEnd)} · showing ${list.length} of ${allList.length}</span></div>
     <div class="goals-wrap"><table class="users-table goals-table"><thead><tr><th>Recruiter</th><th>Division</th><th style="width:130px;">Goal</th><th>Schedules that week</th></tr></thead><tbody>
     ${allList.map(n=>{ const has = saved[n]!==undefined && saved[n]!==null && saved[n]!==''; const wk = weeksData.find(x=>x.weekEndDate===st.week); const sch = wk && wk.byRecruiter && wk.byRecruiter[n] ? fmtNum(wk.byRecruiter[n].schedules||0) : '–';
-      return `<tr ${list.includes(n)?'':'hidden'}><td>${escapeHtml(n)}${isRecent(n)?'':`<span class="ge-idle" title="No schedules or interviews in the 5 weeks up to this week">${lastSeen[n]?'last active Wk '+weekOfDate(lastSeen[n]).number:'no activity yet'}</span>`}</td><td class="hint">${escapeHtml(getEffectiveRecruiterDivision(n, st.week)||'Unassigned')}</td><td><input type="number" min="0" step="1" class="goal-input" data-name="${escapeHtml(n)}" value="${has?Number(saved[n]):''}" placeholder="${DEFAULT_WEEKLY_GOAL}" ${canEdit?'':'disabled'} aria-label="Goal for ${escapeHtml(n)}"></td><td>${sch}</td></tr>`; }).join('') || '<tr><td colspan="4" class="hint" style="padding:14px;">No recruiters yet — upload data first.</td></tr>'}
+      return `<tr ${list.includes(n)?'':'hidden'}><td>${escapeHtml(n)}${isRecent(n)?'':`<span class="ge-idle" title="No schedules or interviews in the 5 weeks up to this week">${lastSeen[n]?'last active Wk '+weekOfDate(lastSeen[n]).number:'no activity yet'}</span>`}</td><td class="hint">${escapeHtml(getEffectiveRecruiterDivision(n, st.week)||'Unassigned')}</td><td><input type="number" min="0" step="1" class="goal-input" data-name="${escapeHtml(n)}" value="${has?Number(saved[n]):''}" placeholder="${(()=>{ const c=goalsFor(tgShift(st.week,-7))[n]; return c!=null?c:DEFAULT_WEEKLY_GOAL; })()}" title="${has?'Set for this week':'Blank — uses '+((()=>{ const c=goalsFor(tgShift(st.week,-7))[n]; return c!=null?'their last goal ('+c+')':'the default ('+DEFAULT_WEEKLY_GOAL+')'; })())}" ${canEdit?'':'disabled'} aria-label="Goal for ${escapeHtml(n)}"></td><td>${sch}</td></tr>`; }).join('') || '<tr><td colspan="4" class="hint" style="padding:14px;">No recruiters yet — upload data first.</td></tr>'}
     </tbody></table></div>
     ${canEdit && allList.length?`<div class="goals-actions"><span class="hint" id="geMsg"></span><button class="btn btn-primary btn-sm" id="geSave">Save goals for week ${w.number}</button></div>`:''}
   </div>
@@ -7726,8 +7726,8 @@ async function renderRecruiterTimeline(names){
   // "Goal so far (today)" on (default): only the working days up to today · off: the whole week's goal
   const soFar=recTl.soFar!==false, gEnd=soFar?(to<today?to:today):null;
   const goalDays=c=>{ if(grain==='day') return [c]; const w=weekOfDate(c); return soFar?tgDays(w.weekStart>from?w.weekStart:from, c<gEnd?c:gEnd):tgDays(w.weekStart,w.weekEnd); };
-  const target=(n,c)=>!isSch?0:goalDays(c).filter(isWd).reduce((a,d)=>a+ltDailyGoal(n,d),0);
-  const totalGoal=n=>{ if(!isSch) return 0; const days=soFar?(gEnd>=from?tgDays(from,gEnd):[]):[...new Set(tgDays(from,to).map(d=>weekOfDate(d).weekEnd))].flatMap(we=>tgDays(weekOfDate(we).weekStart,we)); return days.filter(isWd).reduce((a,d)=>a+ltDailyGoal(n,d),0); };
+  const target=(n,c)=>!isSch?0:Math.round(goalDays(c).filter(isWd).reduce((a,d)=>a+ltDailyGoal(n,d),0));
+  const totalGoal=n=>{ if(!isSch) return 0; const days=soFar?(gEnd>=from?tgDays(from,gEnd):[]):[...new Set(tgDays(from,to).map(d=>weekOfDate(d).weekEnd))].flatMap(we=>tgDays(weekOfDate(we).weekStart,we)); return Math.round(days.filter(isWd).reduce((a,d)=>a+ltDailyGoal(n,d),0)); };
   const people=names.map(n=>{ const r=by[n]||{}, vals=cols.map(c=>r[c]||0); return {n, vals, total:vals.reduce((a,b)=>a+b,0), tgt:totalGoal(n)}; })
    .filter(p=>p.total||names.length<=40).sort((a,b)=>b.total-a.total||a.n.localeCompare(b.n));
   const colTot=cols.map((c,i)=>people.reduce((a,p)=>a+p.vals[i],0)), grand=colTot.reduce((a,b)=>a+b,0), tgtAll=people.reduce((a,p)=>a+p.tgt,0);
@@ -9424,20 +9424,32 @@ const KV = new Map();
 // Attendance lowers goals everywhere: a recruiter absent on a weekday has no target that day, so the week's
 // goal (goals:<week>) is read as goal × present weekdays ÷ 5. KV.getRaw gives the goals exactly as saved.
 KV.getRaw=k=>Map.prototype.get.call(KV,k);
+// A recruiter's goal carries forward: a week without a saved goal for them uses the last goal set before it (default 50 only if never set).
+let _gfVer=0; const _gfCache=new Map();
+KV.set=function(k,v){ if(typeof k==='string'&&k.startsWith('goals:')){ _gfVer++; _gfCache.clear(); } return Map.prototype.set.call(this,k,v); };
+KV.delete=function(k){ if(typeof k==='string'&&k.startsWith('goals:')){ _gfVer++; _gfCache.clear(); } return Map.prototype.delete.call(this,k); };
+KV.clear=function(){ _gfVer++; _gfCache.clear(); return Map.prototype.clear.call(this); };
+function goalsFor(we){
+  if(_gfCache.has(we)) return _gfCache.get(we);
+  const out={}; [...Map.prototype.keys.call(KV)].filter(k=>typeof k==='string'&&k.startsWith('goals:')&&k.slice(6)<=we).sort()
+    .forEach(k=>{ const m=Map.prototype.get.call(KV,k)||{}; Object.entries(m).forEach(([n,v])=>{ if(v!==undefined&&v!==null&&v!==''&&Number.isFinite(Number(v))) out[n]=Number(v); }); });
+  _gfCache.set(we,out); return out;
+}
 const _attGoalCache=new Map();
-KV.get=function(k){ const v0=Map.prototype.get.call(this,k);
-  if(typeof k!=='string'||!k.startsWith('goals:')) return v0;
+KV.get=function(k){ const vRaw=Map.prototype.get.call(this,k);
+  if(typeof k!=='string'||!k.startsWith('goals:')) return vRaw;
+  const v0=goalsFor(k.slice(6));
   const we=k.slice(6), f=typeof clipGoalFactor==='function'?clipGoalFactor(we):1;
   const att=Map.prototype.get.call(this,'attendance'), hasAtt=!!(att&&typeof att==='object'&&Object.keys(att).length);
   const baseOf=n=>{ const raw=v0&&v0[n]; return raw!==undefined&&raw!==null&&raw!==''&&Number.isFinite(Number(raw))?Number(raw):DEFAULT_WEEKLY_GOAL; };
   if(f!==1){   // a week cut by an exact date range: goal ÷ 5 for each working day inside the range they were present
     const R=activeRange(), ws=tgShift(we,-6), names=new Set([...Object.keys(v0||{}), ...Object.keys(((weeksData||[]).find(w=>w.weekEndDate===we)||{}).byRecruiter||{})]), o={};
-    names.forEach(n=>{ let d=0; for(let i=1;i<=5;i++){ const x=tgShift(ws,i); if(x>=R.from&&x<=R.to&&!(hasAtt&&isAbsent(n,x))) d++; } o[n]=Math.round(baseOf(n)*d/5*10)/10; });
+    names.forEach(n=>{ let d=0; for(let i=1;i<=5;i++){ const x=tgShift(ws,i); if(x>=R.from&&x<=R.to&&!(hasAtt&&isAbsent(n,x))) d++; } o[n]=Math.round(baseOf(n)*d/5); });
     return o; }
   if(!hasAtt) return v0;
   const c=_attGoalCache.get(we); if(c&&c.v===v0&&c.att===att) return c.out;
   let out=v0, any=false; const copy={...(v0||{})};
-  Object.keys(att).forEach(n=>{ const ab=absentWeekdays(n,we); if(!ab) return; copy[n]=Math.round(baseOf(n)*(5-ab)/5*10)/10; any=true; });
+  Object.keys(att).forEach(n=>{ const ab=absentWeekdays(n,we); if(!ab) return; copy[n]=Math.round(baseOf(n)*(5-ab)/5); any=true; });   // whole numbers
   if(any) out=copy; _attGoalCache.set(we,{v:v0,att,out}); return out; };
 const Server = {
   client:null, token:null, user:null, since:0, pollTimer:null, failures:0, own:new Map(), ownMasterUntil:0, status:'connecting',
@@ -12870,7 +12882,7 @@ async function attFlush(){
 async function setAbsent(name,d,on){ const all=JSON.parse(JSON.stringify(attMap())), r=all[name]||(all[name]={}); if(on) r[d]='A'; else delete r[d]; if(!Object.keys(r).length) delete all[name];
   const ok=await storageSet('attendance',all); if(ok===null) return false; KV.set('attendance',all); return true; }
 function ltWeeklyGoal(name,date){const g=KV.get('goals:'+weekOfDate(date).weekEnd)||{},v=g[name];return v!==undefined&&v!==null&&v!==''&&Number.isFinite(Number(v))?Number(v):DEFAULT_WEEKLY_GOAL;}
-function ltDailyGoal(name,date){ if(isAbsent(name,date)) return 0; const g=KV.getRaw('goals:'+weekOfDate(date).weekEnd)||{},v=g[name]; return (v!==undefined&&v!==null&&v!==''&&Number.isFinite(Number(v))?Number(v):DEFAULT_WEEKLY_GOAL)/5; }
+function ltDailyGoal(name,date){ if(isAbsent(name,date)) return 0; const g=goalsFor(weekOfDate(date).weekEnd),v=g[name]; return (v!==undefined&&v!==null&&v!==''&&Number.isFinite(Number(v))?Number(v):DEFAULT_WEEKLY_GOAL)/5; }
 function ltToday(now=new Date()){return toIsoDateOnly(now);}
 function ltGroup(a){const own=a.recruiter_name;return {name:a.team_name,memberships:[...(a.memberships||[]).filter(m=>m.name!==own),...(own?[{name:own,from:'1900-01-01',to:null}]:[])]};}
 function ltBounds(mode,today=ltToday()){
@@ -13022,7 +13034,7 @@ function renderTeamGroups(){
  const pk=ltPick(ltState.from,ltState.to,ltState.rangeMode,ltState.anchor,true),anchor=pk.anchor,mode=pk.mode,p=pk.p,cutoff=p.to>today?today:p.to;
  const g={...ltGroup(a),division:ltState.division},report=ltReport(g,p.from,p.to,today);
  const ltSoFar=ltState.basis==='today'&&p.to>today;
- if(ltSoFar){ const wk=cutoff>=p.from?(p.from===cutoff?[p.from]:ltWorkdays(p.from,cutoff)):[]; report.members.forEach(x=>{ x.goal=wk.filter(d=>tgActive(g,x.label,d)).reduce((s2,d)=>s2+ltDailyGoal(x.label,d),0); }); report.total.goal=report.members.reduce((s2,x)=>s2+x.goal,0); }
+ if(ltSoFar){ const wk=cutoff>=p.from?(p.from===cutoff?[p.from]:ltWorkdays(p.from,cutoff)):[]; report.members.forEach(x=>{ x.goal=Math.round(wk.filter(d=>tgActive(g,x.label,d)).reduce((s2,d)=>s2+ltDailyGoal(x.label,d),0)); }); report.total.goal=report.members.reduce((s2,x)=>s2+x.goal,0); }
  // Day by day: the whole week around the chosen day (Day view), otherwise the selected period.
  const dw=mode==='day'?weekOfDate(p.from):null, dFrom=dw?dw.weekStart:p.from, dTo=dw?dw.weekEnd:p.to, dCut=dTo>today?today:dTo;
  const dReport=dw?ltReport(g,dFrom,dTo,today):report;
@@ -13108,7 +13120,7 @@ function ltAnalytics(g,p,cutoff,mode,today,self,checks=[],checkDay=cutoff){
  const work=gEnd>=p.from?(p.from===gEnd?[p.from]:ltWorkdays(p.from,gEnd)):[];
  const rate=(n,d,min=1)=>n==null||d==null||d<min?null:n/d*100;
  const rows=cur.members.map(x=>{
-  const pace=work.filter(d=>tgActive(g,x.label,d)).reduce((a,d)=>a+ltDailyGoal(x.label,d),0);
+  const pace=Math.round(work.filter(d=>tgActive(g,x.label,d)).reduce((a,d)=>a+ltDailyGoal(x.label,d),0));
   return {name:x.label,x,branch:ltBranchOf(x.label,p.from,cutoff),pace,
    goal:rate(x.schedules,pace), show:rate(x.shows,x.scheduledDateOf,3), noshow:(x.shows||0)+(x.noShows||0)>=3?rate(x.noShows,x.scheduledDateOf,3):null, hire:rate(x.i9,x.shows,3)};
  });
@@ -13306,7 +13318,7 @@ function ltLeadsHtmlBuild(p,cutoff,mode,today,division){
   const r=ltReport(g,p.from,p.to,today), T={...r.total};
   // a recruiter without a day-by-day breakdown makes the group total “unavailable” — add up the people that do have it instead
   TG_METRICS.forEach(([k])=>{ if(T[k]===null) T[k]=r.members.reduce((a,m)=>a+(m[k]||0),0); });
-  const pace=r.members.reduce((a,x)=>a+work.filter(d=>tgActive(g,x.label,d)).reduce((s2,d)=>s2+ltDailyGoal(x.label,d),0),0);
+  const pace=r.members.reduce((a,x)=>a+Math.round(work.filter(d=>tgActive(g,x.label,d)).reduce((s2,d)=>s2+ltDailyGoal(x.label,d),0)),0);
   const people=r.members.length; if(!people) return null;
   const hprDen=r.hprDenominator||0;
   return {members:r.members,people,T,pace,goal:rate(T.schedules,pace),show:rate(T.shows,T.scheduledDateOf,3),noshow:(T.shows||0)+(T.noShows||0)>=3?rate(T.noShows,T.scheduledDateOf,3):null,hire:rate(T.i9,T.shows,3),
@@ -13528,7 +13540,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.97.0';   // shown only in the browser tab title
+const APP_VERSION = '4.97.1';   // shown only in the browser tab title
 // Everyone gets the latest look: the page checks the published file for a newer version — right after it opens
 // (switches straight over) and every few minutes / when the tab comes back (offers an Update button).
 const AppUpdate=(()=>{
