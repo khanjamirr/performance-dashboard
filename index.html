@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.89.0</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Performance Dashboard · v4.90.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2590,6 +2593,11 @@ html body .toast,html body #toast{border-radius:14px!important;background:rgba(3
 .oe-holnote{margin:0 0 10px;padding:9px 12px;border-radius:12px;background:#f1e9ff;color:#4c1d95;font-size:13px}
 .oe-holrow td{background:#faf7ff}
 .oe-daypick{flex-wrap:wrap}
+</style>
+<style>
+.app-update{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:100000;display:flex;align-items:center;gap:12px;padding:10px 12px 10px 16px;border-radius:16px;background:#0d1b36;color:#fff;font-size:13.5px;box-shadow:0 10px 30px rgba(13,27,54,.35);max-width:calc(100vw - 32px)}
+.app-update .btn{white-space:nowrap}.app-update-x{border:0;background:transparent;color:#9fb0cf;font-size:15px;cursor:pointer;padding:4px 6px}
+@media (max-width:800px){.app-update{bottom:84px}}
 </style>
 </head>
 <body class="locked">
@@ -10735,7 +10743,11 @@ function applyManualAdjust(week){
   const blank=()=>({schedules:0,scheduledDateOf:0,shows:0,noShows:0,i9:0,placed:0});
   list.forEach(a=>{
     const cur=byRecruiter[a.recruiter], r={...blank(), schedulesList:[], interviewsList:[], showsList:[], noShowsList:[], i9List:[], placedList:[], ...(cur||{}), branch:(cur&&cur.branch)||a.branch||'Unassigned'};
+    // keep a day-by-day breakdown so day-based pages (My Team, Team Leads, day view) can place the adjustment:
+    // a recruiter with no uploaded rows starts an empty one; one without it gets it rebuilt from the candidate lists
     if(r.daily) r.daily={...r.daily};
+    else { r.daily={}; const LK={schedules:'schedulesList',scheduledDateOf:'interviewsList',shows:'showsList',noShows:'noShowsList',i9:'i9List',placed:'placedList'};
+      Object.entries(LK).forEach(([f,lk])=>(r[lk]||[]).forEach(c=>{ if(!c||!c.date) return; const d=r.daily[c.date]||(r.daily[c.date]=(typeof emptyTotals==='function'?emptyTotals():{})); d[f]=(d[f]||0)+1; })); }
     const br=a.branch||r.branch, b={...blank(), ...(byBranch[br]||{})};
     ADJ_FIELDS.forEach(([k,f])=>{ const n=Number(a[k])||0; if(!n) return;
       r[f]=Math.max(0,(r[f]||0)+n); b[f]=Math.max(0,(b[f]||0)+n); totals[f]=Math.max(0,(totals[f]||0)+n);
@@ -12952,7 +12964,31 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.89.0';   // shown only in the browser tab title
+const APP_VERSION = '4.90.1';   // shown only in the browser tab title
+// Everyone gets the latest look: the page checks the published file for a newer version — right after it opens
+// (switches straight over) and every few minutes / when the tab comes back (offers an Update button).
+const AppUpdate=(()=>{
+ const loadedAt=Date.now(); let shown=false, busy=false;
+ const newer=(a,b)=>{ const x=String(a).split('.').map(Number), y=String(b).split('.').map(Number); for(let i=0;i<Math.max(x.length,y.length);i++){ if((x[i]||0)!==(y[i]||0)) return (x[i]||0)>(y[i]||0); } return false; };
+ const go=v=>{ const u=new URL(location.href); u.searchParams.set('v',v); location.replace(u.toString()); };
+ async function check(){
+  if(busy||!/^https?:$/.test(location.protocol)) return; busy=true;
+  try{
+   const u=new URL(location.href); u.hash=''; u.searchParams.set('_vc',Date.now());
+   const r=await fetch(u.toString(),{cache:'no-store', credentials:'same-origin'}); if(!r.ok) return;
+   const m=/const APP_VERSION = '([\d.]+)'/.exec(await r.text()); if(!m||!newer(m[1],APP_VERSION)) return;
+   if(Date.now()-loadedAt<20000){ go(m[1]); return; }   // just opened — nothing to lose yet
+   if(shown) return; shown=true;
+   const bar=document.createElement('div'); bar.className='app-update';
+   bar.innerHTML=`<span>✨ A new version of the dashboard is ready.</span><button type="button" class="btn btn-primary btn-sm">Update now</button><button type="button" class="app-update-x" aria-label="Later">✕</button>`;
+   bar.querySelector('.btn').onclick=()=>go(m[1]); bar.querySelector('.app-update-x').onclick=()=>bar.remove();
+   document.body.appendChild(bar);
+  }catch(e){} finally{ busy=false; }
+ }
+ setTimeout(check,1500); setInterval(check,5*60*1000);
+ document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') check(); });
+ return {check};
+})();
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
