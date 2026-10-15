@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.97.1</title>
+<title>Performance Dashboard · v4.97.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- fonts load without holding up the page (the system font shows for a moment) -->
@@ -2655,6 +2655,9 @@ html body .toast,html body #toast{border-radius:14px!important;background:rgba(3
 </style>
 <style id="ios-settings">
 #myAccountBtn,#accessModeBtn{display:none!important}
+.dpr-ovx{vertical-align:middle}.dpr-ovx .ovx-dbtn span{display:flex;flex-direction:column;line-height:1.15}.dpr-ovx .ovx-dbtn small{font-size:10.5px;font-weight:600;color:#8e8e93;text-transform:uppercase;letter-spacing:.04em}.dpr-ovx .ovx-dbtn b{font-size:14px;color:#1c1c1e;white-space:nowrap}
+.dpr-ovx .ovx-dbtn svg{width:30px;height:30px;padding:6px;border-radius:9px;background:rgba(0,122,255,.1);color:#007aff;box-sizing:border-box;flex:0 0 30px}
+.lt-dates{display:flex;align-items:center;gap:8px}
 .ms-modal{max-width:880px;width:calc(100vw - 32px)}
 .ms-top{display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:12px;margin-bottom:14px;align-items:end}
 .ms-top label,.ms-week>span{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:#6e6e73}
@@ -8030,7 +8033,7 @@ function goalTier(pct){
 function recruiterSignalHtml(x){if(!x.emoji)return '';return `<span class="rc-signal rc-${x.level}" role="img" aria-label="${x.label}" title="${x.label}">${x.emoji}</span>`;}
 const recruiterHistoryAccess={owner:null,name:null,date:null};
 async function verifyRecruiterHistory(name){
- if(Server.isAdmin())return true;
+ if(Server.isAdmin()||hasRight('grant.history_all'))return true;   // "Full history" right: every recruiter, not only their own team
  const owner=String(Server.user?.id||'');if(!owner)return false;
  try{const a=await Server.rpc('dash_team_assignment_get');if(String(Server.user?.id)!==owner)return false;
  const allowed=!!a&&tgActive(ltGroup(a),name,ltToday());
@@ -8038,7 +8041,7 @@ async function verifyRecruiterHistory(name){
  }catch(e){showToast('Could not verify your team assignment. Please retry.');return false;}
 }
 function canOpenHistory(mode,name){return mode==='recruiters'?hasRecruiterHistoryAccess(name):Server.can(mode);}
-function hasRecruiterHistoryAccess(name){return Server.isAdmin()||(recruiterHistoryAccess.owner===String(Server.user?.id)&&recruiterHistoryAccess.name===name&&recruiterHistoryAccess.date===ltToday());}
+function hasRecruiterHistoryAccess(name){return Server.isAdmin()||hasRight('grant.history_all')||(recruiterHistoryAccess.owner===String(Server.user?.id)&&recruiterHistoryAccess.name===name&&recruiterHistoryAccess.date===ltToday());}
 async function openHistoryPage(mode, name){
   if(mode==='recruiters'&&!await verifyRecruiterHistory(name)){showToast('History is available only for recruiters currently assigned to you.');return;}
   if(mode!=='recruiters' && !Server.can(mode)) return;
@@ -12029,7 +12032,7 @@ const UF_PAGES = [
   {mod:'performance', label:'Overview', desc:'Weekly, monthly and quarterly results', sec:'performance', extras:['grant.ov_onb','grant.ov_oe']},
   {mod:null, offGrant:'grant.no_team', label:'My Team', desc:'Their own team, day by day — for team leads with a team assigned', sec:'teams', extras:['grant.team_names','grant.break_image']},
   {mod:null, grant:'grant.leads', label:'Team Leads', desc:'Every team lead’s team side by side (read-only); they can open any team. Changing teams stays with admins.'},
-  {mod:'recruiters', label:'Recruiters', desc:'Recruiter table, day / week comparison, trends and history', sec:'recruiters', extras:['remarks','grant.manual_edit','grant.attendance']},
+  {mod:'recruiters', label:'Recruiters', desc:'Recruiter table, day / week comparison, trends and history', sec:'recruiters', extras:['remarks','grant.manual_edit','grant.attendance','grant.history_all']},
   {mod:'branches', label:'Branches', desc:'Branch table, trends and history', sec:'branches', extras:['grant.branch_merge']},
   {mod:'alerts', label:'Action Center', desc:'Who is below goal and other signals', sec:'alerts', extras:['remarks_approve']},
   {mod:'divreport', label:'Division Report', desc:'Pipeline by client and location, per division'},
@@ -12039,7 +12042,7 @@ const UF_PAGES = [
   {mod:'candidates', label:'Candidates', desc:'Settings → Candidates, plus candidate names and Employee Numbers everywhere', sec:'candidates', extras:['master','master_edit']},
 ];
 const UF_TOOLS = ['upload','export','settings'];
-const UF_EXTRA_LABEL = {'grant.attendance':'Mark attendance (absent days lower that week’s goal)', 'grant.onb_all':'Manage everyone’s calls — log for any onboarder, edit / delete any call, answer lock requests', 'grant.onb_lists':'Manage the onboarding dropdowns and onboarder names', 'grant.oe_bulk':'Bulk upload past days', 'grant.oe_agents':'Manage the order entry agent names', 'grant.manual_edit':'Adjust numbers by hand (＋ Adjust numbers)', 'grant.upload_range':'Upload past data for many weeks at once', 'grant.leads':'Team Leads page (read-only)', 'grant.ov_onb':'Overview → Onboarding tab (everyone’s onboarding numbers, read-only)', 'grant.ov_oe':'Overview → Order Entry tab (order entry numbers, read-only)', 'grant.onb_assign':'Fill in daily assignments', 'grant.onb_report':'See the onboarding report (everyone’s numbers)', remarks:'Can add remarks', remarks_approve:'Can approve and edit remarks', 'grant.team_names':'See their team’s candidate names', 'grant.break_image':'Copy third-break lists as images', 'grant.branch_merge':'Merge branches (applies for everyone)',
+const UF_EXTRA_LABEL = {'grant.history_all':'Full history of every recruiter (without it: only their own team’s)', 'grant.attendance':'Mark attendance (absent days lower that week’s goal)', 'grant.onb_all':'Manage everyone’s calls — log for any onboarder, edit / delete any call, answer lock requests', 'grant.onb_lists':'Manage the onboarding dropdowns and onboarder names', 'grant.oe_bulk':'Bulk upload past days', 'grant.oe_agents':'Manage the order entry agent names', 'grant.manual_edit':'Adjust numbers by hand (＋ Adjust numbers)', 'grant.upload_range':'Upload past data for many weeks at once', 'grant.leads':'Team Leads page (read-only)', 'grant.ov_onb':'Overview → Onboarding tab (everyone’s onboarding numbers, read-only)', 'grant.ov_oe':'Overview → Order Entry tab (order entry numbers, read-only)', 'grant.onb_assign':'Fill in daily assignments', 'grant.onb_report':'See the onboarding report (everyone’s numbers)', remarks:'Can add remarks', remarks_approve:'Can approve and edit remarks', 'grant.team_names':'See their team’s candidate names', 'grant.break_image':'Copy third-break lists as images', 'grant.branch_merge':'Merge branches (applies for everyone)',
   master:'Browse all candidate records', master_edit:'Exclude or include candidates', upload:'Upload spreadsheets', export:'Download and share', settings:'Settings — divisions, branches, goals'};
 const UF_PRESETS = [
   {name:'Viewer', desc:'Overview, recruiters and branches', modules:['performance','recruiters','branches']},
@@ -12100,6 +12103,7 @@ const ROLE_ROWS=[
  {k:'ovoe', needs:'overview', label:'Overview · Order Entry', desc:'Order Entry tab on the Overview page — read-only', v:{g:['grant.ov_oe']}, hv:'See the Order Entry tab'},
  {k:'myteam', sec:'teams', label:'My Team', desc:'Their own team, day by day (team leads)', req:true, v:{special:true}, e:{g:['grant.break_image']}, hv:'Their team’s page', he:'Copy third-break lists as images'},
  {k:'teamnames', label:'Team candidate names', desc:'EID and employee name of their own team’s candidates', v:{g:['grant.team_names']}, hv:'See their team’s candidate names'},
+ {k:'history', label:'Full history', desc:'Recruiter and branch history pages (Full history →)', v:{g:['grant.history_all']}, hv:'Every recruiter’s history (without it: only their own team’s)'},
  {k:'leads', label:'Team Leads', desc:'Every lead’s team side by side', v:{g:['grant.leads']}, hv:'See every team (read-only)'},
  {k:'recruiters', sec:'recruiters', label:'Recruiters', desc:'Recruiter table, day / week and history', req:true, v:{m:['recruiters']}, e:{m:['remarks'],g:['grant.attendance','grant.manual_edit']}, hv:'See recruiters', he:'Add remarks, mark attendance, adjust numbers by hand'},
  {k:'branches', sec:'branches', label:'Branches', desc:'Branch table, trends and history', req:true, v:{m:['branches']}, e:{g:['grant.branch_merge']}, hv:'See branches', he:'Merge branches (for everyone)'},
@@ -12968,12 +12972,14 @@ function ltPick(from,to,mode0,anchor0,defWeek){
  return {mode:'day', anchor:today, p:ltRange('day',today)};
 }
 function ltStep(p,dir){ const n=Math.round((new Date(p.to+'T12:00:00Z')-new Date(p.from+'T12:00:00Z'))/864e5)+1, w=weekOfDate(p.from), full=p.from===w.weekStart&&p.to===w.weekEnd;
+ // a whole month / quarter / year (or one running to today) steps to the previous / next one
+ if(p.from.endsWith('-01')){ const m=+p.from.slice(5,7), y=+p.from.slice(0,4), mEnd=monthEndIso(p.from), months=p.to===mEnd||(p.to.slice(0,7)===p.from.slice(0,7)&&p.to<mEnd)?1
+   :(m-1)%3===0&&(p.to===monthEndIso(y+'-'+String(m+2).padStart(2,'0')+'-01')||p.to.slice(0,7)<=y+'-'+String(m+2).padStart(2,'0')&&p.to>=y+'-'+String(m+2).padStart(2,'0')+'-01')?3:(m===1&&p.to.slice(0,4)===p.from.slice(0,4)&&(p.to.endsWith('-12-31')||p.to.slice(5)>'11-30'))?12:0;
+   if(months){ const d=new Date(Date.UTC(y,m-1+dir*months,1)), from=d.toISOString().slice(0,10), e=new Date(Date.UTC(y,m-1+dir*months+months,0)); return {from, to:e.toISOString().slice(0,10)}; } }
  const k=full?7:n; return {from:tgShift(p.from,dir*k), to:tgShift(p.to,dir*k)}; }
 function ltDatesHtml(prefix,p,today,noToday){
  const nxt=ltStep(p,1);
- return `<div class="lt-period lt-dates" role="group" aria-label="Reporting dates"><button class="btn btn-secondary" id="${prefix}Prev" aria-label="Earlier">←</button>
-  <div class="dpr-field"><span>Dates</span>${dateRangeBtn(prefix+'From',prefix+'To',p.from,p.to,'',true)}</div>
-  <button class="btn btn-secondary" id="${prefix}Next" aria-label="Later" ${nxt.from>today?'disabled':''}>→</button>${noToday?'':`<button class="btn btn-secondary" id="${prefix}Today">Today</button>`}</div>`;
+ return `<div class="lt-period lt-dates" role="group" aria-label="Reporting dates">${dateRangeBtn(prefix+'From',prefix+'To',p.from,p.to,'',true,[`<button type="button" class="ovx-dstep" id="${prefix}Prev" aria-label="Earlier" title="Earlier">‹</button>`,`<button type="button" class="ovx-dstep" id="${prefix}Next" aria-label="Later" title="Later" ${nxt.from>today?'disabled':''}>›</button>`])}${noToday?'':`<button class="btn btn-secondary btn-sm" id="${prefix}Today">Today</button>`}</div>`;
 }
 function ltRange(mode,anchor=ltToday()){
  if(mode==='day')return {from:anchor,to:anchor,label:'Day'};
@@ -13540,7 +13546,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.97.1';   // shown only in the browser tab title
+const APP_VERSION = '4.97.2';   // shown only in the browser tab title
 // Everyone gets the latest look: the page checks the published file for a newer version — right after it opens
 // (switches straight over) and every few minutes / when the tab comes back (offers an Update button).
 const AppUpdate=(()=>{
@@ -14622,7 +14628,7 @@ const Onboarding=(()=>{
  }
  function filters(adm, onbs, withCat){
   return `<div class="onb-tools">
-    ${st.embed&&st.page==='report'?'':`<div class="onb-range"><div class="dpr-field"><span>Dates</span>${dateRangeBtn('onbFrom','onbTo',st.from,st.to)}</div></div>`}
+    ${st.embed&&st.page==='report'?'':`<div class="onb-range"><div class="dpr-field">${dateRangeBtn('onbFrom','onbTo',st.from,st.to)}</div></div>`}
     ${adm?`<label class="cand-field"><span>Onboarder</span><select id="onbFOnb"><option value="">Everyone</option>${onbs.map(o=>`<option ${st.fOnb===o?'selected':''}>${escapeHtml(o)}</option>`).join('')}</select></label>`:''}
     <label class="cand-field"><span>Call type</span><select id="onbFType"><option value="">All</option>${callTypes().map(c=>`<option ${st.fType===c?'selected':''}>${escapeHtml(c)}</option>`).join('')}</select></label>
     ${withCat?`<label class="cand-field"><span>Latest status</span><select id="onbFCat"><option value="">All</option><option value="pending" ${st.fCat==='pending'?'selected':''}>Pending (not complete yet)</option>${VIEW_CATS.map(([k,l])=>`<option value="${k}" ${st.fCat===k?'selected':''}>${l}</option>`).join('')}</select></label>
@@ -15290,7 +15296,7 @@ const OrderEntry=(()=>{
     </tbody></table></div></section>`;
   return `<div class="onb-tools oe-tools">
     <div class="oe-group" role="tablist" aria-label="Group by">${Object.entries(GROUPS).map(([k,g])=>`<button type="button" data-oe-group="${k}" class="${st.group===k?'on':''}" aria-pressed="${st.group===k}">${g.label}</button>`).join('')}</div>
-    ${st.embed?'':`<div class="onb-range"><div class="dpr-field"><span>Dates</span>${dateRangeBtn('oeFrom','oeTo',st.from,st.to)}</div></div>
+    ${st.embed?'':`<div class="onb-range"><div class="dpr-field">${dateRangeBtn('oeFrom','oeTo',st.from,st.to)}</div></div>
     ${st.custom?'<button type="button" class="link-btn" id="oeDefRange" title="Back to the usual dates for this view">Default dates</button>':''}`}
     <label class="cand-field"><span>Agent</span><select id="oeAgent"><option value="">Everyone</option>${names.map(n=>`<option ${st.agent===n?'selected':''}>${escapeHtml(n)}</option>`).join('')}</select></label>
    </div>
@@ -16164,15 +16170,18 @@ function dateRangeLabel(a,b){ if(!a) return 'Pick dates'; const P=s=>new Date(s+
  if(a===b) return P(a).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'});
  const sameY=a.slice(0,4)===b.slice(0,4), n=Math.round((P(b)-P(a))/864e5)+1;
  return P(a).toLocaleDateString(undefined,{month:'short',day:'numeric',...(sameY?{}:{year:'numeric'})})+' – '+P(b).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})+' · '+(()=>{ let w=0; for(let d=P(a); d<=P(b); d.setDate(d.getDate()+1)) if(d.getDay()%6) w++; return w===1?'1 working day':w+' working days'; })(); }
-function dateRangeBtn(fromId,toId,from,to,max,simple){
- return `<span class="dpr"><input type="date" id="${fromId}" value="${from||''}" data-dp-no hidden><input type="date" id="${toId}" value="${to||''}" data-dp-no hidden><button type="button" class="dpr-btn" data-dpr="${fromId}|${toId}" data-max="${max||''}" ${simple?'data-simple="1"':''} aria-label="Dates: ${escapeHtml(dateRangeLabel(from,to))} — click to change"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>${escapeHtml(dateRangeLabel(from,to))}</span><i aria-hidden="true">▾</i></button></span>`; }
+// every date picker looks like the Overview's: ‹ [📅 Dates · Jul 1 – Sep 30 · 66 working days] › — steps are optional
+function dateRangeBtn(fromId,toId,from,to,max,simple,steps){
+ const cal='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>';
+ return `<span class="dpr"><input type="date" id="${fromId}" value="${from||''}" data-dp-no hidden><input type="date" id="${toId}" value="${to||''}" data-dp-no hidden><span class="ovx-date dpr-ovx" role="group">${steps?steps[0]:''}<button type="button" class="ovx-dbtn" data-dpr="${fromId}|${toId}" data-max="${max||''}" ${simple?'data-simple="1"':''} aria-label="Dates: ${escapeHtml(dateRangeLabel(from,to))} — click to change">${cal}<span><small>Dates</small><b>${escapeHtml(dateRangeLabel(from,to))}</b></span></button>${steps?steps[1]:''}</span></span>`;
+}
 document.addEventListener('click',e=>{
  const b=e.target.closest&&e.target.closest('[data-dpr]'); if(!b) return;
  e.preventDefault(); e.stopPropagation();
  const [fi,ti]=b.dataset.dpr.split('|'), f=document.getElementById(fi), t=document.getElementById(ti); if(!f||!t) return;
- DatePick.open(b,{mode:'range', from:f.value||null, to:t.value||f.value||null, max:b.dataset.max||ltToday(), title:'Pick a day or a range', ...(b.dataset.simple?{presets:'simple', weekBtn:true, max:(()=>{ const d=new Date(); d.setDate(d.getDate()+(6-d.getDay())); return toIsoDateOnly(d); })()}:{}),
+ DatePick.open(b,{mode:'range', from:f.value||null, to:t.value||f.value||null, max:b.dataset.max||ltToday(), title:'Pick a day or a range', ...(b.dataset.simple?{weekBtn:true, max:(()=>{ const d=new Date(); d.setDate(d.getDate()+(6-d.getDay())); return toIsoDateOnly(d); })()}:{}),
   onPick:([x,y])=>{ if(!x) return; y=y||x; if(y<x) [x,y]=[y,x]; f.value=x; t.value=y;
-   b.querySelector('span').textContent=dateRangeLabel(x,y);
+   const lb=b.querySelector('b')||b.querySelector('span'); if(lb) lb.textContent=dateRangeLabel(x,y);
    t.dispatchEvent(new Event('change',{bubbles:true})); }});
 },true);
 
