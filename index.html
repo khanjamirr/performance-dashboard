@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.85.4</title>
+<title>Performance Dashboard · v4.86.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2485,6 +2485,18 @@ html body .toast,html body #toast{border-radius:14px!important;background:rgba(3
 .ld-st{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
 .ld-st.ok{background:#e3f8e9;color:#15803d}.ld-st.no{background:#fff1e0;color:#b45309}.ld-st.wait{background:rgba(118,118,128,.12);color:#6e6e73}
 .ld-brk-table td b{font-weight:600}
+</style>
+<style>
+/* menu: groups are single entries on a computer — their pages are picked at the top of the page */
+@media (min-width:801px){
+ html body .nav button.nav-sub{display:none!important}
+ html body .nav .nav-parent .nav-chev{display:none!important}
+ html body .nav .nav-parent{cursor:pointer}
+ html body .nav .nav-parent.has-active{background:#fff!important;color:#0a1f44!important;font-weight:650!important;box-shadow:0 1px 3px rgba(0,0,0,.10),0 1px 1px rgba(0,0,0,.04)!important}
+ html body .nav .nav-parent.has-active .nav-ico{color:var(--ios-blue,#007aff)!important}
+ html body.side-collapsed .nav .nav-parent:not(.hidden){display:flex!important;justify-content:center;gap:0}
+ html body.side-collapsed .nav .nav-parent .nav-full{display:none!important}
+}
 </style>
 </head>
 <body class="locked">
@@ -4991,7 +5003,7 @@ async function refreshUI(){
     document.getElementById('view-'+v).classList.toggle('hidden', v!==currentView);
   });
 
-  if(currentView!=='performance'){ document.getElementById('ovModeBar')?.classList.add('hidden'); document.body.classList.remove('ov-bar'); const tb=document.querySelector('.topbar'); if(tb) tb.style.removeProperty('top'); }
+  if(currentView!=='performance'){ if(!renderSubNav()){ document.getElementById('ovModeBar')?.classList.add('hidden'); document.body.classList.remove('ov-bar'); const tb=document.querySelector('.topbar'); if(tb) tb.style.removeProperty('top'); } }
   document.getElementById('topbarCenter').classList.toggle('hidden', !showDashboardViews || (()=>{ try{ return currentView==='performance'&&(OverviewX.active()||OverviewX.barOn()); }catch(e){ return false; } })() || ['teams','leads','candidates','alerts','highlights','pivot','history','divreport','onboarding','orderentry'].includes(currentView));
 
   if(currentView!=='recruiters' && currentView!=='branches' && currentView!=='master' && currentView!=='candidates' && currentView!=='alerts' && currentView!=='highlights' && currentView!=='pivot'){
@@ -5554,8 +5566,33 @@ function ovxStickyUpdate(){
   const was=bar.classList.contains('stuck'), now=scrollY>4;
   if(was!==now){ bar.classList.toggle('stuck', now);
     // tabs change size when frozen — move the underline with them
-    setTimeout(()=>{ const a=bar.querySelector('[data-ovx].on'), i=bar.querySelector('.ovx-ink'); if(a&&i){ i.style.width=a.offsetWidth+'px'; i.style.transform=`translateX(${a.offsetLeft}px)`; } },270); }
+    setTimeout(()=>{ const a=bar.querySelector('.ovx-tabs a.on'), i=bar.querySelector('.ovx-ink'); if(a&&i){ i.style.width=a.offsetWidth+'px'; i.style.transform=`translateX(${a.offsetLeft}px)`; } },270); }
 }
+/* ---- grouped pages (Recruiting, Reports, Action Center): an iOS segmented control at the top of the page
+   replaces the sub-menu; the menu shows only the group ---- */
+function subNavGroupOf(v){ const b=document.querySelector(`#navList button[data-view="${v}"][data-group-of]`); return b?b.dataset.groupOf:null; }
+function renderSubNav(){
+  const host=document.getElementById('ovModeBar'), g=subNavGroupOf(currentView); if(!host||!g) return false;
+  const subs=[...document.querySelectorAll(`#navList button[data-group-of="${g}"]`)].filter(b=>!b.classList.contains('hidden'));
+  if(subs.length<2) return false;
+  lsSet('ipd_grp_'+g, currentView);
+  host.classList.remove('hidden','ovx-dark'); host.classList.add('ovx-seg'); document.body.classList.add('ov-bar');
+  const label=b=>(b.querySelector('.nav-full')?.textContent||b.textContent||'').trim();
+  host.innerHTML=`<div class="ovx-row"><nav class="ovx-tabs" role="tablist" aria-label="Pages">${subs.map(b=>`<a href="#" role="tab" data-subv="${b.dataset.view}" class="${b.dataset.view===currentView?'on':''}" aria-selected="${b.dataset.view===currentView}"><span class="ovx-t"><b>${escapeHtml(label(b))}</b></span></a>`).join('')}<i class="ovx-ink" aria-hidden="true"></i></nav></div>`;
+  const ink=host.querySelector('.ovx-ink'), place=(el,anim)=>{ if(!el||!ink) return; ink.style.transition=anim?'':'none'; ink.style.width=el.offsetWidth+'px'; ink.style.transform=`translateX(${el.offsetLeft}px)`; };
+  requestAnimationFrame(()=>place(host.querySelector('[data-subv].on'),false));
+  host.querySelectorAll('[data-subv]').forEach(a=>a.onclick=e=>{ e.preventDefault(); if(a.classList.contains('on')) return;
+    host.querySelectorAll('[data-subv]').forEach(x=>{ x.classList.toggle('on',x===a); x.setAttribute('aria-selected',String(x===a)); }); place(a,true);
+    setTimeout(()=>document.querySelector(`#navList button[data-view="${a.dataset.subv}"]`)?.click(),170); });
+  ovxStickySetup();
+  return true;
+}
+// menu: clicking Recruiting / Reports / Action Center opens the last page used in that group (or the first)
+(function(){ const nav=document.getElementById('navList'); if(!nav) return;
+  nav.addEventListener('click',e=>{ const p=e.target.closest('.nav-parent'); if(!p||innerWidth<=800) return; e.preventDefault(); e.stopPropagation();
+    const g=p.dataset.group, vis=[...nav.querySelectorAll(`[data-group-of="${g}"]`)].filter(b=>!b.classList.contains('hidden')), last=lsGet('ipd_grp_'+g);
+    (vis.find(b=>b.dataset.view===last)||vis[0])?.click(); }, true);
+})();
 function ovxStickySetup(){
   if(!window.__ovxSticky){ window.__ovxSticky=true; let q=0; const go=()=>{ if(q) return; q=requestAnimationFrame(()=>{ q=0; ovxStickyUpdate(); }); };
     addEventListener('scroll',go,{passive:true}); addEventListener('resize',go); document.querySelector('.topbar')?.addEventListener('transitionend',go); }
@@ -12793,7 +12830,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.85.4';   // shown only in the browser tab title
+const APP_VERSION = '4.86.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
