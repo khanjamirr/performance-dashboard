@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.82.1</title>
+<title>Performance Dashboard · v4.83.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2326,6 +2326,32 @@ body.ov-bar .topbar{border-top:0}
 #ovModeBar.ovx-dark.stuck .ovx-tabs a.ovx-onboarding.on .ovx-ico{background:linear-gradient(135deg,#5eead4,#0d9488)!important;color:#fff!important}
 #ovModeBar.ovx-dark.stuck .ovx-tabs a.ovx-orderentry.on .ovx-ico{background:linear-gradient(135deg,#c4b5fd,#7c3aed)!important;color:#fff!important}
 #ovModeBar.ovx-dark .ovx-tabs a.ovx-recruiting.on .ovx-ico,#ovModeBar.ovx-dark .ovx-tabs a.ovx-onboarding.on .ovx-ico,#ovModeBar.ovx-dark .ovx-tabs a.ovx-orderentry.on .ovx-ico{color:#fff!important}
+</style>
+<style>
+/* Overview switcher — segmented control (plain words, sliding white tab) */
+#ovModeBar.ovx-seg:not(.hidden){background:var(--bg,#f2f5f6)!important;padding:14px 36px 10px!important;box-shadow:none;border-bottom:0}
+#ovModeBar.ovx-seg::before,#ovModeBar.ovx-seg::after{display:none!important}
+#ovModeBar.ovx-seg .ovx-row{align-items:center;gap:10px 16px}
+#ovModeBar.ovx-seg .ovx-tabs{display:inline-flex!important;width:auto!important;gap:0;padding:4px!important;margin:0;background:#e6ebf2!important;border:0!important;border-radius:12px!important;box-shadow:inset 0 1px 2px #0a1f440f!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;animation:none!important;overflow:visible}
+#ovModeBar.ovx-seg .ovx-tabs a{flex:0 0 auto!important;flex-direction:row!important;padding:8px 22px!important;margin:0!important;border-radius:9px!important;background:transparent!important;color:#64748b!important;gap:0}
+#ovModeBar.ovx-seg .ovx-tabs a:hover:not(.on){color:#0a1f44!important}
+#ovModeBar.ovx-seg .ovx-tabs a.on{color:#0a1f44!important}
+#ovModeBar.ovx-seg .ovx-ico,#ovModeBar.ovx-seg .ovx-t small,#ovModeBar.ovx-seg .ovx-live{display:none!important}
+#ovModeBar.ovx-seg .ovx-t b{font-size:14px;font-weight:600;letter-spacing:0}
+#ovModeBar.ovx-seg .ovx-tabs a.on .ovx-t b{font-weight:700}
+#ovModeBar.ovx-seg .ovx-ink{top:4px!important;bottom:4px!important;height:auto!important;border-radius:9px!important;background:#fff!important;box-shadow:0 1px 3px #0a1f4426,0 1px 1px #0a1f440d!important;color:transparent!important}
+#ovModeBar.ovx-seg .ovx-ink::after{display:none}
+#ovModeBar.ovx-seg .ovx-date{margin:0;background:#fff!important;border:1px solid #e2e8f0!important;box-shadow:0 1px 2px #0a1f440d!important;border-radius:12px;padding:3px}
+#ovModeBar.ovx-seg .ovx-dbtn{color:#0a1f44;padding:4px 10px 4px 6px}
+#ovModeBar.ovx-seg .ovx-dbtn small{display:none}
+#ovModeBar.ovx-seg .ovx-dbtn svg{width:26px;height:26px;padding:5px;border-radius:8px;background:#eef2f7;color:#1d4ed8;box-shadow:none}
+#ovModeBar.ovx-seg .ovx-dstep{color:#64748b;width:28px}
+#ovModeBar.ovx-seg.stuck:not(.hidden){padding:8px 36px 8px!important;box-shadow:0 1px 0 #dfe5ee,0 8px 16px -14px #0a1f4433}
+#ovModeBar.ovx-seg.stuck .ovx-tabs a{padding:6px 20px!important}
+@media(max-width:1100px){#ovModeBar.ovx-seg:not(.hidden),#ovModeBar.ovx-seg.stuck:not(.hidden){padding-left:24px!important;padding-right:24px!important}}
+@media(max-width:700px){#ovModeBar.ovx-seg:not(.hidden),#ovModeBar.ovx-seg.stuck:not(.hidden){padding:8px 12px!important}#ovModeBar.ovx-seg .ovx-row{flex-direction:column;align-items:stretch;gap:8px}
+ #ovModeBar.ovx-seg .ovx-tabs{display:flex!important;width:100%!important}#ovModeBar.ovx-seg .ovx-tabs a{flex:1 1 0!important;justify-content:center;padding:8px 4px!important}#ovModeBar.ovx-seg .ovx-t{align-items:center}#ovModeBar.ovx-seg .ovx-t b{font-size:13.5px}
+ #ovModeBar.ovx-seg .ovx-date{width:100%}#ovModeBar.ovx-seg.stuck .ovx-date{display:none}}
 </style>
 </head>
 <body class="locked">
@@ -12623,7 +12649,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.82.1';   // shown only in the browser tab title
+const APP_VERSION = '4.83.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -14753,7 +14779,7 @@ const OverviewX=(()=>{
    orderentry:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/>'};
   const OVX_SUB={recruiting:'Schedules, shows & hires', onboarding:'Calls & completions', orderentry:'RC & CRM orders'};
   document.body.classList.add('ov-bar');
-  host.classList.add('ovx-dark');
+  host.classList.remove('ovx-dark'); host.classList.add('ovx-seg');
   host.innerHTML=`<div class="ovx-row"><nav class="ovx-tabs" role="tablist" aria-label="Overview">${ms.map(([k,l])=>`<a href="#" role="tab" data-ovx="${k}" class="ovx-${k} ${m===k?'on':''}" aria-selected="${m===k}"><span class="ovx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${OVX_ICO[k]||''}</svg></span><span class="ovx-t"><b>${l}</b><small data-ovx-stat="${k}">${OVX_SUB[k]||''}</small></span><em class="ovx-live" aria-hidden="true"></em></a>`).join('')}<i class="ovx-ink ink-${m}" aria-hidden="true"></i></nav>${dateCtl()}</div>
    ${true?'':`<div class="ovx-quick" role="group" aria-label="Weeks">${[['today','Today'],['yesterday','Yesterday'],['week','This week'],['lastweek','Last week'],['w4','Last 4 weeks'],['w13','Last 13 weeks']].map(([k,l])=>`<button type="button" data-ovq="${k}" class="${st.quick===k?'on':''}" title="${k==='picker'?'Use the weeks chosen in the Period picker at the top':''}">${l}</button>`).join('')}<button type="button" class="ovx-refresh" data-ovr title="Get the latest numbers">↻</button></div>`}`;
   // the underline slides to the picked tab, then the page switches
