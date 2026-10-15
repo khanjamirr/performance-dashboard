@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Performance Dashboard · v4.92.0</title>
+<title>Performance Dashboard · v4.92.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2608,7 +2608,7 @@ html body .toast,html body #toast{border-radius:14px!important;background:rgba(3
 .role-card header{display:flex;gap:10px;align-items:flex-start}.role-card h4{margin:0;font-size:15px}.role-card header p{margin:2px 0 0;font-size:12.5px;color:#6e6e73}
 .role-ppl{margin-left:auto;white-space:nowrap;font-size:12px;font-weight:700;color:#0a3d91;background:rgba(0,122,255,.1);padding:3px 9px;border-radius:999px}
 .role-pages{display:flex;flex-wrap:wrap;gap:4px}.role-levels{display:flex;gap:6px;flex-wrap:wrap}.role-levels .lv{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:7px}
-.lv.v{background:#e8f1ff;color:#0a3d91}.lv.e{background:#e7f8ee;color:#137a3d}.lv.d{background:#fdecec;color:#b42318}
+.lv.v{background:#e8f1ff;color:#0a3d91}.lv.s{background:rgba(118,118,128,.12);color:#3a3a3c}.lv.e{background:#e7f8ee;color:#137a3d}.lv.d{background:#fdecec;color:#b42318}
 .role-card footer{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto;padding-top:6px;border-top:.5px solid #e5e5ea}
 .role-empty{display:flex;flex-direction:column;gap:6px;align-items:flex-start;padding:18px;border-radius:16px;background:rgba(118,118,128,.08)}.role-empty span{color:#6e6e73;font-size:13px}
 .role-custom{margin:12px 0 0}
@@ -2620,6 +2620,11 @@ html body .toast,html body #toast{border-radius:14px!important;background:rgba(3
 .rm-cell{display:flex;gap:8px;align-items:flex-start;cursor:pointer}.rm-cell small{font-size:11.5px;color:#8e8e93;line-height:1.35}
 .rm-table td.on .rm-cell small{color:#3a3a3c}.rm-na{color:#c7c7cc;text-align:center}
 .rm-home{display:block;margin-top:12px;max-width:340px}
+.ar-row[hidden],.ar-list [hidden]{display:none!important}
+.rm-secrow>td{padding-top:0!important;background:#fafafc}.rm-secrow summary{cursor:pointer;font-size:12.5px;font-weight:600;color:#0a3d91;padding:6px 0;display:flex;gap:10px;align-items:center}
+.rm-secrow summary .link-btn{font-size:12px;font-weight:600}.rm-seccount{color:#8e8e93;font-weight:500}
+.rm-secs{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:6px 16px;padding:4px 0 10px;align-items:start}.rm-secgrp{display:flex;flex-direction:column;gap:3px}.rm-secgrp.big{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:3px 16px;padding:8px 10px;border-radius:10px;background:#fff;box-shadow:0 0 0 .5px rgba(0,0,0,.06)}.rm-secgrp.big>.lv0{grid-column:1/-1;font-weight:700}
+.rm-sec{display:flex;gap:7px;align-items:center;font-size:12.5px;color:#1c1c1e}.rm-sec.lv1{padding-left:16px}.rm-sec.lv2{padding-left:32px;color:#3a3a3c}.rm-sec.off{color:#aeaeb2}
 .ua-tabs{display:inline-flex;padding:2px;border-radius:10px;background:rgba(118,118,128,.12)}
 .ua-tabs button{border:0;background:transparent;font:inherit;font-size:13px;font-weight:600;color:#3a3a3c;padding:6px 16px;border-radius:8px;cursor:pointer}
 .ua-tabs button.on{background:#fff;color:#1c1c1e;box-shadow:0 1px 3px rgba(0,0,0,.14),0 0 0 .5px rgba(0,0,0,.04)}
@@ -11804,25 +11809,28 @@ async function applyRightsToOthers(sourceName, r, excludeId){
    each person (the same page rights and extras the server already checks), so nothing changes in the database.
    Editing a role updates everyone who has it. Stored as KV "userRoles" {roles:[{id,name,desc,perms,defaultView}], assign:{userId:roleId}}. */
 const ROLE_ROWS=[
- {k:'overview', label:'Overview', desc:'Weekly, monthly and quarterly results', req:true, v:{m:['performance']}, e:{m:['upload']}, d:{g:['grant.upload_range']}, hv:'See the results', he:'Upload spreadsheets', hd:'Upload past data for many weeks at once'},
- {k:'myteam', label:'My Team', desc:'Their own team, day by day (team leads)', req:true, v:{special:true}, e:{g:['grant.break_image']}, hv:'Their team’s page', he:'Copy third-break lists as images'},
+ {k:'overview', sec:'performance', label:'Overview', desc:'Weekly, monthly and quarterly results', req:true, v:{m:['performance']}, e:{m:['upload']}, d:{g:['grant.upload_range']}, hv:'See the results', he:'Upload spreadsheets', hd:'Upload past data for many weeks at once'},
+ {k:'myteam', sec:'teams', label:'My Team', desc:'Their own team, day by day (team leads)', req:true, v:{special:true}, e:{g:['grant.break_image']}, hv:'Their team’s page', he:'Copy third-break lists as images'},
  {k:'teamnames', label:'Team candidate names', desc:'EID and employee name of their own team’s candidates', v:{g:['grant.team_names']}, hv:'See their team’s candidate names'},
  {k:'leads', label:'Team Leads', desc:'Every lead’s team side by side', v:{g:['grant.leads']}, hv:'See every team (read-only)'},
- {k:'recruiters', label:'Recruiters', desc:'Recruiter table, day / week and history', req:true, v:{m:['recruiters']}, e:{m:['remarks'],g:['grant.attendance','grant.manual_edit']}, hv:'See recruiters', he:'Add remarks, mark attendance, adjust numbers by hand'},
- {k:'branches', label:'Branches', desc:'Branch table, trends and history', req:true, v:{m:['branches']}, e:{g:['grant.branch_merge']}, hv:'See branches', he:'Merge branches (for everyone)'},
- {k:'alerts', label:'Action Center', desc:'Who is below goal, remarks', req:true, v:{m:['alerts']}, e:{m:['remarks']}, d:{m:['remarks_approve']}, hv:'See who needs attention', he:'Add remarks', hd:'Approve, edit or delete anyone’s remarks'},
+ {k:'recruiters', sec:'recruiters', label:'Recruiters', desc:'Recruiter table, day / week and history', req:true, v:{m:['recruiters']}, e:{m:['remarks'],g:['grant.attendance','grant.manual_edit']}, hv:'See recruiters', he:'Add remarks, mark attendance, adjust numbers by hand'},
+ {k:'branches', sec:'branches', label:'Branches', desc:'Branch table, trends and history', req:true, v:{m:['branches']}, e:{g:['grant.branch_merge']}, hv:'See branches', he:'Merge branches (for everyone)'},
+ {k:'alerts', sec:'alerts', label:'Action Center', desc:'Who is below goal, remarks', req:true, v:{m:['alerts']}, e:{m:['remarks']}, d:{m:['remarks_approve']}, hv:'See who needs attention', he:'Add remarks', hd:'Approve, edit or delete anyone’s remarks'},
  {k:'divreport', label:'Division Report', desc:'Pipeline by client and location', v:{m:['divreport']}, hv:'See the report'},
- {k:'onboarding', label:'Onboarding', desc:'Onboarding call log', v:{g:['grant.ov_onb']}, e:{m:['onboarding']}, d:{g:['grant.onb_all','grant.onb_lists']}, hv:'Read-only report (Overview → Onboarding)', he:'Log and edit their own calls', hd:'Edit / delete anyone’s calls, manage dropdowns'},
+ {k:'onboarding', sec:'onboarding', label:'Onboarding', desc:'Onboarding call log', v:{g:['grant.ov_onb']}, e:{m:['onboarding']}, d:{g:['grant.onb_all','grant.onb_lists']}, hv:'Read-only report (Overview → Onboarding)', he:'Log and edit their own calls', hd:'Edit / delete anyone’s calls, manage dropdowns'},
  {k:'onbteam', label:'Onboarding — team report', desc:'Everyone’s onboarding numbers and daily assignments', v:{g:['grant.onb_report']}, e:{g:['grant.onb_assign']}, hv:'See everyone’s numbers', he:'Fill in daily assignments'},
- {k:'orderentry', label:'Order Entry', desc:'Daily Recruitment Cloud and CRM order counts', v:{g:['grant.ov_oe']}, e:{m:['orderentry']}, d:{g:['grant.oe_bulk','grant.oe_agents']}, hv:'Read-only report (Overview → Order Entry)', he:'Enter the daily counts', hd:'Bulk upload past days, manage agent names'},
- {k:'pivot', label:'Report Builder', desc:'Their own tables and charts', v:{m:['pivot']}, hv:'Build reports'},
- {k:'candidates', label:'Candidates', desc:'Candidate names and Employee Numbers everywhere', req:true, v:{m:['candidates','master']}, e:{m:['master_edit']}, hv:'See names and browse all records', he:'Exclude or include candidates'},
+ {k:'orderentry', sec:'orderentry', label:'Order Entry', desc:'Daily Recruitment Cloud and CRM order counts', v:{g:['grant.ov_oe']}, e:{m:['orderentry']}, d:{g:['grant.oe_bulk','grant.oe_agents']}, hv:'Read-only report (Overview → Order Entry)', he:'Enter the daily counts', hd:'Bulk upload past days, manage agent names'},
+ {k:'pivot', sec:'pivot', label:'Report Builder', desc:'Their own tables and charts', v:{m:['pivot']}, hv:'Build reports'},
+ {k:'candidates', sec:'candidates', label:'Candidates', desc:'Candidate names and Employee Numbers everywhere', req:true, v:{m:['candidates','master']}, e:{m:['master_edit']}, hv:'See names and browse all records', he:'Exclude or include candidates'},
  {k:'export', label:'Download & share', desc:'Excel, PDF, Word, snapshots', v:{m:['export']}, hv:'Download and share'},
  {k:'copy', label:'Copy tables', desc:'Copy tables and lists to the clipboard', v:{special:true}, hv:'Copy tables'},
- {k:'settings', label:'Settings', desc:'Divisions, branches, goals', v:{m:['settings']}, hv:'Open settings'},
+ {k:'settings', sec:'settings', label:'Settings', desc:'Divisions, branches, goals', v:{m:['settings']}, hv:'Open settings'},
 ];
 const ROLE_COLS=[['v','View'],['e','Edit'],['d','Delete & manage']];
+// sections inside pages (the same lists as the person editor) — a role hides them for everyone who has it
+const roleSecKeys=()=>new Set(Object.values(PAGE_SECTIONS).flat().map(x=>x[0]).filter(k=>k!=='copy.tables'));
 const ROLE_MANAGED=(()=>{ const m=new Set(), g=new Set(['grant.no_team','copy.tables']); ROLE_ROWS.forEach(r=>['v','e','d'].forEach(c=>{ const x=r[c]; if(!x) return; (x.m||[]).forEach(k=>m.add(k)); (x.g||[]).forEach(k=>g.add(k)); })); return {m,g}; })();
+function roleSecs(role){ const K=roleSecKeys(); return ((role&&role.secs)||[]).filter(k=>K.has(k)); }
 function rolesData(){ const v=KV.get('userRoles'); return {roles:Array.isArray(v&&v.roles)?v.roles.filter(r=>r&&r.id&&r.name):[], assign:v&&v.assign&&typeof v.assign==='object'?{...v.assign}:{}}; }
 async function rolesSave(d){ const ok=await storageSet('userRoles',d); if(ok===null) return false; KV.set('userRoles',d); return true; }
 function roleOfUser(id){ const d=rolesData(), rid=d.assign[String(id)]; return rid?d.roles.find(r=>r.id===rid)||null:null; }
@@ -11830,10 +11838,12 @@ function roleRights(role){ const mods=new Set(), gr=new Set(), P=(role&&role.per
  ROLE_ROWS.forEach(r=>['v','e','d'].forEach(c=>{ const x=r[c]; if(!x||!(P[r.k]||{})[c]) return; (x.m||[]).forEach(k=>mods.add(k)); (x.g||[]).forEach(k=>gr.add(k)); }));
  if(!(P.myteam||{}).v) gr.add('grant.no_team');
  if(!(P.copy||{}).v) gr.add('copy.tables');
+ roleSecs(role).forEach(k=>gr.add(k));
  return {modules:[...mods], hidden:[...gr]}; }
-// the person's own page-section choices are kept; everything a role controls is replaced
-function rightsWithRole(u, role){ const R=roleRights(role);
- return {modules:[...new Set([...(u.modules||[]).filter(k=>!ROLE_MANAGED.m.has(k)), ...R.modules])], hidden_sections:[...new Set([...(u.hidden_sections||[]).filter(k=>!ROLE_MANAGED.g.has(k)), ...R.hidden])]}; }
+// everything a role controls (pages, rights and the sections inside pages) is replaced by the role's
+function rightsWithRole(u, role){ const R=roleRights(role), K=roleSecKeys();
+ return {modules:[...new Set([...(u.modules||[]).filter(k=>!ROLE_MANAGED.m.has(k)), ...R.modules])], hidden_sections:[...new Set([...(u.hidden_sections||[]).filter(k=>!ROLE_MANAGED.g.has(k)&&!K.has(k)), ...R.hidden])]}; }
+const secsFromRights=r=>{ const K=roleSecKeys(); return (r.hidden_sections||[]).filter(k=>K.has(k)); };
 function permsFromRights(r){ const has=k=>(r.modules||[]).includes(k)||(r.hidden_sections||[]).includes(k), P={};
  ROLE_ROWS.forEach(row=>{ const o={}; ['v','e','d'].forEach(c=>{ const x=row[c]; if(!x||x.special) return; const keys=[...(x.m||[]),...(x.g||[])]; o[c]=!!keys.length&&keys.every(has); }); P[row.k]=o; });
  P.myteam.v=!(r.hidden_sections||[]).includes('grant.no_team'); P.copy={v:!(r.hidden_sections||[]).includes('copy.tables')};
@@ -11856,7 +11866,7 @@ function rolesPanelHtml(){
  const cards=d.roles.map(r=>{ const s=roleSummary(r), ppl=people(r.id);
   return `<article class="role-card"><header><div><h4>${escapeHtml(r.name)}</h4>${r.desc?`<p>${escapeHtml(r.desc)}</p>`:''}</div><span class="role-ppl" title="${escapeHtml(ppl.map(u=>u.name).join(', '))}">${ppl.length} ${ppl.length===1?'person':'people'}</span></header>
    <div class="role-pages">${s.pages.length?s.pages.map(x=>`<span class="mod-chip">${escapeHtml(x)}</span>`).join(''):'<span class="hint">No pages yet</span>'}</div>
-   <div class="role-levels"><span class="lv v">View ${s.v}</span><span class="lv e">Edit ${s.e}</span><span class="lv d">Delete & manage ${s.d}</span></div>
+   <div class="role-levels"><span class="lv v">View ${s.v}</span><span class="lv e">Edit ${s.e}</span><span class="lv d">Delete & manage ${s.d}</span>${roleSecs(r).length?`<span class="lv s">${roleSecs(r).length} section${roleSecs(r).length===1?'':'s'} hidden</span>`:'<span class="lv s">All sections shown</span>'}</div>
    ${sa?`<footer><button type="button" class="btn btn-primary btn-sm" data-role-ppl="${r.id}">👥 Assign people</button><button type="button" class="btn btn-secondary btn-sm" data-role-edit="${r.id}">Edit rights</button><button type="button" class="btn btn-secondary btn-sm" data-role-dup="${r.id}">Duplicate</button><button type="button" class="btn btn-link-danger btn-sm" data-role-del="${r.id}">Delete</button></footer>`:`<footer><button type="button" class="btn btn-secondary btn-sm" data-role-edit="${r.id}">View rights</button></footer>`}</article>`; }).join('');
  return `<div class="roles-head"><div><h4>Roles</h4><span class="hint">Set what each role can view, edit and delete once — then give people a role. ${sa?'Changing a role updates everyone who has it.':'Only the super admin can change roles or who has them.'}</span></div>${sa?'<button type="button" class="btn btn-primary" id="roleNew">＋ New role</button>':''}</div>
   ${d.roles.length?`<div class="role-grid">${cards}</div>`:`<div class="role-empty"><strong>No roles yet.</strong><span>Start with the suggested roles — Viewer, Onboarder, Order entry, Team lead and Manager — and adjust them, or build your own.</span>${sa?'<button type="button" class="btn btn-primary" id="roleSeed">Add suggested roles</button>':''}</div>`}
@@ -11878,11 +11888,17 @@ function wireRolesPanel(host, rerender){
 function openRoleEditor(role, done){
  const sa=Server.isSuperAdmin(), isNew=!role, d=rolesData();
  let P=JSON.parse(JSON.stringify((role&&role.perms)||permsFromRights({modules:['performance','recruiters','branches'],hidden_sections:[]})));
+ let S=new Set(roleSecs(role));
  const assigned=role?(usersCache||[]).filter(u=>u.role==='user'&&d.assign[String(u.id)]===role.id):[];
  const views=Object.keys(DEFAULT_VIEW_LABELS).filter(v=>VIEW_MODULE[v]);
  const wrap=document.createElement('div'); wrap.className='modal-overlay';
  const cell=(r,c)=>{ const x=r[c]; if(!x) return '<td class="rm-na">—</td>'; const on=!!(P[r.k]||{})[c], hint=r['h'+c]||'';
   return `<td><label class="rm-cell ${c}" title="${escapeHtml(hint)}"><span class="uf-switch"><input type="checkbox" data-rk="${r.k}" data-rc="${c}" ${on?'checked':''} ${sa?'':'disabled'}><i aria-hidden="true"></i></span><small>${escapeHtml(hint)}</small></label></td>`; };
+ // sections inside the page: indented by the dots in their labels; a hidden parent hides its children
+ const secRow=r=>{ const L=r.sec&&PAGE_SECTIONS[r.sec]; if(!L) return ''; const items=L.filter(([k])=>k!=='copy.tables'); if(!items.length) return '';
+  return `<tr class="rm-secrow" data-sec-of="${r.k}"><td colspan="4"><details><summary>Sections on the ${escapeHtml(r.label)} page <span class="rm-seccount" data-secn="${r.k}"></span>${sa?`<button type="button" class="link-btn" data-secall="${r.k}">Show all</button><button type="button" class="link-btn" data-secnone="${r.k}">Hide all</button>`:''}</summary>
+   <div class="rm-secs">${(()=>{ const groups=[]; items.forEach(([k,l])=>{ const lv=(/^(·+)/.exec(l)||['',''])[1].length; if(!lv||!groups.length) groups.push([]); groups[groups.length-1].push([k,l,lv]); });
+     return groups.map(g=>`<div class="rm-secgrp${g.length>1?' big':''}">${g.map(([k,l,lv])=>`<label class="rm-sec lv${lv}"><input type="checkbox" data-rsec="${escapeHtml(k)}" data-lv="${lv}" ${sa?'':'disabled'}> ${escapeHtml(l.replace(/^·+ /,''))}</label>`).join('')}</div>`).join(''); })()}</div></details></td></tr>`; };
  const startOpts=`<option value="">Start from…</option><optgroup label="Suggested">${UF_PRESETS.map((p,i)=>`<option value="p${i}">${escapeHtml(p.name)}</option>`).join('')}</optgroup>${d.roles.filter(r=>!role||r.id!==role.id).length?`<optgroup label="Other roles">${d.roles.filter(r=>!role||r.id!==role.id).map(r=>`<option value="r${r.id}">${escapeHtml(r.name)}</option>`).join('')}</optgroup>`:''}${(usersCache||[]).filter(u=>u.role==='user').length?`<optgroup label="Copy a person’s current rights">${(usersCache||[]).filter(u=>u.role==='user').map(u=>`<option value="u${u.id}">${escapeHtml(u.name)}</option>`).join('')}</optgroup>`:''}`;
  wrap.innerHTML=`<div class="modal role-modal" role="dialog" aria-modal="true" aria-labelledby="rmTitle"><div class="modal-header"><h3 id="rmTitle">${isNew?'New role':sa?'Edit role':'Role rights'}</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div>
   <div class="modal-body">
@@ -11890,15 +11906,23 @@ function openRoleEditor(role, done){
     <label class="field"><span>Description</span><input id="rmDesc" maxlength="140" value="${escapeHtml(role&&role.desc||'')}" placeholder="Who it is for" ${sa?'':'disabled'}></label>
     ${sa?`<label class="field"><span>Fill in from</span><select id="rmStart">${startOpts}</select></label>`:''}</div>
    <div class="onb-scroll"><table class="users-table rm-table"><thead><tr><th>Page</th>${ROLE_COLS.map(([c,l])=>`<th class="rm-col ${c}">${sa?`<button type="button" class="link-btn" data-rm-col="${c}" title="Turn the whole column on or off">${l}</button>`:l}</th>`).join('')}</tr></thead>
-    <tbody>${ROLE_ROWS.map(r=>`<tr><td><strong>${escapeHtml(r.label)}</strong><small>${escapeHtml(r.desc)}</small></td>${ROLE_COLS.map(([c])=>cell(r,c)).join('')}</tr>`).join('')}</tbody></table></div>
+    <tbody>${ROLE_ROWS.map(r=>`<tr><td><strong>${escapeHtml(r.label)}</strong><small>${escapeHtml(r.desc)}</small></td>${ROLE_COLS.map(([c])=>cell(r,c)).join('')}</tr>${secRow(r)}`).join('')}</tbody></table></div>
    <label class="field rm-home"><span>Home page when they sign in</span><select id="rmHome" ${sa?'':'disabled'}><option value="">First page they can open</option>${views.map(v=>`<option value="${v}" ${role&&role.defaultView===v?'selected':''}>${escapeHtml(DEFAULT_VIEW_LABELS[v])}</option>`).join('')}</select></label>
-   <p class="hint" style="margin:6px 0 0">Edit and Delete & manage switch on View for the same page. What each person sees <i>inside</i> a page (sections) can still be adjusted per person.</p>
+   <p class="hint" style="margin:6px 0 0">Edit and Delete & manage switch on View for the same page. Open “Sections on the … page” under a page to choose which cards, charts and tables people with this role see inside it.</p>
   </div>
   <div class="modal-footer"><span class="auth-msg" id="rmMsg" role="alert"></span><button class="btn btn-secondary" data-close>${sa?'Cancel':'Close'}</button>${sa?`<button class="btn btn-primary" id="rmSave">${isNew?'Create role':assigned.length?`Save & update ${assigned.length} ${assigned.length===1?'person':'people'}`:'Save role'}</button>`:''}</div></div>`;
  document.body.appendChild(wrap);
  const close=()=>wrap.remove();
  wrap.addEventListener('click',e=>{ if(e.target===wrap||e.target.closest('[data-close]')) close(); });
- const sync=()=>wrap.querySelectorAll('[data-rk]').forEach(i=>{ i.checked=!!(P[i.dataset.rk]||{})[i.dataset.rc]; i.closest('td').classList.toggle('on',i.checked); });
+ const sync=()=>{ wrap.querySelectorAll('[data-rk]').forEach(i=>{ i.checked=!!(P[i.dataset.rk]||{})[i.dataset.rc]; i.closest('td').classList.toggle('on',i.checked); });
+  wrap.querySelectorAll('.rm-secrow').forEach(tr=>{ const k=tr.dataset.secOf, o=P[k]||{}; tr.hidden=!(o.v||o.e);
+   const boxes=[...tr.querySelectorAll('[data-rsec]')], stack=[];
+   boxes.forEach(b=>{ const lv=+b.dataset.lv; while(stack.length&&stack[stack.length-1].lv>=lv) stack.pop(); const parentOff=stack.some(x=>!x.on);
+    b.checked=!S.has(b.dataset.rsec); b.disabled=!sa||parentOff; b.closest('label').classList.toggle('off',parentOff||!b.checked); stack.push({lv,on:b.checked&&!parentOff}); });
+   const n=tr.querySelector('[data-secn]'); if(n){ const on=boxes.filter(b=>b.checked&&!b.disabled).length; n.textContent=on===boxes.length?'· all shown':`· ${on} of ${boxes.length} shown`; } }); };
+ wrap.addEventListener('change',e=>{ const b=e.target.closest('[data-rsec]'); if(!b) return; if(b.checked) S.delete(b.dataset.rsec); else S.add(b.dataset.rsec); sync(); });
+ wrap.querySelectorAll('[data-secall],[data-secnone]').forEach(btn=>btn.onclick=e=>{ e.preventDefault(); const k=btn.dataset.secall||btn.dataset.secnone, tr=wrap.querySelector(`.rm-secrow[data-sec-of="${k}"]`); tr.querySelector('details').open=true;
+  tr.querySelectorAll('[data-rsec]').forEach(b=>{ if(btn.dataset.secall) S.delete(b.dataset.rsec); else S.add(b.dataset.rsec); }); sync(); });
  wrap.querySelectorAll('[data-rk]').forEach(i=>i.addEventListener('change',()=>{ const k=i.dataset.rk, c=i.dataset.rc, row=ROLE_ROWS.find(r=>r.k===k), o=P[k]||(P[k]={});
   o[c]=i.checked;
   if(row.req&&c!=='v'&&i.checked) o.v=true;                       // edit / delete need the page itself
@@ -11908,15 +11932,15 @@ function openRoleEditor(role, done){
   rows.forEach(r=>{ const o=P[r.k]||(P[r.k]={}); o[c]=!all; if(r.req&&c!=='v'&&!all) o.v=true; if(r.req&&c==='v'&&all){ o.e=false; o.d=false; } }); sync(); });
  wrap.querySelector('#rmStart')?.addEventListener('change',e=>{ const v=e.target.value; if(!v) return; let src=null;
   if(v[0]==='p'){ const pr=UF_PRESETS[+v.slice(1)]; src=permsFromRights({modules:pr.modules,hidden_sections:pr.grants||[]}); const n=wrap.querySelector('#rmName'); if(n&&!n.value) n.value=pr.name; }
-  else if(v[0]==='r'){ const r=d.roles.find(x=>x.id===v.slice(1)); src=r&&r.perms; }
-  else if(v[0]==='u'){ const u=(usersCache||[]).find(x=>String(x.id)===v.slice(1)); src=u&&permsFromRights(u); }
+  else if(v[0]==='r'){ const r=d.roles.find(x=>x.id===v.slice(1)); src=r&&r.perms; if(r) S=new Set(roleSecs(r)); }
+  else if(v[0]==='u'){ const u=(usersCache||[]).find(x=>String(x.id)===v.slice(1)); src=u&&permsFromRights(u); if(u) S=new Set(secsFromRights(u)); }
   if(src){ P=JSON.parse(JSON.stringify(src)); sync(); } e.target.value=''; });
  sync();
  wrap.querySelector('#rmSave')?.addEventListener('click',async()=>{
   const name=wrap.querySelector('#rmName').value.trim(), msg=t=>{ wrap.querySelector('#rmMsg').textContent=t; };
   if(!name) return msg('Give the role a name.');
   const x=rolesData(); if(x.roles.some(r=>r.name.toLowerCase()===name.toLowerCase()&&(!role||r.id!==role.id))) return msg('There is already a role with that name.');
-  const rec={id:role?role.id:roleId(), name, desc:wrap.querySelector('#rmDesc').value.trim(), perms:P, defaultView:wrap.querySelector('#rmHome').value||''};
+  const rec={id:role?role.id:roleId(), name, desc:wrap.querySelector('#rmDesc').value.trim(), perms:P, secs:[...S], defaultView:wrap.querySelector('#rmHome').value||''};
   x.roles=role?x.roles.map(r=>r.id===role.id?rec:r):[...x.roles, rec];
   const btn=wrap.querySelector('#rmSave'); btn.disabled=true;
   if(!await rolesSave(x)){ btn.disabled=false; return msg('The role could not be saved.'); }
@@ -11932,7 +11956,7 @@ function openRoleAssign(role, done){
  const cur=u=>{ const r=roleOfUser(u.id); return r?r.name:'No role — set by hand'; };
  const wrap=document.createElement('div'); wrap.className='modal-overlay';
  wrap.innerHTML=`<div class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="raTitle"><div class="modal-header"><h3 id="raTitle">Who has “${escapeHtml(role.name)}”</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div>
-  <div class="modal-body"><p class="hint" style="margin:0 0 8px">Ticked people get exactly this role’s rights (their sections inside pages stay as they are). Untick someone to keep their current rights and set them by hand.</p>
+  <div class="modal-body"><p class="hint" style="margin:0 0 8px">Ticked people get exactly this role’s rights, including the sections they see inside each page. Untick someone to keep their current rights and set them by hand.</p>
   <div class="ar-tools"><input type="search" id="raSearch" placeholder="Search people…"><label><input type="checkbox" id="raAll"> Select all</label></div>
   <div class="ar-list">${pool.map(u=>`<label class="ar-row" data-name="${escapeHtml(u.name.toLowerCase())}"><input type="checkbox" value="${escapeHtml(String(u.id))}" ${d.assign[String(u.id)]===role.id?'checked':''}><span><strong>${escapeHtml(u.name)}</strong><em>${escapeHtml(cur(u))}</em></span></label>`).join('')}</div></div>
   <div class="modal-footer"><button class="btn btn-secondary" data-close>Cancel</button><button class="btn btn-primary" id="raGo">Save</button></div></div>`;
@@ -12040,12 +12064,12 @@ function drawUserForm(){
   host.querySelector('#ufApplyOthers')?.addEventListener('click',()=>{ applyRightsToOthers(host.querySelector('#ufName').value.trim()||u.name, readFormRights(host), u.id); });
   // role: its rights fill the switches below and lock them (sections inside pages stay adjustable)
   const roleSel=host.querySelector('#ufRoleSel');
-  const lockSel='.uf-access input[data-mod], .uf-access input[data-grant], .uf-access input[data-grant-off], .uf-access [data-sec="copy.tables"], .uf-access [data-preset], .uf-access #ufCopyFrom, .uf-access #ufApplyOthers';
+  const lockSel='.uf-access input[data-mod], .uf-access input[data-grant], .uf-access input[data-grant-off], .uf-access [data-sec], .uf-access [data-preset], .uf-access #ufCopyFrom, .uf-access #ufApplyOthers';
   const applyRoleUi=fill=>{ const r=roleSel&&roleSel.value?rolesData().roles.find(x=>x.id===roleSel.value):null;
     if(r&&fill){ const cur=readFormRights(host); applyFormRights(host,{...rightsWithRole(cur,r), defaultView:r.defaultView||cur.defaultView}); }
     host.querySelectorAll(lockSel).forEach(el=>el.disabled=!!r);
     host.querySelector('.uf-access')?.classList.toggle('role-locked',!!r);
-    const n=host.querySelector('#ufRoleNote'); if(n) n.innerHTML=r?`Rights come from the role <b>${escapeHtml(r.name)}</b> — the switches below show them and are locked. ${Server.isSuperAdmin()?'Change the role’s rights under Users → <b>Roles</b>, or pick “No role” to set them by hand.':'Only the super admin can change roles.'} What they see inside a page (sections) can still be adjusted here.`:''; };
+    const n=host.querySelector('#ufRoleNote'); if(n) n.innerHTML=r?`Rights come from the role <b>${escapeHtml(r.name)}</b> — the switches below show them and are locked. ${Server.isSuperAdmin()?'Change the role’s rights under Users → <b>Roles</b>, or pick “No role” to set them by hand.':'Only the super admin can change roles.'} The sections they see inside each page come from the role too.`:''; };
   roleSel?.addEventListener('change',()=>applyRoleUi(true)); applyRoleUi(false);
   host.querySelector('#ufCancel').onclick=closeForm;
   host.querySelector('#ufSave').onclick=async ()=>{
@@ -13198,7 +13222,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.92.0';   // shown only in the browser tab title
+const APP_VERSION = '4.92.1';   // shown only in the browser tab title
 // Everyone gets the latest look: the page checks the published file for a newer version — right after it opens
 // (switches straight over) and every few minutes / when the tab comes back (offers an Update button).
 const AppUpdate=(()=>{
