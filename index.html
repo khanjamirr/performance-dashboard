@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.95.0</title>
+<title>Performance Dashboard · v4.95.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- fonts load without holding up the page (the system font shows for a moment) -->
@@ -2630,7 +2630,7 @@ html body .toast,html body #toast{border-radius:14px!important;background:rgba(3
 .ar-row[hidden],.ar-list [hidden]{display:none!important}
 .rm-secrow>td{padding-top:0!important;background:#fafafc}.rm-secrow summary{cursor:pointer;font-size:12.5px;font-weight:600;color:#0a3d91;padding:6px 0;display:flex;gap:10px;align-items:center}
 .rm-secrow summary .link-btn{font-size:12px;font-weight:600}.rm-seccount{color:#8e8e93;font-weight:500}
-.rm-secs{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:6px 16px;padding:4px 0 10px;align-items:start}.rm-secgrp{display:flex;flex-direction:column;gap:3px}.rm-secgrp.big{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:3px 16px;padding:8px 10px;border-radius:10px;background:#fff;box-shadow:0 0 0 .5px rgba(0,0,0,.06)}.rm-secgrp.big>.lv0{grid-column:1/-1;font-weight:700}
+.rm-secs{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px 16px;padding:4px 0 12px;align-items:start}.uf-drawer .sec-opt.sub{display:none!important}.rm-secgrp{display:flex;flex-direction:column;gap:3px}.rm-secgrp.big{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:3px 16px;padding:8px 10px;border-radius:10px;background:#fff;box-shadow:0 0 0 .5px rgba(0,0,0,.06)}.rm-secgrp.big>.lv0{grid-column:1/-1;font-weight:700}
 .rm-sec{display:flex;gap:7px;align-items:center;font-size:12.5px;color:#1c1c1e}.rm-sec.lv1{padding-left:16px}.rm-sec.lv2{padding-left:32px;color:#3a3a3c}.rm-sec.off{color:#aeaeb2}
 .ua-tabs{display:inline-flex;padding:2px;border-radius:10px;background:rgba(118,118,128,.12)}
 .ua-tabs button{border:0;background:transparent;font:inherit;font-size:13px;font-weight:600;color:#3a3a3c;padding:6px 16px;border-radius:8px;cursor:pointer}
@@ -2654,7 +2654,7 @@ html body .toast,html body #toast{border-radius:14px!important;background:rgba(3
 #ovModeBar .rtl-top #rtlToggle button.on{background:#fff;color:#1c1c1e;box-shadow:0 1px 3px rgba(0,0,0,.14),0 0 0 .5px rgba(0,0,0,.04)}
 </style>
 <style id="ios-settings">
-#myAccountBtn{display:none!important}
+#myAccountBtn,#accessModeBtn{display:none!important}
 html body.on-settings #ovModeBar{display:none!important}
 @media (min-width:900px){
  html body .settings-page{grid-template-columns:250px minmax(0,1fr)!important;gap:26px!important}
@@ -11909,7 +11909,9 @@ async function applyRightsToOthers(sourceName, r, excludeId){
    each person (the same page rights and extras the server already checks), so nothing changes in the database.
    Editing a role updates everyone who has it. Stored as KV "userRoles" {roles:[{id,name,desc,perms,defaultView}], assign:{userId:roleId}}. */
 const ROLE_ROWS=[
- {k:'overview', sec:'performance', label:'Overview', desc:'Weekly, monthly and quarterly results', req:true, v:{m:['performance']}, e:{m:['upload']}, d:{g:['grant.upload_range']}, hv:'See the results', he:'Upload spreadsheets', hd:'Upload past data for many weeks at once'},
+ {k:'overview', sec:'performance', label:'Overview · Recruiting', desc:'The Overview page and its Recruiting tab — schedules, shows, hires', req:true, v:{m:['performance']}, e:{m:['upload']}, d:{g:['grant.upload_range']}, hv:'See the results', he:'Upload spreadsheets', hd:'Upload past data for many weeks at once'},
+ {k:'ovonb', needs:'overview', label:'Overview · Onboarding', desc:'Onboarding tab on the Overview page — everyone’s calls, read-only', v:{g:['grant.ov_onb']}, hv:'See the Onboarding tab'},
+ {k:'ovoe', needs:'overview', label:'Overview · Order Entry', desc:'Order Entry tab on the Overview page — read-only', v:{g:['grant.ov_oe']}, hv:'See the Order Entry tab'},
  {k:'myteam', sec:'teams', label:'My Team', desc:'Their own team, day by day (team leads)', req:true, v:{special:true}, e:{g:['grant.break_image']}, hv:'Their team’s page', he:'Copy third-break lists as images'},
  {k:'teamnames', label:'Team candidate names', desc:'EID and employee name of their own team’s candidates', v:{g:['grant.team_names']}, hv:'See their team’s candidate names'},
  {k:'leads', label:'Team Leads', desc:'Every lead’s team side by side', v:{g:['grant.leads']}, hv:'See every team (read-only)'},
@@ -11917,9 +11919,9 @@ const ROLE_ROWS=[
  {k:'branches', sec:'branches', label:'Branches', desc:'Branch table, trends and history', req:true, v:{m:['branches']}, e:{g:['grant.branch_merge']}, hv:'See branches', he:'Merge branches (for everyone)'},
  {k:'alerts', sec:'alerts', label:'Action Center', desc:'Who is below goal, remarks', req:true, v:{m:['alerts']}, e:{m:['remarks']}, d:{m:['remarks_approve']}, hv:'See who needs attention', he:'Add remarks', hd:'Approve, edit or delete anyone’s remarks'},
  {k:'divreport', label:'Division Report', desc:'Pipeline by client and location', v:{m:['divreport']}, hv:'See the report'},
- {k:'onboarding', sec:'onboarding', label:'Onboarding', desc:'Onboarding call log', v:{g:['grant.ov_onb']}, e:{m:['onboarding']}, d:{g:['grant.onb_all','grant.onb_lists']}, hv:'Read-only report (Overview → Onboarding)', he:'Log and edit their own calls', hd:'Edit / delete anyone’s calls, manage dropdowns'},
+ {k:'onboarding', sec:'onboarding', label:'Onboarding', desc:'The Onboarding page — call log', req:true, v:{m:['onboarding']}, d:{g:['grant.onb_all','grant.onb_lists']}, hv:'Open the page — log and edit their own calls', hd:'Edit / delete anyone’s calls, manage dropdowns'},
  {k:'onbteam', label:'Onboarding — team report', desc:'Everyone’s onboarding numbers and daily assignments', v:{g:['grant.onb_report']}, e:{g:['grant.onb_assign']}, hv:'See everyone’s numbers', he:'Fill in daily assignments'},
- {k:'orderentry', sec:'orderentry', label:'Order Entry', desc:'Daily Recruitment Cloud and CRM order counts', v:{g:['grant.ov_oe']}, e:{m:['orderentry']}, d:{g:['grant.oe_bulk','grant.oe_agents']}, hv:'Read-only report (Overview → Order Entry)', he:'Enter the daily counts', hd:'Bulk upload past days, manage agent names'},
+ {k:'orderentry', sec:'orderentry', label:'Order Entry', desc:'The Order Entry page — daily Recruitment Cloud and CRM counts', req:true, v:{m:['orderentry']}, d:{g:['grant.oe_bulk','grant.oe_agents']}, hv:'Open the page — enter the daily counts', hd:'Bulk upload past days, manage agent names'},
  {k:'pivot', sec:'pivot', label:'Report Builder', desc:'Their own tables and charts', v:{m:['pivot']}, hv:'Build reports'},
  {k:'candidates', sec:'candidates', label:'Candidates', desc:'Candidate names and Employee Numbers everywhere', req:true, v:{m:['candidates','master']}, e:{m:['master_edit']}, hv:'See names and browse all records', he:'Exclude or include candidates'},
  {k:'export', label:'Download & share', desc:'Excel, PDF, Word, snapshots', v:{m:['export']}, hv:'Download and share'},
@@ -11931,7 +11933,9 @@ const ROLE_COLS=[['v','View'],['e','Edit'],['d','Delete & manage']];
 const roleSecKeys=()=>new Set(Object.values(PAGE_SECTIONS).flat().map(x=>x[0]).filter(k=>k!=='copy.tables'));
 const ROLE_MANAGED=(()=>{ const m=new Set(), g=new Set(['grant.no_team','copy.tables']); ROLE_ROWS.forEach(r=>['v','e','d'].forEach(c=>{ const x=r[c]; if(!x) return; (x.m||[]).forEach(k=>m.add(k)); (x.g||[]).forEach(k=>g.add(k)); })); return {m,g}; })();
 function roleSecs(role){ const K=roleSecKeys(); return ((role&&role.secs)||[]).filter(k=>K.has(k)); }
-function rolesData(){ const v=KV.get('userRoles'); return {roles:Array.isArray(v&&v.roles)?v.roles.filter(r=>r&&r.id&&r.name):[], assign:v&&v.assign&&typeof v.assign==='object'?{...v.assign}:{}}; }
+function rolePermsV2(P){ P=P||{}; if(P.__v2) return P; const o=P.onboarding||{}, e=P.orderentry||{};
+ return {...P, ovonb:{v:!!o.v}, ovoe:{v:!!e.v}, onboarding:{v:!!o.e, d:!!o.d}, orderentry:{v:!!e.e, d:!!e.d}, __v2:true}; }
+function rolesData(){ const v=KV.get('userRoles'); return {roles:Array.isArray(v&&v.roles)?v.roles.filter(r=>r&&r.id&&r.name).map(r=>({...r, perms:rolePermsV2(r.perms)})):[], assign:v&&v.assign&&typeof v.assign==='object'?{...v.assign}:{}}; }
 async function rolesSave(d){ const ok=await storageSet('userRoles',d); if(ok===null) return false; KV.set('userRoles',d); return true; }
 function roleOfUser(id){ const d=rolesData(), rid=d.assign[String(id)]; return rid?d.roles.find(r=>r.id===rid)||null:null; }
 function roleRights(role){ const mods=new Set(), gr=new Set(), P=(role&&role.perms)||{};
@@ -11946,7 +11950,7 @@ function rightsWithRole(u, role){ const R=roleRights(role), K=roleSecKeys();
 const secsFromRights=r=>{ const K=roleSecKeys(); return (r.hidden_sections||[]).filter(k=>K.has(k)); };
 function permsFromRights(r){ const has=k=>(r.modules||[]).includes(k)||(r.hidden_sections||[]).includes(k), P={};
  ROLE_ROWS.forEach(row=>{ const o={}; ['v','e','d'].forEach(c=>{ const x=row[c]; if(!x||x.special) return; const keys=[...(x.m||[]),...(x.g||[])]; o[c]=!!keys.length&&keys.every(has); }); P[row.k]=o; });
- P.myteam.v=!(r.hidden_sections||[]).includes('grant.no_team'); P.copy={v:!(r.hidden_sections||[]).includes('copy.tables')};
+ P.myteam.v=!(r.hidden_sections||[]).includes('grant.no_team'); P.copy={v:!(r.hidden_sections||[]).includes('copy.tables')}; P.__v2=true;
  return P; }
 function roleSummary(role){ const P=role.perms||{}, n=c=>ROLE_ROWS.filter(r=>r[c]&&(P[r.k]||{})[c]).length;
  return {pages:ROLE_ROWS.filter(r=>(P[r.k]||{}).v||(P[r.k]||{}).e).map(r=>r.label), v:n('v'), e:n('e'), d:n('d')}; }
@@ -11966,7 +11970,7 @@ function rolesPanelHtml(){
  const cards=d.roles.map(r=>{ const s=roleSummary(r), ppl=people(r.id);
   return `<article class="role-card"><header><div><h4>${escapeHtml(r.name)}</h4>${r.desc?`<p>${escapeHtml(r.desc)}</p>`:''}</div><span class="role-ppl" title="${escapeHtml(ppl.map(u=>u.name).join(', '))}">${ppl.length} ${ppl.length===1?'person':'people'}</span></header>
    <div class="role-pages">${s.pages.length?s.pages.map(x=>`<span class="mod-chip">${escapeHtml(x)}</span>`).join(''):'<span class="hint">No pages yet</span>'}</div>
-   <div class="role-levels"><span class="lv v">View ${s.v}</span><span class="lv e">Edit ${s.e}</span><span class="lv d">Delete & manage ${s.d}</span>${roleSecs(r).length?`<span class="lv s">${roleSecs(r).length} section${roleSecs(r).length===1?'':'s'} hidden</span>`:'<span class="lv s">All sections shown</span>'}</div>
+   <div class="role-levels"><span class="lv v">View ${s.v}</span><span class="lv e">Edit ${s.e}</span><span class="lv d">Delete & manage ${s.d}</span>${(()=>{ const n=roleSecs(r).filter(k=>Object.values(PAGE_SECTIONS).flat().some(x=>x[0]===k&&!/^·/.test(x[1]))).length; return n?`<span class="lv s">${n} section${n===1?'':'s'} hidden</span>`:'<span class="lv s">All sections shown</span>'; })()}</div>
    ${sa?`<footer><button type="button" class="btn btn-primary btn-sm" data-role-ppl="${r.id}">👥 Assign people</button><button type="button" class="btn btn-secondary btn-sm" data-role-edit="${r.id}">Edit rights</button><button type="button" class="btn btn-secondary btn-sm" data-role-dup="${r.id}">Duplicate</button><button type="button" class="btn btn-link-danger btn-sm" data-role-del="${r.id}">Delete</button></footer>`:`<footer><button type="button" class="btn btn-secondary btn-sm" data-role-edit="${r.id}">View rights</button></footer>`}</article>`; }).join('');
  const admins=(usersCache||[]).filter(u=>u.role==='admin');
  const adminCard=`<article class="role-card role-builtin"><header><div><h4>Admin <span class="role-bi">Built in</span></h4><p>Every page and every right, approves remarks, manages users (not passwords).</p></div><span class="role-ppl" title="${escapeHtml(admins.map(u=>u.name).join(', '))}">${admins.length} ${admins.length===1?'person':'people'}</span></header><div class="role-levels"><span class="lv v">View all</span><span class="lv e">Edit all</span><span class="lv d">Delete & manage all</span></div><footer><span class="hint">Can’t be changed — pick it in the Role list on People.</span></footer></article>`;
@@ -11989,7 +11993,7 @@ function wireRolesPanel(host, rerender){
 }
 function openRoleEditor(role, done){
  const sa=Server.isSuperAdmin(), isNew=!role, d=rolesData();
- let P=JSON.parse(JSON.stringify((role&&role.perms)||permsFromRights({modules:['performance','recruiters','branches'],hidden_sections:[]})));
+ let P=JSON.parse(JSON.stringify(rolePermsV2((role&&role.perms)||permsFromRights({modules:['performance','recruiters','branches'],hidden_sections:[]}))));
  let S=new Set(roleSecs(role));
  const assigned=role?(usersCache||[]).filter(u=>u.role==='user'&&d.assign[String(u.id)]===role.id):[];
  const views=Object.keys(DEFAULT_VIEW_LABELS).filter(v=>VIEW_MODULE[v]);
@@ -11999,8 +12003,12 @@ function openRoleEditor(role, done){
  // sections inside the page: indented by the dots in their labels; a hidden parent hides its children
  const secRow=r=>{ const L=r.sec&&PAGE_SECTIONS[r.sec]; if(!L) return ''; const items=L.filter(([k])=>k!=='copy.tables'); if(!items.length) return '';
   return `<tr class="rm-secrow" data-sec-of="${r.k}"><td colspan="4"><details><summary>Sections on the ${escapeHtml(r.label)} page <span class="rm-seccount" data-secn="${r.k}"></span>${sa?`<button type="button" class="link-btn" data-secall="${r.k}">Show all</button><button type="button" class="link-btn" data-secnone="${r.k}">Hide all</button>`:''}</summary>
-   <div class="rm-secs">${(()=>{ const groups=[]; items.forEach(([k,l])=>{ const lv=(/^(·+)/.exec(l)||['',''])[1].length; if(!lv||!groups.length) groups.push([]); groups[groups.length-1].push([k,l,lv]); });
-     return groups.map(g=>`<div class="rm-secgrp${g.length>1?' big':''}">${g.map(([k,l,lv])=>`<label class="rm-sec lv${lv}"><input type="checkbox" data-rsec="${escapeHtml(k)}" data-lv="${lv}" ${sa?'':'disabled'}> ${escapeHtml(l.replace(/^·+ /,''))}</label>`).join('')}</div>`).join(''); })()}</div></details></td></tr>`; };
+   <div class="rm-secs">${items.filter(([,l])=>!/^·/.test(l)).map(([k,l])=>`<label class="rm-sec"><input type="checkbox" data-rsec="${escapeHtml(k)}" data-lv="0" ${sa?'':'disabled'}> ${escapeHtml(secName(l))}</label>`).join('')}</div></details></td></tr>`; };
+ // a section's own items (card lines, click-through details) follow it — only the section names are listed
+ const secName=l=>l.replace(/^·+ /,'').replace(/\s*\(all\)$/,'');
+ const kidsOf=k=>{ for(const L of Object.values(PAGE_SECTIONS)){ const i=L.findIndex(x=>x[0]===k); if(i<0) continue; const out=[]; for(let j=i+1;j<L.length&&/^·/.test(L[j][1]);j++) out.push(L[j][0]); return out; } return []; };
+ const topOnly=set=>{ const K=new Set(Object.values(PAGE_SECTIONS).flat().filter(x=>!/^·/.test(x[1])).map(x=>x[0])); return new Set([...set].filter(k=>K.has(k))); };
+ S=topOnly(S);
  const startOpts=`<option value="">Start from…</option><optgroup label="Suggested">${UF_PRESETS.map((p,i)=>`<option value="p${i}">${escapeHtml(p.name)}</option>`).join('')}</optgroup>${d.roles.filter(r=>!role||r.id!==role.id).length?`<optgroup label="Other roles">${d.roles.filter(r=>!role||r.id!==role.id).map(r=>`<option value="r${r.id}">${escapeHtml(r.name)}</option>`).join('')}</optgroup>`:''}${(usersCache||[]).filter(u=>u.role==='user').length?`<optgroup label="Copy a person’s current rights">${(usersCache||[]).filter(u=>u.role==='user').map(u=>`<option value="u${u.id}">${escapeHtml(u.name)}</option>`).join('')}</optgroup>`:''}`;
  wrap.innerHTML=`<div class="modal role-modal" role="dialog" aria-modal="true" aria-labelledby="rmTitle"><div class="modal-header"><h3 id="rmTitle">${isNew?'New role':sa?'Edit role':'Role rights'}</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div>
   <div class="modal-body">
@@ -12022,27 +12030,29 @@ function openRoleEditor(role, done){
    boxes.forEach(b=>{ const lv=+b.dataset.lv; while(stack.length&&stack[stack.length-1].lv>=lv) stack.pop(); const parentOff=stack.some(x=>!x.on);
     b.checked=!S.has(b.dataset.rsec); b.disabled=!sa||parentOff; b.closest('label').classList.toggle('off',parentOff||!b.checked); stack.push({lv,on:b.checked&&!parentOff}); });
    const n=tr.querySelector('[data-secn]'); if(n){ const on=boxes.filter(b=>b.checked&&!b.disabled).length; n.textContent=on===boxes.length?'· all shown':`· ${on} of ${boxes.length} shown`; } }); };
- wrap.addEventListener('change',e=>{ const b=e.target.closest('[data-rsec]'); if(!b) return; if(b.checked) S.delete(b.dataset.rsec); else S.add(b.dataset.rsec); sync(); });
+ wrap.addEventListener('change',e=>{ const b=e.target.closest('[data-rsec]'); if(!b) return; if(b.checked) S.delete(b.dataset.rsec); else S.add(b.dataset.rsec); kidsOf(b.dataset.rsec).forEach(k=>S.delete(k)); sync(); });
  wrap.querySelectorAll('[data-secall],[data-secnone]').forEach(btn=>btn.onclick=e=>{ e.preventDefault(); const k=btn.dataset.secall||btn.dataset.secnone, tr=wrap.querySelector(`.rm-secrow[data-sec-of="${k}"]`); tr.querySelector('details').open=true;
   tr.querySelectorAll('[data-rsec]').forEach(b=>{ if(btn.dataset.secall) S.delete(b.dataset.rsec); else S.add(b.dataset.rsec); }); sync(); });
  wrap.querySelectorAll('[data-rk]').forEach(i=>i.addEventListener('change',()=>{ const k=i.dataset.rk, c=i.dataset.rc, row=ROLE_ROWS.find(r=>r.k===k), o=P[k]||(P[k]={});
   o[c]=i.checked;
   if(row.req&&c!=='v'&&i.checked) o.v=true;                       // edit / delete need the page itself
   if(row.req&&c==='v'&&!i.checked){ o.e=false; o.d=false; }
+  if(row.needs&&i.checked) (P[row.needs]=P[row.needs]||{}).v=true;
+  if(c==='v'&&!i.checked) ROLE_ROWS.filter(r=>r.needs===k).forEach(r=>{ (P[r.k]=P[r.k]||{}).v=false; });
   sync(); }));
  wrap.querySelectorAll('[data-rm-col]').forEach(b=>b.onclick=()=>{ const c=b.dataset.rmCol, rows=ROLE_ROWS.filter(r=>r[c]), all=rows.every(r=>(P[r.k]||{})[c]);
   rows.forEach(r=>{ const o=P[r.k]||(P[r.k]={}); o[c]=!all; if(r.req&&c!=='v'&&!all) o.v=true; if(r.req&&c==='v'&&all){ o.e=false; o.d=false; } }); sync(); });
  wrap.querySelector('#rmStart')?.addEventListener('change',e=>{ const v=e.target.value; if(!v) return; let src=null;
   if(v[0]==='p'){ const pr=UF_PRESETS[+v.slice(1)]; src=permsFromRights({modules:pr.modules,hidden_sections:pr.grants||[]}); const n=wrap.querySelector('#rmName'); if(n&&!n.value) n.value=pr.name; }
-  else if(v[0]==='r'){ const r=d.roles.find(x=>x.id===v.slice(1)); src=r&&r.perms; if(r) S=new Set(roleSecs(r)); }
-  else if(v[0]==='u'){ const u=(usersCache||[]).find(x=>String(x.id)===v.slice(1)); src=u&&permsFromRights(u); if(u) S=new Set(secsFromRights(u)); }
+  else if(v[0]==='r'){ const r=d.roles.find(x=>x.id===v.slice(1)); src=r&&r.perms; if(r) S=topOnly(new Set(roleSecs(r))); }
+  else if(v[0]==='u'){ const u=(usersCache||[]).find(x=>String(x.id)===v.slice(1)); src=u&&permsFromRights(u); if(u) S=topOnly(new Set(secsFromRights(u))); }
   if(src){ P=JSON.parse(JSON.stringify(src)); sync(); } e.target.value=''; });
  sync();
  wrap.querySelector('#rmSave')?.addEventListener('click',async()=>{
   const name=wrap.querySelector('#rmName').value.trim(), msg=t=>{ wrap.querySelector('#rmMsg').textContent=t; };
   if(!name) return msg('Give the role a name.');
   const x=rolesData(); if(x.roles.some(r=>r.name.toLowerCase()===name.toLowerCase()&&(!role||r.id!==role.id))) return msg('There is already a role with that name.');
-  const rec={id:role?role.id:roleId(), name, desc:wrap.querySelector('#rmDesc').value.trim(), perms:P, secs:[...S], defaultView:wrap.querySelector('#rmHome').value||''};
+  const rec={id:role?role.id:roleId(), name, desc:wrap.querySelector('#rmDesc').value.trim(), perms:P, secs:[...new Set([...S].flatMap(k=>[k,...kidsOf(k)]))], defaultView:wrap.querySelector('#rmHome').value||''};
   x.roles=role?x.roles.map(r=>r.id===role.id?rec:r):[...x.roles, rec];
   const btn=wrap.querySelector('#rmSave'); btn.disabled=true;
   if(!await rolesSave(x)){ btn.disabled=false; return msg('The role could not be saved.'); }
@@ -12159,6 +12169,9 @@ function drawUserForm(){
     ['perf','team'].forEach(pf=>Object.entries(LINE_PARENT).forEach(([l,c])=>{ const cb=host.querySelector('[data-sec="'+pf+'.kpi.'+l+'"]'), par=host.querySelector('[data-sec="'+pf+'.kpi.'+c+'"]'); if(cb&&par){ cb.disabled=!par.checked; if(!par.checked) cb.checked=false; } }));
     Object.entries(KPI_PARENT).forEach(([k,parents])=>{ const cb=host.querySelector('[data-sec="perf.detail.'+k+'"]'); if(!cb) return; const off=parents.some(p=>{ const x=host.querySelector('[data-sec="perf.kpi.'+p+'"]'); return x&&!x.checked; }); cb.disabled=off; if(off) cb.checked=false; });
   };
+  host.querySelectorAll('.sec-list').forEach(list=>{ const opts=[...list.querySelectorAll('.sec-opt')];
+    opts.forEach((o,i)=>{ if(o.classList.contains('sub')) return; const cb=o.querySelector('[data-sec]'); if(!cb) return;
+      cb.addEventListener('change',()=>{ for(let j=i+1;j<opts.length&&opts[j].classList.contains('sub');j++){ const c=opts[j].querySelector('[data-sec]'); if(c){ c.checked=cb.checked; } } }); }); });
   host.querySelectorAll('[data-sec]').forEach(cb=>cb.addEventListener('change', ()=>{ syncDetail(); secCount(); })); syncDetail(); secCount();
   if(preset && preset.defaultView){ const dv=host.querySelector('#ufDefaultView'); if(dv) dv.value=preset.defaultView; }
   userFormPreset=null;
@@ -13327,7 +13340,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.95.0';   // shown only in the browser tab title
+const APP_VERSION = '4.95.2';   // shown only in the browser tab title
 // Everyone gets the latest look: the page checks the published file for a newer version — right after it opens
 // (switches straight over) and every few minutes / when the tab comes back (offers an Update button).
 const AppUpdate=(()=>{
@@ -15480,7 +15493,9 @@ const OverviewX=(()=>{
  function dateCtl(){ const r=range(), t=ltToday();
    return `<div class="ovx-date" role="group" aria-label="Dates for every section"><button type="button" class="ovx-dstep" data-ovd="-1" aria-label="Earlier" title="Earlier">‹</button><button type="button" class="ovx-dbtn" id="ovxDateBtn" title="One date range for Recruiting, Onboarding and Order Entry"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span><small>Dates</small><b>${escapeHtml(dateRangeLabel(r.from,r.to))}</b></span></button><button type="button" class="ovx-dstep" data-ovd="1" aria-label="Later" title="Later" ${r.to>=t?'disabled':''}>›</button></div>`; }
  const dayLabel=s=>parse(s).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'});
- const modes=()=>[['recruiting','Recruiting'], ...(canOnb()?[['onboarding','Onboarding']]:[]), ...(canOe()?[['orderentry','Order Entry']]:[])];
+ // tabs only for people who can open the Overview page; without it the Onboarding / Order Entry reports stay on their own pages
+ const canOv=()=>!!Server.user&&(Server.isAdmin()||Server.can('performance'));
+ const modes=()=>canOv()?[['recruiting','Recruiting'], ...(canOnb()?[['onboarding','Onboarding']]:[]), ...(canOe()?[['orderentry','Order Entry']]:[])]:[];
  // who sees the extra tabs: admins; users given the Overview right for that tab (Settings → Users → Overview);
  // onboarders with the onboarding report right; order entry team members
  const hasG=g=>!!(Server.user&&(Server.user.hidden_sections||[]).includes(g));
