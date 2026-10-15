@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.85.3</title>
+<title>Performance Dashboard · v4.85.4</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -12655,7 +12655,7 @@ function renderLeadsView(){
  host.querySelectorAll('[data-ldf]').forEach(b=>b.onclick=()=>{ const k=b.dataset.ldf; host.querySelectorAll('[data-ldf]').forEach(x=>x.classList.toggle('on',x===b)); host.querySelectorAll('#ldBrkTable tbody tr').forEach(tr=>tr.hidden=k!=='all'&&tr.dataset.st!==k); });
  host.querySelector('#ldBrkAll')?.addEventListener('click',()=>{ ltLeadsBreak.__open=!ltLeadsBreak.__open; host.querySelectorAll('details.ld-brk').forEach(d=>d.open=ltLeadsBreak.__open); host.querySelector('#ldBrkAll').textContent=ltLeadsBreak.__open?'Collapse all':'Expand all'; });
  host.querySelectorAll('[data-lt-lead]').forEach(b=>b.onclick=()=>{
-  Object.assign(ltState,{owner:String(Server.user.id),viewingId:b.dataset.ltLead,assignment:null,loaded:false,loading:false,error:'',division:leadsState.division,rangeMode:leadsState.mode,anchor:leadsState.anchor,from:leadsState.from,to:leadsState.to});ltState.requestSeq++;
+  Object.assign(ltState,{owner:String(Server.user.id),viewingId:b.dataset.ltLead,assignment:null,loaded:false,loading:false,error:'',division:leadsState.division,rangeMode:null,anchor:null,from:null,to:null});ltState.requestSeq++;   // a team always opens on its whole current week
   currentView='teams'; document.querySelectorAll('#navList button').forEach(x=>x.classList.toggle('active',x.dataset.view==='teams')); refreshUI(); window.scrollTo(0,0);
  });
  }
@@ -12793,7 +12793,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.85.3';   // shown only in the browser tab title
+const APP_VERSION = '4.85.4';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
