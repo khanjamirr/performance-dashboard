@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.88.1</title>
+<title>Performance Dashboard · v4.89.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2550,30 +2550,46 @@ html body .toast,html body #toast{border-radius:14px!important;background:rgba(3
 </style>
 <style>.uw-auto{margin:6px 0 2px;padding:10px 12px;border-radius:12px;background:rgba(0,122,255,.08);color:#0a3d91;font-size:13px;line-height:1.45}</style>
 <style>
-/* dark menu (computer screens), iOS dark style */
+/* navy menu (computer screens) with a red selection bar */
 @media (min-width:801px){
- html body .sidebar{background:#1c1c1e!important;border-right:.5px solid rgba(255,255,255,.08)!important;color:#f2f2f7!important}
+ html body .sidebar{background:#0d1b36!important;border-right:1px solid rgba(255,255,255,.06)!important;color:#e2e8f0!important}
+ html body .sidebar .brand{border-bottom-color:rgba(255,255,255,.08)!important}
  html body .sidebar .brand h1,html body .sidebar #dashboardTitle{color:#fff!important}
- html body .sidebar .side-collapse{color:#8e8e93!important}html body .sidebar .side-collapse:hover{background:rgba(255,255,255,.08)!important;color:#fff!important}
- html body .sidebar .side-label,html body .nav .nav-group-label{color:#8e8e93!important}
- html body .nav button,html body .nav .nav-parent{color:#e5e5ea!important}
- html body .nav .nav-ico,html body .nav .nav-parent .nav-ico{color:#aeaeb2!important}
- html body .nav button:hover:not(.active),html body .nav .nav-parent:hover:not(.has-active){background:rgba(255,255,255,.07)!important;color:#fff!important}
- html body .nav button.active,html body .nav .nav-parent.has-active{background:rgba(255,255,255,.13)!important;color:#fff!important;box-shadow:inset 0 0 0 .5px rgba(255,255,255,.12)!important}
- html body .nav button.active .nav-ico,html body .nav .nav-parent.has-active .nav-ico{color:#0a84ff!important}
- html body.side-collapsed .nav .nav-group-label{background:rgba(255,255,255,.12)!important}
- html body .sidebar .refresh-stamp,html body .sidebar .ribbon-actions{border-top-color:rgba(255,255,255,.1)!important}
- html body .sidebar .refresh-stamp{color:#8e8e93!important}html body .sidebar .refresh-stamp b,html body .sidebar .refresh-stamp em{color:#8e8e93!important}html body .sidebar .refresh-stamp time{color:#f2f2f7!important}
- html body .sidebar .ribbon-btn,html body .sidebar #downloadDropdownBtn,html body .sidebar #clearAllFiltersBtn,html body .sidebar #accessModeBtn{background:#2c2c2e!important;color:#f2f2f7!important;border:0!important;box-shadow:none!important}
- html body .sidebar .ribbon-btn:hover,html body .sidebar #downloadDropdownBtn:hover,html body .sidebar #clearAllFiltersBtn:hover,html body .sidebar #accessModeBtn:hover{background:#3a3a3c!important}
- html body .sidebar .ribbon-btn .rb-ico{color:#0a84ff!important}
+ html body .sidebar .brand-mark{background:#e5263c!important;color:#fff!important;box-shadow:0 4px 12px rgba(229,38,60,.35)!important}
+ html body .sidebar .side-collapse{color:#8a9bbb!important}html body .sidebar .side-collapse:hover{background:rgba(255,255,255,.07)!important;color:#fff!important}
+ html body .sidebar .side-label,html body .nav .nav-group-label{color:#7f91b3!important}
+ html body .nav button,html body .nav .nav-parent{color:#c9d3e3!important;position:relative}
+ html body .nav .nav-ico,html body .nav .nav-parent .nav-ico{color:#8a9bbb!important}
+ html body .nav button:hover:not(.active),html body .nav .nav-parent:hover:not(.has-active){background:rgba(255,255,255,.06)!important;color:#fff!important}
+ html body .nav button.active,html body .nav .nav-parent.has-active{background:#1e3560!important;color:#fff!important;font-weight:700!important;box-shadow:inset 3px 0 0 #e5263c!important}
+ html body .nav button.active .nav-ico,html body .nav .nav-parent.has-active .nav-ico{color:#fff!important}
+ html body .nav .dot{background:#e5263c!important}
+ html body.side-collapsed .nav .nav-group-label{background:rgba(255,255,255,.1)!important}
+ html body .sidebar .refresh-stamp,html body .sidebar .ribbon-actions{border-top-color:rgba(255,255,255,.08)!important}
+ html body .sidebar .refresh-stamp{color:#7f91b3!important}html body .sidebar .refresh-stamp b,html body .sidebar .refresh-stamp em{color:#7f91b3!important}html body .sidebar .refresh-stamp time{color:#e2e8f0!important}
+ html body .sidebar .ribbon-btn,html body .sidebar #downloadDropdownBtn,html body .sidebar #clearAllFiltersBtn,html body .sidebar #accessModeBtn{background:#172a4d!important;color:#e2e8f0!important;border:0!important;box-shadow:none!important}
+ html body .sidebar .ribbon-btn:hover,html body .sidebar #downloadDropdownBtn:hover,html body .sidebar #clearAllFiltersBtn:hover,html body .sidebar #accessModeBtn:hover{background:#21396a!important}
+ html body .sidebar .ribbon-btn .rb-ico{color:#ff5c6f!important}
  html body .sidebar #userChip,html body .sidebar #userChip .user-name b,html body .sidebar #userChip b{color:#fff!important;background:transparent!important}
- html body .sidebar #userChip:hover{background:rgba(255,255,255,.07)!important}
- html body .sidebar #userChip small{color:#8e8e93!important}
- html body .sidebar #accountMenu{border-top-color:rgba(255,255,255,.1)!important}
- html body .sidebar #accountMenu .ribbon-btn{background:transparent!important;color:#e5e5ea!important}
- html body .sidebar #accountMenu .ribbon-btn:hover{background:rgba(255,255,255,.07)!important}
+ html body .sidebar #userChip:hover{background:rgba(255,255,255,.06)!important}
+ html body .sidebar #userChip small{color:#7f91b3!important}
+ html body .sidebar #accountMenu{border-top-color:rgba(255,255,255,.08)!important}
+ html body .sidebar #accountMenu .ribbon-btn{background:transparent!important;color:#c9d3e3!important}
+ html body .sidebar #accountMenu .ribbon-btn:hover{background:rgba(255,255,255,.06)!important}
 }
+/* order entry: absent / holiday */
+.oe-st{display:inline-flex;padding:2px;border-radius:9px;background:rgba(118,118,128,.12);gap:0;white-space:nowrap}
+.oe-st button{border:0;background:transparent;font:inherit;font-size:12px;font-weight:600;color:#3a3a3c;padding:4px 9px;border-radius:7px;cursor:pointer}
+.oe-st button.on{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.14);color:#1c1c1e}
+.oe-st button.on.absent{color:#c2410c}.oe-st button.on.holiday{color:#7c3aed}
+.oe-st button:disabled{cursor:default;opacity:.6}
+.oe-offrow td{background:rgba(118,118,128,.05)}.oe-offrow input{opacity:.35}
+.oe-offtag{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11px;font-weight:700;background:#fff1e6;color:#c2410c}
+.oe-offtag.holiday{background:#f1e9ff;color:#6d28d9}
+.oe-teamhol{margin-left:10px;font-size:12.5px;white-space:nowrap}
+.oe-holnote{margin:0 0 10px;padding:9px 12px;border-radius:12px;background:#f1e9ff;color:#4c1d95;font-size:13px}
+.oe-holrow td{background:#faf7ff}
+.oe-daypick{flex-wrap:wrap}
 </style>
 </head>
 <body class="locked">
@@ -9959,11 +9975,16 @@ async function ingestFiles(entries, {interactive=true, week=null}={}){
         const det1 = autoDetectMapping(sh.headers, FILE1_COLUMN_SPECS), det2 = autoDetectMapping(sh.headers, FILE2_COLUMN_SPECS);
         const ok1 = !det1.missingRequired.length, ok2 = !det2.missingRequired.length;
         if(!ok1 && !ok2) continue; // e.g. the CRM's hidden helper sheet
-        // The sheet name wins (e.g. one workbook with "Created On" and "Date Of" tabs), then the file name.
-        const hintOf = t=>{ const l=String(t||'').toLowerCase(); const c=/created[\s_-]*on/.test(l), d=/date[\s_-]*of/.test(l); return c&&!d ? 'schedules' : d&&!c ? 'shows' : null; };
-        const hinted = hintOf(sh.name) || hintOf(entry.name);
+        // The FILE NAME decides first ("…Created On…" → schedules by Created On, "…Date Of…" → interviews by Date Of),
+        // then the sheet name (one workbook with "Created On" and "Date Of" tabs), then the columns.
+        const hintOf = t=>{ const l=String(t||'').toLowerCase(); const c=/created[\s_.-]*on/.test(l), d=/date[\s_.-]*of/.test(l); return c&&!d ? 'schedules' : d&&!c ? 'shows' : null; };
+        const multiTab = sheets.filter(x=>!x.goal).length>1;
+        const hinted = (multiTab && hintOf(sh.name)) || hintOf(entry.name) || hintOf(sh.name);
+        const hasCol = k=>{ const m=autoDetectMapping(sh.headers, ALL_SPECS).mapping; return !!m[k]; };
         let source = null;
-        if(hinted==='schedules' && ok1) source='schedules'; else if(hinted==='shows' && ok2) source='shows';
+        if(hinted==='schedules' && (ok1 || hasCol('createdOn'))) source='schedules';
+        else if(hinted==='shows' && (ok2 || hasCol('dateOf'))) source='shows';
+        else if(hinted){ lastFolderScanLog.push({name:entry.name+(sheets.length>1?' / '+sh.name:''), status:'unclassified', detail:'skipped — the name says '+(hinted==='schedules'?'Created On':'Date Of')+' but the sheet has no “'+(hinted==='schedules'?'Created On':'Date Of')+'” column'}); continue; }
         else if(ok1 && !ok2) source='schedules'; else if(ok2 && !ok1) source='shows';
         else if(interactive) source = await chooseSourceDialog(entry.name+(sheets.length>1?' → sheet “'+sh.name+'”':''));
         if(!source){ lastFolderScanLog.push({name:entry.name+(sheets.length>1?' / '+sh.name:''), status:'unclassified', detail:'skipped — could not tell whether it is a Created On or Date Of export (name the sheet or file "Created On" or "Date Of")'}); continue; }
@@ -12931,7 +12952,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.88.1';   // shown only in the browser tab title
+const APP_VERSION = '4.89.0';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -14458,7 +14479,7 @@ const OrderEntry=(()=>{
  const linked=uid=>{ const a=lists().agents.find(x=>x.userId&&String(x.userId)===String(uid)); return a?a.label:null; };
  const me=()=>Server.user&&linked(Server.user.id);
  // ---- state + data ----
- const st={rows:null, lf:null, lt:null, demo:false, err:'', page:'', day:today(), draft:null, from:null, to:null, group:'day', custom:false, agent:'', view:'total', busy:false, refreshing:false, loadedAt:null};
+ const st={rows:null, off:new Map(), offLocal:false, lf:null, lt:null, demo:false, err:'', page:'', day:today(), draft:null, from:null, to:null, group:'day', custom:false, agent:'', view:'total', busy:false, refreshing:false, loadedAt:null};
  const num=v=>v===''||v==null||isNaN(Number(v))?null:Math.max(0,Math.round(Number(v)));
  const tot=r=>(r.rc||0)+(r.crm||0);
  const missing=e=>/Could not find|schema cache|does not exist|PGRST202/i.test(String(e&&e.message||e));
@@ -14473,7 +14494,25 @@ const OrderEntry=(()=>{
   try{ st.rows=(await Server.rpc('dash_oe_list',{p_from:a, p_to:b}))||[]; st.demo=false; }
   catch(e){ if(missing(e)||!Server.token){ st.demo=true; st.rows=demoAll().filter(r=>r.day>=a&&r.day<=b); } else { st.rows=st.rows||[]; st.err=cleanErr(e); } }
   st.rows=st.rows.map(r=>({...r, day:String(r.day).slice(0,10), agent:canon(r.agent), rc:num(r.rc), crm:num(r.crm)}));
+  // absent / holiday marks (agent '*' = whole team)
+  let offs=null; st.offLocal=false;
+  if(!st.demo){ try{ offs=(await Server.rpc('dash_oe_off_list',{p_from:a, p_to:b}))||[]; }catch(e){ if(!missing(e)) console.warn('oe off',e); } }
+  if(offs==null){ st.offLocal=true; offs=offAll().filter(r=>r.day>=a&&r.day<=b); }
+  st.off=new Map(); offs.forEach(r=>{ const ag=r.agent==='*'?'*':canon(r.agent); st.off.set(String(r.day).slice(0,10)+'|'+ag,{kind:r.kind, by:r.updated_by||'', at:r.updated_at||''}); });
   st.lf=a; st.lt=b; st.loadedAt=new Date();
+ }
+ const OFF_KEY='ipd_oe_off';
+ const offAll=()=>{ try{ return JSON.parse(localStorage.getItem(OFF_KEY)||'[]'); }catch(e){ return []; } };
+ // the agent's mark for a day: their own, else the team holiday
+ const offOf=(day,agent)=>{ const o=st.off.get(day+'|'+agent)||st.off.get(day+'|*'); return o?o.kind:''; };
+ const teamOff=day=>!!st.off.get(day+'|*');
+ const OFFL={absent:'Absent', holiday:'Holiday'};
+ async function saveOff(rows){
+  if(!rows.length) return;
+  if(!st.demo&&!st.offLocal){ try{ await Server.rpc('dash_oe_off_save',{p_rows:rows}); return; } catch(e){ if(!missing(e)) throw e; st.offLocal=true; } }
+  const all=offAll().filter(r=>!rows.some(x=>x.day===r.day&&x.agent===r.agent)), now=new Date().toISOString();
+  rows.forEach(x=>{ if(x.kind) all.push({day:x.day, agent:x.agent, kind:x.kind, updated_by:Server.user&&Server.user.name, updated_at:now}); });
+  try{ localStorage.setItem(OFF_KEY, JSON.stringify(all)); }catch(e){}
  }
  // the data covers both the report range and the last two weeks before the entry day
  async function ensure(force){
@@ -14492,7 +14531,7 @@ const OrderEntry=(()=>{
  function periods(rows){
   const G=GROUPS[st.group], m=new Map(), blank=k=>({k, rc:0, crm:0, total:0, agents:new Set(), days:new Set(), n:0});
   // every period in the range is listed (daily: Monday–Friday plus any day with entries) so gaps show
-  if(st.group==='day'){ for(let d=st.from; d<=st.to; d=add(d,1)){ const w=parse(d).getDay(); if(w&&w<6) m.set(d,blank(d)); } }
+  if(st.group==='day'){ for(let d=st.from; d<=st.to; d=add(d,1)){ const w=parse(d).getDay(); if(w&&w<6&&!teamOff(d)) m.set(d,blank(d)); } }
   else for(let k=G.key(st.from); k<=st.to; k=G.key(add(G.end(k),1))) m.set(k,blank(k));
   rows.forEach(r=>{ const k=G.key(r.day); const p=m.get(k)||(m.set(k,blank(k)), m.get(k)); p.rc+=r.rc||0; p.crm+=r.crm||0; p.total+=tot(r); p.agents.add(r.agent); p.days.add(r.day); p.n++; });
   const out=[...m.values()].sort((a,b)=>a.k.localeCompare(b.k));
@@ -14530,32 +14569,36 @@ const OrderEntry=(()=>{
   if(st.draft&&st.draft.day===day) return st.draft;
   const saved=dayRows(day), vals={};
   saved.forEach((r,a)=>{ vals[a]={rc:r.rc==null?'':String(r.rc), crm:r.crm==null?'':String(r.crm), note:r.note||''}; });
-  return st.draft={day, vals, saved};
+  const offSaved={}; st.off.forEach((o,k)=>{ const [dd,ag]=[k.slice(0,10),k.slice(11)]; if(dd===day&&ag!=='*'){ offSaved[ag]=o.kind; (vals[ag]=vals[ag]||{rc:'',crm:'',note:''}).off=o.kind; } });
+  const team=teamOff(day);
+  return st.draft={day, vals, saved, offSaved, team, teamSaved:team};
  }
- const dirtyList=d=>{ const names=new Set([...Object.keys(d.vals), ...d.saved.keys()]); return [...names].filter(a=>{ const v=d.vals[a]||{rc:'',crm:'',note:''}, s=d.saved.get(a);
-   return num(v.rc)!==(s?s.rc:null)||num(v.crm)!==(s?s.crm:null)||String(v.note||'').trim()!==String((s&&s.note)||'').trim(); }); };
+ const dirtyList=d=>{ const names=new Set([...Object.keys(d.vals), ...d.saved.keys()]); const l=[...names].filter(a=>{ const v=d.vals[a]||{rc:'',crm:'',note:''}, s=d.saved.get(a);
+   return num(v.rc)!==(s?s.rc:null)||num(v.crm)!==(s?s.crm:null)||String(v.note||'').trim()!==String((s&&s.note)||'').trim()||(v.off||'')!==((d.offSaved||{})[a]||''); }); if(!!d.team!==!!d.teamSaved) l.push('*'); return l; };
  function entryHtml(){
   const d=draftFor(st.day), mine=me();
   const names=[...new Set([...roster(), ...d.saved.keys()])].sort((a,b)=>(b===mine)-(a===mine)||a.localeCompare(b));
-  const rows=names.map(a=>{ const v=d.vals[a]||{rc:'',crm:'',note:''}, s=d.saved.get(a), t=(num(v.rc)||0)+(num(v.crm)||0), off=!roster().includes(a);
-   return `<tr class="${a===mine?'oe-me':''}" data-agent="${escapeHtml(a)}"><td>${escapeHtml(a)}${a===mine?' <span class="oe-you">You</span>':''}${off?' <span class="oe-off" title="Not on the agent list any more">removed</span>':''}</td>
-    <td class="num"><input type="number" class="oe-in" data-k="rc" min="0" max="100000" step="1" inputmode="numeric" value="${escapeHtml(v.rc)}" aria-label="${escapeHtml(a)} — Recruitment Cloud"></td>
-    <td class="num"><input type="number" class="oe-in" data-k="crm" min="0" max="100000" step="1" inputmode="numeric" value="${escapeHtml(v.crm)}" aria-label="${escapeHtml(a)} — CRM"></td>
-    <td class="num"><strong data-tot>${v.rc===''&&v.crm===''?'–':fmtNum(t)}</strong></td>
+  const rows=names.map(a=>{ const v=d.vals[a]||{rc:'',crm:'',note:''}, s=d.saved.get(a), t=(num(v.rc)||0)+(num(v.crm)||0), off=!roster().includes(a), ok=d.team?'holiday':(v.off||''), dis=ok?'disabled':'';
+   return `<tr class="${a===mine?'oe-me':''} ${ok?'oe-offrow':''}" data-agent="${escapeHtml(a)}"><td>${escapeHtml(a)}${a===mine?' <span class="oe-you">You</span>':''}${off?' <span class="oe-off" title="Not on the agent list any more">removed</span>':''}</td>
+    <td><div class="oe-st" role="radiogroup" aria-label="${escapeHtml(a)} — status">${[['','Working'],['absent','Absent'],['holiday','Holiday']].map(([k,l])=>`<button type="button" data-oe-off="${k}" class="${ok===k?'on':''} ${k}" aria-pressed="${ok===k}" ${d.team?'disabled':''}>${l}</button>`).join('')}</div></td>
+    <td class="num"><input type="number" class="oe-in" data-k="rc" min="0" max="100000" step="1" inputmode="numeric" value="${escapeHtml(v.rc)}" ${dis} aria-label="${escapeHtml(a)} — Recruitment Cloud"></td>
+    <td class="num"><input type="number" class="oe-in" data-k="crm" min="0" max="100000" step="1" inputmode="numeric" value="${escapeHtml(v.crm)}" ${dis} aria-label="${escapeHtml(a)} — CRM"></td>
+    <td class="num"><strong data-tot>${ok?`<span class="oe-offtag ${ok}">${OFFL[ok]}</span>`:v.rc===''&&v.crm===''?'–':fmtNum(t)}</strong></td>
     <td><input class="oe-note" data-k="note" maxlength="500" value="${escapeHtml(v.note||'')}" placeholder="Optional" aria-label="${escapeHtml(a)} — note"></td>
     <td class="oe-by">${s&&s.updated_by?escapeHtml(s.updated_by)+(s.updated_at?' · '+new Date(s.updated_at).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):''):'<span class="hint">Not entered</span>'}</td></tr>`; }).join('');
   const recent=[]; for(let i=0;i<14;i++){ const dd=add(st.day,-i); const w=parse(dd).getDay(); const m=dayRows(dd); if((!w||w===6)&&!m.size) continue; recent.push([dd,m]); }
-  return `<section class="panel oe-entry"><div class="panel-head"><div><h3>Daily entry</h3><span class="hint">Type how many orders each agent entered today in Recruitment Cloud and in CRM — the total adds itself up. Clear both boxes to remove an agent’s day.</span></div>
-    <div class="oe-daypick"><button type="button" class="btn btn-secondary btn-sm" data-oe-step="-1" aria-label="Previous day">◀</button><input type="date" id="oeDay" value="${st.day}" max="${today()}" aria-label="Entry date"><button type="button" class="btn btn-secondary btn-sm" data-oe-step="1" ${st.day>=today()?'disabled':''} aria-label="Next day">▶</button>${st.day!==today()?'<button type="button" class="link-btn" data-oe-today>Today</button>':''}</div></div>
-   ${names.length?`<div class="onb-scroll"><table class="users-table onb-table oe-table" id="oeEntry"><thead><tr><th>Agent</th><th class="num">Recruitment Cloud</th><th class="num">CRM</th><th class="num">Total</th><th>Note</th><th>Last saved</th></tr></thead><tbody>${rows}</tbody>
-    <tfoot><tr class="onb-total"><td><strong>All agents</strong></td><td class="num" data-sum="rc"></td><td class="num" data-sum="crm"></td><td class="num" data-sum="t"></td><td colspan="2" class="hint" data-sum="n"></td></tr></tfoot></table></div>
+  return `<section class="panel oe-entry"><div class="panel-head"><div><h3>Daily entry</h3><span class="hint">Type how many orders each agent entered today in Recruitment Cloud and in CRM — the total adds itself up. Mark an agent Absent or on Holiday when they didn’t work, so they aren’t counted as missing.</span></div>
+    <div class="oe-daypick"><button type="button" class="btn btn-secondary btn-sm" data-oe-step="-1" aria-label="Previous day">◀</button><input type="date" id="oeDay" value="${st.day}" max="${today()}" aria-label="Entry date"><button type="button" class="btn btn-secondary btn-sm" data-oe-step="1" ${st.day>=today()?'disabled':''} aria-label="Next day">▶</button>${st.day!==today()?'<button type="button" class="link-btn" data-oe-today>Today</button>':''}<label class="rtl-chk oe-teamhol" title="Nobody works this day — no one is counted as missing"><button type="button" class="switch" role="switch" id="oeTeamHol" aria-checked="${!!d.team}"><i></i></button>Holiday for everyone</label></div></div>
+   ${d.team?`<p class="oe-holnote">🏖 <b>${escapeHtml(dayName(st.day))}</b> is marked as a holiday for the whole team. Turn it off to enter numbers.</p>`:''}
+   ${names.length?`<div class="onb-scroll"><table class="users-table onb-table oe-table" id="oeEntry"><thead><tr><th>Agent</th><th>Status</th><th class="num">Recruitment Cloud</th><th class="num">CRM</th><th class="num">Total</th><th>Note</th><th>Last saved</th></tr></thead><tbody>${rows}</tbody>
+    <tfoot><tr class="onb-total"><td><strong>All agents</strong></td><td></td><td class="num" data-sum="rc"></td><td class="num" data-sum="crm"></td><td class="num" data-sum="t"></td><td colspan="2" class="hint" data-sum="n"></td></tr></tfoot></table></div>
     <div class="onb-form-foot oe-foot"><span class="oe-dirty" id="oeDirty"></span><span class="onb-err" id="oeErr" role="alert"></span><button type="button" class="btn btn-secondary" id="oeUndo">Undo changes</button><button type="button" class="btn btn-primary" id="oeSave" ${st.busy?'disabled':''}>Save ${escapeHtml(dayName(st.day))}</button></div>`
     :`<p class="hint">No order entry agents yet. ${canAgents()?'Add them with <b>⚙ Manage agents</b> above.':'Ask an admin to add the agent names.'}</p>`}
   </section>
   <section class="panel"><div class="panel-head"><div><h3>Last two weeks</h3><span class="hint">What has been saved for the days before ${escapeHtml(short(st.day))}. Click a day to open it.</span></div>${copyBtnHtml('oeRecent')}</div>
-   <div class="onb-scroll"><table class="users-table onb-table" id="oeRecent"><thead><tr><th>Day</th><th class="num">Recruitment Cloud</th><th class="num">CRM</th><th class="num">Total</th><th class="num">Agents entered</th><th>Not entered yet</th></tr></thead><tbody>
-   ${recent.map(([dd,m])=>{ const v=[...m.values()], rc=v.reduce((a,r)=>a+(r.rc||0),0), crm=v.reduce((a,r)=>a+(r.crm||0),0), miss=roster().filter(a=>!m.has(a));
-     return `<tr class="${dd===st.day?'oe-cur':''}"><td><button type="button" class="link-btn" data-oe-go="${dd}">${escapeHtml(dayName(dd))}</button></td><td class="num">${m.size?fmtNum(rc):'–'}</td><td class="num">${m.size?fmtNum(crm):'–'}</td><td class="num"><strong>${m.size?fmtNum(rc+crm):'–'}</strong></td><td class="num">${m.size} of ${roster().length}</td><td class="oe-miss">${miss.length?escapeHtml(miss.join(', ')):'<span class="hint">Everyone</span>'}</td></tr>`; }).join('')||'<tr><td colspan="6" class="hint">Nothing saved yet.</td></tr>'}
+   <div class="onb-scroll"><table class="users-table onb-table" id="oeRecent"><thead><tr><th>Day</th><th class="num">Recruitment Cloud</th><th class="num">CRM</th><th class="num">Total</th><th class="num">Agents entered</th><th>Not entered yet</th><th>Absent / holiday</th></tr></thead><tbody>
+   ${recent.map(([dd,m])=>{ const v=[...m.values()], rc=v.reduce((a,r)=>a+(r.rc||0),0), crm=v.reduce((a,r)=>a+(r.crm||0),0), offs=roster().filter(a=>!m.has(a)&&offOf(dd,a)), miss=roster().filter(a=>!m.has(a)&&!offOf(dd,a)), exp=roster().length-offs.length;
+     return `<tr class="${dd===st.day?'oe-cur':''} ${teamOff(dd)?'oe-holrow':''}"><td><button type="button" class="link-btn" data-oe-go="${dd}">${escapeHtml(dayName(dd))}</button></td><td class="num">${m.size?fmtNum(rc):'–'}</td><td class="num">${m.size?fmtNum(crm):'–'}</td><td class="num"><strong>${m.size?fmtNum(rc+crm):'–'}</strong></td><td class="num">${teamOff(dd)&&!m.size?'–':m.size+' of '+exp}</td><td class="oe-miss">${miss.length?escapeHtml(miss.join(', ')):'<span class="hint">'+(teamOff(dd)?'–':'Everyone')+'</span>'}</td><td>${teamOff(dd)?'<span class="oe-offtag holiday">Holiday — whole team</span>':offs.length?offs.map(a=>`${escapeHtml(a)} <span class="oe-offtag ${offOf(dd,a)}">${OFFL[offOf(dd,a)]}</span>`).join(', '):'<span class="hint">–</span>'}</td></tr>`; }).join('')||'<tr><td colspan="7" class="hint">Nothing saved yet.</td></tr>'}
    </tbody></table></div></section>`;
  }
  // the same number of days just before the picked dates — used for "vs before" on the summary
@@ -14597,7 +14640,10 @@ const OrderEntry=(()=>{
    if(best&&cnt>1) notes.push(`Best ${per}: <b>${escapeHtml(G.name(best.k))}</b> with ${fmtNum(best.total)} orders.`);
    // missing entries in the last two weeks (weekdays before today)
    const yday=add(today(),-1), lo=[st.from, add(today(),-14)].sort().pop(), hi=[st.to, yday].sort()[0], who=st.agent?[st.agent]:roster(), miss=new Map();
-   if(lo<=hi&&who.length){ const have=new Set((st.rows||[]).map(r=>r.day+'|'+r.agent)); for(let d=lo; d<=hi; d=add(d,1)){ if(!isWd(d)) continue; who.forEach(a=>{ if(!have.has(d+'|'+a)) miss.set(a,(miss.get(a)||0)+1); }); } }
+   if(lo<=hi&&who.length){ const have=new Set((st.rows||[]).map(r=>r.day+'|'+r.agent)); for(let d=lo; d<=hi; d=add(d,1)){ if(!isWd(d)) continue; who.forEach(a=>{ if(!have.has(d+'|'+a)&&!offOf(d,a)) miss.set(a,(miss.get(a)||0)+1); }); } }
+   { const ab=new Map(); let hol=0; st.off.forEach((o,k)=>{ const dd=k.slice(0,10), ag=k.slice(11); if(dd<st.from||dd>st.to||!isWd(dd)) return; if(ag==='*'){ hol++; return; } if(st.agent&&ag!==st.agent) return; ab.set(ag,(ab.get(ag)||0)+1); });
+     const tot=[...ab.values()].reduce((a,b)=>a+b,0);
+     if(hol||tot) notes.push(`<span class="oe-offtag holiday">Off</span> ${hol?`${hol} team holiday${hol===1?'':'s'}${tot?'; ':''}`:''}${tot?`${fmtNum(tot)} absent / holiday day${tot===1?'':'s'}: ${[...ab.entries()].sort((a,b)=>b[1]-a[1]).slice(0,4).map(([a,n])=>`${escapeHtml(a)} (${n})`).join(', ')}${ab.size>4?' and '+(ab.size-4)+' more':''}`:''} — not counted as missing.`); }
    if(miss.size){ const tot=[...miss.values()].reduce((a,b)=>a+b,0); notes.push(`<span class="mr-warn">${fmtNum(tot)} missing ${tot===1?'entry':'entries'}</span> in the last two weeks: ${[...miss.entries()].sort((a,b)=>b[1]-a[1]).slice(0,4).map(([a,n])=>`${escapeHtml(a)} (${n} day${n===1?'':'s'})`).join(', ')}${miss.size>4?' and '+(miss.size-4)+' more':''}.`); }
   }
   const hero=`<section class="mr-hero">
@@ -14661,9 +14707,9 @@ const OrderEntry=(()=>{
  // ---- events ----
  function sums(host){
   const d=st.draft; if(!d) return; let rc=0, crm=0, n=0;
-  Object.values(d.vals).forEach(v=>{ if(v.rc!==''||v.crm!==''){ n++; rc+=num(v.rc)||0; crm+=num(v.crm)||0; } });
+  let off=0; Object.entries(d.vals).forEach(([a,v])=>{ if(v.off&&roster().includes(a)) off++; if(v.rc!==''||v.crm!==''){ n++; rc+=num(v.rc)||0; crm+=num(v.crm)||0; } }); if(d.team) off=roster().length;
   const set=(k,t)=>{ const el=host.querySelector(`[data-sum="${k}"]`); if(el) el.innerHTML=t; };
-  set('rc',fmtNum(rc)); set('crm',fmtNum(crm)); set('t','<strong>'+fmtNum(rc+crm)+'</strong>'); set('n',`${n} of ${roster().length} agents entered`);
+  set('rc',fmtNum(rc)); set('crm',fmtNum(crm)); set('t','<strong>'+fmtNum(rc+crm)+'</strong>'); set('n',d.team?'Holiday for everyone':`${n} of ${roster().length-off} agents entered${off?` · ${off} absent / holiday`:''}`);
   const dl=dirtyList(d), el=host.querySelector('#oeDirty'); if(el) el.textContent=dl.length?`${dl.length} unsaved change${dl.length===1?'':'s'}`:'All saved';
   el&&el.classList.toggle('on',!!dl.length);
  }
@@ -14683,6 +14729,10 @@ const OrderEntry=(()=>{
    // Enter moves down the column, like a spreadsheet
    tr.querySelectorAll('.oe-in').forEach(inp=>inp.addEventListener('keydown',e=>{ if(e.key!=='Enter') return; e.preventDefault(); const k=inp.dataset.k, nx=tr.nextElementSibling&&tr.nextElementSibling.querySelector(`[data-k="${k}"]`); if(nx){ nx.focus(); nx.select(); } else $('#oeSave')?.focus(); }));
   });
+  host.querySelectorAll('#oeEntry tbody tr [data-oe-off]').forEach(b=>b.onclick=()=>{ const tr=b.closest('tr'), a=tr.dataset.agent, v=st.draft.vals[a]||(st.draft.vals[a]={rc:'',crm:'',note:''}), k=b.dataset.oeOff;
+   if(k&&(v.rc!==''||v.crm!=='')&&!confirm(a+' has numbers for this day. Mark '+OFFL[k]+' and clear them?')) return;
+   v.off=k; if(k){ v.rc=''; v.crm=''; } render(); });
+  $('#oeTeamHol')?.addEventListener('click',()=>{ const d=st.draft; if(!d.team){ const has=Object.values(d.vals).some(v=>v.rc!==''||v.crm!==''); if(has&&!confirm('Some agents have numbers for '+dayName(d.day)+'. Mark it as a holiday for everyone anyway? Their numbers are kept.')) return; } d.team=!d.team; render(); });
   if($('#oeEntry')) sums(host);
   $('#oeDay')?.addEventListener('change',e=>goDay(e.target.value));
   host.querySelectorAll('[data-oe-step]').forEach(b=>b.onclick=()=>goDay(add(st.day,+b.dataset.oeStep)));
@@ -14694,9 +14744,11 @@ const OrderEntry=(()=>{
    if(!dl.length) return showToast('Nothing to save — no changes.');
    const bad=dl.find(a=>{ const v=d.vals[a]||{}; return ['rc','crm'].some(k=>v[k]!==''&&v[k]!=null&&(!/^\d+$/.test(String(v[k]).trim())||Number(v[k])>100000)); });
    if(bad) return err('“'+bad+'”: counts must be whole numbers from 0 to 100,000.');
-   const rows=dl.map(a=>{ const v=d.vals[a]||{rc:'',crm:'',note:''}; return {agent:a, rc:num(v.rc), crm:num(v.crm), note:String(v.note||'').trim()}; });
+   const ag=dl.filter(a=>a!=='*'), rows=ag.filter(a=>{ const v=d.vals[a]||{}, s=d.saved.get(a); return num(v.rc)!==(s?s.rc:null)||num(v.crm)!==(s?s.crm:null)||String(v.note||'').trim()!==String((s&&s.note)||'').trim(); }).map(a=>{ const v=d.vals[a]||{rc:'',crm:'',note:''}; return {agent:a, rc:num(v.rc), crm:num(v.crm), note:String(v.note||'').trim()}; });
+   const offRows=ag.filter(a=>((d.vals[a]||{}).off||'')!==((d.offSaved||{})[a]||'')).map(a=>({day:d.day, agent:a, kind:(d.vals[a]||{}).off||''}));
+   if(dl.includes('*')) offRows.push({day:d.day, agent:'*', kind:d.team?'holiday':''});
    st.busy=true; $('#oeSave').disabled=true;
-   try{ await saveDay(d.day, rows); showToast(`Saved ${rows.length} agent${rows.length===1?'':'s'} for ${dayName(d.day)}.`); st.draft=null; await ensure(true); }
+   try{ if(rows.length) await saveDay(d.day, rows); await saveOff(offRows); showToast(`Saved ${dl.length} change${dl.length===1?'':'s'} for ${dayName(d.day)}.`); st.draft=null; await ensure(true); }
    catch(e){ st.busy=false; $('#oeSave').disabled=false; return err('Not saved: '+cleanErr(e)); }
    st.busy=false; render();
   });
@@ -14738,7 +14790,7 @@ const OrderEntry=(()=>{
   if((m=/^(\d{1,2})[\s-]+([a-z]{3,9})\.?,?[\s-]+(\d{2,4})$/.exec(w))&&MONTHS[m[2].slice(0,3)]) return ymd(m[3],MONTHS[m[2].slice(0,3)],m[1]);
   return null;
  }
- // AB / absent / leave / off / PTO / holiday / N/A = the agent wasn't working that day → not imported, not an error
+ // AB / absent / leave / off / PTO / holiday = the agent wasn't working that day → saved as an Absent / Holiday mark (N/A, x = ignored)
  const ABSENT=/^(ab|a|abs|absent|leave|onleave|off|dayoff|pto|holiday|hol|sick|na|n\/a|wo|weekoff|x)$/i;
  const cnt=v=>{ if(v==null) return {v:null}; const s=String(v).trim().replace(/,/g,''); if(s===''||s==='-'||s==='–') return {v:null}; if(ABSENT.test(s.replace(/[\s.]/g,''))) return {v:null, absent:true}; if(!/^\d+(\.0+)?$/.test(s)) return {bad:true}; const n=Number(s); return n>100000?{bad:true}:{v:n}; };
  const isDateH=h=>/^(date|day|entrydate|workdate|orderdate|dt)$/.test(h)||h.endsWith('date');
@@ -14774,7 +14826,7 @@ const OrderEntry=(()=>{
    const x={line, rawDay:day, rawAgent:agentRaw, note:String(note==null?'':note).trim().slice(0,500)}, iss=[];
    x.day=toDay(day); if(!x.day) iss.push('date not recognised'); else if(x.day>today()) iss.push('date is in the future');
    const a=resolveAgent(agentRaw); x.agent=a.name; x.unknown=a.unknown; x.guessed=a.guessed; if(!a.name) iss.push('no agent name');
-   const R=cnt(rc), C=cnt(crm); if(R.bad) iss.push('RC is not a whole number'); if(C.bad) iss.push('CRM is not a whole number');
+   const R=cnt(rc), C=cnt(crm); x.offKind=[rc,crm].map(v=>String(v==null?'':v).trim().toLowerCase().replace(/[\s.]/g,'')).some(v=>/^(holiday|hol)$/.test(v))?'holiday':'absent'; if([rc,crm].every(v=>v==null||/^(na|n\/a|x|-|–|)$/i.test(String(v).trim()))) x.offKind=''; if(R.bad) iss.push('RC is not a whole number'); if(C.bad) iss.push('CRM is not a whole number');
    x.rc=R.v; x.crm=C.v; if(!R.bad&&!C.bad&&x.rc==null&&x.crm==null){ if(R.absent||C.absent) x.absent=true; else iss.push('no RC or CRM count'); }
    if(tot!=null&&!iss.length){ const T=cnt(tot); if(T.v!=null&&T.v!==(x.rc||0)+(x.crm||0)) x.totWarn=`Total column says ${fmtNum(T.v)}, RC + CRM = ${fmtNum((x.rc||0)+(x.crm||0))}`; }
    x.issues=iss; out.push(x); };
@@ -14783,7 +14835,7 @@ const OrderEntry=(()=>{
   const wide=H.map((h,j)=>({j, w:j===cD?null:wideHead(h)})).filter(x=>x.w);
   if(wide.length){ const agentsW=[...new Set(wide.map(x=>x.w.agent))];
    body.forEach((r,i)=>agentsW.forEach(a=>{ const rcC=wide.find(x=>x.w.agent===a&&x.w.src==='rc'), crC=wide.find(x=>x.w.agent===a&&x.w.src==='crm');
-     const rc=rcC?r[rcC.j]:null, crm=crC?r[crC.j]:null; if(cnt(rc).v==null&&cnt(crm).v==null&&!cnt(rc).bad&&!cnt(crm).bad) return; push(hi+i+2, r[cD], a, rc, crm, null, ''); }));
+     const rc=rcC?r[rcC.j]:null, crm=crC?r[crC.j]:null; if(cnt(rc).v==null&&cnt(crm).v==null&&!cnt(rc).bad&&!cnt(crm).bad&&!cnt(rc).absent&&!cnt(crm).absent) return; push(hi+i+2, r[cD], a, rc, crm, null, ''); }));
    return {rows:out, layout:`One row per day, ${agentsW.length} agent${agentsW.length===1?'':'s'} across the columns`}; }
   return {error:'Found a Date column but no Agent / Recruitment Cloud / CRM columns. Use Date, Agent, Recruitment Cloud, CRM — or columns like “Priya RC” and “Priya CRM”.'};
  }
@@ -14818,14 +14870,14 @@ const OrderEntry=(()=>{
    const n=s=>k.filter(x=>x.state===s&&!skipNew.includes(x)).length;
    st.bulkGo=go;
    const shown=[...bad, ...k, ...abs].slice(0,300);
-   const stTag=x=>x.absent?'<span class="oe-tag skip">absent — not imported</span>':x.issues.length?`<span class="oe-tag bad">${escapeHtml(x.issues.join(', '))}</span>`:skipNew.includes(x)?'<span class="oe-tag skip">skipped — agent not on the list</span>':x.state==='new'?'<span class="oe-tag new">new</span>':x.state==='same'?'<span class="oe-tag same">already saved</span>':b.mode==='replace'?`<span class="oe-tag chg">replaces RC ${x.old.rc??'–'} · CRM ${x.old.crm??'–'}</span>`:'<span class="oe-tag skip">kept existing</span>';
+   const stTag=x=>x.absent?(x.offKind&&!x.issues.length?`<span class="oe-tag new">saved as ${OFFL[x.offKind]}</span>`:'<span class="oe-tag skip">absent — not imported</span>'):x.issues.length?`<span class="oe-tag bad">${escapeHtml(x.issues.join(', '))}</span>`:skipNew.includes(x)?'<span class="oe-tag skip">skipped — agent not on the list</span>':x.state==='new'?'<span class="oe-tag new">new</span>':x.state==='same'?'<span class="oe-tag same">already saved</span>':b.mode==='replace'?`<span class="oe-tag chg">replaces RC ${x.old.rc??'–'} · CRM ${x.old.crm??'–'}</span>`:'<span class="oe-tag skip">kept existing</span>';
    preview=`<div class="oe-bulk-sum">
      <div><b>${fmtNum(R.rows.length)}</b><span>rows read</span></div>
      <div class="new"><b>${fmtNum(n('new'))}</b><span>new</span></div>
      <div class="chg"><b>${fmtNum(n('change'))}</b><span>different from saved</span></div>
      <div><b>${fmtNum(n('same'))}</b><span>already saved</span></div>
      <div class="${bad.length?'bad':''}"><b>${fmtNum(bad.length)}</b><span>with problems (skipped)</span></div>
-     ${abs.length?`<div><b>${fmtNum(abs.length)}</b><span>absent (AB) — not imported</span></div>`:''}
+     ${abs.length?`<div><b>${fmtNum(abs.length)}</b><span>absent / holiday — saved as marks</span></div>`:''}
      ${dup.length?`<div class="warn"><b>${fmtNum(dup.length)}</b><span>repeated — last one used</span></div>`:''}
     </div>
     <p class="hint">${escapeHtml(R.layout)} · ${R.from?`${escapeHtml(dayName(R.from))} → ${escapeHtml(dayName(R.to))}`:'no valid dates'} · ${new Set(k.map(x=>x.agent)).size} agents · RC ${fmtNum(k.reduce((a,x)=>a+(x.rc||0),0))} · CRM ${fmtNum(k.reduce((a,x)=>a+(x.crm||0),0))}</p>
@@ -14868,13 +14920,14 @@ const OrderEntry=(()=>{
   }catch(e){ st.bulk={...(st.bulk||{mode:'replace', addAgents:true}), res:{error:'Could not read '+file.name+': '+cleanErr(e)}, fileName:file.name}; render(); }
  }
  async function importBulk(){
-  const b=st.bulk, go=(st.bulkGo||[]).slice(); if(!go.length) return;
+  const b=st.bulk, go=(st.bulkGo||[]).slice(); if(!go.length&&!((b.res&&b.res.rows)||[]).some(x=>x.absent&&x.offKind&&!x.issues.length)) return;
   const err=t=>{ const el=document.getElementById('oeBErr'); if(el) el.textContent=t; };
   st.busy=true; render();
   try{
    if(b.addAgents&&b.res.newAgents.length){ const L=lists().agents.slice(); b.res.newAgents.forEach(n=>{ if(!L.some(x=>x.label.toLowerCase()===n.toLowerCase())) L.push({label:n}); });
     const ok=await storageSet('oeLists',{agents:L}); if(ok===null) throw new Error('the agent list could not be saved'); KV.set('oeLists',{agents:L}); }
    const rows=go.map(x=>({day:x.day, agent:x.agent, rc:x.rc, crm:x.crm, note:x.note||''}));
+   const offRows=(b.res.rows||[]).filter(x=>x.absent&&x.offKind&&!x.issues.length&&x.agent&&(!x.unknown||b.addAgents)).map(x=>({day:x.day, agent:x.agent, kind:x.offKind}));
    let saved=0, skipped=0;
    if(!st.demo){
     try{ for(let i=0;i<rows.length;i+=1000){ const r=await Server.rpc('dash_oe_bulk',{p_rows:rows.slice(i,i+1000), p_mode:b.mode})||{}; saved+=r.saved||0; skipped+=r.skipped||0; } }
@@ -14887,11 +14940,12 @@ const OrderEntry=(()=>{
    if(st.demo){ const all=demoAll(), now=new Date().toISOString(), idx=new Map(all.map((r,i)=>[r.day+'|'+r.agent,i]));
     rows.forEach(r=>{ const k=r.day+'|'+r.agent, i=idx.get(k); if(i!=null&&b.mode==='skip'){ skipped++; return; } const v={day:r.day, agent:r.agent, rc:r.rc, crm:r.crm, note:r.note||(i!=null?all[i].note:''), updated_by:(Server.user&&Server.user.name||'')+' (bulk upload)', updated_at:now}; if(i!=null) all[i]=v; else { idx.set(k,all.length); all.push(v); } saved++; });
     demoPut(all); }
-   const from=b.res.from, to=b.res.to;
+   if(offRows.length){ try{ await saveOff(offRows); }catch(e){ showToast('Absent / holiday marks not saved: '+cleanErr(e)); } }
+   const offDays=offRows.map(x=>x.day).sort(), from=b.res.from||offDays[0]||today(), to=b.res.to||offDays[offDays.length-1]||today();
    st.busy=false; st.bulk=null; st.bulkGo=null;
    st.from=from; st.to=to; st.custom=true; st.group=(Date.parse(to)-Date.parse(from))/864e5>120?'month':(Date.parse(to)-Date.parse(from))/864e5>45?'week':'day'; st.agent='';
    await ensure(true); st.page='report';
-   showToast(`Imported ${fmtNum(saved)} row${saved===1?'':'s'}${skipped?` (${fmtNum(skipped)} kept as saved)`:''} — showing ${dayName(from)} to ${dayName(to)}.`);
+   showToast(`Imported ${fmtNum(saved)} row${saved===1?'':'s'}${offRows.length?` and ${fmtNum(offRows.length)} absent / holiday mark${offRows.length===1?'':'s'}`:''}${skipped?` (${fmtNum(skipped)} kept as saved)`:''} — showing ${dayName(from)} to ${dayName(to)}.`);
    render();
   }catch(e){ st.busy=false; render(); err('Not imported: '+cleanErr(e)); }
  }
