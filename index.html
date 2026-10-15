@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.86.2</title>
+<title>Performance Dashboard · v4.86.3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2499,6 +2499,12 @@ html body .toast,html body #toast{border-radius:14px!important;background:rgba(3
 }
 </style>
 <style>.rtl-seg{display:inline-flex;margin-left:14px}.rtl-seg2{display:inline-flex}.rtl-seg2 button{padding:6px 14px!important;font-size:13px!important}.rtl-seg2 button:disabled{opacity:.4}.rtl-seg button{padding:6px 16px!important;font-size:13px!important;white-space:nowrap}</style>
+<style>
+/* Recruiters: the Recruiter Detail header (Table | Day / week) stays frozen while scrolling */
+.panel-head:has(#rtlToggle){position:sticky;top:var(--stick-top,0px);z-index:40;background:#fff;margin-left:-24px;margin-right:-24px;padding-left:24px;padding-right:24px;border-radius:18px 18px 0 0}
+.panel-head:has(#rtlToggle).is-stuck{box-shadow:0 8px 14px -12px rgba(0,0,0,.25)}
+.panel:has(#rtlToggle){overflow:visible!important}
+</style>
 </head>
 <body class="locked">
 <div id="appLoading" class="app-loading"><div class="spinner" aria-hidden="true"></div><p>Loading dashboard…</p></div>
@@ -5558,13 +5564,15 @@ let weeklyRenderRevision=0;
 /* ---- Overview tabs stay frozen under the page heading while scrolling ---- */
 function ovxStickyUpdate(){
   const bar=document.getElementById('ovModeBar'), tb=document.querySelector('.topbar'); if(!bar) return;
-  if(bar.classList.contains('hidden')||!bar.offsetParent){ if(tb) tb.style.removeProperty('top'); document.querySelectorAll('.lt-sticky').forEach(el=>el.style.removeProperty('top')); return; }
+  if(bar.classList.contains('hidden')||!bar.offsetParent){ if(tb) tb.style.removeProperty('top'); document.querySelectorAll('.lt-sticky').forEach(el=>el.style.removeProperty('top')); document.body.style.setProperty('--stick-top', Math.round(tb&&tb.offsetParent&&getComputedStyle(tb).position==='sticky'?tb.getBoundingClientRect().bottom:0)+'px'); return; }
   const side=document.querySelector('.sidebar'), sideCs=side&&getComputedStyle(side);
   // on a phone the menu bar sits across the top; on a computer the menu is on the left
   const top=side&&['sticky','fixed'].includes(sideCs.position)&&side.getBoundingClientRect().width>=innerWidth-2?Math.max(0,Math.round(side.getBoundingClientRect().bottom)):0;
   bar.style.setProperty('--ovx-top',top+'px');
   if(tb){ if(getComputedStyle(tb).position==='sticky') tb.style.setProperty('top',(top+bar.offsetHeight)+'px','important'); else tb.style.removeProperty('top'); }
   document.querySelectorAll('.lt-sticky').forEach(el=>{ if(getComputedStyle(el).position==='sticky') el.style.setProperty('top',(top+bar.offsetHeight)+'px','important'); });
+  // anything frozen inside the page sits under the bar + heading
+  document.body.style.setProperty('--stick-top', Math.round(Math.max(top+bar.offsetHeight, tb&&getComputedStyle(tb).position==='sticky'&&tb.offsetParent?tb.getBoundingClientRect().bottom:0))+'px');
   const was=bar.classList.contains('stuck'), now=scrollY>4;
   if(was!==now){ bar.classList.toggle('stuck', now);
     // tabs change size when frozen — move the underline with them
@@ -12835,7 +12843,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.86.2';   // shown only in the browser tab title
+const APP_VERSION = '4.86.3';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
