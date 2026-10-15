@@ -3,20 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<title>Performance Dashboard · v4.94.0</title>
+<title>Performance Dashboard · v4.95.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- fonts load without holding up the page (the system font shows for a moment) -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap"></noscript>
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<!-- Excel and PDF tools are only needed for uploads and downloads: they load in the background and never hold up opening the page -->
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+window.__libs=(function(){
+  function add(src){ return new Promise(function(done){ var s=document.createElement('script'); s.src=src; s.async=true; s.onload=s.onerror=function(){ done(); }; document.head.appendChild(s); }); }
+  var pdf=null;
+  return { pdf:function(){ return pdf||(pdf=add('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js').then(function(){ return add('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js'); })); } };
+})();
+addEventListener('load',function(){ setTimeout(function(){ window.__libs.pdf(); },1200); });
+</script>
 <style>
   :root{
     --bg:#F3F5F8;
@@ -3198,9 +3205,9 @@ const REQUIRED_2 = ['dateOf','recruiter','branch','attendance'];
 const WEEK_ANCHOR_LABEL = 'Week Ending Date (must be a Saturday, so the week runs Sunday\u2013Saturday)';
 
 /* ============================= STORAGE ADAPTER ============================= */
-// window.storage only exists inside the Claude.ai artifact preview. When this file is
-// downloaded and opened directly in a browser, that API is unavailable, so we fall back
-// to the browser's own localStorage — this makes the downloaded file fully self-contained.
+// window.storage only exists in some embedded preview hosts. When this file is opened
+// directly in a browser that API is unavailable, so we fall back to the browser's own
+// localStorage — this keeps the file fully self-contained.
 /* ============================= INDEXEDDB (large-capacity fallback) ============================= */
 // IndexedDB draws from actual available disk space (commonly 60%+ of free disk in Chrome),
 // unlike localStorage's fixed ~5-10MB-per-origin cap — this is the real fix for "ran out of
@@ -8717,6 +8724,7 @@ function omitExportPanel(panel){
   return !!panel.closest('[data-export-exclude]') || !!panel.querySelector('.insight-list') || /intelligence|^(Recruiter|Branch) Detail$/i.test(panel.querySelector('.panel-head h3')?.textContent.trim()||'');
 }
 async function exportCurrentPageToPDF(){
+  if(!window.jspdf&&window.__libs){ showToast('Preparing the PDF…'); await window.__libs.pdf(); }
   if(!window.jspdf){ showToast('PDF library failed to load \u2014 check your connection and try again.'); return; }
   const activeContainer = getActiveExportContainer();
   if(!activeContainer){ showToast('Nothing to export on this page yet.'); return; }
@@ -9353,7 +9361,7 @@ const Server = {
     if(window.supabase && window.supabase.createClient) return true;
     return new Promise(resolve=>{
       const sc=document.createElement('script');
-      sc.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+      sc.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';
       sc.onload=()=>resolve(!!(window.supabase && window.supabase.createClient));
       sc.onerror=()=>resolve(false);
       document.head.appendChild(sc);
@@ -9837,17 +9845,18 @@ async function afterLogin(boot, lightReady){
   try{
     if(!boot){ try{ boot = await Server.rpc('dash_bootstrap'); }catch(e){ if(!/Could not find|schema cache|does not exist/i.test(e.message+' '+(e.code||''))) throw e; } }
     if(boot){
-      Server.user = boot.me; await Server.mergeGrants();
-      if(isOnboardingOnlyUser(Server.user)) lsSet('ipd_light_user','1'); else lsDel('ipd_light_user');
+      Server.user = boot.me;
       KV.clear();
       await Promise.all((boot.kv||[]).map(async r=>{ KV.set(r.key, await decodeKvValue(r.key, r.value)); }));
       Remarks.list = boot.remarks || [];
       Server.since = Number(boot.since)||0;
+      await Promise.all([Server.mergeGrants(), loadGrantedKv()]); boot.__gkv=true;   // two small calls at once instead of one after the other
+      if(isOnboardingOnlyUser(Server.user)) lsSet('ipd_light_user','1'); else lsDel('ipd_light_user');
     } else {
       await Server.loadKv(t=>setLoading(t));
       await Remarks.load().catch(()=>{});
     }
-    await loadGrantedKv();
+    if(!(boot&&boot.__gkv)) await loadGrantedKv();
     await loadDivisionNames(); await loadDedupeSetting(); await loadAllWeeks(); await loadExcludedRecruiters(); await loadExcludedBranches();
     await loadRecruiterDivisions(); await loadBranchDivisions(); await loadDedupeSetting(); await loadPerformerHighlightSetting();
     deleteSourceFilesAfterImport = lsGet('ipd_delete_sources')!=='0';
@@ -11962,9 +11971,9 @@ function rolesPanelHtml(){
  const admins=(usersCache||[]).filter(u=>u.role==='admin');
  const adminCard=`<article class="role-card role-builtin"><header><div><h4>Admin <span class="role-bi">Built in</span></h4><p>Every page and every right, approves remarks, manages users (not passwords).</p></div><span class="role-ppl" title="${escapeHtml(admins.map(u=>u.name).join(', '))}">${admins.length} ${admins.length===1?'person':'people'}</span></header><div class="role-levels"><span class="lv v">View all</span><span class="lv e">Edit all</span><span class="lv d">Delete & manage all</span></div><footer><span class="hint">Can’t be changed — pick it in the Role list on People.</span></footer></article>`;
  return `<div class="roles-head"><div><h4>Roles</h4><span class="hint">Set what each role can view, edit and delete once — then give people a role. ${sa?'Changing a role updates everyone who has it.':'Only the super admin can change roles or who has them.'}</span></div>${sa?'<button type="button" class="btn btn-primary" id="roleNew">＋ New role</button>':''}</div>
-  ${d.roles.length?`<div class="role-grid">${adminCard}${cards}</div>`:`<div class="role-empty"><strong>No roles yet.</strong><span>Start with the suggested roles — Viewer, Onboarder, Order entry, Team lead and Manager — and adjust them, or build your own.</span>${sa?'<button type="button" class="btn btn-primary" id="roleSeed">Add suggested roles</button>':''}</div>`}
+  ${d.roles.length?`<div class="role-grid">${cards}</div>`:`<div class="role-empty"><strong>No roles yet.</strong><span>Start with the suggested roles — Viewer, Onboarder, Order entry, Team lead and Manager — and adjust them, or build your own.</span>${sa?'<button type="button" class="btn btn-primary" id="roleSeed">Add suggested roles</button>':''}</div>`}
   ${custom.length&&d.roles.length?`<p class="hint role-custom">${custom.length} ${custom.length===1?'person has':'people have'} no role yet (rights set by hand): ${escapeHtml(custom.slice(0,8).map(u=>u.name).join(', '))}${custom.length>8?' and '+(custom.length-8)+' more':''}.</p>`:''}
-  <p class="hint"><b>Admin</b> is a built-in role — every page and right, approves remarks, manages users. Give it from the Role list on the People tab. The super admin always has everything.</p>`;
+  <p class="hint">To make someone an admin (every page and right), pick <b>Admin</b> in their Role list on the People tab. The super admin always has everything.</p>`;
 }
 function wireRolesPanel(host, rerender){
  const d=rolesData();
@@ -13318,7 +13327,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.94.0';   // shown only in the browser tab title
+const APP_VERSION = '4.95.0';   // shown only in the browser tab title
 // Everyone gets the latest look: the page checks the published file for a newer version — right after it opens
 // (switches straight over) and every few minutes / when the tab comes back (offers an Update button).
 const AppUpdate=(()=>{
@@ -13328,10 +13337,10 @@ const AppUpdate=(()=>{
  async function check(){
   if(busy||!/^https?:$/.test(location.protocol)) return; busy=true;
   try{
-   const u=new URL(location.href); u.hash=''; u.searchParams.set('_vc',Date.now());
-   const r=await fetch(u.toString(),{cache:'no-store', credentials:'same-origin'}); if(!r.ok) return;
+   const u=new URL(location.href); u.hash='';
+   const r=await fetch(u.toString(),{cache:'no-cache', credentials:'same-origin'}); if(!r.ok) return;
    const m=/const APP_VERSION = '([\d.]+)'/.exec(await r.text()); if(!m||!newer(m[1],APP_VERSION)) return;
-   if(Date.now()-loadedAt<20000){ go(m[1]); return; }   // just opened — nothing to lose yet
+   if(Date.now()-loadedAt<25000){ go(m[1]); return; }   // just opened — nothing to lose yet
    if(shown) return; shown=true;
    const bar=document.createElement('div'); bar.className='app-update';
    bar.innerHTML=`<span>✨ A new version of the dashboard is ready.</span><button type="button" class="btn btn-primary btn-sm">Update now</button><button type="button" class="app-update-x" aria-label="Later">✕</button>`;
@@ -13339,7 +13348,7 @@ const AppUpdate=(()=>{
    document.body.appendChild(bar);
   }catch(e){} finally{ busy=false; }
  }
- setTimeout(check,1500); setInterval(check,5*60*1000);
+ setTimeout(check,4000); setInterval(check,5*60*1000);
  document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') check(); });
  return {check};
 })();
