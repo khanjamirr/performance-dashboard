@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.87.1</title>
+<title>Performance Dashboard · v4.88.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2547,6 +2547,33 @@ html body .toast,html body #toast{border-radius:14px!important;background:rgba(3
 .al-peer i{font-style:normal;font-weight:800}.al-peer small{color:#8e8e93;font-size:10.5px}
 .al-peer.good i{color:#15803d}.al-peer.warn i{color:#b45309}.al-peer.bad i{color:#c8102e}
 .al-peer.more{color:#007aff;font-weight:600}
+</style>
+<style>.uw-auto{margin:6px 0 2px;padding:10px 12px;border-radius:12px;background:rgba(0,122,255,.08);color:#0a3d91;font-size:13px;line-height:1.45}</style>
+<style>
+/* dark menu (computer screens), iOS dark style */
+@media (min-width:801px){
+ html body .sidebar{background:#1c1c1e!important;border-right:.5px solid rgba(255,255,255,.08)!important;color:#f2f2f7!important}
+ html body .sidebar .brand h1,html body .sidebar #dashboardTitle{color:#fff!important}
+ html body .sidebar .side-collapse{color:#8e8e93!important}html body .sidebar .side-collapse:hover{background:rgba(255,255,255,.08)!important;color:#fff!important}
+ html body .sidebar .side-label,html body .nav .nav-group-label{color:#8e8e93!important}
+ html body .nav button,html body .nav .nav-parent{color:#e5e5ea!important}
+ html body .nav .nav-ico,html body .nav .nav-parent .nav-ico{color:#aeaeb2!important}
+ html body .nav button:hover:not(.active),html body .nav .nav-parent:hover:not(.has-active){background:rgba(255,255,255,.07)!important;color:#fff!important}
+ html body .nav button.active,html body .nav .nav-parent.has-active{background:rgba(255,255,255,.13)!important;color:#fff!important;box-shadow:inset 0 0 0 .5px rgba(255,255,255,.12)!important}
+ html body .nav button.active .nav-ico,html body .nav .nav-parent.has-active .nav-ico{color:#0a84ff!important}
+ html body.side-collapsed .nav .nav-group-label{background:rgba(255,255,255,.12)!important}
+ html body .sidebar .refresh-stamp,html body .sidebar .ribbon-actions{border-top-color:rgba(255,255,255,.1)!important}
+ html body .sidebar .refresh-stamp{color:#8e8e93!important}html body .sidebar .refresh-stamp b,html body .sidebar .refresh-stamp em{color:#8e8e93!important}html body .sidebar .refresh-stamp time{color:#f2f2f7!important}
+ html body .sidebar .ribbon-btn,html body .sidebar #downloadDropdownBtn,html body .sidebar #clearAllFiltersBtn,html body .sidebar #accessModeBtn{background:#2c2c2e!important;color:#f2f2f7!important;border:0!important;box-shadow:none!important}
+ html body .sidebar .ribbon-btn:hover,html body .sidebar #downloadDropdownBtn:hover,html body .sidebar #clearAllFiltersBtn:hover,html body .sidebar #accessModeBtn:hover{background:#3a3a3c!important}
+ html body .sidebar .ribbon-btn .rb-ico{color:#0a84ff!important}
+ html body .sidebar #userChip,html body .sidebar #userChip .user-name b,html body .sidebar #userChip b{color:#fff!important;background:transparent!important}
+ html body .sidebar #userChip:hover{background:rgba(255,255,255,.07)!important}
+ html body .sidebar #userChip small{color:#8e8e93!important}
+ html body .sidebar #accountMenu{border-top-color:rgba(255,255,255,.1)!important}
+ html body .sidebar #accountMenu .ribbon-btn{background:transparent!important;color:#e5e5ea!important}
+ html body .sidebar #accountMenu .ribbon-btn:hover{background:rgba(255,255,255,.07)!important}
+}
 </style>
 </head>
 <body class="locked">
@@ -9906,10 +9933,11 @@ async function ingestFiles(entries, {interactive=true, week=null}={}){
   if(!Server.can('upload')){ showToast('Your account cannot upload data.'); return; }
   if(!week){ showToast('Choose which week this data is for first.'); return; }
   // Past data (super admin): week = {from: Sunday, to: Saturday}; rows are split into their own weeks.
-  const range = (week && typeof week==='object') ? week : null;
-  if(range){ if(!canUploadRange()){ showToast('Only the super admin (or someone given “Upload past data for many weeks”) can do this.'); return; } week = range.to; }
-  const weekStart = range ? range.from : toIsoDateOnly(new Date(new Date(week+'T00:00:00').getTime()-6*86400000));
-  const weekLabel = range ? 'Past data ('+fmtDate(weekStart)+' – '+fmtDate(week)+')' : 'Week '+isoWeekNumber(new Date(week+'T00:00:00'))+' ('+fmtDate(weekStart)+' – '+fmtDate(week)+')';
+  // Past data / automatic: no dates to pick — every row goes to the week of its own date
+  let range = (week && typeof week==='object') ? week : null;
+  if(range){ if(!canUploadRange()){ showToast('Only the super admin (or someone given “Upload past data for many weeks”) can do this.'); return; } week = range.to||'9999-12-31'; }
+  const weekStart = range ? (range.from||'0000-01-01') : toIsoDateOnly(new Date(new Date(week+'T00:00:00').getTime()-6*86400000));
+  const weekLabel = range ? (range.auto?'the dates in the files':'Past data ('+fmtDate(weekStart)+' – '+fmtDate(week)+')') : 'Week '+isoWeekNumber(new Date(week+'T00:00:00'))+' ('+fmtDate(weekStart)+' – '+fmtDate(week)+')';
   const prepared = [];
   lastFolderScanLog = [];
   const imported = [], goalSheets = [];
@@ -9981,7 +10009,12 @@ async function ingestFiles(entries, {interactive=true, week=null}={}){
     }
     // Every Created On / Date Of sheet must hold ONLY the chosen week — otherwise nothing is saved
     // and the super admin is told.
-    const bad = prepared.filter(p=>p.outside>0);
+    let bad = range&&range.auto ? [] : prepared.filter(p=>p.outside>0);
+    // one week picked but the files span other weeks: offer to place every row in its own week instead
+    if(bad.length && !range && canUploadRange() && interactive){
+      const span=bad.map(p=>p.sheetLabel+': '+fmtDate(p.minD)+' – '+fmtDate(p.maxD)).join('\n');
+      if(confirm('These files have rows outside '+weekLabel+':\n\n'+span+'\n\nUpload them by their own dates instead? Each row goes to its own week — rows with the same EID and date are replaced, new ones are added, and dates not in the files are left as they are.')){ range={auto:true}; bad=[]; }
+    }
     if(bad.length){
       const lines = bad.map(p=>p.sheetLabel+' ('+(p.source==='schedules'?'Created On':'Date Of')+'): '+fmtNum(p.outside)+' of '+fmtNum(p.batch.length)+' rows are outside the week — dates run '+fmtDate(p.minD)+' to '+fmtDate(p.maxD));
       const summary = 'Upload for '+weekLabel+' rejected — '+lines.join('; ');
@@ -10001,14 +10034,18 @@ async function ingestFiles(entries, {interactive=true, week=null}={}){
       if(!range){ jobs.push({p, rows:p.batch, from:weekStart, to:week, label:weekLabel}); continue; }
       const byWeek = new Map();
       p.batch.forEach(r=>{ const d=String(p.source==='schedules'?r.created_on:r.date_of).slice(0,10); const we=weekOfDate(d).weekEnd; (byWeek.get(we)||byWeek.set(we,[]).get(we)).push(r); });
-      [...byWeek.keys()].sort().forEach(we=>{ const wo=weekOfDate(we); jobs.push({p, rows:byWeek.get(we), from:wo.weekStart, to:we, label:'Week '+wo.number+' ('+fmtDate(wo.weekStart)+' – '+fmtDate(we)+')'}); });
+      [...byWeek.keys()].sort().forEach(we=>{ const wo=weekOfDate(we), rs=byWeek.get(we);
+        // only the days the file covers are replaced (a file that starts or ends mid-week leaves the other days alone)
+        // (the file's own first and last date bound what it covers; a day inside that span with no rows is a real zero)
+        const from=range.auto&&p.minD>wo.weekStart?p.minD:wo.weekStart, to=range.auto&&p.maxD<we?p.maxD:we;
+        jobs.push({p, rows:rs, from, to, we, label:'Week '+wo.number+' ('+fmtDate(from)+' – '+fmtDate(to)+')'}); });
     }
     if(range){
-      const wk=[...new Set(jobs.map(j=>j.to))].sort(), has=wk.filter(w=>KV.has('weekly:'+w)).length;
+      const wk=[...new Set(jobs.map(j=>j.we||j.to))].sort(), has=wk.filter(w=>KV.has('weekly:'+w)).length;
       const files=prepared.map(p=>'• '+p.sheetLabel+' — '+(p.source==='schedules'?'Created On':'Date Of')+', '+fmtNum(p.batch.length)+' rows').join('\n');
       setLoading(null);
       if(!wk.length){ showToast('No dated rows found in these files.'); return; }
-      if(!confirm('Upload past data: '+wk.length+' week'+(wk.length===1?'':'s')+' found ('+fmtDate(wk[0])+' – '+fmtDate(wk[wk.length-1])+').\n\n'+files+'\n\n'+(has?has+' of these weeks already have data and will be REPLACED.':'None of these weeks have data yet.')+'\n\nContinue?')) { showToast('Past data upload cancelled — nothing was saved.'); return; }
+      if(!confirm('Upload by the dates in the files: '+wk.length+' week'+(wk.length===1?'':'s')+' found ('+fmtDate(weekOfDate(wk[0]).weekStart)+' – '+fmtDate(wk[wk.length-1])+').\n\n'+files+'\n\n'+(has?has+' of these weeks already have data — for the dates in the files, rows with the same EID and date are replaced and new ones are added. Other dates stay as they are.':'None of these weeks have data yet — everything is added.')+'\n\nContinue?')) { showToast('Upload cancelled — nothing was saved.'); return; }
       try{ const removedList=await Server.rpc('dash_removed_weeks'); const rem=(removedList||[]).map(r=>r.week).filter(w=>wk.includes(w));
         if(rem.length && confirm(rem.length+' of these weeks were removed earlier, so their rows would be skipped. Restore them so this upload is saved?')) for(const w of rem) await Server.rpc('dash_restore_week',{p_week:w}); }catch(e){}
     }
@@ -10026,7 +10063,7 @@ async function ingestFiles(entries, {interactive=true, week=null}={}){
       const savedRows = counts.reduce((a,c)=>a+(Number(c)||0),0);
       const blocked = Math.max(0, batch.length - savedRows); totalBlocked += blocked;
       const fin = await Server.rpc('dash_import_finish', {p_import_id:importId, p_source:source, p_from:from, p_to:to, p_rows_read:range?batch.length:p.rowsRead, p_removed_columns:removed});
-      ((fin&&fin.weeks)||[]).forEach(w=>allWeeks.add(w)); allWeeks.add(to);
+      ((fin&&fin.weeks)||[]).forEach(w=>allWeeks.add(w)); allWeeks.add(job.we||to);
       uploadStamps[source]={at:new Date().toISOString(), by:Server.user.name};
       totalRows += batch.length - blocked; totalSkipped += skipped;
       if(!imported.some(x=>x.entry===entry)) imported.push({entry, source, rows:batch.length, removed}); else imported.find(x=>x.entry===entry).rows += batch.length;
@@ -10216,20 +10253,19 @@ function chooseUploadWeekDialog(presetWeekEnd, onChoose){
   wrap.innerHTML = `<div class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="uwTitle">
     <div class="modal-header"><h3 id="uwTitle">Which week are you uploading?</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div>
     <div class="modal-body">
-      ${canUploadRange()?`<div class="uw-mode" role="tablist"><button type="button" data-uwm="week" class="on">One week</button><button type="button" data-uwm="range">Past data<span class="uw-sa">Super admin</span></button></div>`:''}
+      ${canUploadRange()?`<div class="uw-mode" role="tablist"><button type="button" data-uwm="week" class="on">One week</button><button type="button" data-uwm="range">Past data · auto<span class="uw-sa">Super admin</span></button></div>`:''}
       <div id="uwOne"><label class="uw-label" for="uwDate">Week ending (Saturday)</label>
       <select id="uwDate">${sats.map(d=>{ const w=weekOfDate(d); return `<option value="${d}" ${d===initial?'selected':''}>Sat ${fmtDate(d)} · Week ${w.number}${d===thisSat?' (this week)':''}</option>`; }).join('')}</select></div>
-      ${canUploadRange()?`<div id="uwMany" class="hidden"><div class="uw-range"><label><span class="uw-label">From</span><input type="date" id="uwFrom"></label><label><span class="uw-label">To</span><input type="date" id="uwTo"></label></div>
-       <div class="uw-quick"><button type="button" data-uwq="ly">Last year (${new Date().getFullYear()-1})</button><button type="button" data-uwq="ytd">This year to date</button><button type="button" data-uwq="12m">Last 12 months</button><button type="button" data-uwq="2y">Last 2 years</button></div></div>`:''}
+      ${canUploadRange()?`<div id="uwMany" class="hidden"><p class="uw-auto">No dates to pick — the dashboard reads the dates in the files and puts every row in its own week.</p></div>`:''}
       <div class="uw-week" id="uwWeek" aria-live="polite"></div>
       <ul class="uw-rules" id="uwRulesOne">
         <li>The data already saved for this week is <strong>replaced</strong> by the new files (Created On and Date Of separately).</li>
-        <li>Every row must fall inside this week — Created On dates for the Created On export, Date Of dates for the Date Of export. A file with rows from any other week is rejected and the super admin is notified.</li>
+        <li>Every row should fall inside this week — Created On dates for the Created On export, Date Of dates for the Date Of export.${canUploadRange()?' If the files cover other weeks you’re offered to upload them by their own dates instead.':' A file with rows from any other week is rejected and the super admin is notified.'}</li>
       </ul>
       <ul class="uw-rules hidden" id="uwRulesMany">
-        <li>Upload one Created On export and one Date Of export covering the whole period — rows are <strong>split into their weeks automatically</strong>.</li>
-        <li>Each week found in the files is <strong>replaced</strong>; weeks with no rows in the files are left as they are.</li>
-        <li>Rows dated outside the chosen period stop the upload — nothing is saved.</li>
+        <li>Upload Created On and / or Date Of exports for any period — rows are <strong>placed in their weeks automatically</strong> by their own dates.</li>
+        <li>For the dates in the files, rows with the <strong>same EID and date are replaced</strong> and new rows are <strong>added</strong>.</li>
+        <li>Dates that are not in the files are left exactly as they are.</li>
       </ul>
     </div>
     <div class="modal-footer"><button class="btn btn-secondary" data-close>Cancel</button><button class="btn btn-primary" id="uwChoose">Choose files</button></div></div>`;
@@ -10241,10 +10277,10 @@ function chooseUploadWeekDialog(presetWeekEnd, onChoose){
   let mode='week';
   const many = wrap.querySelector('#uwMany');
   if(many){
-    const fI=wrap.querySelector('#uwFrom'), tI=wrap.querySelector('#uwTo'), y=new Date().getFullYear(), today=toIsoDateOnly(new Date());
-    fI.value=(y-1)+'-01-01'; tI.value=(y-1)+'-12-31'; fI.max=tI.max=today;
-    const span=()=>{ if(!fI.value||!tI.value) return null; let a=fI.value, b=tI.value; if(a>b) [a,b]=[b,a]; const to=weekOfDate(b).weekEnd, from=weekOfDate(a).weekStart; return {from, to}; };
-    const showMany=()=>{ const r=span(); if(!r){ out.textContent='Pick both dates.'; go.disabled=true; return; }
+    const y=new Date().getFullYear(), today=toIsoDateOnly(new Date());
+    const span=()=>({auto:true});
+    const showMany=()=>{ out.innerHTML='<strong>Automatic</strong> · weeks are taken from the dates in the files'; go.disabled=false; };
+    const showManyOld=()=>{ const r=span(); if(!r){ out.textContent='Pick both dates.'; go.disabled=true; return; }
       const weeks=[]; for(let d=weekOfDate(r.from).weekEnd; d<=r.to; d=toIsoDateOnly(new Date(new Date(d+'T00:00:00').getTime()+7*86400000))) weeks.push(d);
       const has=weeks.filter(w=>KV.has('weekly:'+w)).length;
       go.disabled = weeks.length>156;
@@ -10253,18 +10289,13 @@ function chooseUploadWeekDialog(presetWeekEnd, onChoose){
     const setMode=m=>{ mode=m; wrap.querySelectorAll('[data-uwm]').forEach(b=>b.classList.toggle('on',b.dataset.uwm===m));
       wrap.querySelector('#uwOne').classList.toggle('hidden',m!=='week'); many.classList.toggle('hidden',m==='week');
       wrap.querySelector('#uwRulesOne').classList.toggle('hidden',m!=='week'); wrap.querySelector('#uwRulesMany').classList.toggle('hidden',m==='week');
-      wrap.querySelector('#uwTitle').textContent = m==='week' ? 'Which week are you uploading?' : 'Upload past data';
+      wrap.querySelector('#uwTitle').textContent = m==='week' ? 'Which week are you uploading?' : 'Upload past data (automatic)';
       m==='week'?show():showMany(); };
     wrap.querySelectorAll('[data-uwm]').forEach(b=>b.onclick=()=>setMode(b.dataset.uwm));
-    fI.addEventListener('change',showMany); tI.addEventListener('change',showMany); fI.addEventListener('input',showMany); tI.addEventListener('input',showMany);
-    wrap.querySelectorAll('[data-uwq]').forEach(b=>b.onclick=()=>{ const q=b.dataset.uwq, d=new Date();
-      const back=n=>{ const x=new Date(); x.setDate(x.getDate()-n); return toIsoDateOnly(x); };
-      if(q==='ly'){ fI.value=(y-1)+'-01-01'; tI.value=(y-1)+'-12-31'; } else if(q==='ytd'){ fI.value=y+'-01-01'; tI.value=today; }
-      else if(q==='12m'){ fI.value=back(364); tI.value=today; } else { fI.value=back(728); tI.value=today; }
-      showMany(); });
+
     wrap._span=span;
   }
-  go.onclick = ()=>{ if(mode==='range'){ const r=wrap._span(); if(!r) return; wrap.remove(); onChoose({from:r.from, to:r.to}); return; }
+  go.onclick = ()=>{ if(mode==='range'){ wrap.remove(); onChoose({auto:true}); return; }
     const w = weekOfDate(inp.value); wrap.remove(); onChoose(w.weekEnd); }; // still inside the click, so the file picker may open
   setTimeout(()=>inp.focus(), 30);
 }
@@ -12900,7 +12931,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.87.1';   // shown only in the browser tab title
+const APP_VERSION = '4.88.1';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
