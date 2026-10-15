@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.79.0</title>
+<title>Performance Dashboard · v4.79.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2121,7 +2121,7 @@ body.side-collapsed .refresh-stamp:not(.top){display:none!important}
 @media(max-width:700px){.rv-item{flex-direction:column}.rv-tick{white-space:normal}}
 </style>
 <style>
-.ex-wrap{display:grid;gap:14px;margin-bottom:14px}
+.ex-wrap{display:grid;gap:14px;margin-bottom:14px}.ex-slimbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 16px;background:#fff;border:1px solid #e1e7ef;border-radius:12px}.ex-slimbar .ex-detail-sw{margin:0}
 .ex-hero{margin:0}
 .ex-detail-sw{align-self:flex-start}
 .ex-goal{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:12.5px;color:#475569}
@@ -2150,6 +2150,25 @@ b.g{color:#15803d}b.a{color:#4d7c0f}b.w{color:#c2410c}b.r{color:#c8102e}
 .mr-kpi[data-exec-detail]{cursor:pointer}.mr-kpi[data-exec-detail]:hover{border-color:#c7d2e3;box-shadow:0 4px 14px #0a1f4412}
 @media(max-width:1100px){.ex-grid{grid-template-columns:1fr}}
 @media(max-width:600px){.ex-two{grid-template-columns:1fr}.ex-tbl .ex-gcell{min-width:130px}}
+</style>
+<style>
+/* Overview: Recruiting · Onboarding · Order Entry as underlined page tabs */
+.ovx-tabs{position:relative;display:flex;gap:4px;border-bottom:1px solid #dfe5ee;margin:0 0 4px;overflow-x:auto;scrollbar-width:none}
+.ovx-tabs::-webkit-scrollbar{display:none}
+.ovx-tabs a{display:flex;align-items:center;gap:11px;padding:10px 22px 14px 4px;margin-right:18px;text-decoration:none;color:#64748b;white-space:nowrap;outline:none;transition:color .2s}
+.ovx-tabs a:hover{color:#0a1f44}
+.ovx-tabs a:focus-visible .ovx-t b{text-decoration:underline;text-underline-offset:4px}
+.ovx-ico{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;background:#eef2f7;color:#64748b;transition:background .2s,color .2s}
+.ovx-ico svg{width:18px;height:18px}
+.ovx-t{display:flex;flex-direction:column;line-height:1.2}
+.ovx-t b{font-size:15px;font-weight:700;letter-spacing:-.01em}
+.ovx-t small{font-size:11.5px;font-weight:500;color:#94a3b8;margin-top:2px}
+.ovx-tabs a.on{color:#0a1f44}
+.ovx-tabs a.on .ovx-ico{background:#0a1f44;color:#fff}
+.ovx-tabs a.on .ovx-t small{color:#64748b}
+.ovx-ink{position:absolute;left:0;bottom:-1px;height:3px;border-radius:3px 3px 0 0;background:linear-gradient(90deg,#1d4ed8,#0a1f44);transition:transform .28s cubic-bezier(.3,.7,.2,1),width .28s cubic-bezier(.3,.7,.2,1);pointer-events:none}
+#ovModeBar:not(.hidden){display:block!important;width:100%;margin-bottom:14px}.ovx-tabs{width:100%}
+@media(max-width:700px){.ovx-tabs a{padding:8px 10px 12px 2px;margin-right:6px;gap:8px}.ovx-t small{display:none}.ovx-ico{width:28px;height:28px;border-radius:8px}.ovx-t b{font-size:14px}}
 </style>
 </head>
 <body class="locked">
@@ -5206,6 +5225,8 @@ let weeklyRenderRevision=0;
 let perfDetailOpen = lsGet('ipd_perf_detail')==='1';
 function execSummaryHtml(o){
   const {t, goal, prevT, multi, label, hpr, prevHpr, pend, byRec, goals, scopeDiv} = o;
+  // detailed view on: only the detail shows (plus this bar to switch back)
+  if(perfDetailOpen) return `<section class="ex-wrap ex-slim"><div class="ex-slimbar"><span class="mr-eyebrow">${escapeHtml(label)}${scopeDiv?' · '+escapeHtml(Array.isArray(scopeDiv)?scopeDiv.join(', '):scopeDiv):' · All divisions'} · Detailed view</span><label class="rtl-chk basis-sw ex-detail-sw" title="Turn off to go back to the summary"><button type="button" class="switch" role="switch" id="perfDetailSw" aria-checked="true"><i></i></button>Detailed view</label></div></section>`;
   const sr = t.scheduledDateOf ? t.shows/t.scheduledDateOf*100 : null, psr = prevT&&prevT.scheduledDateOf ? prevT.shows/prevT.scheduledDateOf*100 : null;
   const gp = goal>0 ? t.schedules/goal*100 : null;
   const chip=(c,p,{pts=false,good=1}={})=>{ if(multi||p==null||c==null) return ''; const d=pts?c-p:(p?(c-p)/p*100:null); if(d==null) return '';
@@ -5351,7 +5372,6 @@ async function renderWeeklyView(){
   container.innerHTML = `
     ${execHtml}
     <div id="perfDetailWrap" ${perfDetailOpen?'':'hidden'}>
-    <div class="section-divider">Detailed view</div>
     ${universalDivision ? `<div class="hint" style="margin-bottom:10px;">Viewing <strong>${escapeHtml(universalDivision)}</strong> only</div>` : ''}
 
     <div class="kpi-grid mk-grid" data-section="perf.kpis">${(()=>{
@@ -5400,11 +5420,11 @@ async function renderWeeklyView(){
   `;
   // executive summary: switch, clicks, chart and division table
   container.querySelector('#perfDetailSw')?.addEventListener('click',()=>{ perfDetailOpen=!perfDetailOpen; lsSet('ipd_perf_detail',perfDetailOpen?'1':'0'); renderWeeklyView(); });
-  container.querySelectorAll('[data-exec-detail]').forEach(el=>el.addEventListener('click',()=>{ if(!perfDetailOpen){ perfDetailOpen=true; lsSet('ipd_perf_detail','1'); renderWeeklyView(); } setTimeout(()=>document.getElementById('perfDetailWrap')?.scrollIntoView({behavior:'smooth',block:'start'}),120); }));
+  container.querySelectorAll('[data-exec-detail]').forEach(el=>el.addEventListener('click',()=>{ if(!perfDetailOpen){ perfDetailOpen=true; lsSet('ipd_perf_detail','1'); renderWeeklyView(); window.scrollTo({top:0,behavior:'smooth'}); } }));
   container.querySelectorAll('[data-exec-rec]').forEach(b=>b.onclick=()=>{ try{ openRemarksModal(b.dataset.execRec, isMultiWeekMode?(weeksForAggregate.at(-1)||{}).weekEndDate:week.weekEndDate); }catch(e){} });
   container.querySelectorAll('[data-exec-go]').forEach(b=>b.onclick=()=>{ alertsState.week=isMultiWeekMode?null:week.weekEndDate; document.querySelector('#navList button[data-view="alerts"]')?.click(); });
-  fillExecDivisions(isMultiWeekMode?weeksForAggregate:[week], referenceWeekForDivisions);
-  { const sorted=[...weeksData].sort((a,b)=>a.weekEndDate.localeCompare(b.weekEndDate));
+  if(!perfDetailOpen) fillExecDivisions(isMultiWeekMode?weeksForAggregate:[week], referenceWeekForDivisions);
+  if(!perfDetailOpen){ const sorted=[...weeksData].sort((a,b)=>a.weekEndDate.localeCompare(b.weekEndDate));
     const ew=(isMultiWeekMode?[...weeksForAggregate].sort((a,b)=>a.weekEndDate.localeCompare(b.weekEndDate)):sorted.filter(w=>w.weekEndDate<=week.weekEndDate).slice(-8)).slice(-26).map(w=>scopeWeekToDivision(w,universalDivision));
     Promise.all(ew.map(w=>computeGoalsForWeeks([w],universalDivision,w.weekEndDate).then(g=>g.total))).then(g=>{ if(revision===weeklyRenderRevision&&currentView==='performance'){ drawExecTrend(ew,g); const n=document.getElementById('execTrendNote'); if(n) n.textContent=(isMultiWeekMode?ew.length+' selected weeks':'Last '+ew.length+' weeks')+' · green bar = goal reached · dashed line = goal'; } }); }
   if(!perfDetailOpen) return;
@@ -12413,7 +12433,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.79.0';   // shown only in the browser tab title
+const APP_VERSION = '4.79.2';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -14507,9 +14527,20 @@ const OverviewX=(()=>{
   const host=document.getElementById('ovModeBar'); if(!host) return;
   const ms=modes(); if(ms.length<2){ host.innerHTML=''; host.classList.add('hidden'); return; }
   host.classList.remove('hidden'); const m=mode();
-  host.innerHTML=`<div class="ovx-switch" role="tablist" aria-label="Overview">${ms.map(([k,l])=>`<button type="button" role="tab" data-ovx="${k}" class="${m===k?'on':''}" aria-selected="${m===k}">${l}</button>`).join('')}</div>
+  const OVX_ICO={recruiting:'<circle cx="9" cy="8" r="3.2"/><path d="M3 19.5c.7-3.3 3.1-5.2 6-5.2s5.3 1.9 6 5.2"/><path d="M16 4.8a3 3 0 0 1 0 6.2M18.2 14.6c1.6.6 2.6 2.2 3 4.9"/>',
+   onboarding:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/>',
+   orderentry:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/>'};
+  const OVX_SUB={recruiting:'Schedules, shows & hires', onboarding:'Calls & completions', orderentry:'RC & CRM orders'};
+  host.innerHTML=`<nav class="ovx-tabs" role="tablist" aria-label="Overview">${ms.map(([k,l])=>`<a href="#" role="tab" data-ovx="${k}" class="${m===k?'on':''}" aria-selected="${m===k}"><span class="ovx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${OVX_ICO[k]||''}</svg></span><span class="ovx-t"><b>${l}</b><small>${OVX_SUB[k]||''}</small></span></a>`).join('')}<i class="ovx-ink" aria-hidden="true"></i></nav>
    ${true?'':`<div class="ovx-quick" role="group" aria-label="Weeks">${[['today','Today'],['yesterday','Yesterday'],['week','This week'],['lastweek','Last week'],['w4','Last 4 weeks'],['w13','Last 13 weeks']].map(([k,l])=>`<button type="button" data-ovq="${k}" class="${st.quick===k?'on':''}" title="${k==='picker'?'Use the weeks chosen in the Period picker at the top':''}">${l}</button>`).join('')}<button type="button" class="ovx-refresh" data-ovr title="Get the latest numbers">↻</button></div>`}`;
-  host.querySelectorAll('[data-ovx]').forEach(b=>b.onclick=()=>{ st.mode=b.dataset.ovx; try{ localStorage.setItem(LS,st.mode); }catch(e){} refreshUI(); });
+  // the underline slides to the picked tab, then the page switches
+  const nav=host.querySelector('.ovx-tabs'), ink=host.querySelector('.ovx-ink');
+  const place=(el,anim)=>{ if(!el||!ink) return; ink.style.transition=anim?'':'none'; ink.style.width=el.offsetWidth+'px'; ink.style.transform=`translateX(${el.offsetLeft}px)`; };
+  requestAnimationFrame(()=>place(host.querySelector('[data-ovx].on'),false));
+  if(!window.__ovxInkResize){ window.__ovxInkResize=true; addEventListener('resize',()=>{ const h=document.getElementById('ovModeBar'); const a=h&&h.querySelector('[data-ovx].on'), i=h&&h.querySelector('.ovx-ink'); if(a&&i){ i.style.transition='none'; i.style.width=a.offsetWidth+'px'; i.style.transform=`translateX(${a.offsetLeft}px)`; } }); }
+  host.querySelectorAll('[data-ovx]').forEach(b=>b.onclick=e=>{ e.preventDefault(); if(b.classList.contains('on')) return;
+    host.querySelectorAll('[data-ovx]').forEach(x=>{ x.classList.toggle('on',x===b); x.setAttribute('aria-selected',String(x===b)); }); place(b,true);
+    st.mode=b.dataset.ovx; try{ localStorage.setItem(LS,st.mode); }catch(e){} setTimeout(refreshUI,180); });
   host.querySelectorAll('[data-ovq]').forEach(b=>b.onclick=()=>{ st.quick=b.dataset.ovq; refreshUI(); });
   host.querySelector('[data-ovr]')?.addEventListener('click',()=>{ st.cache.clear(); refreshUI(); });
 
