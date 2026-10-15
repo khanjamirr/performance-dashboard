@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.86.4</title>
+<title>Performance Dashboard · v4.86.5</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2506,6 +2506,19 @@ html body .toast,html body #toast{border-radius:14px!important;background:rgba(3
 .panel:has(#rtlToggle){overflow:visible!important}
 </style>
 <style>.panel-head:has(#rtlToggle){justify-content:flex-start!important;gap:16px}.panel-head:has(#rtlToggle)>h3{min-width:150px;margin:0}.panel-head:has(#rtlToggle) .rtl-seg{margin-left:0}.panel-head:has(#rtlToggle)>div:last-child{flex:1 1 auto;display:flex!important;justify-content:flex-start}.panel-head:has(#rtlToggle) #rtlToggle{margin-right:auto!important}</style>
+<style>
+/* tighter page heading under the top picker (computer screens) */
+@media (min-width:1101px){
+ body.ov-bar .topbar{padding-top:8px!important;padding-bottom:12px!important;gap:16px!important;align-items:center!important}
+ body.ov-bar #ovModeBar.ovx-seg:not(.hidden){padding-bottom:4px!important}
+ html body .topbar h2,html body #viewTitle{font-size:24px!important;line-height:1.15}
+ html body .topbar #viewSub{margin-top:2px}
+ html body #topbarCenter{justify-content:flex-start!important;flex:0 1 auto!important}
+ html body #topbarExtra{flex:1 1 auto!important;max-width:none!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-end!important;gap:8px!important}
+ html body #topbarExtra .header-search{flex:0 1 260px!important;width:260px!important;margin:0!important;order:-1}
+ html body #topbarExtra .division-chip{padding:5px 10px!important;min-width:0!important}
+}
+</style>
 </head>
 <body class="locked">
 <div id="appLoading" class="app-loading"><div class="spinner" aria-hidden="true"></div><p>Loading dashboard…</p></div>
@@ -12844,7 +12857,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.86.4';   // shown only in the browser tab title
+const APP_VERSION = '4.86.5';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
