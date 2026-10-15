@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.85.2</title>
+<title>Performance Dashboard · v4.85.3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -12239,20 +12239,21 @@ function ltCards(r,prev,series){
 }
 /* One shared period drives the team page and its drill-down. */
 // My Team / Team Leads: one date button. One day = Day view, a Sunday–Saturday week = Week view, anything else = those dates.
-function ltPick(from,to,mode0,anchor0){
+function ltPick(from,to,mode0,anchor0,defWeek){
  const today=ltToday();
  if(from&&to){ if(to<from)[from,to]=[to,from]; const w=weekOfDate(from), full=from===w.weekStart&&to===w.weekEnd;
   const mode=from===to?'day':full?'week':'period'; return {mode, anchor:to, p:{from,to,label:mode==='day'?'Day':mode==='week'?'Week':'Dates'}}; }
- // nothing picked yet: today (an older saved Day / Week / Month view is ignored)
+ // nothing picked yet: today (an older saved Day / Week / Month view is ignored) — My Team starts on the whole week
+ if(defWeek){ const w=weekOfDate(today); return {mode:'week', anchor:w.weekEnd, p:{from:w.weekStart,to:w.weekEnd,label:'Week'}}; }
  return {mode:'day', anchor:today, p:ltRange('day',today)};
 }
 function ltStep(p,dir){ const n=Math.round((new Date(p.to+'T12:00:00Z')-new Date(p.from+'T12:00:00Z'))/864e5)+1, w=weekOfDate(p.from), full=p.from===w.weekStart&&p.to===w.weekEnd;
  const k=full?7:n; return {from:tgShift(p.from,dir*k), to:tgShift(p.to,dir*k)}; }
-function ltDatesHtml(prefix,p,today){
+function ltDatesHtml(prefix,p,today,noToday){
  const nxt=ltStep(p,1);
  return `<div class="lt-period lt-dates" role="group" aria-label="Reporting dates"><button class="btn btn-secondary" id="${prefix}Prev" aria-label="Earlier">←</button>
   <div class="dpr-field"><span>Dates</span>${dateRangeBtn(prefix+'From',prefix+'To',p.from,p.to,'',true)}</div>
-  <button class="btn btn-secondary" id="${prefix}Next" aria-label="Later" ${nxt.from>today?'disabled':''}>→</button><button class="btn btn-secondary" id="${prefix}Today">Today</button></div>`;
+  <button class="btn btn-secondary" id="${prefix}Next" aria-label="Later" ${nxt.from>today?'disabled':''}>→</button>${noToday?'':`<button class="btn btn-secondary" id="${prefix}Today">Today</button>`}</div>`;
 }
 function ltRange(mode,anchor=ltToday()){
  if(mode==='day')return {from:anchor,to:anchor,label:'Day'};
@@ -12310,7 +12311,7 @@ function renderTeamGroups(){
   if(!ltState.loaded&&!ltState.error&&!ltState.loading)ltLoad();return;
  }
  const a=ltState.assignment,now=new Date(),today=ltToday(now),zone=Intl.DateTimeFormat().resolvedOptions().timeZone;
- const pk=ltPick(ltState.from,ltState.to,ltState.rangeMode,ltState.anchor),anchor=pk.anchor,mode=pk.mode,p=pk.p,cutoff=p.to>today?today:p.to;
+ const pk=ltPick(ltState.from,ltState.to,ltState.rangeMode,ltState.anchor,true),anchor=pk.anchor,mode=pk.mode,p=pk.p,cutoff=p.to>today?today:p.to;
  const g={...ltGroup(a),division:ltState.division},report=ltReport(g,p.from,p.to,today);
  const ltSoFar=ltState.basis==='today'&&p.to>today;
  if(ltSoFar){ const wk=cutoff>=p.from?(p.from===cutoff?[p.from]:ltWorkdays(p.from,cutoff)):[]; report.members.forEach(x=>{ x.goal=wk.filter(d=>tgActive(g,x.label,d)).reduce((s2,d)=>s2+ltDailyGoal(x.label,d),0); }); report.total.goal=report.members.reduce((s2,x)=>s2+x.goal,0); }
@@ -12329,7 +12330,7 @@ function renderTeamGroups(){
  const rangeText=mode==='day'?fmtDate(p.from):`${fmtDate(p.from)} – ${fmtDate(p.to)}`;
  host.innerHTML=`<div class="lt-sticky">
  <header class="lt-toolbar">${canViewLeads()?'<button type="button" class="btn btn-secondary btn-sm lt-back" id="ltBackLeads">← All team leads</button>':''}<div class="lt-title"><h2>${escapeHtml(a.team_name)}</h2><span>${escapeHtml(leader)} · ${escapeHtml(a.recruiter_name)}</span></div>${ltTeamPicker()}
- ${ltDatesHtml('lt',p,today)}
+ ${ltDatesHtml('lt',p,today,true)}
  <label class="lt-field">Division<select id="ltDivision"><option value="">All team divisions</option>${divisions.map(d=>`<option ${d===g.division?'selected':''}>${escapeHtml(d)}</option>`).join('')}</select></label><label class="rtl-chk basis-sw" title="${p.to>today?'On: goal for the working days so far · Off: the goal for the whole '+mode:'Only while the '+mode+' is still going'}"><button type="button" class="switch" role="switch" id="ltTeamBasisSw" aria-checked="${ltState.basis==='today'&&p.to>today}" ${p.to>today?'':'disabled'}><i></i></button>Goal so far (today)</label><button class="btn btn-secondary" id="ltRefresh" aria-label="Refresh team" title="Refresh team">↻</button></header>
  <div class="lt-scope"><span><strong>${rangeText}</strong> · ${escapeHtml(g.division||'All divisions')}${p.to>today?' · through today':''}</span><span title="Dates and cutoff times use your system timezone">${escapeHtml(zone)}</span></div>
  <section class="lt-summary" aria-label="Team performance summary" data-section="team.summary"><div class="kpi-grid mk-grid mk-team">${ltCompactCards(report, mode==='month'?Math.round(ltWorkdays(p.from,cutoff).length/5*10)/10:1, mode==='day'&&isHeldShowDay(p.from))}</div></section>
@@ -12364,7 +12365,7 @@ function renderTeamGroups(){
  host.querySelector('#ltTo').addEventListener('change',()=>ltSet(host.querySelector('#ltFrom').value,host.querySelector('#ltTo').value));
  host.querySelector('#ltPrev').onclick=()=>{const r=ltStep(p,-1);ltSet(r.from,r.to);};
  host.querySelector('#ltNext').onclick=()=>{const r=ltStep(p,1);if(r.from<=today)ltSet(r.from,r.to>today&&mode!=='week'?today:r.to);};
- host.querySelector('#ltToday').onclick=()=>ltSet(today,today);
+ host.querySelector('#ltToday')?.addEventListener('click',()=>ltSet(today,today));
  host.querySelector('#ltRefresh').onclick=()=>{if(Server.isAdmin())ltState.users=null;ltLoad();};
  host.querySelector('#ltTeamBasisSw')?.addEventListener('click',e=>{ if(e.currentTarget.disabled) return; ltState.basis=ltState.basis==='today'?'week':'today'; renderTeamGroups(); });
  host.querySelector('#ltDirectoryRetry')?.addEventListener('click',()=>{ltState.users=null;ltLoad();});
@@ -12792,7 +12793,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.85.2';   // shown only in the browser tab title
+const APP_VERSION = '4.85.3';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
