@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.84.0</title>
+<title>Performance Dashboard · v4.85.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2397,6 +2397,90 @@ body.ov-bar .topbar{border-top:0}
  html body.side-collapsed .nav .nav-group-label{font-size:0!important;height:1px;margin:8px 10px!important;background:#e1e7ef}
 }
 </style>
+<style id="ios-theme">
+/* ===================== iOS look for the whole dashboard ===================== */
+:root{--ios-bg:#f2f2f7;--ios-menu:#e7e7ee;--ios-card:#ffffff;--ios-sep:#e5e5ea;--ios-fill:rgba(118,118,128,.12);--ios-fill2:rgba(118,118,128,.08);--ios-label:#1c1c1e;--ios-label2:#6e6e73;--ios-label3:#8e8e93;--ios-blue:#007aff;--ios-green:#34c759;--ios-red:#ff3b30;--ios-orange:#ff9500;
+ --bg:var(--ios-bg)!important;--paper:var(--ios-bg);--surface:#fff;--border:var(--ios-sep);--line:var(--ios-sep);--shadow:0 1px 2px rgba(0,0,0,.04),0 4px 14px -6px rgba(0,0,0,.06)}
+html body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Inter",system-ui,"Segoe UI",Roboto,sans-serif!important;background:var(--ios-bg)!important;color:var(--ios-label);-webkit-font-smoothing:antialiased;letter-spacing:-.005em}
+html body button,html body input,html body select,html body textarea{font-family:inherit}
+html body .main,html body .content{background:transparent!important}
+/* page heading */
+html body .topbar{background:rgba(242,242,247,.97)!important;border-bottom:.5px solid rgba(60,60,67,.18)!important;box-shadow:none!important}
+html body .topbar h2,html body #viewTitle{color:var(--ios-label)!important;font-weight:800!important;letter-spacing:-.025em!important}
+html body #viewSub,html body .topbar .sub{color:var(--ios-label2)!important}
+html body #ovModeBar.ovx-seg:not(.hidden){background:rgba(242,242,247,.92)!important;-webkit-backdrop-filter:saturate(1.8) blur(18px);backdrop-filter:saturate(1.8) blur(18px)}
+/* cards: white, rounded, no hard borders */
+html body .panel,html body .kpi-card,html body .mr-hero,html body .hi-detail,html body .hi-card,html body .al-card,html body .ex-slimbar,html body .rv-item,html body .onb-form,html body .settings-page .set-card{background:var(--ios-card)!important;border:0!important;border-radius:18px!important;box-shadow:0 1px 2px rgba(0,0,0,.04),0 6px 20px -10px rgba(0,0,0,.10)!important}
+html body .mr-kpi,html body .onb-tile,html body .ovx-card,html body .as-tile,html body .ut-tile{background:var(--ios-bg)!important;border:0!important;border-radius:14px!important;box-shadow:none!important}
+html body button.mr-kpi:not(:disabled):hover,html body .mr-kpi[data-exec-detail]:hover{background:#ebebf0!important}
+html body button.mr-kpi.sel{background:#e5f0ff!important;box-shadow:inset 0 0 0 2px var(--ios-blue)!important}
+html body .mr-notes,html body .hi-legend{background:var(--ios-bg)!important;border:0!important;border-radius:14px!important}
+html body .al-tile{border-radius:18px!important;border-width:0!important;box-shadow:0 1px 2px rgba(0,0,0,.04),0 6px 20px -10px rgba(0,0,0,.10)!important}
+html body .al-tile.sel{box-shadow:inset 0 0 0 2px currentColor,0 6px 20px -10px rgba(0,0,0,.12)!important}
+html body .hi-card.on{box-shadow:inset 0 0 0 2px var(--ios-blue),0 6px 20px -10px rgba(0,0,0,.12)!important}
+html body .section-divider{color:var(--ios-label3)!important}
+html body h3,html body .panel h3,html body .panel-head h3{color:var(--ios-label);letter-spacing:-.015em;font-weight:700}
+html body .hint{color:var(--ios-label3)}
+/* buttons */
+html body .btn{border-radius:12px!important;font-weight:600!important;box-shadow:none!important;transition:background .15s,opacity .15s}
+html body .btn-primary{background:var(--ios-blue)!important;color:#fff!important;border:0!important}
+html body .btn-primary:hover{background:#0a6ef0!important}
+html body .btn-secondary{background:var(--ios-fill)!important;color:var(--ios-blue)!important;border:0!important}
+html body .btn-secondary:hover{background:rgba(118,118,128,.18)!important}
+html body .link-btn{color:var(--ios-blue)!important}
+html body .link-btn.danger{color:var(--ios-red)!important}
+/* inputs */
+html body input[type=text],html body input[type=search],html body input[type=date],html body input[type=number],html body input[type=email],html body input[type=password],html body select,html body textarea,html body .dpr-btn{background:var(--ios-fill2)!important;border:0!important;border-radius:11px!important;box-shadow:none!important;color:var(--ios-label)!important}
+html body input:focus,html body select:focus,html body textarea:focus,html body .dpr-btn:focus{outline:none!important;box-shadow:0 0 0 3px rgba(0,122,255,.25)!important;background:#fff!important}
+html body .header-search input{background:var(--ios-fill)!important}
+html body .cand-field>span,html body .dpr-field>span,html body label.cand-field span{color:var(--ios-label3)!important;font-weight:600!important;text-transform:none!important;letter-spacing:0!important;font-size:12px!important}
+/* switches: iOS green */
+html body .switch{background:#e9e9ea!important;width:44px!important;flex-basis:44px!important;height:26px!important;border-radius:13px!important;box-shadow:inset 0 0 0 1px rgba(0,0,0,.04)}
+html body .switch i{width:22px!important;height:22px!important;top:2px!important;left:2px!important;border-radius:50%!important;background:#fff!important;box-shadow:0 2px 4px rgba(0,0,0,.18),0 0 1px rgba(0,0,0,.2)!important}
+html body .switch[aria-checked="true"]{background:var(--ios-green)!important}
+html body .switch[aria-checked="true"] i{left:20px!important}
+/* segmented controls everywhere */
+html body .oe-group,html body .ua-filter,html body .onb-nav,html body .hi-tabs,html body .remark-scope{background:var(--ios-fill)!important;border:0!important;border-radius:10px!important;padding:2px!important;box-shadow:none!important}
+html body .oe-group button,html body .ua-filter button,html body .onb-nav button,html body .hi-tabs button{border:0!important;border-radius:8px!important;background:transparent!important;color:var(--ios-label)!important;font-weight:500!important;box-shadow:none!important}
+html body .oe-group button.on,html body .ua-filter button.on,html body .onb-nav button.on,html body .hi-tabs button.on{background:#fff!important;font-weight:600!important;box-shadow:0 3px 8px rgba(0,0,0,.12),0 3px 1px rgba(0,0,0,.04)!important}
+html body .ex-viewpick{background:var(--ios-fill)!important;box-shadow:none!important}
+/* chips / pills */
+html body .division-chip{border-radius:14px!important;border:0!important;background:#fff!important;box-shadow:0 1px 2px rgba(0,0,0,.05)!important}
+html body .division-chip[aria-pressed="true"]{background:var(--ios-blue)!important;color:#fff!important}
+html body .division-chip[aria-pressed="true"] *{color:#fff!important}
+html body .onb-quick button{border-radius:999px!important;border:0!important;background:var(--ios-fill2)!important}
+html body .onb-quick button.on{background:var(--ios-label)!important;color:#fff!important}
+/* tables: inset grouped list feel */
+html body .users-table,html body .ep-table,html body .hi-tbl{border-collapse:separate!important;border-spacing:0}
+html body .users-table th,html body .ep-table th,html body .hi-tbl th{background:transparent!important;color:var(--ios-label3)!important;font-weight:600!important;text-transform:none!important;letter-spacing:0!important;font-size:12px!important;border-bottom:.5px solid rgba(60,60,67,.29)!important}
+html body .users-table td,html body .ep-table td,html body .hi-tbl td{border-bottom:.5px solid rgba(60,60,67,.14)!important}
+html body .users-table tr:hover td,html body .hi-tbl tr:hover td{background:rgba(118,118,128,.05)!important}
+html body .onb-total td,html body .ex-total td,html body tr.onb-total td{background:var(--ios-bg)!important}
+/* modals, toast */
+html body .modal-overlay{background:rgba(0,0,0,.28)!important;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+html body .modal{border-radius:20px!important;border:0!important;box-shadow:0 30px 80px -20px rgba(0,0,0,.35)!important}
+html body .toast,html body #toast{border-radius:14px!important;background:rgba(30,30,32,.92)!important;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+/* the menu: a shade darker than the page */
+@media (min-width:801px){
+ html body .sidebar{background:var(--ios-menu)!important;border-right:.5px solid rgba(60,60,67,.2)!important}
+ html body .nav button:hover:not(.active){background:rgba(118,118,128,.14)!important}
+ html body .nav button.active{background:#fff!important;box-shadow:0 1px 3px rgba(0,0,0,.10),0 1px 1px rgba(0,0,0,.04)!important}
+ html body .nav button.active .nav-ico,html body .nav .nav-parent.has-active .nav-ico,html body .sidebar .ribbon-btn .rb-ico{color:var(--ios-blue)!important}
+ html body .sidebar .ribbon-btn,html body .sidebar #downloadDropdownBtn,html body .sidebar #clearAllFiltersBtn,html body .sidebar #accessModeBtn{background:#fff!important;border:0!important;box-shadow:0 1px 2px rgba(0,0,0,.06)!important}
+ html body .sidebar .refresh-stamp,html body .sidebar .ribbon-actions{border-top-color:rgba(60,60,67,.18)!important}
+ html body .sidebar #userChip:hover{background:rgba(118,118,128,.14)!important}
+}
+/* phone: light top bar like iOS */
+@media (max-width:800px){
+ html body .sidebar{background:#e7e7ee!important;color:var(--ios-label)!important;border-bottom:.5px solid rgba(60,60,67,.2)!important;box-shadow:none!important}
+ html body .sidebar .brand h1,html body .sidebar #dashboardTitle{color:var(--ios-label)!important}
+ html body .mobile-menu-btn{background:#fff!important;color:var(--ios-label)!important;border:0!important;box-shadow:0 1px 2px rgba(0,0,0,.08)!important}
+ html body .nav{background:rgba(242,242,247,.96)!important;border-top:.5px solid rgba(60,60,67,.22)!important;box-shadow:none!important}
+ html body .nav button{color:var(--ios-label3)!important;background:transparent!important}
+ html body .nav button.active{color:var(--ios-blue)!important;background:transparent!important;box-shadow:none!important}
+ html body .nav button.active .nav-ico{color:var(--ios-blue)!important}
+}
+</style>
 </head>
 <body class="locked">
 <div id="appLoading" class="app-loading"><div class="spinner" aria-hidden="true"></div><p>Loading dashboard…</p></div>
@@ -3480,7 +3564,7 @@ function safeChart(ctx, config){
     return null;
   }
   try{
-    Chart.defaults.font.family = "'Inter', system-ui, sans-serif";
+    Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif";
     Chart.defaults.font.size = 11;
     Chart.defaults.color = '#687e89';
     Chart.defaults.borderColor = '#eaf0f2';
@@ -12064,7 +12148,7 @@ function tgRate(n,d){return n===null||d===null||!d?'—':(n/d*100).toFixed(1)+'%
 /* Admin-owned team assignments; leader dashboard uses local system date/time. */
 // Default view: Day, except Thursday 12:00 PM through Friday (local time), when the week is wrapping up.
 function ltDefaultMode(now=new Date()){ const d=now.getDay(); return (d===4&&now.getHours()>=12)||d===5?'week':'day'; }
-const ltState={viewingId:null,users:null,directoryError:'',requestSeq:0,rangeMode:null,anchor:null,owner:null,assignment:null,loaded:false,loading:false,error:'',period:'current',day:null,weekDate:null,division:'',focus:null,adminDraft:null,adminUser:null,adminBusy:false};
+const ltState={basis:'week',viewingId:null,users:null,directoryError:'',requestSeq:0,rangeMode:null,anchor:null,owner:null,assignment:null,loaded:false,loading:false,error:'',period:'current',day:null,weekDate:null,division:'',focus:null,adminDraft:null,adminUser:null,adminBusy:false};
 // ---- attendance: present by default; an admin (or someone given “Mark attendance”) marks a weekday Absent ----
 function attMap(){ const a=KV.getRaw('attendance'); return a&&typeof a==='object'?a:{}; }
 function isAbsent(name,d){ const a=attMap()[name]; return !!(a&&a[d]==='A'); }
@@ -12223,6 +12307,8 @@ function renderTeamGroups(){
  const a=ltState.assignment,now=new Date(),today=ltToday(now),zone=Intl.DateTimeFormat().resolvedOptions().timeZone;
  const pk=ltPick(ltState.from,ltState.to,ltState.rangeMode,ltState.anchor),anchor=pk.anchor,mode=pk.mode,p=pk.p,cutoff=p.to>today?today:p.to;
  const g={...ltGroup(a),division:ltState.division},report=ltReport(g,p.from,p.to,today);
+ const ltSoFar=ltState.basis==='today'&&p.to>today;
+ if(ltSoFar){ const wk=cutoff>=p.from?(p.from===cutoff?[p.from]:ltWorkdays(p.from,cutoff)):[]; report.members.forEach(x=>{ x.goal=wk.filter(d=>tgActive(g,x.label,d)).reduce((s2,d)=>s2+ltDailyGoal(x.label,d),0); }); report.total.goal=report.members.reduce((s2,x)=>s2+x.goal,0); }
  // Day by day: the whole week around the chosen day (Day view), otherwise the selected period.
  const dw=mode==='day'?weekOfDate(p.from):null, dFrom=dw?dw.weekStart:p.from, dTo=dw?dw.weekEnd:p.to, dCut=dTo>today?today:dTo;
  const dReport=dw?ltReport(g,dFrom,dTo,today):report;
@@ -12239,7 +12325,7 @@ function renderTeamGroups(){
  host.innerHTML=`<div class="lt-sticky">
  <header class="lt-toolbar">${canViewLeads()?'<button type="button" class="btn btn-secondary btn-sm lt-back" id="ltBackLeads">← All team leads</button>':''}<div class="lt-title"><h2>${escapeHtml(a.team_name)}</h2><span>${escapeHtml(leader)} · ${escapeHtml(a.recruiter_name)}</span></div>${ltTeamPicker()}
  ${ltDatesHtml('lt',p,today)}
- <label class="lt-field">Division<select id="ltDivision"><option value="">All team divisions</option>${divisions.map(d=>`<option ${d===g.division?'selected':''}>${escapeHtml(d)}</option>`).join('')}</select></label><button class="btn btn-secondary" id="ltRefresh" aria-label="Refresh team" title="Refresh team">↻</button></header>
+ <label class="lt-field">Division<select id="ltDivision"><option value="">All team divisions</option>${divisions.map(d=>`<option ${d===g.division?'selected':''}>${escapeHtml(d)}</option>`).join('')}</select></label><label class="rtl-chk basis-sw" title="${p.to>today?'On: goal for the working days so far · Off: the goal for the whole '+mode:'Only while the '+mode+' is still going'}"><button type="button" class="switch" role="switch" id="ltTeamBasisSw" aria-checked="${ltState.basis==='today'&&p.to>today}" ${p.to>today?'':'disabled'}><i></i></button>Goal so far (today)</label><button class="btn btn-secondary" id="ltRefresh" aria-label="Refresh team" title="Refresh team">↻</button></header>
  <div class="lt-scope"><span><strong>${rangeText}</strong> · ${escapeHtml(g.division||'All divisions')}${p.to>today?' · through today':''}</span><span title="Dates and cutoff times use your system timezone">${escapeHtml(zone)}</span></div>
  <section class="lt-summary" aria-label="Team performance summary" data-section="team.summary"><div class="kpi-grid mk-grid mk-team">${ltCompactCards(report, mode==='month'?Math.round(ltWorkdays(p.from,cutoff).length/5*10)/10:1, mode==='day'&&isHeldShowDay(p.from))}</div></section>
  ${report.uncovered?'<p class="lt-data-note">Some selected dates have no import; affected totals are unavailable.</p>':''}
@@ -12275,6 +12361,7 @@ function renderTeamGroups(){
  host.querySelector('#ltNext').onclick=()=>{const r=ltStep(p,1);if(r.from<=today)ltSet(r.from,r.to>today&&mode!=='week'?today:r.to);};
  host.querySelector('#ltToday').onclick=()=>ltSet(today,today);
  host.querySelector('#ltRefresh').onclick=()=>{if(Server.isAdmin())ltState.users=null;ltLoad();};
+ host.querySelector('#ltTeamBasisSw')?.addEventListener('click',e=>{ if(e.currentTarget.disabled) return; ltState.basis=ltState.basis==='today'?'week':'today'; renderTeamGroups(); });
  host.querySelector('#ltDirectoryRetry')?.addEventListener('click',()=>{ltState.users=null;ltLoad();});
  host.querySelectorAll('[data-lt-person]').forEach(b=>b.onclick=()=>{epState.week=weekOfDate(p.to).weekEnd;openHistoryPage('recruiters',b.dataset.ltPerson);});
  const drawCharts=()=>{ if(charts.ltTimeline||!document.getElementById('ltTimeline'))return;
@@ -12300,7 +12387,9 @@ function ltBranchOf(name,from,to){
 }
 function ltAnalytics(g,p,cutoff,mode,today,self,checks=[],checkDay=cutoff){
  const cur=ltReport(g,p.from,p.to,today);
- const work=cutoff>=p.from?(p.from===cutoff?[p.from]:ltWorkdays(p.from,cutoff)):[];
+ // goal: the whole period (default) or only the working days so far (switch on My Team)
+ const gEnd=ltState.basis==='today'&&p.to>today?cutoff:p.to;
+ const work=gEnd>=p.from?(p.from===gEnd?[p.from]:ltWorkdays(p.from,gEnd)):[];
  const rate=(n,d,min=1)=>n==null||d==null||d<min?null:n/d*100;
  const rows=cur.members.map(x=>{
   const pace=work.filter(d=>tgActive(g,x.label,d)).reduce((a,d)=>a+ltDailyGoal(x.label,d),0);
@@ -12693,7 +12782,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.84.0';   // shown only in the browser tab title
+const APP_VERSION = '4.85.1';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
