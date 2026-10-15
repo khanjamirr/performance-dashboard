@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Performance Dashboard · v4.91.0</title>
+<title>Performance Dashboard · v4.91.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -12646,13 +12646,17 @@ function ltAnalytics(g,p,cutoff,mode,today,self,checks=[],checkDay=cutoff){
  <tfoot><tr><td></td><td>Team</td><td>${pc(team.goal)}<small class="hint"> ${fmtNum(T.schedules||0)} / ${tgNumber(teamPace)}</small></td><td>${num0(T.scheduledDateOf)}</td><td>${pc(team.show)}<small class="hint"> ${num0(T.shows)}</small></td><td>${pc(team.noshow)}<small class="hint"> ${num0(T.noShows)}</small></td><td>${num0(T.i9)}<small class="hint"> ${pc(team.hire)}</small></td>${perWk?`<td>${teamHpw==null?'–':teamHpw.toFixed(1)}</td>`:''}</tr></tfoot></table></div>
  <details class="ta-legend"><summary>How to read this</summary><p class="hint">Schedules vs goal: green at 90%+ of the goal, amber 50–89%, red under 50%. Show rate is green at 70%+, no-show rate green under 20%. Hires are compared with the team’s hire rate. Emoji: 🤬 under 50% · 🫡 50–80% · 🫰 81–100% · 🤩 above 100% of goal. Click a recruiter to see their history.</p></details></section>`;
  // ---- third break: this team only, its own table below ----
- const brkRows=[...checks.filter(c=>c.eligible).map(c=>({c,st:'yes'})),...checks.filter(c=>c.known&&!c.eligible).map(c=>({c,st:'no'})),...checks.filter(c=>!c.known).map(c=>({c,st:'wait'}))]
+ // "Goal so far (today)" on → needed = goal for the working days so far; off → the whole week's goal
+ const brkSoFar=ltState.basis==='today'&&p.to>today, cw=weekOfDate(checkDay);
+ const bChecks=brkSoFar?checks:checks.map(c=>{ const req=Math.ceil(tgDays(cw.weekStart,cw.weekEnd).filter(d=>{const n=new Date(d+'T12:00:00Z').getUTCDay();return n>=1&&n<=5;}).reduce((a,d)=>a+ltDailyGoal(c.name,d),0)-1e-9);
+   return {...c, required:req, eligible:c.cum!==null&&c.cum>=req}; });
+ const brkRows=[...bChecks.filter(c=>c.eligible).map(c=>({c,st:'yes'})),...bChecks.filter(c=>c.known&&!c.eligible).map(c=>({c,st:'no'})),...bChecks.filter(c=>!c.known).map(c=>({c,st:'wait'}))]
    .sort((x,y)=>({yes:0,no:1,wait:2}[x.st]-{yes:0,no:1,wait:2}[y.st])||(x.st==='no'?(y.c.cum/y.c.required)-(x.c.cum/x.c.required):0)||String(x.c.name).localeCompare(String(y.c.name)));
  const nE=brkRows.filter(r=>r.st==='yes').length, nN=brkRows.filter(r=>r.st==='no').length;
  const stCell=r=>r.st==='yes'?'<span class="ld-st ok">✓ Eligible</span>':r.st==='no'?`<span class="ld-st no">${tgNumber(Math.max(0,r.c.required-r.c.cum))} more needed</span>`:'<span class="ld-st wait">No data yet</span>';
- const breakHtml=!checks.length||!canSeeSection('team.goals')?'':`<section class="panel ta ld-break" data-section="team.goals"><div class="panel-head"><div><h3>☕ Third break · ${fmtDate(checkDay)}</h3><span class="hint">Your team only. Eligible when schedules so far this week reach a fifth of the weekly goal per working day (goal 50: Mon 10 · Tue 20 · Wed 30 · Thu 40 · Fri 50).</span></div>
+ const breakHtml=!checks.length||!canSeeSection('team.goals')?'':`<section class="panel ta ld-break" data-section="team.goals"><div class="panel-head"><div><h3>☕ Third break · ${fmtDate(checkDay)}</h3><span class="hint">Your team only. ${brkSoFar?'<b>Goal so far</b> — eligible when schedules so far this week reach a fifth of the weekly goal per working day (goal 50: Mon 10 · Tue 20 · Wed 30 · Thu 40 · Fri 50).':'<b>Whole week</b> — eligible once schedules this week reach the full weekly goal. Turn on “Goal so far (today)” to use the goal for the working days so far.'}</span></div>
   <div class="mr-head-tools"><div class="oe-group" role="tablist" aria-label="Show">${[['all','All · '+brkRows.length],['yes','Eligible · '+nE],['no','Not yet · '+nN]].map(([k,l])=>`<button type="button" data-ltf="${k}" class="${k==='all'?'on':''}">${l}</button>`).join('')}</div>${canCopyBreakImage()?'<button type="button" class="btn btn-secondary btn-sm" id="ltBrkImg" title="Copy eligible and not-yet-eligible recruiters as one image">📷 Copy as image</button>':''}${copyBtnHtml('ltBrkTable')}</div></div>
-  <div class="onb-scroll"><table class="users-table onb-table ld-brk-table" id="ltBrkTable"><thead><tr><th>Recruiter</th><th>Branch</th><th class="num">Schedules this week</th><th class="num">Needed by ${escapeHtml(new Date(checkDay+'T12:00:00Z').toLocaleDateString('en-US',{weekday:'short',timeZone:'UTC'}))}</th><th>Third break</th></tr></thead><tbody>
+  <div class="onb-scroll"><table class="users-table onb-table ld-brk-table" id="ltBrkTable"><thead><tr><th>Recruiter</th><th>Branch</th><th class="num">Schedules this week</th><th class="num">${brkSoFar?'Needed by '+escapeHtml(new Date(checkDay+'T12:00:00Z').toLocaleDateString('en-US',{weekday:'short',timeZone:'UTC'})):'Week goal'}</th><th>Third break</th></tr></thead><tbody>
   ${brkRows.map(r=>`<tr data-st="${r.st}"${r.c.name===self?' class="lt-mine"':''}><td><b>${escapeHtml(r.c.name)}</b>${r.c.name===self?' <span class="hint">(You)</span>':''}</td><td class="hint">${escapeHtml(ltBranchOf(r.c.name,p.from,cutoff)||'–')}</td><td class="num">${r.st==='wait'?'–':tgNumber(r.c.cum)}</td><td class="num">${r.st==='wait'?'–':tgNumber(r.c.required)}</td><td>${stCell(r)}</td></tr>`).join('')}
   </tbody></table></div></section>`;
  // Others at the same branches (no names shown): everyone active in the period who isn't on this team.
@@ -12682,7 +12686,7 @@ function ltAnalytics(g,p,cutoff,mode,today,self,checks=[],checkDay=cutoff){
   <tr class="bc-other"><td><span class="pill pending">Other recruiters</span></td>${x.other?`<td>${x.other.n}</td><td>${fmtNum(x.other.s)}</td>${cols.map(([k,,,f])=>plain(x.other,k,f)).join('')}<td>${fmtNum(x.other.i)}</td><td>${fmtNum(x.other.h)}</td>`:`<td colspan="${4+cols.length}" class="ta-n">No other recruiters at this branch in this period</td>`}</tr>`).join('')}
   </tbody></table></div>`;
  }
- return {highlights:'',table,breakHtml,branches,breakLists:{eligible:checks.filter(c=>c.eligible).map(c=>({...c,branch:ltBranchOf(c.name,p.from,cutoff)})),notyet:checks.filter(c=>c.known&&!c.eligible).map(c=>({...c,branch:ltBranchOf(c.name,p.from,cutoff)})).sort((a,b)=>(b.cum/b.required)-(a.cum/a.required)),dayLabel:fmtDate(checkDay),day:checkDay}};
+ return {highlights:'',table,breakHtml,branches,breakLists:{eligible:bChecks.filter(c=>c.eligible).map(c=>({...c,branch:ltBranchOf(c.name,p.from,cutoff)})),notyet:bChecks.filter(c=>c.known&&!c.eligible).map(c=>({...c,branch:ltBranchOf(c.name,p.from,cutoff)})).sort((a,b)=>(b.cum/b.required)-(a.cum/a.required)),dayLabel:fmtDate(checkDay),day:checkDay}};
 }
 // ---------- Team leads comparison (admins): every lead's team side by side ----------
 const ltLeads={owner:null,teams:null,loading:false,error:'',at:0};
@@ -12984,7 +12988,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.91.0';   // shown only in the browser tab title
+const APP_VERSION = '4.91.1';   // shown only in the browser tab title
 // Everyone gets the latest look: the page checks the published file for a newer version — right after it opens
 // (switches straight over) and every few minutes / when the tab comes back (offers an Update button).
 const AppUpdate=(()=>{
