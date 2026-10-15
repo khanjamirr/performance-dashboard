@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.86.8</title>
+<title>Performance Dashboard · v4.87.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2536,6 +2536,17 @@ html body .toast,html body #toast{border-radius:14px!important;background:rgba(3
  html body .nav button .nav-ico-grp{width:22px;height:22px;flex:0 0 auto}
 }
 @media (min-width:801px){ html body .nav button .nav-short-grp,html body .nav button .nav-ico-grp{display:none!important} }
+</style>
+<style>
+.al-peers{margin-top:10px;padding-top:9px;border-top:.5px solid rgba(60,60,67,.16);display:flex;flex-direction:column;gap:6px}
+.al-peers-h{font-size:11px;font-weight:700;color:#8e8e93;letter-spacing:.02em}.al-peers-h small{font-weight:600;color:#aeaeb2;margin-left:4px}
+.al-peers.none em{font-style:normal;font-size:12px;color:#8e8e93}
+.al-peer-list{display:flex;flex-wrap:wrap;gap:5px}
+.al-peer{display:inline-flex;align-items:baseline;gap:5px;padding:3px 8px;border-radius:999px;font-size:11.5px;background:rgba(118,118,128,.1);color:#1c1c1e;max-width:100%}
+.al-peer b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.al-peer i{font-style:normal;font-weight:800}.al-peer small{color:#8e8e93;font-size:10.5px}
+.al-peer.good i{color:#15803d}.al-peer.warn i{color:#b45309}.al-peer.bad i{color:#c8102e}
+.al-peer.more{color:#007aff;font-weight:600}
 </style>
 </head>
 <body class="locked">
@@ -11169,7 +11180,7 @@ function drawPivot(){
 // Who needs attention in a week. Main list: recruiters below 50% of their schedule goal (for the
 // week in progress: below 50% of where they should be by today). Then 50–79%, other signals
 // (show rate drops, no-shows, inactivity, wins), and remarks waiting for approval.
-const alertsState = {week:null, signals:'attention', search:'', group:lsGet('ipd_alerts_group2')||'none', band:'below', bands:['below'], basis:'today'};
+const alertsState = {peers:lsGet('ipd_al_peers')!=='0', week:null, signals:'attention', search:'', group:lsGet('ipd_alerts_group2')||'none', band:'below', bands:['below'], basis:'today'};
 // Groups alert items as Division › Branch (or Branch only, or none). Biggest groups first.
 // Smart grouping: small branches sit side by side, single-recruiter branches share one box, and each
 // group header carries its own summary (average %, schedules vs goal) so you can scan without opening cards.
@@ -11389,6 +11400,16 @@ function alertsRemarksSectionHtml(st, rows, q){
     <div class="mr-head-tools"><div class="oe-group" role="tablist"><button type="button" data-rvf="todo" class="${f==='todo'?'on':''}">To review · ${todo.length}</button><button type="button" data-rvf="done" class="${f==='done'?'on':''}">Reviewed · ${done.length}</button><button type="button" data-rvf="all" class="${f==='all'?'on':''}">All</button></div><button type="button" class="link-btn" id="alRvOpen">${open?'Hide':'Show'}</button></div></div>
     ${open?(list.length?`<ul class="rv-list">${list.map(row).join('')}</ul>`:`<p class="hint" style="margin:0">${f==='todo'?(all.length?'Everything this week has been reviewed. ✓':'No remarks for this week yet.'):f==='done'?'Nothing reviewed yet this week.':'No remarks for this week yet.'}</p>`):''}</section>`;
 }
+// Action Center: who else works at the same branch this week, and how they are doing (any result)
+function alPeersHtml(r, rows, soFar){
+  const br=r.branch; if(!br) return '';
+  const peers=rows.filter(x=>x.name!==r.name&&x.branch===br).sort((a,b)=>b.score-a.score||b.sched-a.sched);
+  if(!peers.length) return `<div class="al-peers none"><span class="al-peers-h">Same branch</span><em>Only recruiter at ${escapeHtml(br)} this week</em></div>`;
+  const band=v=>v>=80?'good':v>=50?'warn':'bad', show=peers.slice(0,4), more=peers.slice(4);
+  const chip=x=>`<span class="al-peer ${band(x.score)}" title="${escapeHtml(x.name)} · ${fmtNum(x.sched)} of ${fmtNum(x.target)} schedules${soFar?' so far':''} (${Math.round(x.score)}%)"><b>${escapeHtml(x.name)}</b><i>${Math.round(x.score)}%</i><small>${fmtNum(x.sched)}/${fmtNum(x.target)}</small></span>`;
+  const tot=peers.reduce((a,x)=>a+x.sched,0)+r.sched, tg=peers.reduce((a,x)=>a+(x.target||0),0)+(r.target||0);
+  return `<div class="al-peers"><span class="al-peers-h">Same branch · ${peers.length} other${peers.length===1?'':'s'} <small>branch ${fmtNum(tot)}/${fmtNum(tg)} (${tg?Math.round(tot/tg*100):0}%)</small></span><div class="al-peer-list">${show.map(chip).join('')}${more.length?`<span class="al-peer more" title="${escapeHtml(more.map(x=>x.name+' '+Math.round(x.score)+'%').join(' · '))}">+${more.length} more</span>`:''}</div></div>`;
+}
 async function renderAlertsView(){
   const host = document.getElementById('view-alerts'); if(!host) return;
   const st = alertsState;
@@ -11423,6 +11444,7 @@ async function renderAlertsView(){
       <div class="al-sub">${escapeHtml(r.division)}${r.branch?' · '+escapeHtml(r.branch):''}</div>
       ${bar(r)}
       <div class="al-facts"><span><strong>${fmtNum(r.sched)}</strong> / ${fmtNum(r.target)} schedules${today?' so far':''}</span>${inProgress?(today?`<span>weekly goal ${fmtNum(r.goal)} · on track for ~${fmtNum(r.projected)}</span>`:`<span>on track for ~${fmtNum(r.projected)} · ${fmtNum(Math.round(r.expected))} due by today</span>`):`<span>${fmtNum(r.shows)} shows · ${fmtNum(r.hires)} hires</span>`}</div>
+      ${sev!=='good'&&st.peers!==false?alPeersHtml(r, rows, today):''}
     </div>`;
   const belowShown = below.filter(match), watchShown = watch.filter(match), goodShown = onTrack.filter(match).sort((a,b)=>b.score-a.score);
   // several cards can be on at once (click to add / remove); Highlights is a card too
@@ -11436,6 +11458,7 @@ async function renderAlertsView(){
     <div class="al-toolbar">
       <label class="cand-field"><span>Week ending</span><select id="alWeek">${weeks.map(d=>`<option value="${d}" ${d===st.week?'selected':''}>Wk ${weekOfDate(d).number} · ending ${fmtDate(d)}${d===toIsoDateOnly(saturdayOnOrAfter(new Date()))?' (this week)':''}</option>`).join('')}</select></label>
       <label class="cand-field"><span>Group by</span><select id="alGroup"><option value="division" ${st.group==='division'?'selected':''}>Division › Branch</option><option value="branch" ${st.group==='branch'?'selected':''}>Branch</option><option value="none" ${st.group==='none'?'selected':''}>No grouping</option></select></label>
+      <div class="cand-field al-basis-pick"><span>Same branch</span><label class="rtl-chk basis-sw" title="Show who else works at each recruiter’s branch on the cards"><button type="button" class="switch" role="switch" id="alPeersSw" aria-checked="${st.peers!==false}"><i></i></button>Show on cards</label></div>
       <div class="cand-field al-basis-pick"><span>Compare with</span><label class="rtl-chk basis-sw" title="${inProgress?'On: goal so far (daily goal × working days so far) · Off: the full weekly goal':'Only for the week in progress'}"><button type="button" class="switch" role="switch" id="alBasisSw" aria-checked="${today}" ${inProgress?'':'disabled'}><i></i></button>Goal so far (today)</label></div>
       <p class="hint al-basis">${today?`Week in progress — ${elapsed} of 5 working days so far. Each recruiter’s schedules are compared with their goal so far (daily goal × ${elapsed} day${elapsed===1?'':'s'}).`:inProgress?`Week in progress — ${elapsed} of 5 working days so far. Groups compare schedules with each recruiter’s full weekly goal; each card also shows where they should be by today. Recruiters with no schedules yet are included.`:`Completed week — schedules compared with each recruiter’s weekly goal (default ${DEFAULT_WEEKLY_GOAL}).`}</p>
     </div>
@@ -11473,6 +11496,7 @@ async function renderAlertsView(){
   host.querySelector('[data-hi-all]')?.addEventListener('click',()=>{ st.hiAll=!st.hiAll; renderAlertsView(); });
   host.querySelectorAll('[data-hi-cat]').forEach(b=>b.onclick=()=>{ st.hiCat=b.dataset.hiCat; host.querySelectorAll('[data-hi-cat]').forEach(x=>x.classList.toggle('on',x===b)); host.querySelectorAll('[data-hi-list]').forEach(x=>x.hidden=x.dataset.hiList!==st.hiCat); });
   host.querySelector('[data-hi-copy]')?.addEventListener('click',e=>{ e.preventDefault(); copyRemarksTable(hiShown.streak.map(x=>x.row), st.week, 'below', today); });
+  host.querySelector('#alPeersSw')?.addEventListener('click',()=>{ st.peers=st.peers===false; lsSet('ipd_al_peers', st.peers?'1':'0'); renderAlertsView(); });
   host.querySelector('#alBasisSw')?.addEventListener('click',e=>{ if(e.currentTarget.disabled) return; st.basis=st.basis==='today'?'week':'today'; renderAlertsView(); });
   host.querySelectorAll('[data-sig]').forEach(b=>b.onclick=()=>{ st.signals=b.dataset.sig; renderAlertsView(); });
   host.querySelectorAll('[data-al-remarks]').forEach(b=>b.onclick=()=>openRemarksModal(b.dataset.alRemarks, st.week));
@@ -12876,7 +12900,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.86.8';   // shown only in the browser tab title
+const APP_VERSION = '4.87.1';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
