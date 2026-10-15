@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.86.7</title>
+<title>Performance Dashboard · v4.86.8</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://vgalfqkzoedzdbggwhfa.supabase.co" crossorigin>
@@ -2526,6 +2526,17 @@ html body .toast,html body #toast{border-radius:14px!important;background:rgba(3
 .ta-wins-bar em{margin-left:auto;font-style:normal;font-weight:600;color:#007aff}
 .ta-wins-bar svg{width:16px;height:16px;color:#007aff;transition:transform .2s}
 .ta-wins-bar[aria-expanded="true"] svg{transform:rotate(180deg)}</style>
+<style>
+@media (max-width:800px){
+ html body .nav button.nav-grp-dup{display:none!important}
+ html body .nav button .nav-short-grp{display:none}
+ html body .nav button:has(.nav-short-grp) .nav-short{display:none!important}
+ html body .nav button:has(.nav-short-grp) .nav-short-grp{display:block}
+ html body .nav button:has(.nav-short-grp) .nav-ico{display:none!important}
+ html body .nav button .nav-ico-grp{width:22px;height:22px;flex:0 0 auto}
+}
+@media (min-width:801px){ html body .nav button .nav-short-grp,html body .nav button .nav-ico-grp{display:none!important} }
+</style>
 </head>
 <body class="locked">
 <div id="appLoading" class="app-loading"><div class="spinner" aria-hidden="true"></div><p>Loading dashboard…</p></div>
@@ -12865,7 +12876,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.86.7';   // shown only in the browser tab title
+const APP_VERSION = '4.86.8';   // shown only in the browser tab title
 async function init(){
   document.title = 'Performance Dashboard · v'+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
@@ -13036,8 +13047,19 @@ function layoutNav(){
     else if(el.matches('button[data-view]')&&!el.classList.contains('hidden')) any=true;
   });
   if(label) label.classList.toggle('hidden',!any);
-  const vis=[...nav.querySelectorAll('button[data-view]')].filter(b=>!b.classList.contains('hidden'));
-  const PRIO=['performance','onboarding','orderentry','alerts','highlights','teams','leads','recruiters','branches','divreport','pivot'], rank=b=>{ const i=PRIO.indexOf(b.dataset.view); return i<0?99:i; };
+  // phone: a group (Recruiting, Reports, Action Center) is ONE tab — its open / last-used page stands for it;
+  // the other pages of the group are picked with the segmented control at the top of the page
+  const GRP={rec:'Recruiting', rep:'Reports', act:'Action'};
+  const all=[...nav.querySelectorAll('button[data-view]')].filter(b=>!b.classList.contains('hidden'));
+  const repOf={};
+  all.forEach(b=>{ const g=b.dataset.groupOf; if(!g) return; const cur=repOf[g]; const last=lsGet('ipd_grp_'+g);
+    if(!cur||b.classList.contains('active')||(!cur.classList.contains('active')&&b.dataset.view===last&&cur.dataset.view!==last)) repOf[g]=b; });
+  all.forEach(b=>{ const g=b.dataset.groupOf, isRep=!g||repOf[g]===b; b.classList.toggle('nav-grp-dup',!isRep);
+    let gs=b.querySelector('.nav-short-grp'); if(g&&isRep){ if(!gs){ gs=document.createElement('span'); gs.className='nav-short-grp'; b.appendChild(gs); } gs.textContent=GRP[g]||'';
+      if(!b.querySelector('.nav-ico-grp')){ const ico=nav.querySelector(`.nav-parent[data-group="${g}"] .nav-ico`); if(ico){ const c=ico.cloneNode(true); c.classList.remove('nav-ico'); c.classList.add('nav-ico-grp'); b.insertBefore(c,b.firstChild); } } }
+    else { if(gs) gs.remove(); b.querySelector('.nav-ico-grp')?.remove(); } });
+  const vis=all.filter(b=>!b.classList.contains('nav-grp-dup'));
+  const PRIO=['performance','recruiting','onboarding','orderentry','action','reports'], key=b=>b.dataset.groupOf?({rec:'recruiting',rep:'reports',act:'action'}[b.dataset.groupOf]):b.dataset.view, rank=b=>{ const i=PRIO.indexOf(key(b)); return i<0?99:i; };
   let main=vis.slice().sort((a,b)=>rank(a)-rank(b)).slice(0,4); const act=vis.find(b=>b.classList.contains('active'));
   if(vis.length>5&&act&&!main.includes(act)) main=[...main.slice(0,3),act];
   const extra=vis.length>5?vis.filter(b=>!main.includes(b)):[];
@@ -13053,7 +13075,7 @@ function layoutNav(){
   more.hidden=!extra.length; more.classList.toggle('active',!!extra.find(b=>b.classList.contains('active')));
   let sheet=document.getElementById('navMoreSheet');
   if(!sheet){ sheet=document.createElement('div'); sheet.id='navMoreSheet'; sheet.setAttribute('role','menu'); document.body.appendChild(sheet); }
-  sheet.innerHTML='<div class="nav-more-title">More pages</div>'+extra.map(b=>`<button type="button" role="menuitem" data-go="${b.dataset.view}" class="${b.classList.contains('active')?'active':''}">${b.querySelector('.nav-ico')?.outerHTML||''}<span>${escapeHtml(b.querySelector('.nav-full')?.textContent||b.textContent.trim())}</span></button>`).join('');
+  sheet.innerHTML='<div class="nav-more-title">More pages</div>'+extra.map(b=>`<button type="button" role="menuitem" data-go="${b.dataset.view}" class="${b.classList.contains('active')?'active':''}">${(b.querySelector('.nav-ico-grp')?b.querySelector('.nav-ico-grp').outerHTML.replace('nav-ico-grp','nav-ico'):b.querySelector('.nav-ico')?.outerHTML)||''}<span>${escapeHtml(b.dataset.groupOf?(({rec:'Recruiting',rep:'Reports',act:'Action Center'})[b.dataset.groupOf]):(b.querySelector('.nav-full')?.textContent||b.textContent.trim()))}</span></button>`).join('');
   sheet.querySelectorAll('[data-go]').forEach(x=>x.onclick=()=>{ toggleNavMore(false); nav.querySelector(`button[data-view="${x.dataset.go}"]`)?.click(); });
 }
 function toggleNavMore(force){ const on=force===undefined?!document.body.classList.contains('nav-more-open'):force; document.body.classList.toggle('nav-more-open',on); document.getElementById('navMoreBtn')?.setAttribute('aria-expanded',String(on)); }
