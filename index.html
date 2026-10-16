@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.98.0</title>
+<title>Performance Dashboard · v4.98.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- fonts load without holding up the page (the system font shows for a moment) -->
@@ -2654,7 +2654,7 @@ html body .toast,html body #toast{border-radius:14px!important;background:rgba(3
 #ovModeBar .rtl-top #rtlToggle button.on{background:#fff;color:#1c1c1e;box-shadow:0 1px 3px rgba(0,0,0,.14),0 0 0 .5px rgba(0,0,0,.04)}
 </style>
 <style id="ios-settings">
-#myAccountBtn,#accessModeBtn{display:none!important}
+#myAccountBtn,#accessModeBtn{display:none!important}.ie-pre{white-space:pre-wrap;word-break:break-word;margin:0;padding:10px 12px;border-radius:10px;background:#f2f2f7;font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;color:#1c1c1e;max-height:200px;overflow:auto}.ie-why{display:block;margin-top:3px;font-size:11px;color:#b42318;max-width:260px}
 .bk-dl{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}.bk-dl select{height:34px}
 .bk-preview{margin:12px 0 0;padding:12px 14px;border-radius:12px;background:rgba(0,122,255,.06)}.bk-preview p{margin:0 0 8px;font-size:13px}
 .bk-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:6px 16px;font-size:13px}.bk-items label{display:flex;gap:7px;align-items:baseline}
@@ -10364,6 +10364,30 @@ function importProgress(text){
   setLoading(text);
 }
 
+// ---- uploads that don't give up on the first hiccup, and say exactly what went wrong when they do ----
+const importStep={file:'', step:''};
+const isRetryable=e=>/timeout|timed out|canceling statement|statement_timeout|Failed to fetch|NetworkError|network error|ECONNRESET|payload too large|entity too large|\b(413|500|502|503|504)\b|aborted|Load failed|gateway/i.test(String(e&&e.message||e));
+async function rpcRetry(fn,args,tries=3){ let last; for(let i=0;i<tries;i++){ try{ return await Server.rpc(fn,args); }catch(e){ last=e; if(!isRetryable(e)||i===tries-1) break; await new Promise(r=>setTimeout(r,1200*(i+1))); } } throw last; }
+// a batch that fails for size / time reasons is split in half and tried again (down to 50 rows)
+async function importRowsSafe(importId, source, rows){
+  try{ return await rpcRetry('dash_import_rows',{p_import_id:importId, p_source:source, p_rows:rows}, rows.length>100?1:3); }
+  catch(e){ if(rows.length>50&&isRetryable(e)){ const h=Math.ceil(rows.length/2); return (Number(await importRowsSafe(importId,source,rows.slice(0,h)))||0)+(Number(await importRowsSafe(importId,source,rows.slice(h)))||0); }
+    const err=new Error(cleanErr(e)); err.code=e&&e.code; err.detail=e&&(e.details||e.hint); throw err; }
+}
+function showImportError(e){
+  const msg=cleanErr(e), info={at:new Date().toISOString(), file:importStep.file, step:importStep.step, msg, code:e&&e.code||'', detail:e&&e.detail||''};
+  try{ const l=JSON.parse(localStorage.getItem('ipd_import_errors')||'[]'); l.unshift(info); localStorage.setItem('ipd_import_errors',JSON.stringify(l.slice(0,20))); }catch(x){}
+  const text=`Upload failed while ${info.step||'importing'}${info.file?' — '+info.file:''}\nError: ${msg}${info.code?' (code '+info.code+')':''}${info.detail?'\nDetails: '+info.detail:''}\nDashboard v${APP_VERSION} · ${new Date().toLocaleString()} · ${Server.user&&Server.user.name||''}`;
+  document.getElementById('impErrDlg')?.remove();
+  const w=document.createElement('div'); w.className='modal-overlay'; w.id='impErrDlg';
+  w.innerHTML=`<div class="modal modal-sm" role="alertdialog" aria-modal="true" aria-labelledby="ieT"><div class="modal-header"><h3 id="ieT">Upload didn’t finish</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div>
+   <div class="modal-body"><p style="margin:0 0 8px">It stopped while <b>${escapeHtml(info.step||'importing')}</b>${info.file?` for <b>${escapeHtml(info.file)}</b>`:''}. Nothing was lost — your files weren’t deleted and the week keeps its previous data, so you can upload again.</p>
+   <pre class="ie-pre">${escapeHtml(text)}</pre><p class="hint" style="margin:6px 0 0">If it happens again, copy this and send it to whoever looks after the dashboard.</p></div>
+   <div class="modal-footer"><button class="btn btn-secondary" id="ieCopy">Copy details</button><button class="btn btn-primary" data-close>OK</button></div></div>`;
+  document.body.appendChild(w);
+  w.addEventListener('click',ev=>{ if(ev.target===w||ev.target.closest('[data-close]')) w.remove(); });
+  w.querySelector('#ieCopy').onclick=async()=>{ try{ await navigator.clipboard.writeText(text); showToast('Copied.'); }catch(x){ showToast('Select the text and copy it.'); } };
+}
 // entries: [{name, getFile: ()=>Promise<File>, remove: null | ()=>Promise}]
 async function ingestFiles(entries, {interactive=true, week=null}={}){
   if(!Server.can('upload')){ showToast('Your account cannot upload data.'); return; }
@@ -10500,11 +10524,14 @@ async function ingestFiles(entries, {interactive=true, week=null}={}){
       const importId = await Server.rpc('dash_import_begin', {p_source:source, p_file_name:p.sheetLabel+' · '+label});
       const chunks=[]; for(let i=0;i<batch.length;i+=IMPORT_BATCH) chunks.push(batch.slice(i,i+IMPORT_BATCH));
       importProgress('Saving '+entry.name+tag+': 0 / '+fmtNum(batch.length)+' rows…');
-      const counts = await runPool(chunks.map(rows=>()=>Server.rpc('dash_import_rows', {p_import_id:importId, p_source:source, p_rows:rows})), NET_PARALLEL,
+      importStep.file=entry.name; importStep.step='saving rows';
+      const counts = await runPool(chunks.map(rows=>()=>importRowsSafe(importId, source, rows)), NET_PARALLEL,
         (d,n)=>importProgress('Saving '+entry.name+tag+': '+fmtNum(Math.min(d*IMPORT_BATCH,batch.length))+' / '+fmtNum(batch.length)+' rows…'));
+      importStep.step='finishing the import';
       const savedRows = counts.reduce((a,c)=>a+(Number(c)||0),0);
       const blocked = Math.max(0, batch.length - savedRows); totalBlocked += blocked;
-      const fin = await Server.rpc('dash_import_finish', {p_import_id:importId, p_source:source, p_from:from, p_to:to, p_rows_read:range?batch.length:p.rowsRead, p_removed_columns:removed});
+      const fin = await rpcRetry('dash_import_finish', {p_import_id:importId, p_source:source, p_from:from, p_to:to, p_rows_read:range?batch.length:p.rowsRead, p_removed_columns:removed});
+      importStep.step='recalculating';
       ((fin&&fin.weeks)||[]).forEach(w=>allWeeks.add(w)); allWeeks.add(job.we||to);
       uploadStamps[source]={at:new Date().toISOString(), by:Server.user.name};
       totalRows += batch.length - blocked; totalSkipped += skipped;
@@ -10531,7 +10558,7 @@ async function ingestFiles(entries, {interactive=true, week=null}={}){
     if(imported.length) showToast(weekLabel+' replaced: '+fmtNum(totalRows)+' rows from '+imported.length+' file'+(imported.length===1?'':'s')+(allWeeks.size?' · '+allWeeks.size+' week'+(allWeeks.size===1?'':'s')+' recalculated':'')+(deleted?' · '+deleted+' source file'+(deleted===1?'':'s')+' deleted':'')+(totalBlocked?' · '+fmtNum(totalBlocked)+' row'+(totalBlocked===1?'':'s')+' skipped because their week was removed (Settings → Fetched Data → Removed weeks)':'')+'.');
   }catch(e){
     console.error(e);
-    showToast('Import stopped: '+cleanErr(e)+'. Your files were not deleted — you can run the import again safely.');
+    showImportError(e);
   }finally{
     Server.ownMasterUntil = Date.now()+8000;
     setLoading(null);
@@ -12974,7 +13001,8 @@ async function renderUploadHistory(){
   try{
     const log = await Server.rpc('dash_upload_log', {p_limit:15});
     const last = log[0];
-    host.innerHTML = `<details class="panel set-details"><summary><span class="sd-title">Recent imports</span><span class="sd-status">${last ? escapeHtml(String(last.file_name||'').slice(0,60))+' · '+new Date(last.uploaded_at).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})+(last.uploaded_by?' · '+escapeHtml(last.uploaded_by):'') : 'None yet'}</span></summary>${log.length?`<div style="overflow-x:auto"><table class="users-table"><thead><tr><th>When</th><th>File</th><th>Type</th><th>Rows</th><th>Contact columns removed</th><th>By</th><th>Status</th></tr></thead><tbody>${log.map(l=>`<tr><td style="white-space:nowrap;">${new Date(l.uploaded_at).toLocaleString()}</td><td>${escapeHtml(l.file_name)}</td><td>${escapeHtml(SOURCE_LABEL[l.source]||l.source||'')}</td><td>${fmtNum(l.rows_saved||0)}</td><td>${escapeHtml((l.removed_columns||[]).join(', ')||'—')}</td><td>${escapeHtml(l.uploaded_by||'')}</td><td>${l.status==='done'?'Done':'<span class="pill warn">Incomplete</span>'}</td></tr>`).join('')}</tbody></table></div>`:'<p class="hint" style="margin:0;">No imports yet.</p>'}</details>`;
+    host.innerHTML = `<details class="panel set-details"><summary><span class="sd-title">Recent imports</span><span class="sd-status">${last ? escapeHtml(String(last.file_name||'').slice(0,60))+' · '+new Date(last.uploaded_at).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})+(last.uploaded_by?' · '+escapeHtml(last.uploaded_by):'') : 'None yet'}</span></summary>${log.length?`<div style="overflow-x:auto"><table class="users-table"><thead><tr><th>When</th><th>File</th><th>Type</th><th>Rows</th><th>Contact columns removed</th><th>By</th><th>Status</th></tr></thead><tbody>${log.map(l=>`<tr><td style="white-space:nowrap;">${new Date(l.uploaded_at).toLocaleString()}</td><td>${escapeHtml(l.file_name)}</td><td>${escapeHtml(SOURCE_LABEL[l.source]||l.source||'')}</td><td>${fmtNum(l.rows_saved||0)}</td><td>${escapeHtml((l.removed_columns||[]).join(', ')||'—')}</td><td>${escapeHtml(l.uploaded_by||'')}</td><td>${l.status==='done'?'Done':(()=>{ let why=''; try{ const errs=JSON.parse(localStorage.getItem('ipd_import_errors')||'[]'), t=Date.parse(l.uploaded_at); const m=errs.find(x=>Math.abs(Date.parse(x.at)-t)<30*60e3&&(!x.file||String(l.file_name||'').startsWith(x.file.replace(/\.xlsx?$/i,'').slice(0,20)))); if(m) why=m.step+': '+m.msg; }catch(e){}
+      return `<span class="pill warn" ${why?`title="${escapeHtml(why)}"`:''}>Incomplete</span>${why?`<small class="ie-why">${escapeHtml(why)}</small>`:''}`; })()}</td></tr>`).join('')}</tbody></table></div>`:'<p class="hint" style="margin:0;">No imports yet.</p>'}</details>`;
   }catch(e){ host.innerHTML=''; }
 }
 
@@ -13711,7 +13739,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.98.0';   // shown only in the browser tab title
+const APP_VERSION = '4.98.1';   // shown only in the browser tab title
 // Everyone gets the latest look: the page checks the published file for a newer version — right after it opens
 // (switches straight over) and every few minutes / when the tab comes back (offers an Update button).
 const AppUpdate=(()=>{
