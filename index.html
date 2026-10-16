@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.98.2</title>
+<title>Performance Dashboard · v4.98.4</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- fonts load without holding up the page (the system font shows for a moment) -->
@@ -10367,7 +10367,7 @@ function importProgress(text){
 // ---- uploads that don't give up on the first hiccup, and say exactly what went wrong when they do ----
 const importStep={file:'', step:''};
 const isRetryable=e=>/timeout|timed out|canceling statement|statement_timeout|Failed to fetch|NetworkError|network error|ECONNRESET|payload too large|entity too large|\b(413|500|502|503|504)\b|aborted|Load failed|gateway/i.test(String(e&&e.message||e));
-async function rpcRetry(fn,args,tries=3){ let last; for(let i=0;i<tries;i++){ try{ return await Server.rpc(fn,args); }catch(e){ last=e; if(!isRetryable(e)||i===tries-1) break; await new Promise(r=>setTimeout(r,1200*(i+1))); } } throw last; }
+async function rpcRetry(fn,args,tries=3){ let last; importStep.tries=[]; for(let i=0;i<tries;i++){ const t0=performance.now(); try{ return await Server.rpc(fn,args); }catch(e){ last=e; importStep.tries.push(((performance.now()-t0)/1000).toFixed(1)+'s'); if(!isRetryable(e)||i===tries-1||(fn==='dash_import_finish'&&/statement timeout|57014/i.test(String(e&&e.message||e)+' '+(e&&e.code||'')))) break; await new Promise(r=>setTimeout(r,1200*(i+1))); } } throw last; }
 // a batch that fails for size / time reasons is split in half and tried again (down to 50 rows)
 async function importRowsSafe(importId, source, rows){
   try{ return await rpcRetry('dash_import_rows',{p_import_id:importId, p_source:source, p_rows:rows}, rows.length>100?1:3); }
@@ -10377,12 +10377,12 @@ async function importRowsSafe(importId, source, rows){
 function showImportError(e){
   const msg=cleanErr(e), info={at:new Date().toISOString(), file:importStep.file, step:importStep.step, msg, code:e&&e.code||'', detail:e&&e.detail||''};
   try{ const l=JSON.parse(localStorage.getItem('ipd_import_errors')||'[]'); l.unshift(info); localStorage.setItem('ipd_import_errors',JSON.stringify(l.slice(0,20))); }catch(x){}
-  const text=`Upload failed while ${info.step||'importing'}${info.file?' — '+info.file:''}\nError: ${msg}${info.code?' (code '+info.code+')':''}${info.detail?'\nDetails: '+info.detail:''}\nDashboard v${APP_VERSION} · ${new Date().toLocaleString()} · ${Server.user&&Server.user.name||''}`;
+  const text=`Upload failed while ${info.step||'importing'}${info.file?' — '+info.file:''}\nError: ${msg}${info.code?' (code '+info.code+')':''}${info.detail?'\nDetails: '+info.detail:''}${(importStep.tries||[]).length?'\nAttempts: '+importStep.tries.join(', '):''}\nDashboard v${APP_VERSION} · ${new Date().toLocaleString()} · ${Server.user&&Server.user.name||''}`;
   document.getElementById('impErrDlg')?.remove();
   const w=document.createElement('div'); w.className='modal-overlay'; w.id='impErrDlg';
   w.innerHTML=`<div class="modal modal-sm" role="alertdialog" aria-modal="true" aria-labelledby="ieT"><div class="modal-header"><h3 id="ieT">Upload didn’t finish</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div>
    <div class="modal-body"><p style="margin:0 0 8px">It stopped while <b>${escapeHtml(info.step||'importing')}</b>${info.file?` for <b>${escapeHtml(info.file)}</b>`:''}. Nothing was lost — your files weren’t deleted and the week keeps its previous data, so you can upload again.</p>
-   <pre class="ie-pre">${escapeHtml(text)}</pre><p class="hint" style="margin:6px 0 0">${/statement timeout|57014/i.test(text)?'The database ran out of time. Run Part 8 of dashboard_update.sql in the Supabase SQL Editor once, then upload again.':'If it happens again, copy this and send it to whoever looks after the dashboard.'}</p></div>
+   <pre class="ie-pre">${escapeHtml(text)}</pre><p class="hint" style="margin:6px 0 0">${/statement timeout|57014/i.test(text)?'The database ran out of time. Make sure Part 9 of dashboard_update.sql has been run, then upload again. If it still fails, send these details.':'If it happens again, copy this and send it to whoever looks after the dashboard.'}</p></div>
    <div class="modal-footer"><button class="btn btn-secondary" id="ieCopy">Copy details</button><button class="btn btn-primary" data-close>OK</button></div></div>`;
   document.body.appendChild(w);
   w.addEventListener('click',ev=>{ if(ev.target===w||ev.target.closest('[data-close]')) w.remove(); });
@@ -13739,7 +13739,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.98.2';   // shown only in the browser tab title
+const APP_VERSION = '4.98.4';   // shown only in the browser tab title
 // Everyone gets the latest look: the page checks the published file for a newer version — right after it opens
 // (switches straight over) and every few minutes / when the tab comes back (offers an Update button).
 const AppUpdate=(()=>{
