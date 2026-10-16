@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.97.2</title>
+<title>Performance Dashboard · v4.98.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- fonts load without holding up the page (the system font shows for a moment) -->
@@ -2655,6 +2655,10 @@ html body .toast,html body #toast{border-radius:14px!important;background:rgba(3
 </style>
 <style id="ios-settings">
 #myAccountBtn,#accessModeBtn{display:none!important}
+.bk-dl{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}.bk-dl select{height:34px}
+.bk-preview{margin:12px 0 0;padding:12px 14px;border-radius:12px;background:rgba(0,122,255,.06)}.bk-preview p{margin:0 0 8px;font-size:13px}
+.bk-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:6px 16px;font-size:13px}.bk-items label{display:flex;gap:7px;align-items:baseline}
+.bk-go{display:flex;gap:8px;margin-top:12px}html body .settings-page .set-row strong .pill{display:inline-block!important;width:auto!important;margin-left:6px;padding:2px 9px!important;border-radius:999px!important;font-size:12px!important;font-weight:700!important;vertical-align:1px}.set-row strong .pill.good{background:#e7f8ee!important;color:#137a3d!important}.set-row strong .pill.warn{background:#fff4e5!important;color:#a35a00!important}
 .dpr-ovx{vertical-align:middle}.dpr-ovx .ovx-dbtn span{display:flex;flex-direction:column;line-height:1.15}.dpr-ovx .ovx-dbtn small{font-size:10.5px;font-weight:600;color:#8e8e93;text-transform:uppercase;letter-spacing:.04em}.dpr-ovx .ovx-dbtn b{font-size:14px;color:#1c1c1e;white-space:nowrap}
 .dpr-ovx .ovx-dbtn svg{width:30px;height:30px;padding:6px;border-radius:9px;background:rgba(0,122,255,.1);color:#007aff;box-sizing:border-box;flex:0 0 30px}
 .lt-dates{display:flex;align-items:center;gap:8px}
@@ -10084,23 +10088,28 @@ function chooseSourceDialog(fileName){
 let privacyLog=null;   // {running, lines:[], result}
 function renderPrivacyCleanup(){
   const host=document.getElementById('privacyCleanup'); if(!host) return;
-  if(!(Server.user&&(Server.isAdmin()||Server.can('upload')))){ host.innerHTML=''; return; }
-  const done=KV.get('privacyCleanupAt'), run=privacyLog&&privacyLog.running;
-  host.innerHTML=`<div class="panel set-card"><h3 class="set-title">Encrypt saved names &amp; slim the data</h3>
-    <div class="set-row"><div><strong>${done?'Last run '+escapeHtml(new Date(done.at).toLocaleString())+(done.by?' by '+escapeHtml(done.by):'')+(done.weeks!=null?' · '+done.weeks+' week'+(done.weeks===1?'':'s')+' re-saved':''):'Weeks uploaded before encryption still hold plain names and extra columns'}</strong>
-    <span>Re-saves every week with only the columns the dashboard uses and candidate names encrypted — smaller data, faster loading. Counts don’t change. Keep this tab open while it runs.</span></div>
-    <button type="button" class="btn btn-primary btn-sm" id="privacyRun" ${run?'disabled':''}>${run?'Running…':done?'Run again':'Encrypt & slim now'}</button></div>
+  if(!(Server.user&&Server.isSuperAdmin())){ host.innerHTML=''; return; }   // names in the database: super admin only
+  const done=KV.get('privacyCleanupAt'), run=privacyLog&&privacyLog.running, plain=KV.get('namesPhase')==='plain';
+  host.innerHTML=`<div class="panel set-card"><h3 class="set-title">Candidate names in the database</h3>
+    <div class="set-row"><div><strong>Names are stored <span class="pill ${plain?'warn':'good'}">${plain?'readable (decrypted)':'encrypted'}</span></strong>
+    <span>${done?'Last change '+escapeHtml(new Date(done.at).toLocaleString())+(done.by?' by '+escapeHtml(done.by):'')+(done.weeks!=null?' · '+done.weeks+' week'+(done.weeks===1?'':'s')+' re-saved':''):'Switch every saved week between encrypted and readable names.'} New uploads follow the same setting. Counts don’t change. Keep this tab open while it runs.</span></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn ${plain?'btn-primary':'btn-secondary'} btn-sm" id="privacyRun" ${run?'disabled':''}>${run&&privacyLog.mode!=='decrypt'?'Encrypting…':'🔒 Encrypt names'}</button><button type="button" class="btn btn-secondary btn-sm" id="privacyDec" ${run?'disabled':''}>${run&&privacyLog.mode==='decrypt'?'Decrypting…':'🔓 Decrypt names'}</button></div></div>
     ${privacyLog?`<div class="pc-log ${privacyLog.error?'bad':''}" role="status" aria-live="polite">${privacyLog.result?`<strong>${escapeHtml(privacyLog.result)}</strong>`:''}<ul>${privacyLog.lines.slice(-8).map(l=>`<li class="${l.bad?'bad':''}">${escapeHtml(l.t)}</li>`).join('')}</ul></div>`:''}</div>`;
-  host.querySelector('#privacyRun').onclick=encryptSavedNames;
+  host.querySelector('#privacyRun').onclick=()=>encryptSavedNames('encrypt');
+  host.querySelector('#privacyDec').onclick=()=>encryptSavedNames('decrypt');
 }
 function pcLog(t,bad){ if(!privacyLog) return; privacyLog.lines.push({t,bad:!!bad}); renderPrivacyCleanup(); }
-async function encryptSavedNames(){
-  privacyLog={running:true,lines:[],result:'',error:false}; renderPrivacyCleanup();
+async function encryptSavedNames(mode){
+  mode=mode==='decrypt'?'decrypt':'encrypt'; const dec=mode==='decrypt';
+  if(!Server.isSuperAdmin()){ showToast('Only the super admin can change how names are stored.'); return; }
+  privacyLog={running:true,lines:[],result:'',error:false,mode}; renderPrivacyCleanup();
   pcLog('Getting the name-protection key…');
   if(!(await NamePolicy.getKey(true))){ privacyLog.running=false; privacyLog.error=true; privacyLog.result='Couldn’t start: '+(NamePolicy.keyErr||'the key isn’t available.'); renderPrivacyCleanup(); return; }
   const weeks=[...weeksData].map(w=>w.weekEndDate).sort();
   if(!weeks.length){ privacyLog.running=false; privacyLog.result='No saved weeks yet.'; renderPrivacyCleanup(); return; }
-  if(!confirm(`Encrypt candidate names and remove unused columns for all ${weeks.length} saved weeks?\n\nCounts stay the same. Rows you excluded in Candidates that have no Employee Number may need excluding again. Keep this tab open until it finishes.`)){ privacyLog=null; renderPrivacyCleanup(); return; }
+  if(!confirm(dec?`Decrypt candidate names in all ${weeks.length} saved weeks?\n\nNames are then stored readable in the database: anyone with access to candidate details sees real names, and new uploads keep names readable until you encrypt again. Counts stay the same. Keep this tab open until it finishes.`
+    :`Encrypt candidate names and remove unused columns for all ${weeks.length} saved weeks?\n\nCounts stay the same. Rows you excluded in Candidates that have no Employee Number may need excluding again. Keep this tab open until it finishes.`)){ privacyLog=null; renderPrivacyCleanup(); return; }
+  let undecodable=0;
   const keep=new Set(Object.values(CANON)), tokCache=new Map(), touched=new Set(), localRows=new Map(), failed=[];
   const toTok=async n=>{ if(tokCache.has(n)) return tokCache.get(n); const t=await NamePolicy.enc(n)||await NamePolicy.hash(n); tokCache.set(n,t); return t; };
   let changedWeeks=0, skippedWeeks=0, rowsDone=0;
@@ -10117,7 +10126,7 @@ async function encryptSavedNames(){
       await runPool(chunks.map(c=>async()=>{ ((await Server.rpc('dash_rows_by_ids',{p_ids:c}))||[]).forEach(r=>data.set(r.id,r.data)); }), NET_PARALLEL);
       if(data.size<ids.length){ failed.push(label); pcLog(label+': only '+data.size+' of '+ids.length+' rows could be read — left unchanged.',true); continue; }
       const plainName=v=>v!=null&&String(v).trim()!==''&&!NamePolicy.isTok(String(v).trim())&&!NamePolicy.isHash(String(v).trim())&&!isBlankIdent(v);
-      const needs=[...data.values()].some(d=>d&&(Object.keys(d).some(k=>!keep.has(k))||plainName(d['Candidate Name'])));
+      const needs=[...data.values()].some(d=>d&&(Object.keys(d).some(k=>!keep.has(k))||(dec?NamePolicy.isTok(String(d['Candidate Name']||'').trim()):plainName(d['Candidate Name']))));
       if(!needs){ skippedWeeks++; continue; }
       // safety: never re-save a week whose rows don't carry the core columns (unexpected format)
       const broken=[...data.values()].filter(d=>!d||!(d['Created On']||d['Date Of'])||!('Created By' in d)).length;
@@ -10130,7 +10139,8 @@ async function encryptSavedNames(){
         for(const [idx,r] of rows.entries()){
           const d=data.get(r.id), out={};
           for(const k of Object.keys(d)){ if(keep.has(k)) out[k]=d[k]; else dropped.add(k); }
-          if(plainName(out['Candidate Name'])) out['Candidate Name']=await toTok(String(out['Candidate Name']).trim());
+          if(dec){ const t=String(out['Candidate Name']||'').trim(); if(NamePolicy.isTok(t)){ const v=await NamePolicy.dec(t); if(v) out['Candidate Name']=v; else undecodable++; } }
+          else if(plainName(out['Candidate Name'])) out['Candidate Name']=await toTok(String(out['Candidate Name']).trim());
           const created=out['Created On']||null, dateOf=out['Date Of']||null, eid=normalizeEmployeeNumber(out['Employee Number']||'');
           const base=[created||'', String(out['Created By']||'').trim().toLowerCase(), eid || ('n:'+String(out['Candidate Name']||'').trim().toLowerCase()), dateOf||''].join('|');
           const n=occ.get(base)||0; occ.set(base,n+1); const id=base+'#'+n;
@@ -10144,31 +10154,185 @@ async function encryptSavedNames(){
         const saved=counts.reduce((a,c)=>a+(Number(c)||0),0); rowsWeek+=batch.length; rowsDone+=batch.length;
         if(saved&&saved<batch.length) pcLog(label+' '+(source==='schedules'?'Created On':'Date Of')+': the server kept '+saved+' of '+batch.length+' rows.',true);
       }
-      touched.add(week); changedWeeks++; pcLog(label+': '+fmtNum(rowsWeek)+' rows encrypted and slimmed.');
+      touched.add(week); changedWeeks++; pcLog(label+': '+fmtNum(rowsWeek)+' rows '+(dec?'decrypted':'encrypted and slimmed')+'.');
     }catch(e){ failed.push(label); pcLog(label+': '+cleanErr(e),true); }
   }
   try{
     if(touched.size){ pcLog('Recalculating '+touched.size+' week'+(touched.size===1?'':'s')+'…'); await rebuildWeeks([...touched], localRows, t=>setLoading(t)); }
-    await storageSet('privacyCleanupAt',{at:new Date().toISOString(),by:Server.user.name,weeks:changedWeeks});
+    await storageSet('privacyCleanupAt',{at:new Date().toISOString(),by:Server.user.name,weeks:changedWeeks,mode});
+    if(!failed.length) await storageSet('namesPhase', dec?'plain':'encrypted');
     candState.cache?.clear?.(); await loadAllWeeks(); refreshUI();
   }catch(e){ failed.push('recalculation'); pcLog('Recalculating: '+cleanErr(e),true); }
   setLoading(null); const u=document.getElementById('uploadFilesBtn'); if(u) u.textContent='Upload Excel files';
   privacyLog.running=false; privacyLog.error=failed.length>0;
-  privacyLog.result=failed.length?`Finished with problems in ${failed.join(', ')} — run it again to retry those.`:changedWeeks?`Done — ${changedWeeks} week${changedWeeks===1?'':'s'} re-saved (${fmtNum(rowsDone)} rows). ${skippedWeeks} already clean.`:`Everything was already encrypted and slim — nothing to change.`;
+  privacyLog.result=(failed.length?`Finished with problems in ${failed.join(', ')} — run it again to retry those.`:changedWeeks?`Done — ${changedWeeks} week${changedWeeks===1?'':'s'} re-saved (${fmtNum(rowsDone)} rows). ${skippedWeeks} already ${dec?'readable':'clean'}.`:dec?'Every name was already readable — nothing to change.':`Everything was already encrypted and slim — nothing to change.`)
+    +(undecodable?` ${fmtNum(undecodable)} name${undecodable===1?'':'s'} couldn’t be decrypted (saved as one-way codes before the key existed) and stay as codes.`:'');
   renderPrivacyCleanup();
 }
-// ---------- Admins: download exactly what the server holds ----------
-// Rows come back as stored — encrypted names stay encrypted, columns as saved — so you can check
-// what's really in the database.
+// ---------- Super admin: full backup to Excel, and restore from it ----------
+// One workbook holds everything: candidate rows, every setting (goals, divisions, roles, attendance, adjustments, lists…),
+// users and their rights, teams, onboarding, order entry, absences, remark reviews and branch merges.
+// Uploading it replaces what's in the file and leaves everything else alone. Only the super admin can do either.
+const BK_TABLES=[['dash_onboarding','Onboarding calls'],['dash_onb_links','Onboarder links'],['dash_onb_requests','Onboarding requests'],['dash_onb_assign','Daily assignments'],
+ ['dash_order_entry','Order entry'],['dash_oe_off','Order entry off days'],['dash_user_grants','User rights'],['dash_granted_kv','Shared settings'],['dash_remark_reviews','Remark reviews'],
+ ['dash_team_assignments','Teams'],['dash_branch_merges','Branch merges'],['dash_remarks','Remarks']];
+const BK_ROWCOLS=[['s','In Created On file'],['sw','Created On week'],['so','Created On order'],['v','In Date Of file'],['vw','Date Of week'],['vo','Date Of order'],['excluded','Excluded']];
+let bkState=null;
 function renderServerDownload(){
   const host=document.getElementById('serverDownload'); if(!host) return;
-  if(!(Server.user&&Server.isAdmin())){ host.innerHTML=''; return; }
-  const weeks=[...weeksData].map(w=>w.weekEndDate).sort().reverse();
-  host.innerHTML=`<div class="panel set-card"><h3 class="set-title">Download what’s saved on the server</h3>
-    <div class="set-row"><div><strong>The stored rows, exactly as saved</strong><span>Every column the database holds, names still encrypted, plus which file each row came from. A second sheet lists each week’s row counts and columns.</span></div>
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><select id="srvWeek" aria-label="Weeks to download"><option value="">All ${weeks.length} weeks</option>${weeks.map(w=>`<option value="${w}">Wk ${weekOfDate(w).number} · ending ${fmtDate(w)}</option>`).join('')}</select>
-    <button type="button" class="btn btn-primary btn-sm" id="srvDl">Download Excel</button></div></div></div>`;
-  host.querySelector('#srvDl').onclick=()=>downloadServerRows(host.querySelector('#srvWeek').value);
+  if(!(Server.user&&Server.isSuperAdmin())){ host.innerHTML=''; return; }
+  const plain=KV.get('namesPhase')==='plain', b=bkState;
+  host.innerHTML=`<div class="panel set-card bk-card"><h3 class="set-title">Backup &amp; restore</h3>
+    <div class="set-row"><div><strong>Download everything as one Excel file</strong><span>Candidate rows, every setting (goals, divisions, branches, roles, attendance, adjustments, dropdowns…), users and their rights, teams, onboarding, order entry, absences, remark reviews and branch merges. Passwords are never included.</span></div>
+     <div class="bk-dl"><label class="cand-field"><span>Candidate names in the file</span><select id="bkNames"><option value="enc" ${plain?'':'selected'}>Encrypted (codes)</option><option value="plain" ${plain?'selected':''}>Readable (decrypted)</option></select></label><button type="button" class="btn btn-primary btn-sm" id="bkDl" ${b&&b.busy?'disabled':''}>Download backup</button></div></div>
+    <div class="set-row"><div><strong>Restore from a backup file</strong><span>Upload a backup made here. What’s in the file <b>replaces</b> the same weeks, settings and records in the database; anything not in the file stays as it is. Names are saved the way the database is set (${plain?'readable':'encrypted'}).</span></div>
+     <label class="btn btn-secondary btn-sm" style="cursor:pointer">Choose backup file<input type="file" id="bkFile" accept=".xlsx" hidden></label></div>
+    ${b&&b.preview?bkPreviewHtml(b.preview):''}
+    ${b&&b.log?`<div class="pc-log ${b.error?'bad':''}" role="status" aria-live="polite">${b.result?`<strong>${escapeHtml(b.result)}</strong>`:''}<ul>${b.log.slice(-10).map(l=>`<li class="${l.bad?'bad':''}">${escapeHtml(l.t)}</li>`).join('')}</ul></div>`:''}</div>`;
+  host.querySelector('#bkDl').onclick=()=>downloadBackupXlsx(host.querySelector('#bkNames').value==='plain');
+  host.querySelector('#bkFile').onchange=e=>{ const f=e.target.files[0]; e.target.value=''; if(f) readBackupXlsx(f); };
+  host.querySelector('#bkGo')?.addEventListener('click',()=>{ const parts=[...host.querySelectorAll('[data-bkp]:checked')].map(i=>i.dataset.bkp); restoreBackup(parts); });
+  host.querySelector('#bkCancel')?.addEventListener('click',()=>{ bkState=null; renderServerDownload(); });
+}
+function bkLog(t,bad){ if(!bkState) bkState={}; (bkState.log||(bkState.log=[])).push({t,bad:!!bad}); renderServerDownload(); }
+// cells: objects as JSON; anything longer than an Excel cell goes to the "Long values" sheet
+function bkCellWriter(){ const long=[]; let n=0;
+  const cell=v=>{ if(v==null) return ''; let s=typeof v==='object'?JSON.stringify(v):v; if(typeof s==='string'&&s.length>30000){ const ref='@@long:'+(++n); for(let i=0;i<s.length;i+=30000) long.push([ref,i/30000,s.slice(i,i+30000)]); return ref; } return s; };
+  return {cell, long}; }
+async function buildBackupXlsx(readable, say){
+  const C=bkCellWriter(), wb=XLSX.utils.book_new(), counts={};
+  const add=(name,aoa,widths)=>{ const sh=XLSX.utils.aoa_to_sheet(aoa); if(widths) sh['!cols']=widths.map(w=>({wch:w})); XLSX.utils.book_append_sheet(wb,sh,name); };
+  // settings and weekly results, exactly as stored
+  const kv=[]; let after='';
+  for(;;){ const rows=await Server.rpc('dash_kv_page',{p_after:after,p_limit:25}); if(!rows||!rows.length) break; rows.forEach(r=>kv.push([r.key,r.value])); after=rows[rows.length-1].key; say('Settings and weekly results… '+kv.length); }
+  const have=new Set(kv.map(r=>r[0])), lk=kv.map(r=>r[0]).filter(k=>k.startsWith('weekly:')&&!k.endsWith(LISTS_SUFFIX)).map(k=>k+LISTS_SUFFIX).filter(k=>!have.has(k));
+  for(let i=0;i<lk.length;i+=4){ (await Server.rpc('dash_kv_get',{p_keys:lk.slice(i,i+4)})||[]).forEach(r=>kv.push([r.key,r.value])); say('Candidate lists… '+Math.min(i+4,lk.length)+' / '+lk.length); }
+  counts.settings=kv.length;
+  // every candidate row with the week and order it counts in
+  const rows=[]; after='';
+  for(;;){ const page=await Server.rpc('dash_master_export',{p_after:after,p_limit:1000}); if(!page||!page.length) break; rows.push(...page); after=page[page.length-1].id; say('Candidate rows… '+fmtNum(rows.length)); }
+  const wset=new Set(); rows.forEach(r=>['Created On','Date Of'].forEach(k=>{ const d=String((r.data||{})[k]||'').slice(0,10); if(/^\d{4}-\d{2}-\d{2}$/.test(d)) wset.add(weekOfDate(d).weekEnd); }));
+  const pos=new Map(), wl=[...wset].sort();
+  for(let i=0;i<wl.length;i+=8){ let a=''; for(;;){ const page=await Server.rpc('dash_week_index',{p_weeks:wl.slice(i,i+8),p_after:a,p_limit:1000}); if(!page||!page.length) break; page.forEach(x=>pos.set(x.id,x)); a=page[page.length-1].id; } say('Row order… week '+Math.min(i+8,wl.length)+' / '+wl.length); }
+  if(readable){ say('Decrypting names…'); const toks=[...new Set(rows.map(r=>String((r.data||{})['Candidate Name']||'').trim()).filter(t=>NamePolicy.isTok(t)))], m=new Map();
+    for(let i=0;i<toks.length;i+=200){ await Promise.all(toks.slice(i,i+200).map(async t=>m.set(t,await NamePolicy.dec(t)))); say('Decrypting names… '+fmtNum(Math.min(i+200,toks.length))+' / '+fmtNum(toks.length)); }
+    rows.forEach(r=>{ const t=String((r.data||{})['Candidate Name']||'').trim(); if(m.get(t)) r.data={...r.data,'Candidate Name':m.get(t)}; }); }
+  const dataKeys=[...new Set(rows.flatMap(r=>Object.keys(r.data||{})))];
+  add('Candidate rows',[['Row ID',...BK_ROWCOLS.map(c=>c[1]),...dataKeys], ...rows.map(r=>{ const p=pos.get(r.id)||{}, x={s:!!r.s, v:!!r.v, excluded:!!r.excluded, sw:p.sw||'', so:p.so??0, vw:p.vw||'', vo:p.vo??0};
+    return [r.id,...BK_ROWCOLS.map(([k])=>typeof x[k]==='boolean'?(x[k]?'Yes':'No'):x[k]),...dataKeys.map(k=>C.cell((r.data||{})[k]))]; })],[42,8,12,8,8,12,8,8,...dataKeys.map(()=>16)]);
+  counts.rows=rows.length;
+  add('Settings',[['Key','Value (JSON)'],...kv.map(([k,v])=>[k,C.cell(JSON.stringify(v===undefined?null:v))])],[40,100]);   // exact: always JSON
+  const users=(await Server.rpc('dash_users_list'))||[]; counts.users=users.length;
+  add('Users',[['ID','Name','Role','Active','Email','Pages (modules)','Rights & sections'],...users.map(u=>[String(u.id),u.name,u.role,u.active?'Yes':'No',u.email||'',C.cell(u.modules||[]),C.cell(u.hidden_sections||[])])],[38,24,12,8,28,60,80]);
+  for(const [t,label] of BK_TABLES){ const all=[]; let off=0, missing=false;
+    for(;;){ const page=await Server.rpc('dash_backup_table',{p_table:t,p_offset:off,p_limit:5000}); if(page==null){ missing=true; break; } all.push(...page); if(page.length<5000) break; off+=5000; say(label+'… '+fmtNum(all.length)); }
+    if(missing) continue; say(label+'… '+fmtNum(all.length));
+    const cols=[...new Set(all.flatMap(r=>Object.keys(r)))], js=new Set(cols.filter(c=>all.some(r=>r[c]!=null&&typeof r[c]==='object')));
+    add(label.slice(0,31),[[...cols.map(c=>js.has(c)?c+' {json}':c)],...all.map(r=>cols.map(c=>js.has(c)?C.cell(r[c]==null?null:JSON.stringify(r[c])):C.cell(r[c])))]);
+    counts[t]=all.length; }
+  if(C.long.length) add('Long values',[['Ref','Part','Value'],...C.long],[14,6,120]);
+  const about=[['Dashboard backup'],['Format','ipd-backup-xlsx'],['Version',1],['Exported',new Date().toISOString()],['Exported by',Server.user.name],['Candidate names',readable?'Readable':'Encrypted'],
+    ['Candidate rows',counts.rows],['Settings',counts.settings],['Users',counts.users],...BK_TABLES.filter(([t])=>counts[t]!=null).map(([t,l])=>[l,counts[t]]),[],['Restore it in Settings → Uploads → Backup & restore (super admin only).']];
+  const sh=XLSX.utils.aoa_to_sheet(about); sh['!cols']=[{wch:22},{wch:40}]; XLSX.utils.book_append_sheet(wb,sh,'About'); wb.SheetNames.unshift(wb.SheetNames.pop());
+  return {wb, counts};
+}
+async function downloadBackupXlsx(readable){
+  if(!Server.isSuperAdmin()){ showToast('Only the super admin can download a backup.'); return; }
+  if(typeof XLSX==='undefined'){ showToast('The Excel tools are still loading — try again in a moment.'); return; }
+  if(readable&&!(await NamePolicy.getKey(true))){ showToast('Names can’t be decrypted: '+(NamePolicy.keyErr||'the key isn’t available.')); return; }
+  bkState={busy:true}; renderServerDownload();
+  try{ const {wb,counts}=await buildBackupXlsx(readable,t=>setLoading(t)); setLoading('Writing the file…');
+    XLSX.writeFile(wb,'dashboard-backup-'+(readable?'readable-names-':'')+ltToday()+'.xlsx');
+    bkState={log:[{t:`Backup downloaded — ${fmtNum(counts.rows)} candidate rows, ${fmtNum(counts.settings)} settings, ${counts.users} users${readable?', names readable':''}.`}]}; }
+  catch(e){ bkState={log:[{t:'Backup failed: '+cleanErr(e),bad:true}],error:true}; }
+  finally{ setLoading(null); renderServerDownload(); }
+}
+// ---- restore ----
+function bkRead(wb){
+  const sheet=n=>wb.Sheets[n]?XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,defval:'',raw:true}):null;
+  const about=sheet('About'); if(!about||!about.some(r=>r[0]==='Format'&&r[1]==='ipd-backup-xlsx')) throw new Error('This isn’t a dashboard backup file (no About sheet).');
+  const long=new Map(); (sheet('Long values')||[]).slice(1).forEach(([ref,part,v])=>{ if(!long.has(ref)) long.set(ref,[]); long.get(ref)[+part]=String(v); });
+  const val=v=>typeof v==='string'&&v.startsWith('@@long:')?(long.get(v)||[]).join(''):v;
+  const json=v=>{ v=val(v); if(v===''||v==null) return null; try{ return JSON.parse(v); }catch(e){ return v; } };
+  const info=Object.fromEntries(about.filter(r=>r[0]).map(r=>[r[0],r[1]]));
+  const P={info, parts:{}};
+  const rs=sheet('Candidate rows'); if(rs&&rs.length>1){ const h=rs[0]; const ix=Object.fromEntries(BK_ROWCOLS.map(([k,l])=>[k,h.indexOf(l)])); const dk=h.slice(1+BK_ROWCOLS.length);
+    P.parts.rows=rs.slice(1).filter(r=>r[0]).map(r=>({id:String(r[0]), s:r[ix.s]==='Yes', v:r[ix.v]==='Yes', excluded:r[ix.excluded]==='Yes', sw:String(r[ix.sw]||''), so:Number(r[ix.so])||0, vw:String(r[ix.vw]||''), vo:Number(r[ix.vo])||0,
+      data:Object.fromEntries(dk.map((k,i)=>[k,val(r[1+BK_ROWCOLS.length+i])]).filter(([,v])=>v!==''&&v!=null))})); }
+  const st=sheet('Settings'); if(st&&st.length>1) P.parts.settings=st.slice(1).filter(r=>r[0]).map(r=>{ const raw=val(r[1]); let value=null; try{ value=JSON.parse(raw); }catch(e){ value=raw; } return {key:String(r[0]), value}; });
+  const us=sheet('Users'); if(us&&us.length>1) P.parts.users=us.slice(1).filter(r=>r[0]).map(r=>({id:String(r[0]), name:String(r[1]), role:String(r[2]), active:r[3]==='Yes', modules:json(r[5])||[], hidden_sections:json(r[6])||[]}));
+  BK_TABLES.forEach(([t,l])=>{ const x=sheet(l.slice(0,31)); if(!x||x.length<2) return; const h=x[0].map(String);
+    P.parts[t]=x.slice(1).map(r=>Object.fromEntries(h.map((c,i)=>c.endsWith(' {json}')?[c.slice(0,-7),json(r[i])]:[c,r[i]===''?null:val(r[i])]))); });
+  return P;
+}
+async function readBackupXlsx(file){
+  if(typeof XLSX==='undefined'){ showToast('The Excel tools are still loading — try again in a moment.'); return; }
+  try{ setLoading('Reading the backup…'); const wb=XLSX.read(new Uint8Array(await file.arrayBuffer()),{type:'array'}); bkState={preview:{...bkRead(wb), file:file.name}}; }
+  catch(e){ bkState={log:[{t:'Couldn’t read '+file.name+': '+cleanErr(e),bad:true}],error:true}; }
+  finally{ setLoading(null); renderServerDownload(); }
+}
+function bkPreviewHtml(P){
+  const n=k=>Array.isArray(P.parts[k])?P.parts[k].length:0, weeks=new Set((P.parts.rows||[]).flatMap(r=>[r.s&&r.sw,r.v&&r.vw]).filter(Boolean));
+  const items=[['settings','Settings & weekly results',n('settings')+' items'],['rows','Candidate rows',fmtNum(n('rows'))+' rows · '+weeks.size+' weeks'],['users','Users’ roles & rights',n('users')+' people (matched by name; passwords unchanged)'],
+    ...BK_TABLES.filter(([t])=>P.parts[t]).map(([t,l])=>[t,l,fmtNum(n(t))+' records'])];
+  return `<div class="bk-preview"><p><b>${escapeHtml(P.file)}</b> · made ${escapeHtml(new Date(P.info.Exported).toLocaleString())} by ${escapeHtml(P.info['Exported by']||'?')} · names ${escapeHtml(String(P.info['Candidate names']||'').toLowerCase())}</p>
+   <div class="bk-items">${items.map(([k,l,c])=>`<label><input type="checkbox" data-bkp="${k}" checked> <b>${escapeHtml(l)}</b> <span class="hint">${escapeHtml(c)}</span></label>`).join('')}</div>
+   <div class="bk-go"><button type="button" class="btn btn-primary btn-sm" id="bkGo">Restore — replace these in the database</button><button type="button" class="btn btn-secondary btn-sm" id="bkCancel">Cancel</button></div></div>`;
+}
+async function restoreBackup(parts){
+  const P=bkState&&bkState.preview; if(!P||!parts.length) return;
+  if(!Server.isSuperAdmin()){ showToast('Only the super admin can restore a backup.'); return; }
+  if(!confirm(`Restore ${parts.length} part${parts.length===1?'':'s'} from ${P.file}?\n\nWhat’s in the file replaces the same weeks, settings and records in the database. Anything not in the file stays. This can’t be undone — download a backup of the current data first if you might need it.`)) return;
+  bkState={log:[],busy:true}; renderServerDownload();
+  const say=t=>{ setLoading(t); }, failed=[];
+  Server.ownMasterUntil=Date.now()+60*60*1000;
+  try{
+    // 1. settings (weekly results are rebuilt from the restored rows; weeks without rows keep the file's results)
+    const sett=parts.includes('settings')?(P.parts.settings||[]):[], weekly=sett.filter(x=>x.key.startsWith('weekly:'));
+    let n=0; for(const x of sett.filter(x=>!x.key.startsWith('weekly:'))){ try{ await Server.rpc('dash_kv_set',{p_key:x.key,p_value:x.value}); n++; }catch(e){ failed.push('setting '+x.key); } if(n%20===0) say('Settings… '+n); }
+    if(sett.length) bkLog(`Settings: ${n} restored.`);
+    if(sett.some(x=>x.key==='namesPhase')){ const np=sett.find(x=>x.key==='namesPhase'); try{ KV.set('namesPhase', await decodeKvValue('namesPhase', np.value)); }catch(e){} }
+    // 2. users' roles and rights (existing accounts only — a backup never holds passwords)
+    if(parts.includes('users')){ const cur=(await Server.rpc('dash_users_list'))||[]; let ok=0; const missing=[];
+      for(const u of P.parts.users||[]){ if(u.role==='super_admin') continue; const t=cur.find(x=>String(x.id)===u.id)||cur.find(x=>x.name.toLowerCase()===u.name.toLowerCase()); if(!t){ missing.push(u.name); continue; }
+        try{ await Server.rpc('dash_user_save',{p:{id:t.id,name:t.name,role:u.role==='admin'?'admin':'user',modules:u.modules,hidden_sections:u.hidden_sections,active:u.active}}); ok++; }catch(e){ failed.push(u.name); } }
+      bkLog(`Users: ${ok} updated.`+(missing.length?` Not in this database (add them in Users, then restore again): ${missing.join(', ')}.`:''), missing.length>0); }
+    // 3. the dashboard's own tables
+    for(const [t,l] of BK_TABLES){ if(!parts.includes(t)||!P.parts[t]) continue; const rows=P.parts[t]; let done=0;
+      try{ for(let i=0;i<rows.length;i+=500){ done+=Number(await Server.rpc('dash_restore_rows',{p_table:t,p_rows:rows.slice(i,i+500)}))||0; say(l+'… '+fmtNum(Math.min(i+500,rows.length))+' / '+fmtNum(rows.length)); } bkLog(`${l}: ${fmtNum(done)} restored.`); }
+      catch(e){ failed.push(l); bkLog(l+': '+cleanErr(e),true); } }
+    // 4. candidate rows — each week replaced, names saved the way the database is set
+    const touched=new Set(), localRows=new Map();
+    if(parts.includes('rows')&&(P.parts.rows||[]).length){
+      const plain=KV.get('namesPhase')==='plain'; if(!plain||P.parts.rows.some(r=>NamePolicy.isTok(String(r.data['Candidate Name']||'')))) await NamePolicy.getKey(true);
+      const cache=new Map(), fix=async v=>{ const s0=String(v||'').trim(); if(!s0||isBlankIdent(s0)||NamePolicy.isHash(s0)) return v; if(cache.has(s0)) return cache.get(s0);
+        let out=v; if(plain&&NamePolicy.isTok(s0)) out=(await NamePolicy.dec(s0))||v; else if(!plain&&!NamePolicy.isTok(s0)) out=(await NamePolicy.enc(s0))||(await NamePolicy.hash(s0)); cache.set(s0,out); return out; };
+      const groups=new Map();
+      for(const r of P.parts.rows){ if(r.data['Candidate Name']!=null) r.data['Candidate Name']=await fix(r.data['Candidate Name']);
+        localRows.set(r.id,r.data); if(r.s&&r.sw){ const k='schedules|'+r.sw; if(!groups.has(k)) groups.set(k,[]); groups.get(k).push(r); } if(r.v&&r.vw){ const k='shows|'+r.vw; if(!groups.has(k)) groups.set(k,[]); groups.get(k).push(r); } }
+      let gi=0;
+      for(const [k,list] of groups){ const [source,week]=k.split('|'); gi++; say('Candidate rows · '+gi+' of '+groups.size+' (Wk '+weekOfDate(week).number+')');
+        try{ const ord=source==='schedules'?'so':'vo'; list.sort((a,b)=>a[ord]-b[ord]);
+          const batch=list.map((r,i)=>({id:r.id, created_on:r.data['Created On']||null, date_of:r.data['Date Of']||null, recruiter:String(r.data['Created By']||'').trim()||'Unassigned', branch:String(r.data['Branch']||'').trim()||'Unassigned',
+            employee_number:normalizeEmployeeNumber(r.data['Employee Number']||'')||null, candidate_name:String(r.data['Candidate Name']||'').trim()||null, ord:i, data:r.data}));
+          const importId=await Server.rpc('dash_import_begin',{p_source:source,p_file_name:'Restore · '+P.file});
+          const chunks=[]; for(let i=0;i<batch.length;i+=IMPORT_BATCH) chunks.push(batch.slice(i,i+IMPORT_BATCH));
+          await runPool(chunks.map(c=>()=>Server.rpc('dash_import_rows',{p_import_id:importId,p_source:source,p_rows:c})), NET_PARALLEL);
+          await Server.rpc('dash_import_finish',{p_import_id:importId,p_source:source,p_from:tgShift(week,-6),p_to:week,p_rows_read:batch.length,p_removed_columns:[]});
+          touched.add(week); }
+        catch(e){ failed.push('Wk '+weekOfDate(week).number); bkLog('Candidate rows, '+source+' Wk '+weekOfDate(week).number+': '+cleanErr(e),true); } }
+      const ex=P.parts.rows.filter(r=>r.excluded).map(r=>r.id);
+      for(let i=0;i<ex.length;i+=500){ try{ await Server.rpc('dash_master_set_excluded',{p_ids:ex.slice(i,i+500),q:{},p_excluded:true}); }catch(e){ failed.push('excluded rows'); break; } }
+      bkLog(`Candidate rows: ${fmtNum(P.parts.rows.length)} restored in ${touched.size} week${touched.size===1?'':'s'}${ex.length?' ('+fmtNum(ex.length)+' excluded)':''}.`);
+      if(touched.size){ say('Recalculating '+touched.size+' weeks…'); await rebuildWeeks([...touched], localRows, t=>say(t)); }
+    }
+    // weekly results for weeks that have no candidate rows in the file
+    let wn=0; for(const x of weekly){ const we=x.key.slice(7,17); if(touched.has(we)) continue; try{ await Server.rpc('dash_kv_set',{p_key:x.key,p_value:x.value}); wn++; }catch(e){ failed.push(x.key); } }
+    if(wn) bkLog(`Weekly results: ${wn} restored as saved in the file.`);
+    bkState.result=failed.length?`Restored with problems: ${failed.slice(0,8).join(', ')}${failed.length>8?' …':''}. Run the restore again to retry.`:'Restore finished — reloading the dashboard…'; bkState.error=failed.length>0;
+  }catch(e){ bkState.result='Restore stopped: '+cleanErr(e); bkState.error=true; }
+  finally{ bkState.busy=false; setLoading(null); renderServerDownload(); }
+  if(!bkState.error) setTimeout(()=>location.reload(),2500);
 }
 async function downloadServerRows(onlyWeek){
   if(typeof XLSX==='undefined'){ showToast('The Excel writer didn’t load — check your connection and reload.'); return; }
@@ -10258,7 +10422,8 @@ async function ingestFiles(entries, {interactive=true, week=null}={}){
         // candidate names never leave this browser as plain text: deterministic encrypted tokens
         const nameCol=full.candidateName, plainNames=nameCol?[...new Set(sh.rows.map(r=>String(r[nameCol]??'').trim()).filter(v=>v&&!isBlankIdent(v)))]:[];   // placeholders like “N/A” stay as they are (they mean “no candidate”)
         const tok=new Map(); let encOk=true;
-        if(plainNames.length){ importProgress('Protecting candidate names…'); for(const nmv of plainNames){ let t=encOk?await NamePolicy.enc(nmv):null; if(!t){ encOk=false; t=await NamePolicy.hash(nmv); } tok.set(nmv,t); } }
+        if(plainNames.length&&KV.get('namesPhase')==='plain'){ plainNames.forEach(nmv=>tok.set(nmv,nmv)); }   // the super admin chose readable names in the database
+        else if(plainNames.length){ importProgress('Protecting candidate names…'); for(const nmv of plainNames){ let t=encOk?await NamePolicy.enc(nmv):null; if(!t){ encOk=false; t=await NamePolicy.hash(nmv); } tok.set(nmv,t); } }
         if(plainNames.length&&!encOk&&!window.__namesDropNote){ window.__namesDropNote=true; showToast('Candidate names were replaced with a one-way code — the name-protection key isn’t set up (run privacy.sql), so admins can’t unlock these names. Employee Numbers are kept.'); }
         sh.rows.forEach((row, idx)=>{
           const out = {};
@@ -13546,7 +13711,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.97.2';   // shown only in the browser tab title
+const APP_VERSION = '4.98.0';   // shown only in the browser tab title
 // Everyone gets the latest look: the page checks the published file for a newer version — right after it opens
 // (switches straight over) and every few minutes / when the tab comes back (offers an Update button).
 const AppUpdate=(()=>{
