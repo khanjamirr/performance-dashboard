@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.98.1</title>
+<title>Performance Dashboard · v4.98.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- fonts load without holding up the page (the system font shows for a moment) -->
@@ -10382,7 +10382,7 @@ function showImportError(e){
   const w=document.createElement('div'); w.className='modal-overlay'; w.id='impErrDlg';
   w.innerHTML=`<div class="modal modal-sm" role="alertdialog" aria-modal="true" aria-labelledby="ieT"><div class="modal-header"><h3 id="ieT">Upload didn’t finish</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div>
    <div class="modal-body"><p style="margin:0 0 8px">It stopped while <b>${escapeHtml(info.step||'importing')}</b>${info.file?` for <b>${escapeHtml(info.file)}</b>`:''}. Nothing was lost — your files weren’t deleted and the week keeps its previous data, so you can upload again.</p>
-   <pre class="ie-pre">${escapeHtml(text)}</pre><p class="hint" style="margin:6px 0 0">If it happens again, copy this and send it to whoever looks after the dashboard.</p></div>
+   <pre class="ie-pre">${escapeHtml(text)}</pre><p class="hint" style="margin:6px 0 0">${/statement timeout|57014/i.test(text)?'The database ran out of time. Run Part 8 of dashboard_update.sql in the Supabase SQL Editor once, then upload again.':'If it happens again, copy this and send it to whoever looks after the dashboard.'}</p></div>
    <div class="modal-footer"><button class="btn btn-secondary" id="ieCopy">Copy details</button><button class="btn btn-primary" data-close>OK</button></div></div>`;
   document.body.appendChild(w);
   w.addEventListener('click',ev=>{ if(ev.target===w||ev.target.closest('[data-close]')) w.remove(); });
@@ -13739,7 +13739,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.98.1';   // shown only in the browser tab title
+const APP_VERSION = '4.98.2';   // shown only in the browser tab title
 // Everyone gets the latest look: the page checks the published file for a newer version — right after it opens
 // (switches straight over) and every few minutes / when the tab comes back (offers an Update button).
 const AppUpdate=(()=>{
