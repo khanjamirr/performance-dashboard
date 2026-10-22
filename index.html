@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.99.1</title>
+<title>Performance Dashboard · v4.100.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- fonts load without holding up the page (the system font shows for a moment) -->
@@ -1155,6 +1155,9 @@ button.onb-tile{font:inherit;text-align:left;cursor:pointer}button.onb-tile:disa
 .onb-catpop{position:absolute;z-index:3000;background:#fff;border-radius:12px;box-shadow:0 12px 32px rgba(15,23,42,.18),0 0 0 1px rgba(15,23,42,.06);padding:8px;min-width:250px}.ocp-row{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;font-size:13px;cursor:pointer}.ocp-row:hover{background:#f1f5f9}.ocp-row input{width:16px;height:16px;accent-color:#0a84ff}.ocp-all{border-bottom:1px solid #eef1f5;margin-bottom:4px;font-weight:600}.ocp-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 6px 2px;border-top:1px solid #eef1f5;margin-top:4px}
 .ol-dur{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;color:#475569;white-space:nowrap}.ol-dur input,.ol-catchk input{accent-color:#0a84ff}.ol-cats{display:flex;flex-wrap:wrap;gap:6px 16px;margin-bottom:8px}.ol-catchk{display:inline-flex;align-items:center;gap:6px;font-size:13px}
 th.onb-ctcol{color:#64748b;font-style:italic}
+.onb-late-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}.onb-late-head .mr-tabhint{flex:1;min-width:260px}.onb-psttag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:1px 6px;border-radius:6px;background:#ede9fe;color:#5b21b6;vertical-align:1px}
+.onb-late-kpis{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px;margin:4px 0 14px}.olk{background:#f6f7fb;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}.olk span{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#64748b}.olk b{font-size:22px;color:#0a1f44}.olk small{font-size:12px;color:#64748b}
+@media(max-width:1100px){.onb-late-kpis{grid-template-columns:repeat(4,minmax(0,1fr))}}@media(max-width:600px){.onb-late-kpis{grid-template-columns:1fr 1fr}}.onb-late-h4{margin:18px 0 8px;font-size:14px}.onb-late-note{margin-top:10px}
 .onb-catpop .onb-cat.q-pending{background:#e2e8f0!important;color:#334155!important}
 .ol-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}.ol-row{display:flex;gap:8px;align-items:center}.ol-row input{flex:1;padding:7px 9px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:13px;min-width:0}.ol-row select[data-uid]{width:200px}.ol-row select{padding:7px 8px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:12.5px;width:170px}
 .ol-move{display:flex;flex-direction:column}.ol-move button{border:0;background:none;font-size:9px;line-height:1;padding:1px 4px;color:#64748b;cursor:pointer}.ol-move button:disabled{opacity:.3;cursor:default}
@@ -12233,13 +12236,13 @@ const UF_PAGES = [
   {mod:'branches', label:'Branches', desc:'Branch table, trends and history', sec:'branches', extras:['grant.branch_merge']},
   {mod:'alerts', label:'Action Center', desc:'Who is below goal and other signals', sec:'alerts', extras:['remarks_approve']},
   {mod:'divreport', label:'Division Report', desc:'Pipeline by client and location, per division'},
-  {mod:'onboarding', label:'Onboarding', desc:'Log calls — they see and edit their own entries. Tick below for more.', sec:'onboarding', extras:['grant.onb_report','grant.onb_all','grant.onb_lists']},
+  {mod:'onboarding', label:'Onboarding', desc:'Log calls — they see and edit their own entries. Tick below for more.', sec:'onboarding', extras:['grant.onb_report','grant.onb_late','grant.onb_all','grant.onb_lists']},
   {mod:'orderentry', label:'Order Entry', desc:'Enter the daily Recruitment Cloud and CRM order counts and see the team’s reports', sec:'orderentry', extras:['grant.oe_bulk','grant.oe_agents']},
   {mod:'pivot', label:'Report Builder', desc:'Build their own tables and charts', sec:'pivot'},
   {mod:'candidates', label:'Candidates', desc:'Settings → Candidates, plus candidate names and Employee Numbers everywhere', sec:'candidates', extras:['master','master_edit']},
 ];
 const UF_TOOLS = ['upload','export','settings'];
-const UF_EXTRA_LABEL = {'grant.history_all':'Full history of every recruiter (without it: only their own team’s)', 'grant.attendance':'Mark attendance (absent days lower that week’s goal)', 'grant.onb_all':'Manage everyone’s calls — log for any onboarder, edit / delete any call, answer lock requests', 'grant.onb_lists':'Manage the onboarding dropdowns and onboarder names', 'grant.oe_bulk':'Bulk upload past days', 'grant.oe_agents':'Manage the order entry agent names', 'grant.manual_edit':'Adjust numbers by hand (＋ Adjust numbers)', 'grant.upload_range':'Upload past data for many weeks at once', 'grant.leads':'Team Leads page (read-only)', 'grant.ov_onb':'Overview → Onboarding tab (everyone’s onboarding numbers, read-only)', 'grant.ov_oe':'Overview → Order Entry tab (order entry numbers, read-only)', 'grant.onb_assign':'Fill in daily assignments', 'grant.onb_report':'See the onboarding report (everyone’s numbers)', remarks:'Can add remarks', remarks_approve:'Can approve and edit remarks', 'grant.team_names':'See their team’s candidate names', 'grant.break_image':'Copy third-break lists as images', 'grant.branch_merge':'Merge branches (applies for everyone)',
+const UF_EXTRA_LABEL = {'grant.onb_late':'After 6 PM ET report (PST shift)', 'grant.history_all':'Full history of every recruiter (without it: only their own team’s)', 'grant.attendance':'Mark attendance (absent days lower that week’s goal)', 'grant.onb_all':'Manage everyone’s calls — log for any onboarder, edit / delete any call, answer lock requests', 'grant.onb_lists':'Manage the onboarding dropdowns and onboarder names', 'grant.oe_bulk':'Bulk upload past days', 'grant.oe_agents':'Manage the order entry agent names', 'grant.manual_edit':'Adjust numbers by hand (＋ Adjust numbers)', 'grant.upload_range':'Upload past data for many weeks at once', 'grant.leads':'Team Leads page (read-only)', 'grant.ov_onb':'Overview → Onboarding tab (everyone’s onboarding numbers, read-only)', 'grant.ov_oe':'Overview → Order Entry tab (order entry numbers, read-only)', 'grant.onb_assign':'Fill in daily assignments', 'grant.onb_report':'See the onboarding report (everyone’s numbers)', remarks:'Can add remarks', remarks_approve:'Can approve and edit remarks', 'grant.team_names':'See their team’s candidate names', 'grant.break_image':'Copy third-break lists as images', 'grant.branch_merge':'Merge branches (applies for everyone)',
   master:'Browse all candidate records', master_edit:'Exclude or include candidates', upload:'Upload spreadsheets', export:'Download and share', settings:'Settings — divisions, branches, goals'};
 const UF_PRESETS = [
   {name:'Viewer', desc:'Overview, recruiters and branches', modules:['performance','recruiters','branches']},
@@ -12307,6 +12310,7 @@ const ROLE_ROWS=[
  {k:'alerts', sec:'alerts', label:'Action Center', desc:'Who is below goal, remarks', req:true, v:{m:['alerts']}, e:{m:['remarks']}, d:{m:['remarks_approve']}, hv:'See who needs attention', he:'Add remarks', hd:'Approve, edit or delete anyone’s remarks'},
  {k:'divreport', label:'Division Report', desc:'Pipeline by client and location', v:{m:['divreport']}, hv:'See the report'},
  {k:'onboarding', sec:'onboarding', label:'Onboarding', desc:'The Onboarding page — call log', req:true, v:{m:['onboarding']}, d:{g:['grant.onb_all','grant.onb_lists']}, hv:'Open the page — log and edit their own calls', hd:'Edit / delete anyone’s calls, manage dropdowns'},
+ {k:'onblate', label:'Onboarding — after 6 PM ET', desc:'Evening calls (PST shift) on the Onboarding report — everyone’s calls logged after 6 PM Eastern', v:{g:['grant.onb_late']}, hv:'See the after-6 PM ET report'},
  {k:'onbteam', label:'Onboarding — team report', desc:'Everyone’s onboarding numbers and daily assignments', v:{g:['grant.onb_report']}, e:{g:['grant.onb_assign']}, hv:'See everyone’s numbers', he:'Fill in daily assignments'},
  {k:'orderentry', sec:'orderentry', label:'Order Entry', desc:'The Order Entry page — daily Recruitment Cloud and CRM counts', req:true, v:{m:['orderentry']}, d:{g:['grant.oe_bulk','grant.oe_agents']}, hv:'Open the page — enter the daily counts', hd:'Bulk upload past days, manage agent names'},
  {k:'pivot', sec:'pivot', label:'Report Builder', desc:'Their own tables and charts', v:{m:['pivot']}, hv:'Build reports'},
@@ -13744,7 +13748,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.99.1';   // shown only in the browser tab title
+const APP_VERSION = '4.100.0';   // shown only in the browser tab title
 // Everyone gets the latest look: the page checks the published file for a newer version — right after it opens
 // (switches straight over) and every few minutes / when the tab comes back (offers an Update button).
 const AppUpdate=(()=>{
@@ -13817,8 +13821,8 @@ document.addEventListener('keydown', e=>{
 });
 // ---------- Manage access in place (super admin) ----------
 const PAGE_MODULE = {performance:'performance', recruiters:'recruiters', branches:'branches', candidates:'candidates', master:'master', alerts:'alerts', highlights:'alerts', pivot:'pivot', divreport:'divreport', onboarding:'onboarding', orderentry:'orderentry'};
-const PAGE_EDIT = {performance:['upload','export','grant.ov_onb','grant.ov_oe'], recruiters:['remarks','export','grant.manual_edit','grant.attendance'], onboarding:['grant.onb_report','grant.onb_all','grant.onb_lists'], orderentry:['grant.oe_bulk','grant.oe_agents'], branches:['export','grant.branch_merge'], candidates:['master_edit','export'], master:['master_edit','export'], alerts:['remarks','remarks_approve'], pivot:['export'], teams:['grant.team_names','grant.break_image'], leads:[], divreport:['upload','candidates']};
-const EDIT_LABEL = {'grant.attendance':'Mark attendance', 'grant.manual_edit':'Adjust numbers by hand', 'grant.onb_report':'See everyone’s onboarding numbers', 'grant.onb_all':'Manage everyone’s calls', 'grant.onb_lists':'Manage onboarding dropdowns', 'grant.oe_bulk':'Bulk upload past days', 'grant.oe_agents':'Manage agent names', 'grant.ov_onb':'Overview → Onboarding tab', 'grant.ov_oe':'Overview → Order Entry tab', 'grant.branch_merge':'Merge branches', 'grant.break_image':'Copy third-break list as image', 'grant.team_names':'See their team’s candidate names', candidates:'See all candidate names'};
+const PAGE_EDIT = {performance:['upload','export','grant.ov_onb','grant.ov_oe'], recruiters:['remarks','export','grant.manual_edit','grant.attendance'], onboarding:['grant.onb_report','grant.onb_late','grant.onb_all','grant.onb_lists'], orderentry:['grant.oe_bulk','grant.oe_agents'], branches:['export','grant.branch_merge'], candidates:['master_edit','export'], master:['master_edit','export'], alerts:['remarks','remarks_approve'], pivot:['export'], teams:['grant.team_names','grant.break_image'], leads:[], divreport:['upload','candidates']};
+const EDIT_LABEL = {'grant.onb_late':'See the after-6 PM ET report', 'grant.attendance':'Mark attendance', 'grant.manual_edit':'Adjust numbers by hand', 'grant.onb_report':'See everyone’s onboarding numbers', 'grant.onb_all':'Manage everyone’s calls', 'grant.onb_lists':'Manage onboarding dropdowns', 'grant.oe_bulk':'Bulk upload past days', 'grant.oe_agents':'Manage agent names', 'grant.ov_onb':'Overview → Onboarding tab', 'grant.ov_oe':'Overview → Order Entry tab', 'grant.branch_merge':'Merge branches', 'grant.break_image':'Copy third-break list as image', 'grant.team_names':'See their team’s candidate names', candidates:'See all candidate names'};
 let accessMode=false, accessObs=null;
 function sectionLabel(key){ for(const secs of Object.values(PAGE_SECTIONS)) for(const [k,l] of secs) if(k===key) return l.replace(/^·+ /,''); return null; }
 // Super admin: locks appear on hover everywhere (no mode needed); "Show all locks" pins them all on.
@@ -14545,6 +14549,18 @@ const Onboarding=(()=>{
  const linkedName=uid=>{ const x=(lists().onboarders||[]).find(o=>o.userId&&String(o.userId)===String(uid)); return x?x.label:null; };
  const myName=()=>linkedName(Server.user&&Server.user.id)||(Server.user&&Server.user.name)||'';
  const canAssign=()=>hasGrant('grant.onb_assign'), canReport=()=>hasGrant('grant.onb_report');
+ // ---- after 6 PM Eastern (PST shift): only admins and people given grant.onb_late ----
+ const canLate=()=>hasGrant('grant.onb_late');
+ const LATE_HOUR=18;
+ const pstNames=()=>new Set((lists().onboarders||[]).filter(o=>o.pst).map(o=>o.label));
+ const etFmt=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
+ // when the call was logged, in Eastern time: {day:'YYYY-MM-DD', h, m} (null without a saved time)
+ function etOf(ts){ if(!ts) return null; const d=new Date(ts); if(isNaN(d)) return null; const p={}; etFmt.formatToParts(d).forEach(x=>p[x.type]=x.value);
+  return {day:`${p.year}-${p.month}-${p.day}`, h:Number(p.hour)%24, m:Number(p.minute)}; }
+ // a call counts as after 6 PM ET when it was logged at or after 6 PM Eastern on the call's own date;
+ // calls typed in on a later day have no real call time, so they are left out (and counted separately)
+ function lateSplit(rows){ const late=[], unknown=[]; rows.forEach(r=>{ const e=etOf(r.created_at); if(!e||e.day!==String(r.call_date).slice(0,10)){ unknown.push(r); return; } if(e.h>=LATE_HOUR) late.push({...r, _et:e}); }); return {late, unknown}; }
+ const etTime=e=>{ const h=e.h%12||12; return `${h}:${String(e.m).padStart(2,'0')} ${e.h<12?'AM':'PM'} ET`; };
  // ---- daily assignments worked out from the call log ----
  // Each candidate (EID) counts once, on the day of their FIRST logged call, for the onboarder who made it:
  //  · first call already EB Complete / I9 Complete → "Already Completed"
@@ -14855,11 +14871,13 @@ const Onboarding=(()=>{
   const embed=st.embed&&st.embed.isConnected?st.embed:null; if(!embed) st.embed=null;
   const host=embed||document.getElementById('view-onboarding'); if(!host) return;
   if(!embed&&!Server.can('onboarding')){ host.innerHTML='<div class="panel"><p class="hint" style="margin:0">Ask an admin for the Onboarding right.</p></div>'; return; }
-  const all=st.rows||[], adm=ADM()||canReport()||!!embed, q=st.q.trim().toLowerCase();
+  // people who only have the after-6 PM report get everyone's calls from the server — their call log still shows only their own
+  const ownOnly=!embed&&st.page!=='late'&&!(ADM()||canReport()||canAssign())&&canLate()&&Server.user;
+  const all=(st.rows||[]).filter(r=>!ownOnly||String(r.onboarder_id)===String(Server.user.id)), adm=ADM()||canReport()||!!embed, q=st.q.trim().toLowerCase();
   // the report lives on Overview → Onboarding for everyone who can open it there
   const repOnOv=(()=>{ try{ return OverviewX.has('onboarding'); }catch(e){ return false; } })();
   // Daily assignments tab removed — its numbers now come from Log calls (Report → Assignments in these dates)
-  let pages=embed?[['report','📊 Report']]:[['log','📞 Log calls'],...(canReport()&&!repOnOv?[['report','📊 Report']]:[])].filter(([k])=>canSeeSection('onb.'+k)); if(!pages.length) pages=[['log','📞 Log calls']];
+  let pages=embed?[['report','📊 Report']]:[['log','📞 Log calls'],...(canReport()&&!repOnOv?[['report','📊 Report']]:[]),...(canLate()&&!canReport()?[['late','🌙 After 6 PM ET']]:[])].filter(([k])=>k==='late'||canSeeSection('onb.'+k)); if(!pages.length) pages=[['log','📞 Log calls']];
   if(!st.page||!pages.some(([k])=>k===st.page)) st.page=pages.some(([k])=>k==='report')?'report':pages[0][0];
   const rows=all.filter(r=>(!st.fOnb||r.onboarder===st.fOnb)&&(!st.fType||r.call_type===st.fType));
   const assign=mergedAssign().map(d=>st.fOnb?{...d, data:{...d.data, rows:Object.fromEntries(Object.entries((d.data&&d.data.rows)||{}).filter(([n])=>n===st.fOnb))}}:d);
@@ -14874,6 +14892,7 @@ const Onboarding=(()=>{
   const top=`${LST()&&!embed?`<div class="onb-admin"><span><strong>${Server.isAdmin()?'Admin':'Manage'}</strong> · onboarder names, call types, statuses and assignment types</span><button type="button" class="btn btn-primary btn-sm" id="onbLists2">⚙ Manage dropdowns</button></div>`:''}${st.demo?'<div class="onb-demo"><strong>Demo mode</strong> — entries are saved in this browser only. Run <code>onboarding.sql</code> in Supabase to share them with everyone.</div>':''}${st.err?`<div class="onb-demo bad">Could not load: ${escapeHtml(st.err)}</div>`:''}${nav}`;
   let body='';
   if(st.page==='assign') body=assignHtml();
+  else if(st.page==='late') body=`${filters(true,onbs,false)}<section class="panel"><div class="panel-head"><div><h3>After 6 PM ET</h3></div>${copyBtnHtml('onbRep')}${Server.can('export')?downloadBtnHtml('onbRep','onboarding-after-6pm.xlsx'):''}</div>${lateHtml(rows)}</section>`;
   else if(st.page==='log') body=`${requestsHtml()}${formHtml()}${filters(adm,onbs,true)}
    ${(()=>{ const cnt=k=>k===''?allCands.length:k==='pending'?allCands.filter(c=>!isDone(c.cat)).length:allCands.filter(c=>c.cat===k).length;
      const ever=allCands.filter(c=>c.calls.some(x=>catOf(x.status,x.call_type)==='lvm')).length;
@@ -14972,7 +14991,7 @@ const Onboarding=(()=>{
   const types=[...types0,...(aTot.__other?['__other']:[]),...cts], tLbl=t=>t==='__other'?'Other (Inbound…)':isCt(t)?t.slice(3):t;
   const pool={}; assign.forEach(d=>types.forEach(t=>{ pool[t]=(pool[t]||0)+(Number(((d.data&&d.data.pool)||{})[t])||0); }));
   const totPeople=vol.reduce((a,v)=>a+v.people,0), totCalls=vol.reduce((a,v)=>a+v.calls,0);
-  const tabs=[['results','Results',per.length],['activity','Activity',vol.length],['assign','Assignments',assign.length]].filter(t=>t[2]);
+  const tabs=[['results','Results',per.length],['activity','Activity',vol.length],['assign','Assignments',assign.length],['late','🌙 After 6 PM ET',canLate()?1:0]].filter(t=>t[2]);
   let tab=st.repTab&&tabs.some(t=>t[0]===st.repTab)?st.repTab:(tabs[0]||[])[0];
   const resultsHtml=()=>`<p class="hint mr-tabhint">Where each onboarder’s candidates stand — credited to whoever made the latest call. % = share of that onboarder’s candidates.</p>
     <div class="onb-scroll"><table class="users-table onb-table" id="onbRep"><thead><tr><th>Onboarder</th><th class="num">Candidates</th><th class="num">Onb. complete</th><th class="num">In between</th><th class="num">LVM / No ans.</th><th class="num">Never resp.</th><th class="num">Calls / cand.</th><th class="num">Avg. min</th><th class="num">Talk time</th><th class="num">Days to complete</th><th title="Onboarding complete or finalized">Done</th></tr></thead><tbody>
@@ -14996,7 +15015,7 @@ const Onboarding=(()=>{
     </tbody></table></div>`;
   const panel=tabs.length?`<section class="panel"><div class="panel-head"><div><h3>Onboarders</h3></div>
     <div class="mr-head-tools"><div class="oe-group" role="tablist" aria-label="Show">${tabs.map(([k,l])=>`<button type="button" data-onb-rtab="${k}" class="${tab===k?'on':''}" aria-pressed="${tab===k}">${l}</button>`).join('')}</div>${copyBtnHtml('onbRep')}${Server.can('export')?downloadBtnHtml('onbRep','onboarding-'+tab+'.xlsx'):''}</div></div>
-    ${tab==='results'?resultsHtml():tab==='activity'?activityHtml():assignHtml2()}</section>`:'';
+    ${tab==='results'?resultsHtml():tab==='activity'?activityHtml():tab==='late'?lateHtml(rows):assignHtml2()}</section>`:'';
   return `${filters(adm,onbs,true)}${hero}${panel}`;
  }
  // ---- daily assignment sheet: onboarder × assignment type, plus the pool totals; or paste the daily message ----
@@ -15080,6 +15099,33 @@ const Onboarding=(()=>{
    ${calls.map(r=>`<tr><td>${fmtDate(r.call_date)}</td><td>${escapeHtml(r.onboarder)}</td><td><strong>${escapeHtml(r.eid)}</strong></td><td><span class="onb-type t${typeIdx(r.call_type)}">${escapeHtml(r.call_type)}</span></td><td class="num">${durTxt(r)}</td><td>${stPill(r.status,r.call_type)}</td><td class="onb-note">${escapeHtml(r.note||'')}</td><td>${linkHtml(linkOf(r.eid))}</td><td class="onb-act">${actions(r)}</td></tr>`).join('')}
   </tbody></table></div>`;
  }
+ // ---- after 6 PM ET report ----
+ function lateHtml(rows){
+  const pst=pstNames(), havePst=pst.size>0; if(st.lateWho==null) st.lateWho=havePst?'pst':'all'; if(!havePst) st.lateWho='all';
+  const {late:late0, unknown}=lateSplit(rows), late=late0.filter(r=>st.lateWho==='all'||pst.has(r.onboarder));
+  const f1=v=>v==null||!isFinite(v)?'–':(Math.round(v*10)/10).toLocaleString('en-US');
+  const talk=list=>{ const m=list.reduce((a,r)=>a+(r.duration_min!=null&&r.duration_min!==''?Number(r.duration_min)||0:0),0); if(!m) return '–'; const h=Math.floor(m/60), mm=Math.round(m-h*60); return h?(mm?`${h} h ${mm} m`:`${h} h`):`${mm} m`; };
+  // each candidate called after 6 PM counts once; their status is the latest call in the picked dates (any time of day)
+  const latest=new Map(candidates(rows).map(c=>[c.eid,c]));
+  const stat=list=>{ const eids=[...new Set(list.map(r=>normEid(r.eid)||String(r.eid)))], cs=eids.map(e=>latest.get(e)).filter(Boolean), by={};
+   VIEW_CATS.forEach(([k])=>by[k]=0); cs.forEach(c=>by[c.cat]=(by[c.cat]||0)+1);
+   const reached=cs.filter(c=>c.calls.some(x=>!['lvm','no_response'].includes(catOf(x.status,x.call_type)))).length;
+   return {calls:list.length, n:cs.length, reached, done:(by.finalized||0)+(by.complete||0), by, days:new Set(list.map(r=>r.call_date)).size}; };
+  const T=stat(late), names=[...new Set(late.map(r=>r.onboarder))].sort();
+  const per=names.map(o=>{ const mine=late.filter(r=>r.onboarder===o), x=stat(mine), last=mine.reduce((a,r)=>!a||(r._et.h*60+r._et.m)>(a.h*60+a.m)?r._et:a,null); return {o, mine, last, ...x}; }).sort((a,b)=>b.calls-a.calls);
+  const days=[...new Set(late.map(r=>r.call_date))].sort().reverse().map(d=>({d, ...stat(late.filter(r=>r.call_date===d))}));
+  const c=(x,k)=>`<td class="num">${x.by[k]||'–'}${x.by[k]?`<small>${pct(x.by[k],x.n)}</small>`:''}</td>`;
+  const who=havePst?`<div class="oe-group onb-latewho" role="tablist" aria-label="Who">${[['pst','PST shift · '+pst.size],['all','Everyone after 6 PM']].map(([k,l])=>`<button type="button" data-onb-late="${k}" class="${st.lateWho===k?'on':''}" aria-pressed="${st.lateWho===k}">${l}</button>`).join('')}</div>`:'';
+  return `<div class="onb-late-head"><p class="hint mr-tabhint">Calls logged at or after <b>6 PM Eastern</b> on the call’s own day, by the time each call was saved. Each candidate counts once; their status is their latest call in these dates.${havePst?'':' Mark PST shift onboarders in ⚙ Manage dropdowns to see them on their own.'}</p>${who}</div>
+   <div class="onb-late-kpis">${[['Calls after 6 PM',fmtNum(T.calls),T.days?f1(T.calls/T.days)+' a day':''],['Candidates',fmtNum(T.n),'different people'],['Reached',fmtNum(T.reached),pct(T.reached,T.n)],['Finalized / complete',fmtNum(T.done),pct(T.done,T.n)],['In between',fmtNum(T.by.in_process||0),pct(T.by.in_process||0,T.n)],['LVM / No answer',fmtNum(T.by.lvm||0),pct(T.by.lvm||0,T.n)],['Never responded',fmtNum(T.by.no_response||0),pct(T.by.no_response||0,T.n)],['Talk time',talk(late),'']].map(([l,v,sb])=>`<div class="olk"><span>${l}</span><b>${v}</b>${sb?`<small>${sb}</small>`:''}</div>`).join('')}</div>
+   <div class="onb-scroll"><table class="users-table onb-table" id="onbRep"><thead><tr><th>Onboarder</th><th class="num">Calls</th><th class="num">Candidates</th><th class="num">Reached</th><th class="num">Finalized / complete</th><th class="num">In between</th><th class="num">LVM / No ans.</th><th class="num">Never resp.</th><th class="num">Calls / day</th><th class="num">Talk time</th><th class="num">Latest call</th></tr></thead><tbody>
+   ${per.length?per.map(x=>`<tr><td><button type="button" class="link-btn" data-onb-pick="${escapeHtml(x.o)}">${escapeHtml(x.o)}</button>${pst.has(x.o)?' <span class="onb-psttag">PST</span>':''}</td><td class="num"><strong>${fmtNum(x.calls)}</strong></td><td class="num">${fmtNum(x.n)}</td><td class="num">${fmtNum(x.reached)}<small>${pct(x.reached,x.n)}</small></td><td class="num"><strong>${x.done||'–'}</strong>${x.done?`<small>${pct(x.done,x.n)}</small>`:''}</td>${c(x,'in_process')}${c(x,'lvm')}${c(x,'no_response')}<td class="num">${x.days?f1(x.calls/x.days):'–'}</td><td class="num">${talk(x.mine)}</td><td class="num">${x.last?etTime(x.last):'–'}</td></tr>`).join('')
+    :`<tr><td colspan="11" class="hint">No calls logged after 6 PM ET in these dates${st.lateWho==='pst'?' by PST shift onboarders':''}.</td></tr>`}
+   ${per.length>1?`<tr class="onb-total"><td><strong>All</strong></td><td class="num"><strong>${fmtNum(T.calls)}</strong></td><td class="num">${fmtNum(T.n)}</td><td class="num">${fmtNum(T.reached)}<small>${pct(T.reached,T.n)}</small></td><td class="num"><strong>${fmtNum(T.done)}</strong><small>${pct(T.done,T.n)}</small></td>${c(T,'in_process')}${c(T,'lvm')}${c(T,'no_response')}<td class="num">${T.days?f1(T.calls/T.days):'–'}</td><td class="num">${talk(late)}</td><td></td></tr>`:''}
+   </tbody></table></div>
+   ${days.length?`<h4 class="onb-late-h4">By day</h4><div class="onb-scroll"><table class="users-table onb-table"><thead><tr><th>Day</th><th class="num">Calls after 6 PM</th><th class="num">Candidates</th><th class="num">Reached</th><th class="num">Finalized / complete</th><th class="num">LVM / No ans.</th></tr></thead><tbody>${days.map(x=>`<tr><td>${escapeHtml(fmtDate(x.d))}</td><td class="num"><strong>${fmtNum(x.calls)}</strong></td><td class="num">${fmtNum(x.n)}</td><td class="num">${fmtNum(x.reached)}</td><td class="num">${x.done||'–'}</td><td class="num">${x.by.lvm||'–'}</td></tr>`).join('')}</tbody></table></div>`:''}
+   ${unknown.length?`<p class="hint onb-late-note">${fmtNum(unknown.length)} call${unknown.length===1?' was':'s were'} typed in on a later day, so their call time isn’t known — they aren’t in this report.</p>`:''}`;
+ }
  // Latest status: tick one or more; applied when the box closes
  function openCatPicker(anchor){
   document.getElementById('onbCatPop')?.remove();
@@ -15113,6 +15159,7 @@ const Onboarding=(()=>{
    let t; $('#onbQ')?.addEventListener('input',e=>{ clearTimeout(t); t=setTimeout(()=>{ st.q=e.target.value; render(); const q=document.getElementById('onbQ'); if(q){ q.focus(); q.setSelectionRange(q.value.length,q.value.length); } },250); });
    host.querySelectorAll('[data-onb-aq]').forEach(b=>b.onclick=()=>{ st.aCat=b.dataset.onbAq; render(); });
    host.querySelectorAll('[data-onb-rtab]').forEach(b=>b.onclick=()=>{ st.repTab=b.dataset.onbRtab; render(); });
+   host.querySelectorAll('[data-onb-late]').forEach(b=>b.onclick=()=>{ st.lateWho=b.dataset.onbLate; render(); });
    host.querySelectorAll('[data-onb-cat]').forEach(b=>b.onclick=()=>{ const ks=b.dataset.onbCat.split(','); st.fCats=fCats().join()===ks.join()?[]:ks; render(); });
    host.querySelectorAll('[data-onb-pick]').forEach(b=>b.onclick=()=>{ st.fOnb=b.dataset.onbPick; render(); }); };
   filt();
@@ -15219,7 +15266,7 @@ const Onboarding=(()=>{
   document.getElementById('onbListsDlg')?.remove();
   const wrap=document.createElement('div'); wrap.className='modal-overlay'; wrap.id='onbListsDlg';
   const draw=()=>{
-   const row=(kind,x,i,n)=>`<div class="ol-row"><span class="ol-move"><button type="button" data-mv="${kind}:${i}:-1" ${i?'':'disabled'} aria-label="Move up">▲</button><button type="button" data-mv="${kind}:${i}:1" ${i<n-1?'':'disabled'} aria-label="Move down">▼</button></span><input data-lbl="${kind}:${i}" value="${escapeHtml(x.label)}" maxlength="120">${kind==='onboarders'?`<select data-uid="${i}" title="Dashboard user who logs in as this onboarder"><option value="">— no user linked —</option>${users.map(u=>`<option value="${escapeHtml(String(u.id))}" ${String(x.userId||'')===String(u.id)?'selected':''}>${escapeHtml(u.name)}${u.role&&u.role!=='user'?' ('+escapeHtml(u.role.replace('_',' '))+')':''}</option>`).join('')}${x.userId&&!users.some(u=>String(u.id)===String(x.userId))?`<option value="${escapeHtml(String(x.userId))}" selected>⚠ Linked user not found — pick again</option>`:''}</select>`:''}${kind==='callTypes'?`<label class="ol-dur" title="Untick for call types that have no talk time, such as LVM"><input type="checkbox" data-dur="${i}" ${durOkItem(x)?'checked':''}> Duration</label>`:''}${kind==='statuses'?`<select data-cat="${i}">${CATS.map(([k,l])=>`<option value="${k}" ${x.cat===k?'selected':''}>${l}</option>`).join('')}</select>`:''}<button type="button" class="link-btn danger" data-rm="${kind}:${i}">Delete</button></div>`;
+   const row=(kind,x,i,n)=>`<div class="ol-row"><span class="ol-move"><button type="button" data-mv="${kind}:${i}:-1" ${i?'':'disabled'} aria-label="Move up">▲</button><button type="button" data-mv="${kind}:${i}:1" ${i<n-1?'':'disabled'} aria-label="Move down">▼</button></span><input data-lbl="${kind}:${i}" value="${escapeHtml(x.label)}" maxlength="120">${kind==='onboarders'?`<select data-uid="${i}" title="Dashboard user who logs in as this onboarder"><option value="">— no user linked —</option>${users.map(u=>`<option value="${escapeHtml(String(u.id))}" ${String(x.userId||'')===String(u.id)?'selected':''}>${escapeHtml(u.name)}${u.role&&u.role!=='user'?' ('+escapeHtml(u.role.replace('_',' '))+')':''}</option>`).join('')}${x.userId&&!users.some(u=>String(u.id)===String(x.userId))?`<option value="${escapeHtml(String(x.userId))}" selected>⚠ Linked user not found — pick again</option>`:''}</select><label class="ol-dur" title="Works the PST shift — shown on its own in the After 6 PM ET report"><input type="checkbox" data-pst="${i}" ${x.pst?'checked':''}> PST shift</label>`:''}${kind==='callTypes'?`<label class="ol-dur" title="Untick for call types that have no talk time, such as LVM"><input type="checkbox" data-dur="${i}" ${durOkItem(x)?'checked':''}> Duration</label>`:''}${kind==='statuses'?`<select data-cat="${i}">${CATS.map(([k,l])=>`<option value="${k}" ${x.cat===k?'selected':''}>${l}</option>`).join('')}</select>`:''}<button type="button" class="link-btn danger" data-rm="${kind}:${i}">Delete</button></div>`;
    wrap.innerHTML=`<div class="modal ol-modal" role="dialog" aria-modal="true" aria-labelledby="olT"><div class="modal-header"><h3 id="olT">Onboarding dropdowns</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div>
     <div class="modal-body">
      ${(()=>{ const miss=work.onboarders.filter(o=>o.userId&&!users.some(u=>String(u.id)===String(o.userId))).length; return usersErr||miss?`<div class="onb-demo bad" style="margin:0 0 10px">${usersErr?'The user list could not be loaded ('+escapeHtml(usersErr)+') — only admins can load it.':''} ${miss?`${miss} onboarder${miss===1?' is':'s are'} linked to a user that no longer exists (the account was removed or re-created). Pick the right user for ${miss===1?'it':'them'} and Save.`:''}</div>`:''; })()}
@@ -15234,6 +15281,7 @@ const Onboarding=(()=>{
    wrap.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>wrap.remove());
    wrap.querySelectorAll('[data-lbl]').forEach(i=>i.oninput=()=>{ const [k,n]=i.dataset.lbl.split(':'); const x=work[k][+n]; x.label=i.value;
      if(k==='statuses'&&!x.catTouched){ const g=guessCat(i.value); if(g&&g!==x.cat){ x.cat=g; const sel=wrap.querySelector(`[data-cat="${n}"]`); if(sel) sel.value=g; } } });
+   wrap.querySelectorAll('[data-pst]').forEach(c=>c.onchange=()=>{ work.onboarders[+c.dataset.pst].pst=c.checked; });
    wrap.querySelectorAll('[data-dur]').forEach(c=>c.onchange=()=>{ work.callTypes[+c.dataset.dur].noDur=!c.checked; });
    wrap.querySelectorAll('[data-rcat]').forEach(c=>c.onchange=()=>{ const k=c.dataset.rcat; work.reportCats=work.reportCats.filter(x=>x!==k); if(c.checked) work.reportCats.push(k); });
    wrap.querySelectorAll('[data-cat]').forEach(s=>s.onchange=()=>{ const x=work.statuses[+s.dataset.cat]; x.cat=s.value; x.catTouched=true; });
