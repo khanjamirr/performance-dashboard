@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard - 1.1.5</title>
+<title>Dashboard - 1.2.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- fonts load without holding up the page (the system font shows for a moment) -->
@@ -1160,6 +1160,7 @@ button.onb-tile{font:inherit;text-align:left;cursor:pointer}button.onb-tile:disa
 .onb-catpop{position:absolute;z-index:3000;background:#fff;border-radius:12px;box-shadow:0 12px 32px rgba(15,23,42,.18),0 0 0 1px rgba(15,23,42,.06);padding:8px;min-width:250px}.ocp-row{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;font-size:13px;cursor:pointer}.ocp-row:hover{background:#f1f5f9}.ocp-row input{width:16px;height:16px;accent-color:#0a84ff}.ocp-all{border-bottom:1px solid #eef1f5;margin-bottom:4px;font-weight:600}.ocp-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 6px 2px;border-top:1px solid #eef1f5;margin-top:4px}
 .ol-dur{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;color:#475569;white-space:nowrap}.ol-dur input,.ol-catchk input{accent-color:#0a84ff}.ol-cats{display:flex;flex-wrap:wrap;gap:6px 16px;margin-bottom:8px}.ol-catchk{display:inline-flex;align-items:center;gap:6px;font-size:13px}
 th.onb-ctcol{color:#64748b;font-style:italic}
+.onb-colbtn{margin-left:auto;align-self:center}.onb-aq{align-items:center}.onb-colpop{min-width:330px}.ocp-head,.ocp-col{display:grid;grid-template-columns:1fr 56px 64px;align-items:center;gap:6px}.ocp-head{padding:4px 8px 8px;border-bottom:1px solid #eef1f5;margin-bottom:4px;font-size:11.5px;color:#64748b;text-align:center}.ocp-head b{text-align:left;color:#0a1f44;font-size:13px}.ocp-col input{justify-self:center;width:16px;height:16px;accent-color:#0a84ff}.ocp-name small{color:#94a3b8;font-size:11px}.ocp-warn{margin:6px 8px;padding:7px 9px;border-radius:8px;background:#fff7e6;color:#8a5300;font-size:12px}.ocp-note{margin:6px 8px 0;font-size:11.5px;color:#64748b}
 .onb-late-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}.onb-late-head .mr-tabhint{flex:1;min-width:260px}.onb-psttag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:1px 6px;border-radius:6px;background:#ede9fe;color:#5b21b6;vertical-align:1px}
 .onb-late-kpis{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px;margin:4px 0 14px}.olk{background:#f6f7fb;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}.olk span{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#64748b}.olk b{font-size:22px;color:#0a1f44}.olk small{font-size:12px;color:#64748b}
 @media(max-width:1100px){.onb-late-kpis{grid-template-columns:repeat(4,minmax(0,1fr))}}@media(max-width:600px){.onb-late-kpis{grid-template-columns:1fr 1fr}}.onb-late-h4{margin:18px 0 8px;font-size:14px}.onb-late-note{margin-top:10px}
@@ -13806,7 +13807,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '1.1.5';   // shown in the browser tab title (Dashboard - 1.1.5)
+const APP_VERSION = '1.2.1';   // shown in the browser tab title (Dashboard - 1.2.1)
 // Everyone gets the latest look: the page checks the published file for a newer version — right after it opens
 // (switches straight over) and every few minutes / when the tab comes back (offers an Update button).
 const AppUpdate=(()=>{
@@ -14655,6 +14656,13 @@ const Onboarding=(()=>{
  }
  // call types from the dropdown that aren't already an assignment type get their own column (key 'ct:<call type>')
  const isCt=t=>String(t).startsWith('ct:');
+ // admins choose which Assignments columns show and which count in Total (Manage → ⚙ Columns); stored with the dropdowns
+ const colCfg=()=>{ const v=lists().assignCols; return v&&typeof v==='object'?v:{}; };
+ const defTotal=k=>isCt(k)?false:inSum(k);
+ const inTotal=k=>{ const c=colCfg()[k]; return c&&typeof c.total==='boolean'?c.total:defTotal(k); };
+ const showCol=k=>{ const c=colCfg()[k]; return !(c&&c.show===false); };
+ const colLabel=k=>k==='__other'?'Other (Inbound…)':isCt(k)?k.slice(3):k;
+ const allAssignCols=()=>[...assignTypes().filter(t=>!isBranch(t)), '__other', ...ctKeys()];
  const ctKeys=()=>callTypes().filter(c=>isBranch(c)||!assignTypes().some(t=>anorm(t)===anorm(c))).map(c=>'ct:'+c);
  function ctKeyOf(ct){ const k=String(ct||'').trim().toLowerCase(); if(!k) return null; const x=lists().callTypes.find(c=>c.label.toLowerCase()===k||(c.aliases||[]).some(a=>String(a).toLowerCase()===k)), lbl=x?x.label:String(ct).trim();
   return !isBranch(lbl)&&assignTypes().some(t=>anorm(t)===anorm(lbl))?null:'ct:'+lbl; }
@@ -14916,7 +14924,7 @@ const Onboarding=(()=>{
    const people=by.size, reached=[...by.values()].filter(cs=>cs.some(c=>REACHED(catOf(c.status,c.call_type)))).length, completed=[...by.values()].filter(cs=>cs.some(c=>isDone(catOf(c.status,c.call_type)))).length;
    const assigned={}; let aTot=0; const aDays=new Set();
    let calls_typed=0;
-   assign.forEach(d=>{ const r=((d.data&&d.data.rows)||{})[o]; if(!r) return; let any=0; [...types,'__other',...ctKeys()].forEach(t=>{ const n=Number(r[t])||0; assigned[t]=(assigned[t]||0)+n; if(isCt(t)) return; if(inSum(t)) aTot+=n; any+=n; }); if(hasTot(r)) calls_typed+=Number(r.__total); if(any) aDays.add(d.day); });
+   assign.forEach(d=>{ const r=((d.data&&d.data.rows)||{})[o]; if(!r) return; let any=0; [...types,'__other',...ctKeys()].forEach(t=>{ const n=Number(r[t])||0; assigned[t]=(assigned[t]||0)+n; if(inTotal(t)) aTot+=n; if(!isCt(t)) any+=n; }); if(hasTot(r)) calls_typed+=Number(r.__total); if(any) aDays.add(d.day); });
    const days=new Set([...mine.map(r=>r.call_date), ...aDays]).size||0, callDays=new Set(mine.map(r=>r.call_date)).size;
    return {o, calls_typed, calls:mine.length, people, reached, notReached:people-reached, completed, assigned, aTot, days, callDays,
     perDay:callDays?mine.length/callDays:null, peoplePerDay:callDays?people/callDays:null, callsPerPerson:people?mine.length/people:null};
@@ -15061,7 +15069,7 @@ const Onboarding=(()=>{
   const aList=Object.entries(autoAssign()).filter(([d])=>d>=st.from&&d<=st.to).flatMap(([,a])=>a.list).filter(x=>!st.fOnb||x.o===st.fOnb);
   const aCnt=k=>aList.filter(x=>catMatch(x.cat,k)).length;
   const types0=assignTypes().filter(t=>!isBranch(t)), cts=ctKeys(), aTot={}; assignF.forEach(d=>Object.values((d.data&&d.data.rows)||{}).forEach(r=>[...types0,'__other',...cts].forEach(t=>{ aTot[t]=(aTot[t]||0)+(Number(r[t])||0); })));
-  const types=[...types0,...(aTot.__other?['__other']:[]),...cts], tLbl=t=>t==='__other'?'Other (Inbound…)':isCt(t)?t.slice(3):t;
+  const types=[...types0,...(aTot.__other||colCfg().__other?['__other']:[]),...cts], tLbl=colLabel, shown=types.filter(showCol);
   const pool={}; assign.forEach(d=>types.forEach(t=>{ pool[t]=(pool[t]||0)+(Number(((d.data&&d.data.pool)||{})[t])||0); }));
   const totPeople=vol.reduce((a,v)=>a+v.people,0), totCalls=vol.reduce((a,v)=>a+v.calls,0);
   const tabs=[['results','Results',per.length],['activity','Activity',vol.length],['assign','Assignments',assign.length],['late','🌙 After 6 PM ET',canLate()?1:0]].filter(t=>t[2]);
@@ -15078,13 +15086,13 @@ const Onboarding=(()=>{
     <tr class="onb-total"><td><strong>All onboarders</strong></td>${assign.length?`<td class="num">${fmtNum(vol.reduce((a,v)=>a+v.aTot,0))}</td>`:''}<td class="num">${fmtNum(totCalls)}</td><td class="num">${fmtNum(totPeople)}</td><td class="num">${fmtNum(vol.reduce((a,v)=>a+v.reached,0))}</td><td class="num">${fmtNum(vol.reduce((a,v)=>a+v.notReached,0))}</td><td class="num">${fmtNum(vol.reduce((a,v)=>a+v.completed,0))}</td><td class="num">${pct(vol.reduce((a,v)=>a+v.completed,0),vol.reduce((a,v)=>a+v.reached,0))}</td>${(()=>{ const days=new Set(rows.map(r=>r.call_date)).size, dayPeople=new Set(rows.map(r=>r.call_date+'|'+(normEid(r.eid)||r.eid))).size; return `<td class="num">${days||'–'}</td><td class="num" title="All calls by the team ÷ days with calls">${days?fmt1(totCalls/days):'–'}</td><td class="num">${days?fmt1(dayPeople/days):'–'}</td>`; })()}<td class="num">${totPeople?fmt1(totCalls/totPeople):'–'}</td><td class="num"><strong>${talk(talkOf(rows))}</strong></td><td></td></tr>
     </tbody></table></div>`;
   const assignHtml2=()=>`<p class="hint mr-tabhint">From Log calls — each candidate counts once, on their first call, for the onboarder who made it. Pick a stage to see only candidates whose latest status is in it.</p>
-    <div class="onb-quick onb-aq" role="tablist" aria-label="Filter assignments by stage">${[['','All'],['pending','Pending'],['finalized','Finalized'],['complete','Onboarding complete'],['in_process','In between stages'],['lvm','LVM / No answer'],['no_response','Never responded']].map(([k,l])=>`<button type="button" data-onb-aq="${k}" class="${aCat===k?'on':''} ${k?CAT_CLS[k]||'q-pending':''}" aria-pressed="${aCat===k}"><span>${l}</span><b>${fmtNum(aCnt(k))}</b></button>`).join('')}</div>
+    <div class="onb-quick onb-aq" role="tablist" aria-label="Filter assignments by stage">${[['','All'],['pending','Pending'],['finalized','Finalized'],['complete','Onboarding complete'],['in_process','In between stages'],['lvm','LVM / No answer'],['no_response','Never responded']].map(([k,l])=>`<button type="button" data-onb-aq="${k}" class="${aCat===k?'on':''} ${k?CAT_CLS[k]||'q-pending':''}" aria-pressed="${aCat===k}"><span>${l}</span><b>${fmtNum(aCnt(k))}</b></button>`).join('')}${Server.isSuperAdmin()?'<button type="button" class="btn btn-secondary btn-sm onb-colbtn" id="onbAssignCols" title="Choose which columns show and which count in Total">⚙ Columns</button>':''}</div>
     ${aCat?`<p class="hint onb-aq-note">Showing only <strong>${aCat==='pending'?'Pending':escapeHtml(CAT_LBL[aCat])}</strong> candidates (latest status), counted from Log calls. Typed totals are left out while a stage is picked.</p>`:''}
-    <div class="onb-scroll"><table class="users-table onb-table" id="onbRep"><thead><tr><th>Onboarder</th>${types.map(t=>`<th class="num ${isCt(t)?'onb-ctcol':''}" ${isCt(t)?`title="${isBranch(tLbl(t))?'Candidates whose first call was By Branch — not counted as Self Call and not added to Total':'Candidates whose first call was '+escapeHtml(tLbl(t))+' — already counted in the columns before, so not added to Total'}"`:''}>${escapeHtml(tLbl(t))}</th>`).join('')}<th class="num">Total</th></tr></thead><tbody>
-    ${volA.filter(v=>v.aTot).length?'':`<tr><td colspan="${types.length+2}" class="hint">No candidates in this stage for these dates.</td></tr>`}
-    ${volA.filter(v=>v.aTot).map(v=>`<tr><td>${escapeHtml(v.o)}</td>${types.map(t=>`<td class="num">${v.assigned[t]||'–'}</td>`).join('')}<td class="num"><strong>${v.aTot}</strong></td></tr>`).join('')}
-    <tr class="onb-total"><td><strong>Assigned to onboarders</strong></td>${types.map(t=>`<td class="num">${aTot[t]||0}</td>`).join('')}<td class="num">${types.filter(t=>inSum(t)&&!isCt(t)).reduce((a,t)=>a+(aTot[t]||0),0)}</td></tr>
-    ${!aCat&&types.some(t=>pool[t])?`<tr class="onb-total"><td><strong>Total (typed)</strong></td>${types.map(t=>`<td class="num">${pool[t]||'–'}${pool[t]&&aTot[t]!==pool[t]?`<small>${pool[t]-(aTot[t]||0)} not assigned</small>`:''}</td>`).join('')}<td class="num">${types.reduce((a,t)=>a+(pool[t]||0),0)||'–'}</td></tr>`:''}
+    <div class="onb-scroll"><table class="users-table onb-table" id="onbRep"><thead><tr><th>Onboarder</th>${shown.map(t=>`<th class="num ${inTotal(t)?'':'onb-ctcol'}" title="${inTotal(t)?'Counted in Total':isBranch(tLbl(t))?'By Branch — not counted as Self Call and not added to Total':isCt(t)?'Candidates whose first call was '+escapeHtml(tLbl(t))+' — not added to Total':'Not added to Total'}">${escapeHtml(tLbl(t))}</th>`).join('')}<th class="num">Total</th></tr></thead><tbody>
+    ${volA.filter(v=>v.aTot||shown.some(t=>v.assigned[t])).length?'':`<tr><td colspan="${shown.length+2}" class="hint">No candidates in this stage for these dates.</td></tr>`}
+    ${volA.filter(v=>v.aTot||shown.some(t=>v.assigned[t])).map(v=>`<tr><td>${escapeHtml(v.o)}</td>${shown.map(t=>`<td class="num">${v.assigned[t]||'–'}</td>`).join('')}<td class="num"><strong>${v.aTot||'–'}</strong></td></tr>`).join('')}
+    <tr class="onb-total"><td><strong>Assigned to onboarders</strong></td>${shown.map(t=>`<td class="num">${aTot[t]||0}</td>`).join('')}<td class="num">${types.filter(inTotal).reduce((a,t)=>a+(aTot[t]||0),0)}</td></tr>
+    ${!aCat&&shown.some(t=>pool[t])?`<tr class="onb-total"><td><strong>Total (typed)</strong></td>${shown.map(t=>`<td class="num">${pool[t]||'–'}${pool[t]&&aTot[t]!==pool[t]?`<small>${pool[t]-(aTot[t]||0)} not assigned</small>`:''}</td>`).join('')}<td class="num">${types.filter(inTotal).reduce((a,t)=>a+(pool[t]||0),0)||'–'}</td></tr>`:''}
     </tbody></table></div>`;
   const panel=tabs.length?`<section class="panel"><div class="panel-head"><div><h3>Onboarders</h3></div>
     <div class="mr-head-tools"><div class="oe-group" role="tablist" aria-label="Show">${tabs.map(([k,l])=>`<button type="button" data-onb-rtab="${k}" class="${tab===k?'on':''}" aria-pressed="${tab===k}">${l}</button>`).join('')}</div>${copyBtnHtml('onbRep')}${Server.can('export')?downloadBtnHtml('onbRep','onboarding-'+tab+'.xlsx'):''}</div></div>
@@ -15199,6 +15207,33 @@ const Onboarding=(()=>{
    ${days.length?`<h4 class="onb-late-h4">By day</h4><div class="onb-scroll"><table class="users-table onb-table"><thead><tr><th>Day</th><th class="num">Calls after 6 PM</th><th class="num">Candidates</th><th class="num">Reached</th><th class="num">Finalized / complete</th><th class="num">LVM / No ans.</th></tr></thead><tbody>${days.map(x=>`<tr><td>${escapeHtml(fmtDate(x.d))}</td><td class="num"><strong>${fmtNum(x.calls)}</strong></td><td class="num">${fmtNum(x.n)}</td><td class="num">${fmtNum(x.reached)}</td><td class="num">${x.done||'–'}</td><td class="num">${x.by.lvm||'–'}</td></tr>`).join('')}</tbody></table></div>`:''}
    ${unknown.length?`<p class="hint onb-late-note">${fmtNum(unknown.length)} call${unknown.length===1?' was':'s were'} typed in on a later day, so their call time isn’t known — they aren’t in this report.</p>`:''}`;
  }
+ // ⚙ Columns (super admin only): Show / Count in Total per Assignments column — saved for everyone
+ function openColPicker(anchor){
+  if(!Server.isSuperAdmin()) return;   // the super admin decides the columns and the Total
+  document.getElementById('onbColPop')?.remove();
+  const keys=allAssignCols(), cfg=JSON.parse(JSON.stringify(colCfg())), get=k=>({show:cfg[k]?cfg[k].show!==false:true, total:cfg[k]&&typeof cfg[k].total==='boolean'?cfg[k].total:defTotal(k)});
+  const sf=selfType(), sl=slType(), selfParts=sf?[...(sl?[sl]:[]), ...ctKeys().filter(k=>!isBranch(k.slice(3))&&!/inbound/i.test(k))]:[], otherParts=ctKeys().filter(k=>/inbound/i.test(k));
+  const pop=document.createElement('div'); pop.id='onbColPop'; pop.className='onb-catpop onb-colpop'; pop.setAttribute('role','dialog'); pop.setAttribute('aria-label','Assignments columns');
+  const draw=()=>{
+   const twice=[...(sf&&get(sf).total?selfParts.filter(k=>get(k).total).map(k=>colLabel(k)+' is already inside '+sf):[]), ...(get('__other').total?otherParts.filter(k=>get(k).total).map(k=>colLabel(k)+' is already inside Other'):[])];
+   pop.innerHTML=`<div class="ocp-head"><b>Columns</b><span>Show</span><span>In Total</span></div>
+    ${keys.map(k=>{ const g=get(k); return `<div class="ocp-row ocp-col"><span class="ocp-name">${escapeHtml(colLabel(k))}${isCt(k)?' <small>call type</small>':''}</span><input type="checkbox" data-show="${escapeHtml(k)}" ${g.show?'checked':''} aria-label="Show ${escapeHtml(colLabel(k))}"><input type="checkbox" data-tot="${escapeHtml(k)}" ${g.total?'checked':''} aria-label="Count ${escapeHtml(colLabel(k))} in Total"></div>`; }).join('')}
+    ${twice.length?`<p class="ocp-warn">Counted twice: ${twice.map(escapeHtml).join('; ')}.</p>`:''}
+    <p class="ocp-note">A hidden column still counts in Total if “In Total” is ticked. Saved for everyone.</p>
+    <div class="ocp-foot"><button type="button" class="link-btn" data-reset>Default</button><span><button type="button" class="btn btn-secondary btn-sm" data-cancel>Cancel</button> <button type="button" class="btn btn-primary btn-sm" data-save>Save</button></span></div>`;
+   pop.querySelectorAll('[data-show]').forEach(c=>c.onchange=()=>{ const k=c.dataset.show; cfg[k]={...get(k), show:c.checked}; draw(); });
+   pop.querySelectorAll('[data-tot]').forEach(c=>c.onchange=()=>{ const k=c.dataset.tot; cfg[k]={...get(k), total:c.checked}; draw(); });
+   pop.querySelector('[data-reset]').onclick=()=>{ Object.keys(cfg).forEach(k=>delete cfg[k]); draw(); };
+   pop.querySelector('[data-cancel]').onclick=close;
+   pop.querySelector('[data-save]').onclick=async()=>{ const b=pop.querySelector('[data-save]'); b.disabled=true;
+    const out={...lists(), assignCols:cfg}; const ok=await storageSet('onbLists', out); if(ok===null){ b.disabled=false; return; }
+    KV.set('onbLists', out); autoCache=null; close(); showToast('Columns saved.'); render(); }; };
+  const close=()=>{ document.removeEventListener('mousedown',outside,true); pop.remove(); };
+  const outside=e=>{ if(!pop.contains(e.target)&&e.target!==anchor) close(); };
+  draw(); document.body.appendChild(pop);
+  const r=anchor.getBoundingClientRect(); pop.style.top=(r.bottom+window.scrollY+6)+'px'; pop.style.left=Math.max(8,Math.min(r.left+window.scrollX, window.scrollX+document.documentElement.clientWidth-pop.offsetWidth-8))+'px';
+  setTimeout(()=>document.addEventListener('mousedown',outside,true),0);
+ }
  // Latest status: tick one or more; applied when the box closes
  function openCatPicker(anchor){
   document.getElementById('onbCatPop')?.remove();
@@ -15231,6 +15266,7 @@ const Onboarding=(()=>{
    $('#onbFCat')?.addEventListener('click',e=>openCatPicker(e.currentTarget));
    let t; $('#onbQ')?.addEventListener('input',e=>{ clearTimeout(t); t=setTimeout(()=>{ st.q=e.target.value; render(); const q=document.getElementById('onbQ'); if(q){ q.focus(); q.setSelectionRange(q.value.length,q.value.length); } },250); });
    host.querySelectorAll('[data-onb-aq]').forEach(b=>b.onclick=()=>{ st.aCat=b.dataset.onbAq; render(); });
+   $('#onbAssignCols')?.addEventListener('click',e=>openColPicker(e.currentTarget));
    host.querySelectorAll('[data-onb-rtab]').forEach(b=>b.onclick=()=>{ st.repTab=b.dataset.onbRtab; render(); });
    host.querySelectorAll('[data-onb-late]').forEach(b=>b.onclick=()=>{ st.lateWho=b.dataset.onbLate; render(); });
    host.querySelectorAll('[data-onb-cat]').forEach(b=>b.onclick=()=>{ const ks=b.dataset.onbCat.split(','); st.fCats=fCats().join()===ks.join()?[]:ks; render(); });
@@ -15372,7 +15408,7 @@ const Onboarding=(()=>{
     if(dup(ct)||dup(ss)||dup(at)||dup(ob)) return err('“'+(dup(ct)||dup(ss)||dup(at)||dup(ob)).label+'” is listed twice.');
     // renamed items remember their old names, so earlier calls still count under them
     const fin=a=>a.map(({orig,catTouched,...x})=>({...x, aliases:[...new Set([...(x.aliases||[]), ...(orig&&orig!==x.label?[orig]:[])])].filter(Boolean)}));
-    const out={onboarders:fin(ob), callTypes:fin(ct), assignTypes:fin(at), statuses:fin(ss), retired:work.retired.filter(r=>!ss.some(s=>s.label.toLowerCase()===r.label.toLowerCase())), reportCats:[['pending'],...VIEW_CATS].map(([k])=>k).filter(k=>work.reportCats.includes(k))};
+    const out={onboarders:fin(ob), callTypes:fin(ct), assignTypes:fin(at), statuses:fin(ss), retired:work.retired.filter(r=>!ss.some(s=>s.label.toLowerCase()===r.label.toLowerCase())), reportCats:[['pending'],...VIEW_CATS].map(([k])=>k).filter(k=>work.reportCats.includes(k)), ...(L.assignCols?{assignCols:L.assignCols}:{})};
     const ok=await storageSet('onbLists', out); if(ok===null) return err('Not saved — the store did not accept the change.');
     KV.set('onbLists', out);
     // the database uses the same links, so a linked user's calls are saved under their onboarder name
