@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard - 1.1.1</title>
+<title>Dashboard - 1.1.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- fonts load without holding up the page (the system font shows for a moment) -->
@@ -13799,7 +13799,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '1.1.1';   // shown in the browser tab title (Dashboard - 1.1.1)
+const APP_VERSION = '1.1.2';   // shown in the browser tab title (Dashboard - 1.1.2)
 // Everyone gets the latest look: the page checks the published file for a newer version — right after it opens
 // (switches straight over) and every few minutes / when the tab comes back (offers an Update button).
 const AppUpdate=(()=>{
@@ -14710,15 +14710,25 @@ const Onboarding=(()=>{
  const demoRows=()=>{ try{ return JSON.parse(localStorage.getItem(DEMO_KEY)||'[]'); }catch(e){ return []; } };
  const demoSave=list=>{ try{ localStorage.setItem(DEMO_KEY, JSON.stringify(list)); }catch(e){} };
  const missing=e=>/Could not find|schema cache|does not exist|PGRST202/i.test(String(e&&e.message||e));
+ // calls, access requests and assignments are asked for at the same time
+ const fetchAll=(a,b)=>Promise.allSettled([Server.rpc('dash_onb_list',{p_from:a, p_to:b}), Server.rpc('dash_onb_requests_list'), Server.rpc('dash_onb_assign_list',{p_from:a, p_to:b})]);
+ // Overview fetches the Onboarding tab ahead (in the background), so opening the tab doesn't wait
+ let ahead=null;
+ function prefetch(a,b){ if(!a||!b||(st.rows!=null&&st.from===a&&st.to===b)||(ahead&&ahead.key===a+'|'+b&&Date.now()-ahead.at<60000)) return;
+  ahead={key:a+'|'+b, at:Date.now(), p:fetchAll(a,b)};
+  const [pF,pT]=prevOf(a,b); fetchRange(pF,pT).catch(()=>{}); }
  async function load(){
-  st.err='';
-  try{ st.rows=await Server.rpc('dash_onb_list',{p_from:st.from, p_to:st.to}) || []; st.demo=false; }
-  catch(e){ if(missing(e)||!Server.token){ st.demo=true; const me=Server.user&&Server.user.id; st.rows=demoRows().filter(r=>r.call_date>=st.from&&r.call_date<=st.to&&(ADM()||r.onboarder_id===me)); }
+  st.err=''; const key=st.from+'|'+st.to;
+  const got=ahead&&ahead.key===key&&Date.now()-ahead.at<60000?ahead.p:null; ahead=null;
+  const [L,Q,A]=await (got||fetchAll(st.from,st.to));
+  if(L.status==='fulfilled'){ st.rows=L.value||[]; st.demo=false; }
+  else { const e=L.reason; if(missing(e)||!Server.token){ st.demo=true; const me=Server.user&&Server.user.id; st.rows=demoRows().filter(r=>r.call_date>=st.from&&r.call_date<=st.to&&(ADM()||r.onboarder_id===me)); }
    else { st.rows=[]; st.err=cleanErr(e); } }
   (st.rows||[]).forEach(r=>{ const ln=linkedName(r.onboarder_id); if(ln) r.onboarder=ln; });
-  await loadRequests(); st.loadedAt=new Date();
-  try{ st.assign=await Server.rpc('dash_onb_assign_list',{p_from:st.from, p_to:st.to}) || []; }
-  catch(e){ const d=demoAssign(); st.assign=Object.keys(d).filter(k=>k>=st.from&&k<=st.to).sort().map(k=>({day:k, ...d[k]})); }
+  if(st.demo) await loadRequests(); else st.requests=Q.status==='fulfilled'?(Q.value||[]):[];
+  st.loadedAt=new Date();
+  if(A.status==='fulfilled') st.assign=A.value||[];
+  else { const d=demoAssign(); st.assign=Object.keys(d).filter(k=>k>=st.from&&k<=st.to).sort().map(k=>({day:k, ...d[k]})); }
  }
  const ADEMO='ipd_onb_assign_demo';
  const demoAssign=()=>{ try{ return JSON.parse(localStorage.getItem(ADEMO)||'{}'); }catch(e){ return {}; } };
@@ -14961,10 +14971,11 @@ const Onboarding=(()=>{
   host.querySelector('[data-ovgo-rep]')?.addEventListener('click',()=>goOverviewTab('onboarding'));
  }
  // the same number of days just before the picked dates, with the same filters — for "vs before" on the summary
+ // the same number of days just before a range — used for "vs before"
+ function prevOf(a,b){ const d=s=>new Date(s+'T12:00:00'), iso=x=>toIsoDateOnly(x), n=Math.round((d(b)-d(a))/864e5)+1;
+  const f=d(a); f.setDate(f.getDate()-n); const t=d(a); t.setDate(t.getDate()-1); return [iso(f), iso(t), n]; }
  function prevSummary(){
-  const d=s=>new Date(s+'T12:00:00'), iso=x=>toIsoDateOnly(x), n=Math.round((d(st.to)-d(st.from))/864e5)+1;
-  const f=d(st.from); f.setDate(f.getDate()-n); const t=d(st.from); t.setDate(t.getDate()-1);
-  const pF=iso(f), pT=iso(t), key=[pF,pT,st.fOnb,st.fType,fCats().join()].join('|');
+  const [pF,pT,n]=prevOf(st.from,st.to), key=[pF,pT,st.fOnb,st.fType,fCats().join()].join('|');
   if(st.prevC&&st.prevC.key===key) return st.prevC;
   const box=st.prevC={key, n, S:null, done:false};
   fetchRange(pF,pT).then(({rows})=>{ if(st.prevC!==box) return;
@@ -15395,12 +15406,16 @@ const Onboarding=(()=>{
   render();
  }
  // the Overview page reads a date range without touching this page's own filters
- async function fetchRange(a,b){ let rows, demo=false;
+ // one call per date range for a minute — the Overview numbers, the comparison and the fetch-ahead share it
+ const rangeMemo=new Map();
+ function fetchRange(a,b){ const k=a+'|'+b, m=rangeMemo.get(k); if(m&&Date.now()-m.at<60000) return m.p;
+  const p=fetchRange0(a,b); rangeMemo.set(k,{at:Date.now(), p}); p.catch(()=>rangeMemo.delete(k)); if(rangeMemo.size>12) rangeMemo.delete(rangeMemo.keys().next().value); return p; }
+ async function fetchRange0(a,b){ let rows, demo=false;
   try{ rows=await Server.rpc('dash_onb_list',{p_from:a, p_to:b})||[]; }
   catch(e){ if(!(missing(e)||!Server.token)) throw e; demo=true; const me=Server.user&&Server.user.id; rows=demoRows().filter(r=>r.call_date>=a&&r.call_date<=b&&(ADM()||r.onboarder_id===me)); }
   rows=rows.map(r=>({...r, call_date:String(r.call_date).slice(0,10)})); rows.forEach(r=>{ const ln=linkedName(r.onboarder_id); if(ln) r.onboarder=ln; });
   return {rows, demo}; }
- return {show, showReport, reload:async()=>{ await load(); render(); }, candidates, catOf, fetchRange, summary, perOnboarder, CAT_LBL, CAT_CLS};
+ return {show, showReport, prefetch, reload:async()=>{ await load(); render(); }, candidates, catOf, fetchRange, summary, perOnboarder, CAT_LBL, CAT_CLS};
 })();
 /* ============================= ORDER ENTRY ============================= */
 // The order entry team types in, each day, how many orders each agent entered in Recruitment Cloud (RC)
@@ -15445,14 +15460,24 @@ const OrderEntry=(()=>{
   if(!st.custom||!st.from||!st.to){ const [a,b]=GROUPS[st.group].def(today()); st.from=a; st.to=b; }
   if(st.from>st.to) [st.from,st.to]=[st.to,st.from];
  }
+ // numbers and absent / holiday marks are asked for at the same time
+ const fetchOe=(a,b)=>Promise.allSettled([Server.rpc('dash_oe_list',{p_from:a, p_to:b}), Server.rpc('dash_oe_off_list',{p_from:a, p_to:b})]);
+ // Overview fetches the Order Entry tab ahead (in the background), so opening the tab doesn't wait
+ let ahead=null;
+ function prefetch(from,to){ if(!from||!to) return; const n=Math.round((parse(to)-parse(from))/864e5)+1;
+  const a=[add(from,-n), from, add(st.day,-13)].sort()[0], b=[to, st.day].sort().pop();
+  if((st.rows&&st.lf<=a&&st.lt>=b)||(ahead&&ahead.a<=a&&ahead.b>=b&&Date.now()-ahead.at<60000)) return;
+  ahead={a, b, at:Date.now(), p:fetchOe(a,b)}; }
  async function load(a,b){
   st.err='';
-  try{ st.rows=(await Server.rpc('dash_oe_list',{p_from:a, p_to:b}))||[]; st.demo=false; }
-  catch(e){ if(missing(e)||!Server.token){ st.demo=true; st.rows=demoAll().filter(r=>r.day>=a&&r.day<=b); } else { st.rows=st.rows||[]; st.err=cleanErr(e); } }
+  let got=null; if(ahead&&ahead.a<=a&&ahead.b>=b&&Date.now()-ahead.at<60000){ got=ahead.p; a=ahead.a; b=ahead.b; } ahead=null;
+  const [L,O]=await (got||fetchOe(a,b));
+  if(L.status==='fulfilled'){ st.rows=L.value||[]; st.demo=false; }
+  else { const e=L.reason; if(missing(e)||!Server.token){ st.demo=true; st.rows=demoAll().filter(r=>r.day>=a&&r.day<=b); } else { st.rows=st.rows||[]; st.err=cleanErr(e); } }
   st.rows=st.rows.map(r=>({...r, day:String(r.day).slice(0,10), agent:canon(r.agent), rc:num(r.rc), crm:num(r.crm)}));
   // absent / holiday marks (agent '*' = whole team)
   let offs=null; st.offLocal=false;
-  if(!st.demo){ try{ offs=(await Server.rpc('dash_oe_off_list',{p_from:a, p_to:b}))||[]; }catch(e){ if(!missing(e)) console.warn('oe off',e); } }
+  if(!st.demo){ if(O.status==='fulfilled') offs=O.value||[]; else if(!missing(O.reason)) console.warn('oe off',O.reason); }
   if(offs==null){ st.offLocal=true; offs=offAll().filter(r=>r.day>=a&&r.day<=b); }
   st.off=new Map(); offs.forEach(r=>{ const ag=r.agent==='*'?'*':canon(r.agent); st.off.set(String(r.day).slice(0,10)+'|'+ag,{kind:r.kind, by:r.updated_by||'', at:r.updated_at||''}); });
   st.lf=a; st.lt=b; st.loadedAt=new Date();
@@ -16002,7 +16027,7 @@ const OrderEntry=(()=>{
   try{ rows=(await Server.rpc('dash_oe_list',{p_from:a, p_to:b}))||[]; }
   catch(e){ if(!(missing(e)||!Server.token)) throw e; demo=true; rows=demoAll().filter(r=>r.day>=a&&r.day<=b); }
   return {rows:rows.map(r=>({...r, day:String(r.day).slice(0,10), agent:canon(r.agent), rc:num(r.rc), crm:num(r.crm)})), demo}; }
- return {show, showReport, _st:st, fetchRange, roster};
+ return {show, showReport, prefetch, _st:st, fetchRange, roster};
 })();
 /* ============================= OVERVIEW: ONBOARDING + ORDER ENTRY ============================= */
 // The Overview page has a switch: Recruiting (the weekly dashboard) · Onboarding · Order Entry.
@@ -16112,11 +16137,13 @@ const OverviewX=(()=>{
   if(!window.__ovxInkResize){ window.__ovxInkResize=true; addEventListener('resize',()=>{ const h=document.getElementById('ovModeBar'); const a=h&&h.querySelector('[data-ovx].on'), i=h&&h.querySelector('.ovx-ink'); if(a&&i){ i.style.transition='none'; i.style.width=a.offsetWidth+'px'; i.style.transform=`translateX(${a.offsetLeft}px)`; } }); }
   host.querySelectorAll('[data-ovx]').forEach(b=>b.onclick=e=>{ e.preventDefault(); if(b.classList.contains('on')) return;
     host.querySelectorAll('[data-ovx]').forEach(x=>{ x.classList.toggle('on',x===b); x.setAttribute('aria-selected',String(x===b)); }); if(ink) ink.className='ovx-ink ink-'+b.dataset.ovx; place(b,true);
-    st.mode=b.dataset.ovx; try{ localStorage.setItem(LS,st.mode); }catch(e){} setTimeout(refreshUI,180); });
+    st.mode=b.dataset.ovx; try{ localStorage.setItem(LS,st.mode); }catch(e){} setTimeout(refreshUI,110); });
   host.querySelectorAll('[data-ovq]').forEach(b=>b.onclick=()=>{ st.quick=b.dataset.ovq; refreshUI(); });
   host.querySelector('#ovxDateBtn')?.addEventListener('click',e=>{ const r=range(), t=ltToday();
     DatePick.open(e.currentTarget,{mode:'range', from:r.from, to:r.to, max:t, title:'Dates for Recruiting, Onboarding and Order Entry', onPick:([a,b])=>setRange(a,b)}); });
   host.querySelectorAll('[data-ovd]').forEach(b=>b.onclick=()=>stepRange(+b.dataset.ovd));
+  // the Onboarding / Order Entry tabs are fetched in the background for the picked dates, so switching to them is instant
+  clearTimeout(st.aheadT); st.aheadT=setTimeout(()=>{ const r=range(); try{ if(canOnb()&&m!=='onboarding') Onboarding.prefetch(r.from,r.to); }catch(e){} try{ if(canOe()&&m!=='orderentry') OrderEntry.prefetch(r.from,r.to); }catch(e){} }, 400);
   host.querySelector('[data-ovr]')?.addEventListener('click',()=>{ st.cache.clear(); refreshUI(); });
 
  }
