@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.98.4</title>
+<title>Performance Dashboard · v4.99.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- fonts load without holding up the page (the system font shows for a moment) -->
@@ -1151,6 +1151,11 @@ button.onb-tile{font:inherit;text-align:left;cursor:pointer}button.onb-tile:disa
 .onb-tabs{margin-bottom:4px}
 .t4{background:#0f766e}.t5{background:#be185d}.t6{background:#4d7c0f}.t7{background:#475569}.t9{background:#64748b}
 .ol-modal{max-width:640px;width:calc(100vw - 24px)}.ol-modal h4{margin:14px 0 6px;font-size:13px;color:#0a1f44}.ol-modal h4:first-child{margin-top:0}
+.onb-ms{min-width:220px;min-height:38px;border:1px solid var(--border);border-radius:9px;padding:6px 30px 6px 10px;font:inherit;font-size:13px;font-weight:600;color:var(--text);background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23334155' stroke-width='2.6' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center;text-align:left;cursor:pointer;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.onb-ms.set{border-color:#0a84ff;color:#0a52b3}
+.onb-catpop{position:absolute;z-index:3000;background:#fff;border-radius:12px;box-shadow:0 12px 32px rgba(15,23,42,.18),0 0 0 1px rgba(15,23,42,.06);padding:8px;min-width:250px}.ocp-row{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;font-size:13px;cursor:pointer}.ocp-row:hover{background:#f1f5f9}.ocp-row input{width:16px;height:16px;accent-color:#0a84ff}.ocp-all{border-bottom:1px solid #eef1f5;margin-bottom:4px;font-weight:600}.ocp-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 6px 2px;border-top:1px solid #eef1f5;margin-top:4px}
+.ol-dur{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;color:#475569;white-space:nowrap}.ol-dur input,.ol-catchk input{accent-color:#0a84ff}.ol-cats{display:flex;flex-wrap:wrap;gap:6px 16px;margin-bottom:8px}.ol-catchk{display:inline-flex;align-items:center;gap:6px;font-size:13px}
+th.onb-ctcol{color:#64748b;font-style:italic}
+.onb-catpop .onb-cat.q-pending{background:#e2e8f0!important;color:#334155!important}
 .ol-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}.ol-row{display:flex;gap:8px;align-items:center}.ol-row input{flex:1;padding:7px 9px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:13px;min-width:0}.ol-row select[data-uid]{width:200px}.ol-row select{padding:7px 8px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:12.5px;width:170px}
 .ol-move{display:flex;flex-direction:column}.ol-move button{border:0;background:none;font-size:9px;line-height:1;padding:1px 4px;color:#64748b;cursor:pointer}.ol-move button:disabled{opacity:.3;cursor:default}
 .ol-note{font-size:12px;margin:12px 0 0}
@@ -2070,7 +2075,7 @@ button.mr-kpi:not(:disabled):hover{border-color:#c7d2e3;box-shadow:0 4px 14px #0
 .mr-unit{font-size:14px;font-weight:600;color:#64748b}
 @media(max-width:700px){.mr-funnel2{grid-template-columns:1fr}.mr-fa{flex-direction:row;padding:8px 0;gap:6px}.mr-fa:before,.mr-fa:after{display:none}}
 .mr-talk{display:block;margin-top:5px;padding-top:5px;border-top:1px dashed #dfe5ee;color:#334155}.mr-talk b{color:#0a1f44;font-size:13px}
-.mr-tabhint{margin:-4px 0 10px!important;font-size:12px!important;color:#64748b}.mr-kpis.onb-k{grid-template-columns:repeat(7,minmax(0,1fr))}@media(max-width:1250px){.mr-kpis.onb-k{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.mr-tabhint{margin:-4px 0 10px!important;font-size:12px!important;color:#64748b}.mr-kpis.onb-k{grid-template-columns:repeat(6,minmax(0,1fr))}@media(max-width:1250px){.mr-kpis.onb-k{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:700px){.mr-kpis.onb-k{grid-template-columns:1fr 1fr}.mr-hero{padding:16px}.mr-headline{font-size:19px}.mr-kpis{grid-template-columns:1fr 1fr}.mr-kpi>strong{font-size:22px}.mr-funnel{grid-template-columns:1fr;max-width:none}.mr-rule{margin-left:0}.mr-head-tools{margin-left:0}}
 </style>
 <style>
@@ -13739,7 +13744,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.98.4';   // shown only in the browser tab title
+const APP_VERSION = '4.99.1';   // shown only in the browser tab title
 // Everyone gets the latest look: the page checks the published file for a newer version — right after it opens
 // (switches straight over) and every few minutes / when the tab comes back (offers an Update button).
 const AppUpdate=(()=>{
@@ -14565,14 +14570,20 @@ const Onboarding=(()=>{
    const d=out[day]||(out[day]={rows:{}, other:0, list:[]});
    // no matching assignment type: outbound-style calls (Outbound, LVM / No answer, …) are self calls; Inbound goes to "Other"
    const k=t||(/inbound/i.test(f.call_type||'')?'__other':'__outbound'); if(!t) d.other++;
-   d.list.push({o, k, cat:c.cat, eid:c.eid});
-   const r=d.rows[o]||(d.rows[o]={}); r[k]=(r[k]||0)+1; });
+   const ctk=ctKeyOf(f.call_type);
+   d.list.push({o, k, ctk, cat:c.cat, eid:c.eid});
+   const r=d.rows[o]||(d.rows[o]={}); r[k]=(r[k]||0)+1; if(ctk) r[ctk]=(r[ctk]||0)+1; });
   return autoCache=out;
  }
+ // call types from the dropdown that aren't already an assignment type get their own column (key 'ct:<call type>')
+ const isCt=t=>String(t).startsWith('ct:');
+ const ctKeys=()=>callTypes().filter(c=>!assignTypes().some(t=>anorm(t)===anorm(c))).map(c=>'ct:'+c);
+ function ctKeyOf(ct){ const k=String(ct||'').trim().toLowerCase(); if(!k) return null; const x=lists().callTypes.find(c=>c.label.toLowerCase()===k||(c.aliases||[]).some(a=>String(a).toLowerCase()===k)), lbl=x?x.label:String(ct).trim();
+  return assignTypes().some(t=>anorm(t)===anorm(lbl))?null:'ct:'+lbl; }
  const catMatch=(cat,f)=>!f||(f==='pending'?!isDone(cat):cat===f);
  // first-call rows for one stage only (latest status) — typed numbers can't be split by stage, so only the call log counts
  function autoRowsFor(day, f){ const a=autoAssign()[day]; if(!a) return {}; if(!f) return a.rows; const rows={};
-  a.list.forEach(x=>{ if(!catMatch(x.cat,f)) return; const r=rows[x.o]||(rows[x.o]={}); r[x.k]=(r[x.k]||0)+1; }); return rows; }
+  a.list.forEach(x=>{ if(!catMatch(x.cat,f)) return; const r=rows[x.o]||(rows[x.o]={}); r[x.k]=(r[x.k]||0)+1; if(x.ctk) r[x.ctk]=(r[x.ctk]||0)+1; }); return rows; }
  // saved (typed) days + call-log days combined; typed numbers only for the types that aren't automatic
  function mergedAssign(f){
   const auto=autoAssign(), saved=new Map((st.assign||[]).map(d=>[d.day,d])), days=new Set([...saved.keys(), ...Object.keys(auto)]);
@@ -14591,6 +14602,18 @@ const Onboarding=(()=>{
   const first=k.split(' ')[0], m=r.filter(x=>x.toLowerCase().split(/\s+/)[0]===first);
   if(m.length===1) return {name:m[0]}; if(m.length>1) return {name:null, ambiguous:m}; return {name:null}; }
  const callTypes=()=>lists().callTypes.map(x=>x.label);
+ // call types without a duration (LVM, voicemail…): set per call type in Manage dropdowns
+ const durDefault=l=>!/\blvm\b|voice ?mail|no answer|unanswered/i.test(String(l||''));
+ const durOkItem=x=>x&&typeof x.noDur==='boolean'?!x.noDur:durDefault(x&&x.label);
+ const durOk=t=>{ const k=String(t||'').trim().toLowerCase(); if(!k) return true; const x=lists().callTypes.find(c=>c.label.toLowerCase()===k||(c.aliases||[]).some(a=>String(a).toLowerCase()===k)); return x?durOkItem(x):durDefault(t); };
+ // Latest status filter: several at once; the report starts with the admins' default (Manage dropdowns)
+ const defCats=()=>{ const v=lists().reportCats; return Array.isArray(v)?v.filter(k=>k==='pending'||VIEW_CATS.some(([c])=>c===k)):[]; };
+ const fCats=()=>st.fCats!=null?st.fCats:(st.page==='report'?defCats():[]);
+ const catHit=(cat,k)=>k==='pending'?!isDone(cat):cat===k;
+ const catOk=c=>{ const a=fCats(); return !a.length||a.some(k=>catHit(c.cat,k)); };
+ const only=k=>{ const a=fCats(); return k===''?!a.length:a.length===1&&a[0]===k; };
+ const catName=k=>k==='pending'?'Pending':CAT_LBL[k]||k;
+ const catsLabel=()=>{ const a=fCats(); return !a.length?'All':a.length<=2?a.map(catName).join(', '):a.length+' selected'; };
  const statuses=()=>lists().statuses.map(x=>x.label);
  // obvious names decide the category even if a status was added with the wrong one (new statuses used to default to "In process")
  function guessCat(t){ const k=String(t||'').toLowerCase();
@@ -14614,7 +14637,7 @@ const Onboarding=(()=>{
  const typeIdx=t=>{ const i=callTypes().indexOf(t); return i<0?9:i%8; };
  const DEMO_KEY='ipd_onb_demo';
  const today=()=>ltToday(), back=n=>{ const d=new Date(); d.setDate(d.getDate()-n); return toIsoDateOnly(d); };
- const st={from:back(29), to:today(), rows:null, demo:false, err:'', fOnb:'', fType:'', fCat:'', q:'', editing:null, busy:false, tab:'cand', open:new Set(), page:'', assign:[], aDay:ltToday(), aDraft:null, explain:'', aCat:''};
+ const st={from:back(29), to:today(), rows:null, demo:false, err:'', fOnb:'', fType:'', fCats:null, q:'', editing:null, busy:false, tab:'cand', open:new Set(), page:'', assign:[], aDay:ltToday(), aDraft:null, explain:'', aCat:''};
  const normEid=v=>normalizeEmployeeNumber(String(v||'').trim());
  const demoRows=()=>{ try{ return JSON.parse(localStorage.getItem(DEMO_KEY)||'[]'); }catch(e){ return []; } };
  const demoSave=list=>{ try{ localStorage.setItem(DEMO_KEY, JSON.stringify(list)); }catch(e){} };
@@ -14778,7 +14801,7 @@ const Onboarding=(()=>{
     <label>Date *<input type="date" id="onbDate" value="${escapeHtml(e.call_date||today())}" max="${today()}"></label>
     <label>EID *<input id="onbEid" value="${escapeHtml(e.eid||'')}" placeholder="Employee Number" inputmode="numeric" required></label>
     <label>Call type *${sel('onbType',callTypes(),e.call_type)}</label>
-    <label>Duration (min)<input type="number" id="onbDur" min="0" step="0.5" value="${e.duration_min??''}" placeholder="e.g. 12"></label>
+    <label>Duration (min)${(()=>{ const ok=durOk(e.call_type); return `<input type="number" id="onbDur" min="0" step="0.5" value="${ok?(e.duration_min??''):''}" placeholder="${ok?'e.g. 12':'Not needed for this call type'}" ${ok?'':'disabled'}>`; })()}</label>
     <label>Status *${sel('onbStatus',statuses(),e.status)}</label>
     <label class="onb-remark">Remarks<textarea id="onbNote" rows="2" maxlength="500" placeholder="What happened on this call, next step…">${escapeHtml(e.note||'')}</textarea></label>
    </div>
@@ -14805,7 +14828,7 @@ const Onboarding=(()=>{
    const people=by.size, reached=[...by.values()].filter(cs=>cs.some(c=>REACHED(catOf(c.status,c.call_type)))).length, completed=[...by.values()].filter(cs=>cs.some(c=>isDone(catOf(c.status,c.call_type)))).length;
    const assigned={}; let aTot=0; const aDays=new Set();
    let calls_typed=0;
-   assign.forEach(d=>{ const r=((d.data&&d.data.rows)||{})[o]; if(!r) return; let any=0; [...types,'__other'].forEach(t=>{ const n=Number(r[t])||0; assigned[t]=(assigned[t]||0)+n; if(inSum(t)) aTot+=n; any+=n; }); if(hasTot(r)) calls_typed+=Number(r.__total); if(any) aDays.add(d.day); });
+   assign.forEach(d=>{ const r=((d.data&&d.data.rows)||{})[o]; if(!r) return; let any=0; [...types,'__other',...ctKeys()].forEach(t=>{ const n=Number(r[t])||0; assigned[t]=(assigned[t]||0)+n; if(isCt(t)) return; if(inSum(t)) aTot+=n; any+=n; }); if(hasTot(r)) calls_typed+=Number(r.__total); if(any) aDays.add(d.day); });
    const days=new Set([...mine.map(r=>r.call_date), ...aDays]).size||0, callDays=new Set(mine.map(r=>r.call_date)).size;
    return {o, calls_typed, calls:mine.length, people, reached, notReached:people-reached, completed, assigned, aTot, days, callDays,
     perDay:callDays?mine.length/callDays:null, peoplePerDay:callDays?people/callDays:null, callsPerPerson:people?mine.length/people:null};
@@ -14816,7 +14839,7 @@ const Onboarding=(()=>{
   const lines=[`<strong>${escapeHtml(v.o)}</strong> made <strong>${fmtNum(v.calls)} calls</strong> to <strong>${fmtNum(v.people)} different candidates</strong>${v.callDays?` over ${v.callDays} day${v.callDays===1?'':'s'} (about ${f(v.perDay)} calls and ${f(v.peoplePerDay)} people a day)`:''} — ${f(v.callsPerPerson)} calls per person on average.`];
   lines.push(`They <strong>reached ${fmtNum(v.reached)}</strong> of those people (${p(v.reached,v.people)}); ${fmtNum(v.notReached)} were LVM / no answer / never responded.`);
   lines.push(`<strong>${fmtNum(v.completed)}</strong> reached Onboarding complete or Finalized on a call with them — ${p(v.completed,v.reached)} of the people they reached. The other ${fmtNum(Math.max(0,v.reached-v.completed))} they reached are still in process or between I9 stages.`);
-  if(v.aTot) lines.push(`They were assigned <strong>${fmtNum(v.aTot)}</strong> candidates in these dates: ${Object.entries(v.assigned).filter(([,n])=>n).map(([t,n])=>`${n} ${escapeHtml(t.toLowerCase())}`).join(', ')}.`);
+  if(v.aTot) lines.push(`They were assigned <strong>${fmtNum(v.aTot)}</strong> candidates in these dates: ${Object.entries(v.assigned).filter(([t,n])=>n&&!isCt(t)).map(([t,n])=>`${n} ${escapeHtml(t.toLowerCase())}`).join(', ')}.`);
   return lines.map(l=>`<p>${l}</p>`).join('');
  }
  function filters(adm, onbs, withCat){
@@ -14824,7 +14847,7 @@ const Onboarding=(()=>{
     ${st.embed&&st.page==='report'?'':`<div class="onb-range"><div class="dpr-field">${dateRangeBtn('onbFrom','onbTo',st.from,st.to)}</div></div>`}
     ${adm?`<label class="cand-field"><span>Onboarder</span><select id="onbFOnb"><option value="">Everyone</option>${onbs.map(o=>`<option ${st.fOnb===o?'selected':''}>${escapeHtml(o)}</option>`).join('')}</select></label>`:''}
     <label class="cand-field"><span>Call type</span><select id="onbFType"><option value="">All</option>${callTypes().map(c=>`<option ${st.fType===c?'selected':''}>${escapeHtml(c)}</option>`).join('')}</select></label>
-    ${withCat?`<label class="cand-field"><span>Latest status</span><select id="onbFCat"><option value="">All</option><option value="pending" ${st.fCat==='pending'?'selected':''}>Pending (not complete yet)</option>${VIEW_CATS.map(([k,l])=>`<option value="${k}" ${st.fCat===k?'selected':''}>${l}</option>`).join('')}</select></label>
+    ${withCat?`<div class="cand-field"><span>Latest status</span><button type="button" id="onbFCat" class="onb-ms ${fCats().length?'set':''}" aria-haspopup="true" title="Pick one or more">${escapeHtml(catsLabel())}</button></div>
     <label class="cand-field onb-q"><span>Search</span><input type="search" id="onbQ" value="${escapeHtml(st.q)}" placeholder="EID, onboarder, recruiter or remark"></label>`:''}
    </div>`;
  }
@@ -14842,7 +14865,7 @@ const Onboarding=(()=>{
   const assign=mergedAssign().map(d=>st.fOnb?{...d, data:{...d.data, rows:Object.fromEntries(Object.entries((d.data&&d.data.rows)||{}).filter(([n])=>n===st.fOnb))}}:d);
   let cands=candidates(rows);
   const allCands=cands;   // before the status filter — used for the quick-filter counts
-  if(st.fCat) cands=cands.filter(c=>st.fCat==='pending'?!isDone(c.cat):c.cat===st.fCat);
+  cands=cands.filter(catOk);
   if(q) cands=cands.filter(c=>String(c.eid).toLowerCase().includes(q)||c.onboarders.some(o=>o.toLowerCase().includes(q))||String((linkOf(c.eid)||{}).recruiter||'').toLowerCase().includes(q)||c.calls.some(x=>String(x.note||'').toLowerCase().includes(q)));
   const shownCalls=cands.flatMap(c=>c.calls).sort((a,b)=>order(b,a));
   const onbs=[...new Set([...all.map(r=>r.onboarder), ...(st.assign||[]).flatMap(d=>Object.keys((d.data&&d.data.rows)||{}))])].filter(Boolean).sort();
@@ -14856,7 +14879,7 @@ const Onboarding=(()=>{
      const ever=allCands.filter(c=>c.calls.some(x=>catOf(x.status,x.call_type)==='lvm')).length;
      const nrAuto=allCands.filter(c=>c.cat==='no_response'&&c.lvmDays>=NR_LVM_DAYS).length;
      const chips=[['','All'],['pending','Pending'],['finalized','Finalized'],['complete','Onboarding complete'],['in_process','In between stages'],['lvm','LVM / No answer'],['no_response','Never responded']];
-     return `<div class="onb-quick" role="tablist" aria-label="Show candidates">${chips.map(([k,l])=>`<button type="button" data-onb-q="${k}" class="${(st.fCat||'')===k?'on':''} ${k?CAT_CLS[k]||'q-pending':''}" aria-pressed="${(st.fCat||'')===k}" ${k==='lvm'?`title="${ever} candidate${ever===1?'':'s'} had an LVM / no answer at some point; ${fmtNum(cnt(k))} still ${cnt(k)===1?'is':'are'} at LVM on their latest call"`:''}><span>${l}</span><b>${fmtNum(cnt(k))}</b>${k==='lvm'&&ever>cnt(k)?`<small class="q-ever">${fmtNum(ever)} ever</small>`:''}${k==='no_response'&&nrAuto?`<small class="q-ever" title="${nrAuto} with LVM / no answer on ${NR_LVM_DAYS}+ days in a row">${nrAuto} from LVM</small>`:''}</button>`).join('')}</div>`; })()}
+     return `<div class="onb-quick" role="tablist" aria-label="Show candidates">${chips.map(([k,l])=>`<button type="button" data-onb-q="${k}" class="${only(k)?'on':''} ${k?CAT_CLS[k]||'q-pending':''}" aria-pressed="${only(k)}" ${k==='lvm'?`title="${ever} candidate${ever===1?'':'s'} had an LVM / no answer at some point; ${fmtNum(cnt(k))} still ${cnt(k)===1?'is':'are'} at LVM on their latest call"`:''}><span>${l}</span><b>${fmtNum(cnt(k))}</b>${k==='lvm'&&ever>cnt(k)?`<small class="q-ever">${fmtNum(ever)} ever</small>`:''}${k==='no_response'&&nrAuto?`<small class="q-ever" title="${nrAuto} with LVM / no answer on ${NR_LVM_DAYS}+ days in a row">${nrAuto} from LVM</small>`:''}</button>`).join('')}</div>`; })()}
    <section class="panel"><div class="panel-head"><div><div class="ua-filter onb-tabs" role="tablist"><button type="button" data-onb-tab="cand" class="${st.tab==='cand'?'on':''}">Candidates · ${fmtNum(cands.length)}</button><button type="button" data-onb-tab="calls" class="${st.tab==='calls'?'on':''}">All calls · ${fmtNum(shownCalls.length)}</button></div>
      <span class="hint">${st.tab==='cand'?'One row per EID — all calls combined, the latest status counts. Click “calls” to see every call and remark.':(adm?'Everyone’s calls, newest first.':'Your calls, newest first.')}</span></div>${(st.tab==='cand'?cands.length:shownCalls.length)?copyBtnHtml('onbTable')+(Server.can('export')?downloadBtnHtml('onbTable',st.tab==='cand'?'onboarding-candidates.xlsx':'onboarding-calls.xlsx'):''):''}</div>
     ${st.tab==='cand'?candTable(cands):callTable(shownCalls)}</section>`;
@@ -14870,12 +14893,12 @@ const Onboarding=(()=>{
  function prevSummary(){
   const d=s=>new Date(s+'T12:00:00'), iso=x=>toIsoDateOnly(x), n=Math.round((d(st.to)-d(st.from))/864e5)+1;
   const f=d(st.from); f.setDate(f.getDate()-n); const t=d(st.from); t.setDate(t.getDate()-1);
-  const pF=iso(f), pT=iso(t), key=[pF,pT,st.fOnb,st.fType,st.fCat].join('|');
+  const pF=iso(f), pT=iso(t), key=[pF,pT,st.fOnb,st.fType,fCats().join()].join('|');
   if(st.prevC&&st.prevC.key===key) return st.prevC;
   const box=st.prevC={key, n, S:null, done:false};
   fetchRange(pF,pT).then(({rows})=>{ if(st.prevC!==box) return;
    const r=rows.filter(x=>(!st.fOnb||x.onboarder===st.fOnb)&&(!st.fType||x.call_type===st.fType));
-   let c=candidates(r); if(st.fCat) c=c.filter(x=>st.fCat==='pending'?!isDone(x.cat):x.cat===st.fCat);
+   let c=candidates(r).filter(catOk);
    box.S=summary(c, c.flatMap(x=>x.calls)); box.done=true;
    if(st.page==='report'&&document.activeElement?.id!=='onbQ') render(); }).catch(()=>{ box.done=true; });
   return box;
@@ -14897,18 +14920,19 @@ const Onboarding=(()=>{
    return `<span class="mr-d ${Math.abs(d)<.5?'':(d>0)===(good>0)?'up':'down'}" title="${escapeHtml(before)}: ${fmtNum(p)}">${d>=.5?'▲':d<=-.5?'▼':'●'} ${Math.abs(Math.round(d))}%</span>`; };
   const pts=(c,p,good=1)=>{ if(c==null||p==null) return ''; const d=Math.round(c-p);
    return `<span class="mr-d ${!d?'':(d>0)===(good>0)?'up':'down'}" title="${escapeHtml(before)}: ${Math.round(p)}%">${d>0?'▲':d<0?'▼':'●'} ${Math.abs(d)} pts</span>`; };
-  const tile=(lbl,val,sub,cls,cat,extra)=>`<button type="button" class="mr-kpi ${cls||''} ${cat&&st.fCat===cat?'sel':''}" ${cat?`data-onb-cat="${cat}" title="Show only these candidates — click again to show everyone"`:'disabled'}><span>${lbl}</span><strong>${val}</strong>${extra||''}${sub?`<em>${sub}</em>`:''}</button>`;
+  const tile=(lbl,val,sub,cls,cat,extra)=>`<button type="button" class="mr-kpi ${cls||''} ${cat&&fCats().join()===cat?'sel':''}" ${cat?`data-onb-cat="${cat}" title="Show only these candidates — click again to show everyone"`:'disabled'}><span>${lbl}</span><strong>${val}</strong>${extra||''}${sub?`<em>${sub}</em>`:''}</button>`;
   const barKeys=VIEW_CATS.map(([k])=>k).filter(k=>k!=='other'||S.by.other);
   const reachR=rate(S.reached,S.n), doneR=rate(done,S.n), pReachR=P?rate(P.reached,P.n):null, pDoneR=P?rate(pDone,P.n):null;
-  const headline=S.n?`${fmtNum(done)} of ${fmtNum(S.n)} candidates finalized or completed onboarding`:'No calls logged in these dates';
+  // headline: different candidates reached in these dates — each EID counted once, however many calls it had
+  const headline=S.n?`${fmtNum(S.reached)} of ${fmtNum(S.n)} candidates reached`:'No calls logged in these dates';
   const sub=!S.n?'Pick other dates, or log calls on Onboarding → Log calls.'
-   :`${Math.round(doneR)}% of everyone called${pDoneR!=null&&P.n?` · ${pts(doneR,pDoneR)} vs ${escapeHtml(before)} (${Math.round(pDoneR)}%)`:PV.done||!P?'':' · comparing with the days before…'}`;
+   :`${Math.round(reachR)}% of everyone called · each candidate counted once${pReachR!=null&&P.n?` · ${pts(reachR,pReachR)} vs ${escapeHtml(before)} (${Math.round(pReachR)}%)`:PV.done||!P?'':' · comparing with the days before…'} · <b>${fmtNum(done)}</b> finalized or completed onboarding (${Math.round(doneR)}%)`;
   const stepC=(l,v,note,of,cls)=>`<div class="mr-fs ${cls||''}"><span class="mr-fs-l">${l}</span><b>${fmtNum(v)}</b><small>${note}</small><div class="mr-fs-bar" title="${pct(v,of)} of everyone called"><i style="width:${of?Math.max(v?2:0,Math.round(v/of*100)):0}%"></i></div></div>`;
   const arrow=(p,l)=>`<div class="mr-fa"><b>${p}</b><span>${l}</span></div>`;
   const funnel=S.n?`<div class="mr-funnel2" aria-label="Candidate funnel">
-    ${stepC('Candidates called',S.n,`${fmtNum(S.calls)} calls made`,S.n,'called')}
+    ${stepC('Candidates called',S.n,`different candidates · ${fmtNum(S.calls)} calls made`,S.n,'called')}
     ${arrow(pct(S.reached,S.n),'were reached')}
-    ${stepC('Reached',S.reached,`${fmtNum(S.n-S.reached)} not reached`,S.n,'reach')}
+    ${stepC('Reached',S.reached,`different candidates · ${fmtNum(S.n-S.reached)} not reached`,S.n,'reach')}
     ${arrow(pct(done,S.reached),'of reached finished')}
     ${stepC('Finalized / complete',done,`${pct(done,S.n)} of everyone called`,S.n,'done')}
    </div>`:'';
@@ -14923,11 +14947,10 @@ const Onboarding=(()=>{
    if(S.avgDays!=null) notes.push(S.avgDays<.5?`Finalized / completed candidates mostly finished <b>the same day</b> as their first call; ${fmt1(S.avgCalls)} calls per candidate on average.`:`Finalized / completed candidates took <b>${fmt1(S.avgDays)} days</b> on average from their first call; ${fmt1(S.avgCalls)} calls per candidate.`);
   }
   const hero=`<section class="mr-hero">
-    <div class="mr-top"><div class="mr-title"><span class="mr-eyebrow">${escapeHtml(label)}${st.fOnb?' · '+escapeHtml(st.fOnb):''}${st.fType?' · '+escapeHtml(st.fType):''}${st.fCat?' · '+escapeHtml(st.fCat==='pending'?'Pending':CAT_LBL[st.fCat]):''}</span><h3 class="mr-headline">${headline}</h3><p class="mr-sub">${sub}</p></div></div>
+    <div class="mr-top"><div class="mr-title"><span class="mr-eyebrow">${escapeHtml(label)}${st.fOnb?' · '+escapeHtml(st.fOnb):''}${st.fType?' · '+escapeHtml(st.fType):''}${fCats().length?' · '+escapeHtml(fCats().map(catName).join(', ')):''}</span><h3 class="mr-headline">${headline}</h3><p class="mr-sub">${sub}</p></div></div>
     ${funnel}
     <div class="mr-kpis onb-k">
-     ${tile('Finalized',fmtNum(S.by.finalized),pct(S.by.finalized,S.n)+' · EB / I9 complete','fin','finalized',chip(S.by.finalized,P&&P.by.finalized))}
-     ${tile('Onboarding complete',fmtNum(S.by.complete),pct(S.by.complete,S.n),'good','complete',chip(S.by.complete,P&&P.by.complete))}
+     ${tile('Finalized / complete',fmtNum(done),`${pct(done,S.n)} · ${fmtNum(S.by.finalized)} finalized · ${fmtNum(S.by.complete)} onboarding complete`,'good','finalized,complete',chip(done,pDone))}
      ${tile('In between stages',fmtNum(S.by.in_process),pct(S.by.in_process,S.n),'ip','in_process',chip(S.by.in_process,P&&P.by.in_process,0))}
      ${tile('LVM / No answer',fmtNum(S.by.lvm),pct(S.by.lvm,S.n),'warn','lvm',chip(S.by.lvm,P&&P.by.lvm,-1))}
      ${tile('Never responded',fmtNum(S.by.no_response),pct(S.by.no_response,S.n),'bad','no_response',chip(S.by.no_response,P&&P.by.no_response,-1))}
@@ -14945,30 +14968,30 @@ const Onboarding=(()=>{
   const volA=aCat?volume(rows, assignF):vol;
   const aList=Object.entries(autoAssign()).filter(([d])=>d>=st.from&&d<=st.to).flatMap(([,a])=>a.list).filter(x=>!st.fOnb||x.o===st.fOnb);
   const aCnt=k=>aList.filter(x=>catMatch(x.cat,k)).length;
-  const types0=assignTypes(), aTot={}; assignF.forEach(d=>Object.values((d.data&&d.data.rows)||{}).forEach(r=>[...types0,'__other'].forEach(t=>{ aTot[t]=(aTot[t]||0)+(Number(r[t])||0); })));
-  const types=aTot.__other?[...types0,'__other']:types0, tLbl=t=>t==='__other'?'Other (Inbound…)':t;
+  const types0=assignTypes(), cts=ctKeys(), aTot={}; assignF.forEach(d=>Object.values((d.data&&d.data.rows)||{}).forEach(r=>[...types0,'__other',...cts].forEach(t=>{ aTot[t]=(aTot[t]||0)+(Number(r[t])||0); })));
+  const types=[...types0,...(aTot.__other?['__other']:[]),...cts], tLbl=t=>t==='__other'?'Other (Inbound…)':isCt(t)?t.slice(3):t;
   const pool={}; assign.forEach(d=>types.forEach(t=>{ pool[t]=(pool[t]||0)+(Number(((d.data&&d.data.pool)||{})[t])||0); }));
   const totPeople=vol.reduce((a,v)=>a+v.people,0), totCalls=vol.reduce((a,v)=>a+v.calls,0);
   const tabs=[['results','Results',per.length],['activity','Activity',vol.length],['assign','Assignments',assign.length]].filter(t=>t[2]);
   let tab=st.repTab&&tabs.some(t=>t[0]===st.repTab)?st.repTab:(tabs[0]||[])[0];
   const resultsHtml=()=>`<p class="hint mr-tabhint">Where each onboarder’s candidates stand — credited to whoever made the latest call. % = share of that onboarder’s candidates.</p>
-    <div class="onb-scroll"><table class="users-table onb-table" id="onbRep"><thead><tr><th>Onboarder</th><th class="num">Candidates</th><th class="num">Finalized</th><th class="num">Onb. complete</th><th>Done</th><th class="num">In between</th><th class="num">LVM / No ans.</th><th class="num">Never resp.</th><th class="num">Calls / cand.</th><th class="num">Avg. min</th><th class="num">Talk time</th><th class="num">Days to complete</th></tr></thead><tbody>
+    <div class="onb-scroll"><table class="users-table onb-table" id="onbRep"><thead><tr><th>Onboarder</th><th class="num">Candidates</th><th class="num">Onb. complete</th><th class="num">In between</th><th class="num">LVM / No ans.</th><th class="num">Never resp.</th><th class="num">Calls / cand.</th><th class="num">Avg. min</th><th class="num">Talk time</th><th class="num">Days to complete</th><th title="Onboarding complete or finalized">Done</th></tr></thead><tbody>
     ${[...per, (()=>{ const t=summary(candidates(rows), rows); return {o:'All onboarders', total:true, ...t}; })()].map(x=>{ const c=k=>`<td class="num">${x.by[k]||'–'}${x.by[k]?`<small>${pct(x.by[k],x.n)}</small>`:''}</td>`, dn=(x.by.finalized||0)+(x.by.complete||0);
-      return `<tr class="${x.total?'onb-total':''}"><td>${x.total?'<strong>All onboarders</strong>':`<button type="button" class="link-btn" data-onb-pick="${escapeHtml(x.o)}">${escapeHtml(x.o)}</button>`}</td><td class="num"><strong>${fmtNum(x.n)}</strong></td>${c('finalized')}${c('complete')}<td class="mr-share"><span class="mr-bar done"><i style="width:${x.n?Math.round(dn/x.n*100):0}%"></i></span><small>${pct(dn,x.n)}</small></td>${c('in_process')}${c('lvm')}${c('no_response')}<td class="num">${fmt1(x.avgCalls)}</td><td class="num">${fmt1(x.avgDur)}</td><td class="num">${talk(x.total?talkOf(rows):talkBy(x.o))}</td><td class="num">${x.avgDays==null?'–':fmt1(x.avgDays)}</td></tr>`; }).join('')}
+      return `<tr class="${x.total?'onb-total':''}"><td>${x.total?'<strong>All onboarders</strong>':`<button type="button" class="link-btn" data-onb-pick="${escapeHtml(x.o)}">${escapeHtml(x.o)}</button>`}</td><td class="num"><strong>${fmtNum(x.n)}</strong></td>${c('complete')}${c('in_process')}${c('lvm')}${c('no_response')}<td class="num">${fmt1(x.avgCalls)}</td><td class="num">${fmt1(x.avgDur)}</td><td class="num">${talk(x.total?talkOf(rows):talkBy(x.o))}</td><td class="num">${x.avgDays==null?'–':fmt1(x.avgDays)}</td><td class="mr-share"><span class="mr-bar done"><i style="width:${x.n?Math.round(dn/x.n*100):0}%"></i></span><small>${pct(dn,x.n)}</small></td></tr>`; }).join('')}
     </tbody></table></div>`;
   const activityHtml=()=>`<p class="hint mr-tabhint">Calls → different people called → people reached → people who finalized / completed with them. Click <b>Explain</b> for a plain-English summary.</p>
     ${ex?`<div class="onb-explain">${explain(ex)}<button type="button" class="link-btn" data-onb-explain="">Close</button></div>`:''}
-    <div class="onb-scroll"><table class="users-table onb-table" id="onbRep"><thead><tr><th>Onboarder</th>${assign.length?`<th class="num">Assigned</th>`:''}<th class="num">Calls</th><th class="num">People called</th><th class="num">Reached</th><th class="num">Not reached</th><th class="num">Completed</th><th class="num">% of reached</th><th class="num">Days</th><th class="num">Calls / day</th><th class="num">People / day</th><th class="num">Calls / person</th><th class="num">Talk time</th><th></th></tr></thead><tbody>
-    ${vol.map(v=>`<tr><td><button type="button" class="link-btn" data-onb-pick="${escapeHtml(v.o)}">${escapeHtml(v.o)}</button></td>${assign.length?`<td class="num" title="${escapeHtml(Object.entries(v.assigned).filter(([,n])=>n).map(([t,n])=>t+': '+n).join(' · '))}">${v.aTot||'–'}</td>`:''}<td class="num"><strong>${fmtNum(v.calls)}</strong></td><td class="num">${fmtNum(v.people)}</td><td class="num">${fmtNum(v.reached)}<small>${pct(v.reached,v.people)}</small></td><td class="num">${fmtNum(v.notReached)}<small>${pct(v.notReached,v.people)}</small></td><td class="num"><strong>${fmtNum(v.completed)}</strong></td><td class="num">${pct(v.completed,v.reached)}</td><td class="num">${v.callDays||'–'}</td><td class="num">${fmt1(v.perDay)}</td><td class="num">${fmt1(v.peoplePerDay)}</td><td class="num">${fmt1(v.callsPerPerson)}</td><td class="num">${talk(talkBy(v.o))}</td><td><button type="button" class="link-btn" data-onb-explain="${escapeHtml(v.o)}">Explain</button></td></tr>`).join('')}
-    <tr class="onb-total"><td><strong>All onboarders</strong></td>${assign.length?`<td class="num">${fmtNum(vol.reduce((a,v)=>a+v.aTot,0))}</td>`:''}<td class="num">${fmtNum(totCalls)}</td><td class="num">${fmtNum(totPeople)}</td><td class="num">${fmtNum(vol.reduce((a,v)=>a+v.reached,0))}</td><td class="num">${fmtNum(vol.reduce((a,v)=>a+v.notReached,0))}</td><td class="num">${fmtNum(vol.reduce((a,v)=>a+v.completed,0))}</td><td class="num">${pct(vol.reduce((a,v)=>a+v.completed,0),vol.reduce((a,v)=>a+v.reached,0))}</td><td></td><td></td><td></td><td class="num">${totPeople?fmt1(totCalls/totPeople):'–'}</td><td class="num"><strong>${talk(talkOf(rows))}</strong></td><td></td></tr>
+    <div class="onb-scroll"><table class="users-table onb-table" id="onbRep"><thead><tr><th>Onboarder</th>${assign.length?`<th class="num">Assigned</th>`:''}<th class="num">Calls</th><th class="num">People called</th><th class="num">Reached</th><th class="num">Not reached</th><th class="num">Completed</th><th class="num">% of reached</th><th class="num">Days</th><th class="num" title="Every call made ÷ days with calls — repeat calls to the same candidate all count">Calls / day</th><th class="num" title="Different candidates called ÷ days with calls">People / day</th><th class="num">Calls / person</th><th class="num">Talk time</th><th></th></tr></thead><tbody>
+    ${vol.map(v=>`<tr><td><button type="button" class="link-btn" data-onb-pick="${escapeHtml(v.o)}">${escapeHtml(v.o)}</button></td>${assign.length?`<td class="num" title="${escapeHtml(Object.entries(v.assigned).filter(([t,n])=>n&&!isCt(t)).map(([t,n])=>t+': '+n).join(' · '))}">${v.aTot||'–'}</td>`:''}<td class="num"><strong>${fmtNum(v.calls)}</strong></td><td class="num">${fmtNum(v.people)}</td><td class="num">${fmtNum(v.reached)}<small>${pct(v.reached,v.people)}</small></td><td class="num">${fmtNum(v.notReached)}<small>${pct(v.notReached,v.people)}</small></td><td class="num"><strong>${fmtNum(v.completed)}</strong></td><td class="num">${pct(v.completed,v.reached)}</td><td class="num">${v.callDays||'–'}</td><td class="num">${fmt1(v.perDay)}</td><td class="num">${fmt1(v.peoplePerDay)}</td><td class="num">${fmt1(v.callsPerPerson)}</td><td class="num">${talk(talkBy(v.o))}</td><td><button type="button" class="link-btn" data-onb-explain="${escapeHtml(v.o)}">Explain</button></td></tr>`).join('')}
+    <tr class="onb-total"><td><strong>All onboarders</strong></td>${assign.length?`<td class="num">${fmtNum(vol.reduce((a,v)=>a+v.aTot,0))}</td>`:''}<td class="num">${fmtNum(totCalls)}</td><td class="num">${fmtNum(totPeople)}</td><td class="num">${fmtNum(vol.reduce((a,v)=>a+v.reached,0))}</td><td class="num">${fmtNum(vol.reduce((a,v)=>a+v.notReached,0))}</td><td class="num">${fmtNum(vol.reduce((a,v)=>a+v.completed,0))}</td><td class="num">${pct(vol.reduce((a,v)=>a+v.completed,0),vol.reduce((a,v)=>a+v.reached,0))}</td>${(()=>{ const days=new Set(rows.map(r=>r.call_date)).size, dayPeople=new Set(rows.map(r=>r.call_date+'|'+(normEid(r.eid)||r.eid))).size; return `<td class="num">${days||'–'}</td><td class="num" title="All calls by the team ÷ days with calls">${days?fmt1(totCalls/days):'–'}</td><td class="num">${days?fmt1(dayPeople/days):'–'}</td>`; })()}<td class="num">${totPeople?fmt1(totCalls/totPeople):'–'}</td><td class="num"><strong>${talk(talkOf(rows))}</strong></td><td></td></tr>
     </tbody></table></div>`;
   const assignHtml2=()=>`<p class="hint mr-tabhint">From Log calls — each candidate counts once, on their first call, for the onboarder who made it. Pick a stage to see only candidates whose latest status is in it.</p>
     <div class="onb-quick onb-aq" role="tablist" aria-label="Filter assignments by stage">${[['','All'],['pending','Pending'],['finalized','Finalized'],['complete','Onboarding complete'],['in_process','In between stages'],['lvm','LVM / No answer'],['no_response','Never responded']].map(([k,l])=>`<button type="button" data-onb-aq="${k}" class="${aCat===k?'on':''} ${k?CAT_CLS[k]||'q-pending':''}" aria-pressed="${aCat===k}"><span>${l}</span><b>${fmtNum(aCnt(k))}</b></button>`).join('')}</div>
     ${aCat?`<p class="hint onb-aq-note">Showing only <strong>${aCat==='pending'?'Pending':escapeHtml(CAT_LBL[aCat])}</strong> candidates (latest status), counted from Log calls. Typed totals are left out while a stage is picked.</p>`:''}
-    <div class="onb-scroll"><table class="users-table onb-table" id="onbRep"><thead><tr><th>Onboarder</th>${types.map(t=>`<th class="num">${escapeHtml(tLbl(t))}</th>`).join('')}<th class="num">Total</th></tr></thead><tbody>
+    <div class="onb-scroll"><table class="users-table onb-table" id="onbRep"><thead><tr><th>Onboarder</th>${types.map(t=>`<th class="num ${isCt(t)?'onb-ctcol':''}" ${isCt(t)?`title="Candidates whose first call was ${escapeHtml(tLbl(t))} — already counted in the columns before, so not added to Total"`:''}>${escapeHtml(tLbl(t))}</th>`).join('')}<th class="num">Total</th></tr></thead><tbody>
     ${volA.filter(v=>v.aTot).length?'':`<tr><td colspan="${types.length+2}" class="hint">No candidates in this stage for these dates.</td></tr>`}
     ${volA.filter(v=>v.aTot).map(v=>`<tr><td>${escapeHtml(v.o)}</td>${types.map(t=>`<td class="num">${v.assigned[t]||'–'}</td>`).join('')}<td class="num"><strong>${v.aTot}</strong></td></tr>`).join('')}
-    <tr class="onb-total"><td><strong>Assigned to onboarders</strong></td>${types.map(t=>`<td class="num">${aTot[t]||0}</td>`).join('')}<td class="num">${types.filter(inSum).reduce((a,t)=>a+(aTot[t]||0),0)}</td></tr>
+    <tr class="onb-total"><td><strong>Assigned to onboarders</strong></td>${types.map(t=>`<td class="num">${aTot[t]||0}</td>`).join('')}<td class="num">${types.filter(t=>inSum(t)&&!isCt(t)).reduce((a,t)=>a+(aTot[t]||0),0)}</td></tr>
     ${!aCat&&types.some(t=>pool[t])?`<tr class="onb-total"><td><strong>Total (typed)</strong></td>${types.map(t=>`<td class="num">${pool[t]||'–'}${pool[t]&&aTot[t]!==pool[t]?`<small>${pool[t]-(aTot[t]||0)} not assigned</small>`:''}</td>`).join('')}<td class="num">${types.reduce((a,t)=>a+(pool[t]||0),0)||'–'}</td></tr>`:''}
     </tbody></table></div>`;
   const panel=tabs.length?`<section class="panel"><div class="panel-head"><div><h3>Onboarders</h3></div>
@@ -15057,6 +15080,24 @@ const Onboarding=(()=>{
    ${calls.map(r=>`<tr><td>${fmtDate(r.call_date)}</td><td>${escapeHtml(r.onboarder)}</td><td><strong>${escapeHtml(r.eid)}</strong></td><td><span class="onb-type t${typeIdx(r.call_type)}">${escapeHtml(r.call_type)}</span></td><td class="num">${durTxt(r)}</td><td>${stPill(r.status,r.call_type)}</td><td class="onb-note">${escapeHtml(r.note||'')}</td><td>${linkHtml(linkOf(r.eid))}</td><td class="onb-act">${actions(r)}</td></tr>`).join('')}
   </tbody></table></div>`;
  }
+ // Latest status: tick one or more; applied when the box closes
+ function openCatPicker(anchor){
+  document.getElementById('onbCatPop')?.remove();
+  const pick=new Set(fCats()), opts=[['pending','Pending (not complete yet)'],...VIEW_CATS];
+  const pop=document.createElement('div'); pop.id='onbCatPop'; pop.className='onb-catpop'; pop.setAttribute('role','dialog'); pop.setAttribute('aria-label','Latest status');
+  const draw=()=>{ pop.innerHTML=`<label class="ocp-row ocp-all"><input type="checkbox" data-k="" ${pick.size?'':'checked'}> All</label>${opts.map(([k,l])=>`<label class="ocp-row"><input type="checkbox" data-k="${k}" ${pick.has(k)?'checked':''}> <span class="onb-cat ${CAT_CLS[k]||'q-pending'}">${escapeHtml(l)}</span></label>`).join('')}
+    <div class="ocp-foot">${defCats().length?`<button type="button" class="link-btn" data-def>Admin default</button>`:'<span></span>'}<button type="button" class="btn btn-primary btn-sm" data-done>Done</button></div>`;
+   pop.querySelectorAll('input[data-k]').forEach(i=>i.onchange=()=>{ const k=i.dataset.k; if(!k) pick.clear(); else i.checked?pick.add(k):pick.delete(k); draw(); });
+   pop.querySelector('[data-def]')?.addEventListener('click',()=>{ pick.clear(); defCats().forEach(k=>pick.add(k)); draw(); });
+   pop.querySelector('[data-done]').onclick=close; };
+  const close=()=>{ document.removeEventListener('mousedown',outside,true); document.removeEventListener('keydown',esc,true); pop.remove();
+   const next=opts.map(([k])=>k).filter(k=>pick.has(k)); if(next.join()!==fCats().join()){ st.fCats=next; render(); } };
+  const outside=e=>{ if(!pop.contains(e.target)&&e.target!==anchor) close(); };
+  const esc=e=>{ if(e.key==='Escape') close(); };
+  draw(); document.body.appendChild(pop);
+  const r=anchor.getBoundingClientRect(); pop.style.top=(r.bottom+window.scrollY+6)+'px'; pop.style.left=Math.max(8,Math.min(r.left+window.scrollX, window.scrollX+document.documentElement.clientWidth-pop.offsetWidth-8))+'px';
+  setTimeout(()=>{ document.addEventListener('mousedown',outside,true); document.addEventListener('keydown',esc,true); },0);
+ }
  function wire(host){
   const $=s=>host.querySelector(s);
   host.querySelectorAll('[data-onb-page]').forEach(b=>b.onclick=()=>{ st.page=b.dataset.onbPage; render(); });
@@ -15068,11 +15109,11 @@ const Onboarding=(()=>{
    $('#onbTo')?.addEventListener('change',e=>{ if(e.target.value){ st.from=$('#onbFrom')?.value||st.from; st.to=e.target.value; if(st.to<st.from) [st.from,st.to]=[st.to,st.from]; reload(); } });
    $('#onbFOnb')?.addEventListener('change',e=>{ st.fOnb=e.target.value; render(); });
    $('#onbFType')?.addEventListener('change',e=>{ st.fType=e.target.value; render(); });
-   $('#onbFCat')?.addEventListener('change',e=>{ st.fCat=e.target.value; render(); });
+   $('#onbFCat')?.addEventListener('click',e=>openCatPicker(e.currentTarget));
    let t; $('#onbQ')?.addEventListener('input',e=>{ clearTimeout(t); t=setTimeout(()=>{ st.q=e.target.value; render(); const q=document.getElementById('onbQ'); if(q){ q.focus(); q.setSelectionRange(q.value.length,q.value.length); } },250); });
    host.querySelectorAll('[data-onb-aq]').forEach(b=>b.onclick=()=>{ st.aCat=b.dataset.onbAq; render(); });
    host.querySelectorAll('[data-onb-rtab]').forEach(b=>b.onclick=()=>{ st.repTab=b.dataset.onbRtab; render(); });
-   host.querySelectorAll('[data-onb-cat]').forEach(b=>b.onclick=()=>{ st.fCat=st.fCat===b.dataset.onbCat?'':b.dataset.onbCat; render(); });
+   host.querySelectorAll('[data-onb-cat]').forEach(b=>b.onclick=()=>{ const ks=b.dataset.onbCat.split(','); st.fCats=fCats().join()===ks.join()?[]:ks; render(); });
    host.querySelectorAll('[data-onb-pick]').forEach(b=>b.onclick=()=>{ st.fOnb=b.dataset.onbPick; render(); }); };
   filt();
   if(st.page==='assign') return wireAssign(host);
@@ -15090,11 +15131,12 @@ const Onboarding=(()=>{
   const eidIn=$('#onbEid'), upd=()=>{ $('#onbMatch').innerHTML=matchHtml(eidIn.value.trim()); clearTimeout(lockT); lockT=setTimeout(showLock,300);
    clearTimeout(eidT); const v=eidIn.value.trim(); if(v.length>=3) eidT=setTimeout(async()=>{ await lookupEid(v); if(eidIn.isConnected&&eidIn.value.trim()===v){ const m=$('#onbMatch'); if(m) m.innerHTML=matchHtml(v); } },350); };
   eidIn.addEventListener('input',upd); upd();
+  $('#onbType')?.addEventListener('change',e=>{ const d=$('#onbDur'), ok=durOk(e.target.value); if(!d) return; d.disabled=!ok; if(!ok) d.value=''; d.placeholder=ok?'e.g. 12':'Not needed for this call type'; });
   host.querySelectorAll('[data-onb-dec]').forEach(b=>b.onclick=async()=>{ b.disabled=true; try{ await decide(+b.dataset.onbDec, b.dataset.ok==='1'); showToast(b.dataset.ok==='1'?'Approved — they can log this candidate now.':'Request declined.'); await loadRequests(); render(); }catch(e){ b.disabled=false; showToast(cleanErr(e)); } });
   $('#onbCancel')?.addEventListener('click',()=>{ st.editing=null; render(); });
   $('#onbForm').addEventListener('submit',async ev=>{ ev.preventDefault();
    const err=t=>{ $('#onbErr').textContent=t; };
-   const row={id:st.editing&&st.editing.id||undefined, call_date:$('#onbDate').value, eid:normEid(eidIn.value)||eidIn.value.trim(), call_type:$('#onbType').value, duration_min:$('#onbDur').value===''?'':String(Number($('#onbDur').value)), status:$('#onbStatus').value, onboarder:$('#onbWho').value.trim(), note:$('#onbNote').value.trim()};
+   const row={id:st.editing&&st.editing.id||undefined, call_date:$('#onbDate').value, eid:normEid(eidIn.value)||eidIn.value.trim(), call_type:$('#onbType').value, duration_min:$('#onbDur').value===''||!durOk($('#onbType').value)?'':String(Number($('#onbDur').value)), status:$('#onbStatus').value, onboarder:$('#onbWho').value.trim(), note:$('#onbNote').value.trim()};
    if(!row.call_date) return err('Pick the date.'); if(!row.eid) return err('Enter the EID.'); if(!row.call_type) return err('Choose the call type.'); if(!row.status) return err('Choose the status.');
    if(row.duration_min!==''&&!(Number(row.duration_min)>=0)) return err('Duration must be 0 or more minutes.');
    st.busy=true;
@@ -15103,7 +15145,7 @@ const Onboarding=(()=>{
    st.busy=false; render(); setTimeout(()=>document.getElementById('onbEid')?.focus(),30);
   });
   host.querySelectorAll('[data-onb-tab]').forEach(b=>b.onclick=()=>{ st.tab=b.dataset.onbTab; render(); });
-  host.querySelectorAll('[data-onb-q]').forEach(b=>b.onclick=()=>{ st.fCat=b.dataset.onbQ; st.tab='cand'; render(); });
+  host.querySelectorAll('[data-onb-q]').forEach(b=>b.onclick=()=>{ st.fCats=b.dataset.onbQ?[b.dataset.onbQ]:[]; st.tab='cand'; render(); });
   host.querySelectorAll('[data-onb-open]').forEach(b=>b.onclick=()=>{ const k=b.dataset.onbOpen; st.open.has(k)?st.open.delete(k):st.open.add(k); render(); });
   host.querySelectorAll('[data-onb-new]').forEach(b=>b.onclick=()=>{ st.editing=null; render(); const i=document.getElementById('onbEid'); i.value=b.dataset.onbNew; i.dispatchEvent(new Event('input')); window.scrollTo({top:0,behavior:'smooth'}); document.getElementById('onbType')?.focus(); });
   host.querySelectorAll('[data-onb-edit]').forEach(b=>b.onclick=()=>{ st.editing=(st.rows||[]).find(r=>String(r.id)===b.dataset.onbEdit)||null; render(); window.scrollTo({top:0,behavior:'smooth'}); });
@@ -15173,24 +15215,27 @@ const Onboarding=(()=>{
   if(!Array.isArray(users)||!users.length) users=(typeof usersCache!=='undefined'&&Array.isArray(usersCache)&&usersCache.length)?usersCache:(Array.isArray(users)?users:[]);
   users=users.filter(u=>u&&u.id!=null).sort((a,b)=>String(a.name).localeCompare(String(b.name)));
   const L=JSON.parse(JSON.stringify(lists()));
-  const work={onboarders:(L.onboarders||[]).map(x=>({...x, orig:x.label})), assignTypes:(L.assignTypes||DEFAULT_LISTS.assignTypes).map(x=>({...x, orig:x.label})), callTypes:L.callTypes.map(x=>({...x, orig:x.label})), statuses:L.statuses.map(x=>({...x, orig:x.label})), retired:L.retired||[]};
+  const work={onboarders:(L.onboarders||[]).map(x=>({...x, orig:x.label})), assignTypes:(L.assignTypes||DEFAULT_LISTS.assignTypes).map(x=>({...x, orig:x.label})), callTypes:L.callTypes.map(x=>({...x, orig:x.label})), statuses:L.statuses.map(x=>({...x, orig:x.label})), retired:L.retired||[], reportCats:Array.isArray(L.reportCats)?L.reportCats.slice():[]};
   document.getElementById('onbListsDlg')?.remove();
   const wrap=document.createElement('div'); wrap.className='modal-overlay'; wrap.id='onbListsDlg';
   const draw=()=>{
-   const row=(kind,x,i,n)=>`<div class="ol-row"><span class="ol-move"><button type="button" data-mv="${kind}:${i}:-1" ${i?'':'disabled'} aria-label="Move up">▲</button><button type="button" data-mv="${kind}:${i}:1" ${i<n-1?'':'disabled'} aria-label="Move down">▼</button></span><input data-lbl="${kind}:${i}" value="${escapeHtml(x.label)}" maxlength="120">${kind==='onboarders'?`<select data-uid="${i}" title="Dashboard user who logs in as this onboarder"><option value="">— no user linked —</option>${users.map(u=>`<option value="${escapeHtml(String(u.id))}" ${String(x.userId||'')===String(u.id)?'selected':''}>${escapeHtml(u.name)}${u.role&&u.role!=='user'?' ('+escapeHtml(u.role.replace('_',' '))+')':''}</option>`).join('')}${x.userId&&!users.some(u=>String(u.id)===String(x.userId))?`<option value="${escapeHtml(String(x.userId))}" selected>⚠ Linked user not found — pick again</option>`:''}</select>`:''}${kind==='statuses'?`<select data-cat="${i}">${CATS.map(([k,l])=>`<option value="${k}" ${x.cat===k?'selected':''}>${l}</option>`).join('')}</select>`:''}<button type="button" class="link-btn danger" data-rm="${kind}:${i}">Delete</button></div>`;
+   const row=(kind,x,i,n)=>`<div class="ol-row"><span class="ol-move"><button type="button" data-mv="${kind}:${i}:-1" ${i?'':'disabled'} aria-label="Move up">▲</button><button type="button" data-mv="${kind}:${i}:1" ${i<n-1?'':'disabled'} aria-label="Move down">▼</button></span><input data-lbl="${kind}:${i}" value="${escapeHtml(x.label)}" maxlength="120">${kind==='onboarders'?`<select data-uid="${i}" title="Dashboard user who logs in as this onboarder"><option value="">— no user linked —</option>${users.map(u=>`<option value="${escapeHtml(String(u.id))}" ${String(x.userId||'')===String(u.id)?'selected':''}>${escapeHtml(u.name)}${u.role&&u.role!=='user'?' ('+escapeHtml(u.role.replace('_',' '))+')':''}</option>`).join('')}${x.userId&&!users.some(u=>String(u.id)===String(x.userId))?`<option value="${escapeHtml(String(x.userId))}" selected>⚠ Linked user not found — pick again</option>`:''}</select>`:''}${kind==='callTypes'?`<label class="ol-dur" title="Untick for call types that have no talk time, such as LVM"><input type="checkbox" data-dur="${i}" ${durOkItem(x)?'checked':''}> Duration</label>`:''}${kind==='statuses'?`<select data-cat="${i}">${CATS.map(([k,l])=>`<option value="${k}" ${x.cat===k?'selected':''}>${l}</option>`).join('')}</select>`:''}<button type="button" class="link-btn danger" data-rm="${kind}:${i}">Delete</button></div>`;
    wrap.innerHTML=`<div class="modal ol-modal" role="dialog" aria-modal="true" aria-labelledby="olT"><div class="modal-header"><h3 id="olT">Onboarding dropdowns</h3><button class="modal-close" data-close aria-label="Close">&times;</button></div>
     <div class="modal-body">
      ${(()=>{ const miss=work.onboarders.filter(o=>o.userId&&!users.some(u=>String(u.id)===String(o.userId))).length; return usersErr||miss?`<div class="onb-demo bad" style="margin:0 0 10px">${usersErr?'The user list could not be loaded ('+escapeHtml(usersErr)+') — only admins can load it.':''} ${miss?`${miss} onboarder${miss===1?' is':'s are'} linked to a user that no longer exists (the account was removed or re-created). Pick the right user for ${miss===1?'it':'them'} and Save.`:''}</div>`:''; })()}
      <h4>Onboarders <span class="hint">— names used on the onboarding page; link each to the user who logs in as them. Pasted messages match by first name.</span></h4><div class="ol-list">${work.onboarders.map((x,i)=>row('onboarders',x,i,work.onboarders.length)).join('')||'<p class="hint" style="margin:0">None yet.</p>'}</div><button type="button" class="btn btn-secondary btn-sm" data-add="onboarders">＋ Add onboarder</button>
-     <h4>Call type</h4><div class="ol-list">${work.callTypes.map((x,i)=>row('callTypes',x,i,work.callTypes.length)).join('')}</div><button type="button" class="btn btn-secondary btn-sm" data-add="callTypes">＋ Add call type</button>
+     <h4>Call type <span class="hint">— untick Duration for calls with no talk time (LVM…); the duration box is then turned off for them</span></h4><div class="ol-list">${work.callTypes.map((x,i)=>row('callTypes',x,i,work.callTypes.length)).join('')}</div><button type="button" class="btn btn-secondary btn-sm" data-add="callTypes">＋ Add call type</button>
      <h4>Assignment type <span class="hint">— columns of the daily assignment sheet</span></h4><div class="ol-list">${work.assignTypes.map((x,i)=>row('assignTypes',x,i,work.assignTypes.length)).join('')}</div><button type="button" class="btn btn-secondary btn-sm" data-add="assignTypes">＋ Add assignment type</button>
      <h4>Status <span class="hint">— the category decides where a candidate counts in the report</span></h4><div class="ol-list">${work.statuses.map((x,i)=>row('statuses',x,i,work.statuses.length)).join('')}</div><button type="button" class="btn btn-secondary btn-sm" data-add="statuses">＋ Add status</button>
+     <h4>Report · Latest status shown by default <span class="hint">— what the Onboarding report starts with; anyone can still change it there. None ticked = All.</span></h4><div class="ol-cats">${[['pending','Pending (not complete yet)'],...VIEW_CATS].map(([k,l])=>`<label class="ol-catchk"><input type="checkbox" data-rcat="${k}" ${work.reportCats.includes(k)?'checked':''}> ${escapeHtml(l)}</label>`).join('')}</div>
      <p class="hint ol-note">Renaming keeps past calls counting under the new name. Deleting only removes the choice from the list — calls already logged with it keep their status and category.</p>
      <p class="me-err" id="olErr"></p>
     </div><div class="modal-footer"><button class="btn btn-secondary" id="olReset" style="margin-right:auto">Reset to defaults</button><button class="btn btn-secondary" data-close>Cancel</button><button class="btn btn-primary" id="olSave">Save</button></div></div>`;
    wrap.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>wrap.remove());
    wrap.querySelectorAll('[data-lbl]').forEach(i=>i.oninput=()=>{ const [k,n]=i.dataset.lbl.split(':'); const x=work[k][+n]; x.label=i.value;
      if(k==='statuses'&&!x.catTouched){ const g=guessCat(i.value); if(g&&g!==x.cat){ x.cat=g; const sel=wrap.querySelector(`[data-cat="${n}"]`); if(sel) sel.value=g; } } });
+   wrap.querySelectorAll('[data-dur]').forEach(c=>c.onchange=()=>{ work.callTypes[+c.dataset.dur].noDur=!c.checked; });
+   wrap.querySelectorAll('[data-rcat]').forEach(c=>c.onchange=()=>{ const k=c.dataset.rcat; work.reportCats=work.reportCats.filter(x=>x!==k); if(c.checked) work.reportCats.push(k); });
    wrap.querySelectorAll('[data-cat]').forEach(s=>s.onchange=()=>{ const x=work.statuses[+s.dataset.cat]; x.cat=s.value; x.catTouched=true; });
    wrap.querySelectorAll('[data-uid]').forEach(s=>s.onchange=()=>{ const v=s.value; if(v) work.onboarders.forEach((o,j)=>{ if(j!==+s.dataset.uid&&String(o.userId)===v) o.userId=''; }); work.onboarders[+s.dataset.uid].userId=v; draw(); });
    wrap.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>{ const [k,i,d]=b.dataset.mv.split(':'), a=work[k], j=+i+(+d); [a[+i],a[j]]=[a[j],a[+i]]; draw(); });
@@ -15206,7 +15251,7 @@ const Onboarding=(()=>{
     if(dup(ct)||dup(ss)||dup(at)||dup(ob)) return err('“'+(dup(ct)||dup(ss)||dup(at)||dup(ob)).label+'” is listed twice.');
     // renamed items remember their old names, so earlier calls still count under them
     const fin=a=>a.map(({orig,catTouched,...x})=>({...x, aliases:[...new Set([...(x.aliases||[]), ...(orig&&orig!==x.label?[orig]:[])])].filter(Boolean)}));
-    const out={onboarders:fin(ob), callTypes:fin(ct), assignTypes:fin(at), statuses:fin(ss), retired:work.retired.filter(r=>!ss.some(s=>s.label.toLowerCase()===r.label.toLowerCase()))};
+    const out={onboarders:fin(ob), callTypes:fin(ct), assignTypes:fin(at), statuses:fin(ss), retired:work.retired.filter(r=>!ss.some(s=>s.label.toLowerCase()===r.label.toLowerCase())), reportCats:[['pending'],...VIEW_CATS].map(([k])=>k).filter(k=>work.reportCats.includes(k))};
     const ok=await storageSet('onbLists', out); if(ok===null) return err('Not saved — the store did not accept the change.');
     KV.set('onbLists', out);
     // the database uses the same links, so a linked user's calls are saved under their onboarder name
@@ -15564,7 +15609,11 @@ const OrderEntry=(()=>{
    st.busy=false; render();
   });
   // report
-  host.querySelectorAll('[data-oe-group]').forEach(b=>b.onclick=async()=>{ st.group=b.dataset.oeGroup; if(!st.embed) st.custom=false; await ensure(); render(); });
+  host.querySelectorAll('[data-oe-group]').forEach(b=>b.onclick=async()=>{ st.group=b.dataset.oeGroup;
+   // on Overview: Weekly / Monthly / Quarterly set the top dates to that week, month or quarter (the one the dates end in)
+   if(st.embed&&st.group!=='day'&&typeof OverviewX!=='undefined'&&OverviewX.setRange){ const G=GROUPS[st.group], t=today(), end=st.to&&st.to<=t?st.to:t, a=G.key(end), e=G.end(a), z=e>t?t:e;
+    st.pin={from:a, to:z, group:st.group}; OverviewX.setRange(a, z); return; }
+   if(!st.embed) st.custom=false; await ensure(); render(); });
   $('#oeShowPer')?.addEventListener('click',()=>{ st.showPer=!st.showPer; render(); });
   host.querySelectorAll('[data-oe-view]').forEach(b=>b.onclick=()=>{ st.view=b.dataset.oeView; render(); });
   const rng=async()=>{ const a=$('#oeFrom').value, b=$('#oeTo').value; if(!a||!b) return; st.from=a; st.to=b; st.custom=true; await ensure(); render(); };
@@ -15839,8 +15888,10 @@ const OrderEntry=(()=>{
  // Overview → Order Entry shows this page's report
  async function showReport(el, from, to){
   st.embed=el; st.page='report';
+  // a week / month / quarter picked with the Weekly / Monthly / Quarterly buttons keeps that grouping
+  const pinned=st.pin&&st.pin.from===from&&st.pin.to===to; if(!pinned) st.pin=null;
   if(from&&to&&(st.from!==from||st.to!==to||!st.custom)){ const n=Math.round((parse(to)-parse(from))/864e5)+1;
-    st.from=from; st.to=to; st.custom=true; st.group=n<=45?'day':n<=140?'week':n<=400?'month':'quarter'; }
+    st.from=from; st.to=to; st.custom=true; st.group=pinned?st.pin.group:n<=45?'day':n<=140?'week':n<=400?'month':'quarter'; }
   if(st.rows==null){ el.innerHTML='<div class="panel"><p class="hint" style="margin:0">Loading order entry numbers…</p></div>'; }
   await ensure();
   if(st.embed!==el||!el.isConnected) return;
@@ -15888,7 +15939,17 @@ const OverviewX=(()=>{
   if(canOe()) get('oe',r.from,r.to).then(({rows})=>{ const t=rows.reduce((a,x)=>a+(x.rc||0)+(x.crm||0),0); put('orderentry',`<b>${fmtNum(t)}</b> orders`); }).catch(()=>{});
  }
  function stepRange(dir){ const r=range(), n=Math.round((parse(r.to)-parse(r.from))/864e5)+1, t=ltToday();
-   let a=add(r.from,dir*n), b=add(r.to,dir*n); if(a>t) return; if(b>t) b=t; setRange(a,b); }
+   const mEnd=s=>{ const d=parse(s.slice(0,8)+'01'); d.setMonth(d.getMonth()+1,0); return iso(d); }, mShift=(s,k)=>{ const d=parse(s.slice(0,8)+'01'); d.setMonth(d.getMonth()+k); return iso(d); };
+   const qOf=s=>{ const d=parse(s); d.setMonth(Math.floor(d.getMonth()/3)*3,1); return iso(d); }, qEnd=s=>mEnd(mShift(qOf(s),2));
+   const ends=e=>r.to===e||(r.to===t&&e>t);
+   let a, b, pin=null; try{ const p=OrderEntry._st.pin; if(p&&p.from===r.from&&p.to===r.to) pin=p.group; }catch(e){}
+   if(pin==='quarter'||(!pin&&r.from===qOf(r.from)&&r.to.slice(0,7)!==r.from.slice(0,7)&&ends(qEnd(r.from)))){ a=mShift(r.from,3*dir); b=qEnd(a); }          // a whole quarter
+   else if(pin==='month'||(!pin&&r.from.slice(8)==='01'&&ends(mEnd(r.from)))){ a=mShift(r.from,dir); b=mEnd(a); }                                         // a whole month
+   else if(pin==='week'||(!pin&&parse(r.from).getDay()===0&&ends(add(r.from,6)))){ a=add(r.from,7*dir); b=add(a,6); }                                     // a whole week
+   else { a=add(r.from,dir*n); b=add(r.to,dir*n); }
+   if(a>t) return; if(b>t) b=t;
+   try{ const p=OrderEntry._st; if(p.pin&&p.pin.from===r.from&&p.pin.to===r.to) p.pin={from:a, to:b, group:p.pin.group}; }catch(e){}
+   setRange(a,b); }
  function dateCtl(){ const r=range(), t=ltToday();
    return `<div class="ovx-date" role="group" aria-label="Dates for every section"><button type="button" class="ovx-dstep" data-ovd="-1" aria-label="Earlier" title="Earlier">‹</button><button type="button" class="ovx-dbtn" id="ovxDateBtn" title="One date range for Recruiting, Onboarding and Order Entry"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span><small>Dates</small><b>${escapeHtml(dateRangeLabel(r.from,r.to))}</b></span></button><button type="button" class="ovx-dstep" data-ovd="1" aria-label="Later" title="Later" ${r.to>=t?'disabled':''}>›</button></div>`; }
  const dayLabel=s=>parse(s).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'});
@@ -16051,7 +16112,7 @@ const OverviewX=(()=>{
     scales:{x:{stacked:true, grid:{display:false}}, y:{stacked:true, beginAtZero:true, ticks:{precision:0}}}}});
   if(ch) st.charts.push(ch);
  }
- return {bar, render, mode, active:()=>mode()!=='recruiting', has:k=>modes().some(([x])=>x===k), setMode:k=>{ st.mode=k; }, pickerLabel, openPicker, step, canStep, barOn:()=>modes().length>1, syncFromRecruiting};
+ return {bar, render, mode, setRange, active:()=>mode()!=='recruiting', has:k=>modes().some(([x])=>x===k), setMode:k=>{ st.mode=k; }, pickerLabel, openPicker, step, canStep, barOn:()=>modes().length>1, syncFromRecruiting};
 })();
 function renderDivReportView(){ DivReport.show(); }
 
