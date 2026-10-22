@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance Dashboard · v4.100.0</title>
+<title>Dashboard - 1.1.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- fonts load without holding up the page (the system font shows for a moment) -->
@@ -13,16 +13,18 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
-<!-- Excel and PDF tools are only needed for uploads and downloads: they load in the background and never hold up opening the page -->
-<script async src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- charts load alongside the page without holding it up; charts drawn before it arrives are redrawn when it does -->
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js" onload="window.__chartLoaded&&window.__chartLoaded()" onerror="window.__chartFailed=true"></script>
+<!-- Excel and PDF tools are only needed for uploads and downloads: they start loading once the page is open -->
 <script>
+// pages opened before 1.1.1 read the first version line in this file to spot an update: const APP_VERSION = '4.101.0'
 window.__libs=(function(){
   function add(src){ return new Promise(function(done){ var s=document.createElement('script'); s.src=src; s.async=true; s.onload=s.onerror=function(){ done(); }; document.head.appendChild(s); }); }
-  var pdf=null;
-  return { pdf:function(){ return pdf||(pdf=add('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js').then(function(){ return add('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js'); })); } };
+  var pdf=null, xl=null;
+  return { xlsx:function(){ return window.XLSX?Promise.resolve():(xl||(xl=add('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'))); },
+   pdf:function(){ return pdf||(pdf=add('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js').then(function(){ return add('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js'); })); } };
 })();
-addEventListener('load',function(){ setTimeout(function(){ window.__libs.pdf(); },1200); });
+addEventListener('load',function(){ setTimeout(function(){ window.__libs.xlsx(); },300); setTimeout(function(){ window.__libs.pdf(); },2500); });
 </script>
 <style>
   :root{
@@ -1159,6 +1161,7 @@ th.onb-ctcol{color:#64748b;font-style:italic}
 .onb-late-kpis{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px;margin:4px 0 14px}.olk{background:#f6f7fb;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}.olk span{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#64748b}.olk b{font-size:22px;color:#0a1f44}.olk small{font-size:12px;color:#64748b}
 @media(max-width:1100px){.onb-late-kpis{grid-template-columns:repeat(4,minmax(0,1fr))}}@media(max-width:600px){.onb-late-kpis{grid-template-columns:1fr 1fr}}.onb-late-h4{margin:18px 0 8px;font-size:14px}.onb-late-note{margin-top:10px}
 .onb-catpop .onb-cat.q-pending{background:#e2e8f0!important;color:#334155!important}
+.boot-pill{position:fixed;right:18px;bottom:18px;z-index:2500;display:flex;align-items:center;gap:8px;background:#0a1f44;color:#fff;font-size:12.5px;font-weight:600;padding:8px 14px;border-radius:999px;box-shadow:0 6px 18px rgba(10,31,68,.25)}.boot-pill i{width:10px;height:10px;border-radius:50%;border:2px solid #ffffff55;border-top-color:#fff;animation:bootspin .8s linear infinite}@keyframes bootspin{to{transform:rotate(360deg)}}
 .ol-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}.ol-row{display:flex;gap:8px;align-items:center}.ol-row input{flex:1;padding:7px 9px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:13px;min-width:0}.ol-row select[data-uid]{width:200px}.ol-row select{padding:7px 8px;border:1px solid #cfd6df;border-radius:6px;font:inherit;font-size:12.5px;width:170px}
 .ol-move{display:flex;flex-direction:column}.ol-move button{border:0;background:none;font-size:9px;line-height:1;padding:1px 4px;color:#64748b;cursor:pointer}.ol-move button:disabled{opacity:.3;cursor:default}
 .ol-note{font-size:12px;margin:12px 0 0}
@@ -3551,7 +3554,7 @@ document.addEventListener('click', (e)=>{
 });
 function downloadTableAsExcel(tableEl, filename){
   if(!tableEl){ showToast('Nothing to export yet.'); return; }
-  if(typeof XLSX === 'undefined'){ showToast('Excel export library not loaded.'); return; }
+  if(typeof XLSX === 'undefined'){ showToast('Preparing Excel…'); window.__libs.xlsx().then(()=>{ if(typeof XLSX!=='undefined') downloadTableAsExcel(tableEl, filename); else showToast('Excel export library not loaded — check your connection.'); }); return; }
   try{
     const wb = XLSX.utils.table_to_book(tableEl, {sheet:'Data'});
     XLSX.writeFile(wb, filename);
@@ -3823,6 +3826,8 @@ function totalsFooter(values,columns,label='Total'){
 }
 function safeChart(ctx, config){
   if(typeof Chart === 'undefined'){
+    // still loading: leave the canvas in place; everything is redrawn the moment the library arrives
+    if(!window.__chartFailed){ window.__chartWanted=true; return null; }
     if(ctx && ctx.parentElement) ctx.parentElement.innerHTML = '<div class="muted-note">Charts library failed to load (check your internet connection, then reload the page).</div>';
     return null;
   }
@@ -3853,6 +3858,7 @@ function safeChart(ctx, config){
     return null;
   }
 }
+window.__chartLoaded=function(){ if(window.__chartWanted&&typeof refreshUI==='function'&&Server&&Server.user){ window.__chartWanted=false; try{ refreshUI(); }catch(e){} } };
 function destroyChart(id){
   if(charts[id]){ charts[id].destroy(); delete charts[id]; }
 }
@@ -3895,7 +3901,8 @@ function parseGoalsGrid(grid){
   }
   return null;
 }
-function readExcelFile(file){
+async function readExcelFile(file){
+  if(typeof XLSX==='undefined') await window.__libs.xlsx();
   return new Promise((resolve,reject)=>{
     const reader = new FileReader();
     reader.onload = (e)=>{
@@ -9573,7 +9580,7 @@ const Server = {
   isSuperAdmin(){ return !!this.user && this.user.role==='super_admin'; },
   expired(){
     if(!this.token) return;
-    this.token=null; lsDel(TOKEN_LS_KEY); clearInterval(this.pollTimer); this.pollTimer=null;
+    this.token=null; lsDel(TOKEN_LS_KEY); clearInterval(this.pollTimer); this.pollTimer=null; BootCache.clear();
     showAuthGate('login', 'Your session ended — please sign in again.');
   },
   async loadKv(progress){
@@ -9625,8 +9632,8 @@ const Server = {
     if(key.startsWith('weekly:') && !key.endsWith(LISTS_SUFFIX) && canCompress){
       const {summary, lists} = splitWeekly(val);
       this.markOwn('kv:'+key+LISTS_SUFFIX);
-      await this.rpc('dash_kv_set', {p_key:key+LISTS_SUFFIX, p_value:{v:4, gz: await gzipB64(JSON.stringify(lists))}});
-      await this.rpc('dash_kv_set', {p_key:key, p_value: await encodeKvValue(key, summary)});
+      const [gz, enc] = await Promise.all([gzipB64(JSON.stringify(lists)), encodeKvValue(key, summary)]);
+      await Promise.all([this.rpc('dash_kv_set', {p_key:key+LISTS_SUFFIX, p_value:{v:4, gz}}), this.rpc('dash_kv_set', {p_key:key, p_value:enc})]);
       val.listsSplit = true; val.listsLoaded = true;
       KV.set(key, val); syncTeamCandidatesSoon(); return;
     }
@@ -9751,7 +9758,7 @@ async function checkDatabaseSchema(){
 // Settings → Data Sync Details, and a toast when one arrives.
 let uploadAlerts = [];
 async function loadUploadAlerts(announce){
-  try{ uploadAlerts = await Server.rpc('dash_alerts'); }catch(e){ uploadAlerts = []; }
+  try{ uploadAlerts = (await Server.rpc('dash_alerts'))||[]; }catch(e){ uploadAlerts = []; }
   const btn = document.getElementById('settingsNavBtn');
   btn?.querySelector('.alert-badge')?.remove();
   if(uploadAlerts.length) btn?.insertAdjacentHTML('beforeend', '<span class="alert-badge" title="Rejected uploads">'+uploadAlerts.length+'</span>');
@@ -9893,6 +9900,27 @@ function isOnboardingOnlyUser(u){
   const has=m=>hs.includes('grant.'+m)||(u.modules||[]).includes(m);
   return (has('onboarding')||has('orderentry')) && !mods.length && hs.includes('grant.no_team') && !hs.includes('grant.divreport') && !hs.includes('grant.leads');
 }
+// ---- open instantly: the last copy of the dashboard is kept in this browser and shown straight away on the next visit,
+// then the latest data arrives from the server a moment later and replaces it. Candidate name lists, manual candidate
+// entries and remarks are never kept in it; the copy is removed when the person signs out or their session ends.
+const BootCache=(()=>{
+ const DB='ipd_boot', ST='snap', MAX_AGE=7*864e5;
+ const open=()=>new Promise((res,rej)=>{ if(!window.indexedDB) return rej(new Error('no idb')); const r=indexedDB.open(DB,1); r.onupgradeneeded=()=>r.result.createObjectStore(ST); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); });
+ const tx=async(mode,fn)=>{ const db=await open(); return new Promise((res,rej)=>{ const t=db.transaction(ST,mode), st=t.objectStore(ST); const q=fn(st); t.oncomplete=()=>{ db.close(); res(q&&q.result); }; t.onerror=t.onabort=()=>{ db.close(); rej(t.error); }; }); };
+ async function tag(token){ const h=await crypto.subtle.digest('SHA-256', new TextEncoder().encode('ipd:'+token)); return [...new Uint8Array(h)].slice(0,12).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+ const SECRET=k=>k.endsWith(LISTS_SUFFIX)||k==='manualRows';
+ return {
+  async get(token){ try{ if(!token||!crypto.subtle) return null; const v=await tx('readonly',st=>st.get('boot')); if(!v||v.ver!==APP_VERSION||v.tag!==await tag(token)||Date.now()-v.at>MAX_AGE) return null; return v.boot; }catch(e){ return null; } },
+  async put(token, boot){ try{ if(!token||!crypto.subtle||!boot||!boot.me) return;
+    const gkv=GKV_KEYS.map(k=>[k, KV.getRaw?KV.getRaw(k):KV.get(k)]).filter(([,v])=>v!=null);
+    const snap={me:Server.user||boot.me, kv:(boot.kv||[]).filter(r=>r&&r.key&&!SECRET(r.key)), gkv, remarks:[], since:0};
+    const v={ver:APP_VERSION, tag:await tag(token), at:Date.now(), boot:snap};
+    await tx('readwrite',st=>st.put(v,'boot')); }catch(e){} },
+  async clear(){ try{ await tx('readwrite',st=>st.delete('boot')); }catch(e){} }
+ };
+})();
+function showUpdatingPill(on){ let el=document.getElementById('bootPill'); if(!on){ el?.remove(); return; } if(el) return;
+ el=document.createElement('div'); el.id='bootPill'; el.className='boot-pill'; el.setAttribute('role','status'); el.innerHTML='<i></i>Getting the latest numbers…'; document.body.appendChild(el); }
 async function startAuthFlow(){
   if(window.DV_MODE) return dvStartAuth();
   // Fast path on refresh: a saved session opens the dashboard with a single server call.
@@ -9902,6 +9930,8 @@ async function startAuthFlow(){
     Server.token = savedToken;
     // onboarders: one small call instead of the full data download
     if(lsGet('ipd_light_user')==='1'){ try{ Server.user = await Server.rpc('dash_me'); await Server.mergeGrants(); if(isOnboardingOnlyUser(Server.user)){ await afterLogin(null, true); return; } }catch(e){ if(/SESSION_EXPIRED/.test(e.message)){ Server.token=null; lsDel(TOKEN_LS_KEY); } } }
+    // a saved copy opens the dashboard at once; the server's latest replaces it in the background
+    if(!window.DV_MODE&&lsGet('ipd_light_user')!=='1'){ const snap=await BootCache.get(savedToken); if(snap){ try{ await afterLogin(snap, false, {cached:true}); return; }catch(e){ console.warn('saved copy failed', e); } } }
     try{ const boot = await Server.rpc('dash_bootstrap'); await afterLogin(boot); return; }
     catch(e){
       document.getElementById('authGate')?.remove(); setLocked(true);
@@ -9955,10 +9985,11 @@ function setLoading(text){
   if(!el){ el=document.createElement('div'); el.id='appLoading'; el.className='app-loading'; el.innerHTML='<div class="spinner" aria-hidden="true"></div><p></p>'; document.body.appendChild(el); }
   el.querySelector('p').textContent = text;
 }
-async function afterLogin(boot, lightReady){
+async function afterLogin(boot, lightReady, opts){
+  opts=opts||{}; const cached=!!opts.cached, quiet=!!opts.quiet;
   setLocked(false);
   if(!boot && Server.user && !lightReady) await Server.mergeGrants();
-  setLoading('Loading dashboard…');
+  if(!quiet) setLoading(cached?'Opening…':'Loading dashboard…');
   // light mode: onboarding-only users load just what the Onboarding page needs
   if(!boot && Server.user && isOnboardingOnlyUser(Server.user)){
     lsSet('ipd_light_user','1');
@@ -9981,12 +10012,15 @@ async function afterLogin(boot, lightReady){
   try{
     if(!boot){ try{ boot = await Server.rpc('dash_bootstrap'); }catch(e){ if(!/Could not find|schema cache|does not exist/i.test(e.message+' '+(e.code||''))) throw e; } }
     if(boot){
+      // everything is unpacked first, then swapped in at once, so a page drawn meanwhile never sees half the data
+      const dec=await Promise.all((boot.kv||[]).map(async r=>[r.key, await decodeKvValue(r.key, r.value)]));
       Server.user = boot.me;
-      KV.clear();
-      await Promise.all((boot.kv||[]).map(async r=>{ KV.set(r.key, await decodeKvValue(r.key, r.value)); }));
+      KV.clear(); dec.forEach(([k,v])=>KV.set(k,v));
       Remarks.list = boot.remarks || [];
       Server.since = Number(boot.since)||0;
-      await Promise.all([Server.mergeGrants(), loadGrantedKv()]); boot.__gkv=true;   // two small calls at once instead of one after the other
+      if(cached){ (boot.gkv||[]).forEach(([k,v])=>KV.set(k,v)); }
+      else await Promise.all([Server.mergeGrants(), loadGrantedKv()]);   // two small calls at once instead of one after the other
+      boot.__gkv=true;
       if(isOnboardingOnlyUser(Server.user)) lsSet('ipd_light_user','1'); else lsDel('ipd_light_user');
     } else {
       await Server.loadKv(t=>setLoading(t));
@@ -9996,12 +10030,20 @@ async function afterLogin(boot, lightReady){
     await loadDivisionNames(); await loadDedupeSetting(); await loadAllWeeks(); await loadExcludedRecruiters(); await loadExcludedBranches();
     await loadRecruiterDivisions(); await loadBranchDivisions(); await loadDedupeSetting(); await loadPerformerHighlightSetting();
     deleteSourceFilesAfterImport = lsGet('ipd_delete_sources')!=='0';
-    if(!(await restoreNav())) applyDefaultView();
+    if(!quiet){ if(!(await restoreNav())) applyDefaultView(); }
     applyPermissions(); renderDefaultViewPref();
     document.getElementById('storageModeNote').textContent = 'Signed in as '+Server.user.name+' · data is stored securely on the server.';
     refreshUI();
     setLoading(null);
-    if(boot) Server.startPollingFrom(Server.since); else await Server.startPolling();
+    if(cached){
+      // the saved copy is on screen — now get the latest from the server and redraw in place
+      showUpdatingPill(true);
+      (async()=>{ try{ const fresh=await Server.rpc('dash_bootstrap'); await afterLogin(fresh, false, {quiet:true}); }
+        catch(e){ if(/SESSION_EXPIRED/.test(String(e&&e.message||''))){ BootCache.clear(); Server.expired(); } else showToast('Showing the saved copy — could not reach the server: '+cleanErr(e)); }
+        finally{ showUpdatingPill(false); } })();
+      return;
+    }
+    if(boot){ BootCache.put(Server.token, boot); Server.startPollingFrom(Server.since); } else await Server.startPolling();
     // background jobs wait until the page is shown and the browser is idle, so the first screen appears sooner
     const idle=f=>('requestIdleCallback' in window)?requestIdleCallback(f,{timeout:4000}):setTimeout(f,1200);
     idle(async ()=>{ await Server.loadListsInBackground(); if(Server.can('upload')||Server.can('master_edit')) setTimeout(()=>autoVerifyWeeks(true), 1500); });
@@ -10013,6 +10055,7 @@ async function afterLogin(boot, lightReady){
   }finally{ setLoading(null); }
 }
 async function signOut(){
+  await BootCache.clear();
   try{ await Server.rpc('dash_logout'); }catch(e){}
   lsDel(TOKEN_LS_KEY); location.reload();
 }
@@ -10068,6 +10111,7 @@ function toTs(v){ if(v===''||v==null) return null; if(/^\d{4}-\d{2}-\d{2} \d{2}:
 function weekEndForWeekNumber(year, wn){ const a=weekAnchorForYear(year); a.setDate(a.getDate()+(wn-1)*7+6); return toIsoDateOnly(a); }
 
 async function readWorkbookForImport(file){
+  if(typeof XLSX==='undefined') await window.__libs.xlsx();
   const wb = XLSX.read(new Uint8Array(await file.arrayBuffer()), {type:'array', cellDates:true, dense:false});
   const sheets = [];
   for(const name of wb.SheetNames){
@@ -10246,6 +10290,7 @@ async function buildBackupXlsx(readable, say){
 }
 async function downloadBackupXlsx(readable){
   if(!Server.isSuperAdmin()){ showToast('Only the super admin can download a backup.'); return; }
+  if(typeof XLSX==='undefined') await window.__libs.xlsx();
   if(typeof XLSX==='undefined'){ showToast('The Excel tools are still loading — try again in a moment.'); return; }
   if(readable&&!(await NamePolicy.getKey(true))){ showToast('Names can’t be decrypted: '+(NamePolicy.keyErr||'the key isn’t available.')); return; }
   bkState={busy:true}; renderServerDownload();
@@ -10274,6 +10319,7 @@ function bkRead(wb){
   return P;
 }
 async function readBackupXlsx(file){
+  if(typeof XLSX==='undefined') await window.__libs.xlsx();
   if(typeof XLSX==='undefined'){ showToast('The Excel tools are still loading — try again in a moment.'); return; }
   try{ setLoading('Reading the backup…'); const wb=XLSX.read(new Uint8Array(await file.arrayBuffer()),{type:'array'}); bkState={preview:{...bkRead(wb), file:file.name}}; }
   catch(e){ bkState={log:[{t:'Couldn’t read '+file.name+': '+cleanErr(e),bad:true}],error:true}; }
@@ -10343,6 +10389,7 @@ async function restoreBackup(parts){
   if(!bkState.error) setTimeout(()=>location.reload(),2500);
 }
 async function downloadServerRows(onlyWeek){
+  if(typeof XLSX==='undefined') await window.__libs.xlsx();
   if(typeof XLSX==='undefined'){ showToast('The Excel writer didn’t load — check your connection and reload.'); return; }
   const weeks=onlyWeek?[onlyWeek]:[...weeksData].map(w=>w.weekEndDate).sort();
   if(!weeks.length){ showToast('No saved weeks yet.'); return; }
@@ -10616,17 +10663,20 @@ const COUNT_RULES = 9;   // 9: per-branch daily schedule counts (branchDays) for
 async function rebuildWeeks(weeks, localRows, progress){
   const list = [...new Set(weeks)].filter(Boolean).sort();
   if(!list.length) return;
-  const index = []; let after='';
-  for(;;){
-    if(progress) progress('Collecting rows for '+list.length+' week'+(list.length===1?'':'s')+'… '+fmtNum(index.length));
-    const page = await Server.rpc('dash_week_index', {p_weeks:list, p_after:after, p_limit:1000});
-    if(!page.length) break; index.push(...page); after = page[page.length-1].id;
-  }
+  // each week's row list is read on its own, several weeks at once (instead of one long list page by page)
+  const index = [], seenIdx = new Set(); let listed=0;
+  if(progress) progress('Collecting rows for '+list.length+' week'+(list.length===1?'':'s')+'…');
+  await runPool(list.map(w=>async()=>{ let after='';
+    for(;;){ const page = await Server.rpc('dash_week_index', {p_weeks:[w], p_after:after, p_limit:1000});
+      if(!page||!page.length) break; page.forEach(r=>{ if(!seenIdx.has(r.id)){ seenIdx.add(r.id); index.push(r); } }); listed+=page.length; after = page[page.length-1].id;
+      if(progress) progress('Collecting rows for '+list.length+' week'+(list.length===1?'':'s')+'… '+fmtNum(listed));
+      } }), NET_PARALLEL+2);
+  index.sort((a,b)=>a.id<b.id?-1:a.id>b.id?1:0);
   const need = index.filter(r=>!localRows || !localRows.has(r.id)).map(r=>r.id);
   const data = new Map(), idChunks=[];
   for(let i=0;i<need.length;i+=500) idChunks.push(need.slice(i,i+500));
   if(idChunks.length && progress) progress('Fetching rows… 0 / '+fmtNum(need.length));
-  await runPool(idChunks.map(ids=>async()=>{ (await Server.rpc('dash_rows_by_ids', {p_ids:ids})).forEach(r=>data.set(r.id, r.data)); }), NET_PARALLEL,
+  await runPool(idChunks.map(ids=>async()=>{ (await Server.rpc('dash_rows_by_ids', {p_ids:ids})).forEach(r=>data.set(r.id, r.data)); }), NET_PARALLEL+2,
     (d)=>{ if(progress) progress('Fetching rows… '+fmtNum(Math.min(d*500,need.length))+' / '+fmtNum(need.length)); });
   const get = id => (localRows && localRows.get(id)) || data.get(id);
   const per = new Map(list.map(w=>[w,{s:[],v:[]}]));
@@ -10640,7 +10690,8 @@ async function rebuildWeeks(weeks, localRows, progress){
   manualRowsList().forEach((m,i)=>{ const d=m.data||{}; manualData.add(d);
     if(m.s && d['Created On']){ const w=weekOfDate(String(d['Created On']).slice(0,10)).weekEnd; if(per.has(w)) per.get(w).s.push([1e9+i, d]); }
     if(m.v && d['Date Of']){ const w=weekOfDate(String(d['Date Of']).slice(0,10)).weekEnd; if(per.has(w)) per.get(w).v.push([1e9+i, d]); } });
-  let i=0;
+  let i=0; const saves=[]; let saving=0, savedN=0;
+  const queueSave=fn=>{ const go=async()=>{ while(saving>=4) await new Promise(r=>setTimeout(r,40)); saving++; try{ await fn(); } finally{ saving--; savedN++; if(progress&&i>=list.length) progress('Saving weeks… '+savedN+' / '+saves.length); } }; saves.push(go()); };
   for(const wed of list){
     if(progress) progress('Recalculating week '+(++i)+' of '+list.length+'…');
     const {s, v} = per.get(wed);
@@ -10656,17 +10707,17 @@ async function rebuildWeeks(weeks, localRows, progress){
       manualAdj={sched_raw:raw.totals.schedules-w0.schedules, sched_dedup:ded.totals.schedules-d0.schedules, int_raw:raw.totals.scheduledDateOf-w0.scheduledDateOf, int_dedup:ded.totals.scheduledDateOf-d0.scheduledDateOf, n:rows1.filter(d=>manualData.has(d)).length+rows2.filter(d=>manualData.has(d)).length};
     }
     const empty = !ded.totals.schedules && !ded.totals.scheduledDateOf && !raw.totals.schedules && !raw.totals.scheduledDateOf;
-    if(empty){ if(KV.has('weekly:'+wed)) await storageDelete('weekly:'+wed); }
+    if(empty){ if(KV.has('weekly:'+wed)) queueSave(()=>storageDelete('weekly:'+wed)); }
     else {
       const rec={weekEndDate:wed, weekNumber:wn, savedAt:new Date().toISOString(), source:'master', rules:COUNT_RULES, ...(manualAdj?{manualAdj}:{}),
         deduped:{totals:ded.totals, byRecruiter:ded.byRecruiter, byBranch:ded.byBranch, diagnostics:ded.diagnostics},
         raw:{totals:raw.totals, byRecruiter:raw.byRecruiter, byBranch:raw.byBranch, diagnostics:raw.diagnostics}};
       const bd=branchDailyFromRecord(rec);
-      await storageSet('weekly:'+wed, rec);
-      try{ await Server.kvSet('branchDaily:'+wed, bd); }catch(e){ console.warn('branch summary not saved', e); }
+      queueSave(()=>Promise.all([storageSet('weekly:'+wed, rec), Server.kvSet('branchDaily:'+wed, bd).catch(e=>console.warn('branch summary not saved', e))]));
     }
     await new Promise(r=>setTimeout(r,0));
   }
+  await Promise.all(saves);
 }
 // Rebuilds every week from the master sheet already on the server (also refreshes interviews
 // that were still in the future at import time and have since happened).
@@ -13748,19 +13799,19 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '4.100.0';   // shown only in the browser tab title
+const APP_VERSION = '1.1.1';   // shown in the browser tab title (Dashboard - 1.1.1)
 // Everyone gets the latest look: the page checks the published file for a newer version — right after it opens
 // (switches straight over) and every few minutes / when the tab comes back (offers an Update button).
 const AppUpdate=(()=>{
  const loadedAt=Date.now(); let shown=false, busy=false;
- const newer=(a,b)=>{ const x=String(a).split('.').map(Number), y=String(b).split('.').map(Number); for(let i=0;i<Math.max(x.length,y.length);i++){ if((x[i]||0)!==(y[i]||0)) return (x[i]||0)>(y[i]||0); } return false; };
  const go=v=>{ const u=new URL(location.href); u.searchParams.set('v',v); location.replace(u.toString()); };
  async function check(){
   if(busy||!/^https?:$/.test(location.protocol)) return; busy=true;
   try{
    const u=new URL(location.href); u.hash='';
    const r=await fetch(u.toString(),{cache:'no-cache', credentials:'same-origin'}); if(!r.ok) return;
-   const m=/const APP_VERSION = '([\d.]+)'/.exec(await r.text()); if(!m||!newer(m[1],APP_VERSION)) return;
+   // any different published version is an update (numbering restarted at 1.1.1, so it isn't always a bigger number)
+   const m=/const APP_VERSION = '([\d.]+)';\s+\/\/ shown in the browser tab/.exec(await r.text()); if(!m||m[1]===APP_VERSION) return;
    if(Date.now()-loadedAt<25000){ go(m[1]); return; }   // just opened — nothing to lose yet
    if(shown) return; shown=true;
    const bar=document.createElement('div'); bar.className='app-update';
@@ -13774,7 +13825,7 @@ const AppUpdate=(()=>{
  return {check};
 })();
 async function init(){
-  document.title = 'Performance Dashboard · v'+APP_VERSION;
+  document.title = 'Dashboard - '+APP_VERSION;
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
   document.getElementById('footerCopyrightYear').textContent = new Date().getFullYear();
   if(EMBEDDED_WEEKS && Array.isArray(EMBEDDED_WEEKS) && EMBEDDED_WEEKS.length){
@@ -14196,6 +14247,7 @@ const DivReport=(()=>{
  async function uploadFile(file){
   if(!file) return;
   if(!/\.xlsx?$/i.test(file.name)){ status('Choose an Excel file (.xlsx or .xls).',true); return; }
+  if(typeof XLSX==='undefined') await window.__libs.xlsx();
   if(typeof XLSX==='undefined'){ status('The Excel reader didn’t load. Check your connection and reload the page.',true); return; }
   status('Reading '+file.name+'…');
   try{
@@ -14487,7 +14539,7 @@ const DivReport=(()=>{
   const drop=$('dr-drop'); ['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('on'); })); ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,()=>drop.classList.remove('on')));
   drop.addEventListener('drop',e=>{ e.preventDefault(); uploadFile(e.dataTransfer.files[0]); });
   $('dr-copy').onclick=async()=>{ const text=toTSV(state.module==='flags'?flagMatrix():reportMatrix()); try{ await navigator.clipboard.writeText(text); showToast('Copied — paste into Excel or an email.'); }catch(e){ showToast('Your browser blocked copying.'); } };
-  $('dr-download').onclick=()=>{ if(typeof XLSX==='undefined'){ showToast('The Excel writer didn’t load — check your connection.'); return; }
+  $('dr-download').onclick=async()=>{ if(typeof XLSX==='undefined') await window.__libs.xlsx(); if(typeof XLSX==='undefined'){ showToast('The Excel writer didn’t load — check your connection.'); return; }
    const isF=state.module==='flags', v=isF?flagMatrix():reportMatrix(), wb=XLSX.utils.book_new(), sh=XLSX.utils.aoa_to_sheet(v); sh['!cols']=v[0].map((_,i)=>({wch:i<2?30:22}));
    XLSX.utils.book_append_sheet(wb,sh,isF?'Red flags':state.module==='west'?'West weekly':'Division reporting'); XLSX.writeFile(wb,(isF?'red-flags':state.module==='west'?'west-weekly':'division-reporting')+'-'+localDay(new Date())+'.xlsx'); };
  }
@@ -15820,6 +15872,7 @@ const OrderEntry=(()=>{
  }
  async function readFile(file){
   if(!file) return;
+  if(typeof XLSX==='undefined') await window.__libs.xlsx();
   if(typeof XLSX==='undefined'){ showToast('The spreadsheet reader has not loaded — check the connection and reload, or paste the cells instead.'); return; }
   try{ const wb=XLSX.read(new Uint8Array(await file.arrayBuffer()),{type:'array', cellDates:false, raw:false});
    // use the first sheet that has a recognisable header
