@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard - 1.1.4</title>
+<title>Dashboard - 1.1.5</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- fonts load without holding up the page (the system font shows for a moment) -->
@@ -13806,7 +13806,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '1.1.4';   // shown in the browser tab title (Dashboard - 1.1.4)
+const APP_VERSION = '1.1.5';   // shown in the browser tab title (Dashboard - 1.1.5)
 // Everyone gets the latest look: the page checks the published file for a newer version — right after it opens
 // (switches straight over) and every few minutes / when the tab comes back (offers an Update button).
 const AppUpdate=(()=>{
@@ -14633,7 +14633,9 @@ const Onboarding=(()=>{
  const ltType=()=>assignTypes().find(t=>anorm(t)==='livetransfer')||null;
  const slType=()=>assignTypes().find(t=>anorm(t)==='schedulelater')||null;
  const hasTot=r=>r&&r.__total!==''&&r.__total!=null;
- function selfFrom(r, lt){ return hasTot(r)?Math.max(0, Number(r.__total)-(Number(lt)||0)):null; }
+ const isBranch=ct=>/\bby\s*branch\b/i.test(String(ct||''));
+ // a typed total minus Live Transfers (and minus By Branch, which is never a self call)
+ function selfFrom(r, lt){ return hasTot(r)?Math.max(0, Number(r.__total)-(Number(lt)||0)-(Number(r&&r.__branch)||0)):null; }
  const inSum=t=>!(t===slType()&&selfType());   // Schedule Later is already inside Self — don't count it twice in totals
  const isAuto=t=>t===alreadyType()||callTypes().some(c=>anorm(c)===anorm(t));
  let autoCache=null, autoKey=null;
@@ -14644,7 +14646,8 @@ const Onboarding=(()=>{
    const t=isDone(catOf(f.status,f.call_type))&&al?al:types.find(x=>x!==al&&anorm(x)===anorm(f.call_type));
    const d=out[day]||(out[day]={rows:{}, other:0, list:[]});
    // no matching assignment type: outbound-style calls (Outbound, LVM / No answer, …) are self calls; Inbound goes to "Other"
-   const k=t||(/inbound/i.test(f.call_type||'')?'__other':'__outbound'); if(!t) d.other++;
+   // By Branch first calls: shown in their own column, never a self call and never added to Total
+   const k=isBranch(f.call_type)?'__branch':t||(/inbound/i.test(f.call_type||'')?'__other':'__outbound'); if(!t&&k!=='__branch') d.other++;
    const ctk=ctKeyOf(f.call_type);
    d.list.push({o, k, ctk, cat:c.cat, eid:c.eid});
    const r=d.rows[o]||(d.rows[o]={}); r[k]=(r[k]||0)+1; if(ctk) r[ctk]=(r[ctk]||0)+1; });
@@ -14652,9 +14655,9 @@ const Onboarding=(()=>{
  }
  // call types from the dropdown that aren't already an assignment type get their own column (key 'ct:<call type>')
  const isCt=t=>String(t).startsWith('ct:');
- const ctKeys=()=>callTypes().filter(c=>!assignTypes().some(t=>anorm(t)===anorm(c))).map(c=>'ct:'+c);
+ const ctKeys=()=>callTypes().filter(c=>isBranch(c)||!assignTypes().some(t=>anorm(t)===anorm(c))).map(c=>'ct:'+c);
  function ctKeyOf(ct){ const k=String(ct||'').trim().toLowerCase(); if(!k) return null; const x=lists().callTypes.find(c=>c.label.toLowerCase()===k||(c.aliases||[]).some(a=>String(a).toLowerCase()===k)), lbl=x?x.label:String(ct).trim();
-  return assignTypes().some(t=>anorm(t)===anorm(lbl))?null:'ct:'+lbl; }
+  return !isBranch(lbl)&&assignTypes().some(t=>anorm(t)===anorm(lbl))?null:'ct:'+lbl; }
  const catMatch=(cat,f)=>!f||(f==='pending'?!isDone(cat):cat===f);
  // first-call rows for one stage only (latest status) — typed numbers can't be split by stage, so only the call log counts
  function autoRowsFor(day, f){ const a=autoAssign()[day]; if(!a) return {}; if(!f) return a.rows; const rows={};
@@ -15057,7 +15060,7 @@ const Onboarding=(()=>{
   const volA=aCat?volume(rows, assignF):vol;
   const aList=Object.entries(autoAssign()).filter(([d])=>d>=st.from&&d<=st.to).flatMap(([,a])=>a.list).filter(x=>!st.fOnb||x.o===st.fOnb);
   const aCnt=k=>aList.filter(x=>catMatch(x.cat,k)).length;
-  const types0=assignTypes(), cts=ctKeys(), aTot={}; assignF.forEach(d=>Object.values((d.data&&d.data.rows)||{}).forEach(r=>[...types0,'__other',...cts].forEach(t=>{ aTot[t]=(aTot[t]||0)+(Number(r[t])||0); })));
+  const types0=assignTypes().filter(t=>!isBranch(t)), cts=ctKeys(), aTot={}; assignF.forEach(d=>Object.values((d.data&&d.data.rows)||{}).forEach(r=>[...types0,'__other',...cts].forEach(t=>{ aTot[t]=(aTot[t]||0)+(Number(r[t])||0); })));
   const types=[...types0,...(aTot.__other?['__other']:[]),...cts], tLbl=t=>t==='__other'?'Other (Inbound…)':isCt(t)?t.slice(3):t;
   const pool={}; assign.forEach(d=>types.forEach(t=>{ pool[t]=(pool[t]||0)+(Number(((d.data&&d.data.pool)||{})[t])||0); }));
   const totPeople=vol.reduce((a,v)=>a+v.people,0), totCalls=vol.reduce((a,v)=>a+v.calls,0);
@@ -15077,7 +15080,7 @@ const Onboarding=(()=>{
   const assignHtml2=()=>`<p class="hint mr-tabhint">From Log calls — each candidate counts once, on their first call, for the onboarder who made it. Pick a stage to see only candidates whose latest status is in it.</p>
     <div class="onb-quick onb-aq" role="tablist" aria-label="Filter assignments by stage">${[['','All'],['pending','Pending'],['finalized','Finalized'],['complete','Onboarding complete'],['in_process','In between stages'],['lvm','LVM / No answer'],['no_response','Never responded']].map(([k,l])=>`<button type="button" data-onb-aq="${k}" class="${aCat===k?'on':''} ${k?CAT_CLS[k]||'q-pending':''}" aria-pressed="${aCat===k}"><span>${l}</span><b>${fmtNum(aCnt(k))}</b></button>`).join('')}</div>
     ${aCat?`<p class="hint onb-aq-note">Showing only <strong>${aCat==='pending'?'Pending':escapeHtml(CAT_LBL[aCat])}</strong> candidates (latest status), counted from Log calls. Typed totals are left out while a stage is picked.</p>`:''}
-    <div class="onb-scroll"><table class="users-table onb-table" id="onbRep"><thead><tr><th>Onboarder</th>${types.map(t=>`<th class="num ${isCt(t)?'onb-ctcol':''}" ${isCt(t)?`title="Candidates whose first call was ${escapeHtml(tLbl(t))} — already counted in the columns before, so not added to Total"`:''}>${escapeHtml(tLbl(t))}</th>`).join('')}<th class="num">Total</th></tr></thead><tbody>
+    <div class="onb-scroll"><table class="users-table onb-table" id="onbRep"><thead><tr><th>Onboarder</th>${types.map(t=>`<th class="num ${isCt(t)?'onb-ctcol':''}" ${isCt(t)?`title="${isBranch(tLbl(t))?'Candidates whose first call was By Branch — not counted as Self Call and not added to Total':'Candidates whose first call was '+escapeHtml(tLbl(t))+' — already counted in the columns before, so not added to Total'}"`:''}>${escapeHtml(tLbl(t))}</th>`).join('')}<th class="num">Total</th></tr></thead><tbody>
     ${volA.filter(v=>v.aTot).length?'':`<tr><td colspan="${types.length+2}" class="hint">No candidates in this stage for these dates.</td></tr>`}
     ${volA.filter(v=>v.aTot).map(v=>`<tr><td>${escapeHtml(v.o)}</td>${types.map(t=>`<td class="num">${v.assigned[t]||'–'}</td>`).join('')}<td class="num"><strong>${v.aTot}</strong></td></tr>`).join('')}
     <tr class="onb-total"><td><strong>Assigned to onboarders</strong></td>${types.map(t=>`<td class="num">${aTot[t]||0}</td>`).join('')}<td class="num">${types.filter(t=>inSum(t)&&!isCt(t)).reduce((a,t)=>a+(aTot[t]||0),0)}</td></tr>
