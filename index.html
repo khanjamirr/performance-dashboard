@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard - 1.1.2</title>
+<title>Dashboard - 1.1.3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- fonts load without holding up the page (the system font shows for a moment) -->
@@ -561,6 +561,9 @@ body.locked #app{visibility:hidden}
 .auth-submit{width:100%;justify-content:center;padding:11px;font-size:14px}
 .auth-foot{margin:2px 0 0;font-size:11.5px;color:var(--text-tertiary);text-align:center}
 .auth-reconnect{align-self:center;font-size:11.5px}
+.boot-skel{display:none}body.booting .boot-skel{display:flex;flex-direction:column;gap:16px;padding:4px 0}body.booting #emptyState{display:none!important}body.booting #storageModeNote{visibility:hidden}
+.bs-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.bs-row.bs-2{grid-template-columns:2fr 1fr}.bs-card,.bs-panel{display:block;border-radius:16px;background:linear-gradient(90deg,#e9edf3 0%,#f4f6f9 40%,#e9edf3 80%);background-size:200% 100%;animation:bsShine 1.3s ease-in-out infinite}.bs-card{height:112px}.bs-panel{height:220px}.bs-panel.bs-tall{height:300px}@keyframes bsShine{from{background-position:120% 0}to{background-position:-80% 0}}@media(max-width:760px){.bs-row{grid-template-columns:1fr 1fr}.bs-row.bs-2{grid-template-columns:1fr}}
+body.booting .app-loading{background:transparent;backdrop-filter:none;justify-content:flex-start;padding-top:38vh;pointer-events:none}
 .app-loading{position:fixed;inset:0;z-index:900;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#f3f6f8d9;backdrop-filter:blur(2px)}
 .app-loading p{margin:0;font-size:13.5px;font-weight:600;color:#13264a;text-align:center;padding:0 16px}
 .spinner{width:34px;height:34px;border-radius:50%;border:3px solid #cfe1e3;border-top-color:#15316e;animation:spin .8s linear infinite}
@@ -2748,7 +2751,7 @@ html body .settings-page .ua-head h3{font-size:22px!important;font-weight:700!im
 }
 </style>
 </head>
-<body class="locked">
+<body class="locked booting">
 <div id="appLoading" class="app-loading"><div class="spinner" aria-hidden="true"></div><p>Loading dashboard…</p></div>
 <div id="app">
 
@@ -2800,7 +2803,7 @@ html body .settings-page .ua-head h3{font-size:22px!important;font-weight:700!im
         <button type="button" class="top-back hidden" id="topBack"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg><span></span></button>
         <h2 id="viewTitle">Weekly Overview</h2>
         <div class="refresh-stamp top" id="refreshStampTop" hidden></div>
-        <div class="sub" id="viewSub">No data uploaded yet</div>
+        <div class="sub" id="viewSub"></div>
       </div>
       <div id="topbarCenter" class="hidden" style="display:flex;align-items:center;justify-content:center;gap:10px;flex:1;flex-wrap:wrap;">
         <span class="lbl">Period:</span>
@@ -2846,6 +2849,8 @@ html body .settings-page .ua-head h3{font-size:22px!important;font-weight:700!im
         <div id="settingsPane-account" class="hidden"><section class="panel"><h3>Display preferences</h3><div class="set-row"><div><strong>Remove repeat Employee Numbers</strong><span id="dedupePrefText">Deduped — each candidate counts once per week (your view only)</span></div><button type="button" class="switch" role="switch" id="settingsDedupeToggleBtn" aria-label="Remove repeat Employee Numbers" aria-checked="true"><i></i></button></div><div class="set-row"><div><strong>Default page</strong><span>The page that opens when you sign in (this browser)</span></div><select id="defaultViewSelect" aria-label="Default page"></select></div></section><div id="myAccount"></div></div>
         </div>
       </div>
+      <!-- shown while the dashboard is opening, instead of the "no data yet" welcome screen -->
+      <div class="boot-skel" aria-hidden="true"><div class="bs-row"><i class="bs-card"></i><i class="bs-card"></i><i class="bs-card"></i><i class="bs-card"></i></div><i class="bs-panel bs-tall"></i><div class="bs-row bs-2"><i class="bs-panel"></i><i class="bs-panel"></i></div></div>
       <div id="emptyState" class="empty-state">
         <div class="icon" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19V11M10 19V5M16 19V9M22 19V2"/></svg></div><div class="welcome-eyebrow">CLARITY. ALIGNMENT. PERFORMANCE.</div>
         <h3>A clearer view of<br>your recruiting performance.</h3>
@@ -9979,9 +9984,11 @@ function showDvGate(err){
   document.body.appendChild(gate);
   gate.querySelector('#dvRetry').onclick=()=>{ gate.remove(); dvStartAuth(); };
 }
+function endBoot(){ document.body.classList.remove('booting'); }
+setTimeout(endBoot, 30000);   // never leave the placeholder up for good
 function setLoading(text){
   let el = document.getElementById('appLoading');
-  if(!text){ el?.remove(); return; }
+  if(!text){ el?.remove(); endBoot(); return; }
   if(!el){ el=document.createElement('div'); el.id='appLoading'; el.className='app-loading'; el.innerHTML='<div class="spinner" aria-hidden="true"></div><p></p>'; document.body.appendChild(el); }
   el.querySelector('p').textContent = text;
 }
@@ -13799,7 +13806,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '1.1.2';   // shown in the browser tab title (Dashboard - 1.1.2)
+const APP_VERSION = '1.1.3';   // shown in the browser tab title (Dashboard - 1.1.3)
 // Everyone gets the latest look: the page checks the published file for a newer version — right after it opens
 // (switches straight over) and every few minutes / when the tab comes back (offers an Update button).
 const AppUpdate=(()=>{
@@ -13829,7 +13836,7 @@ async function init(){
   { const h=document.getElementById('dashboardTitle'); if(h) h.title='Go to your home page'; }
   document.getElementById('footerCopyrightYear').textContent = new Date().getFullYear();
   if(EMBEDDED_WEEKS && Array.isArray(EMBEDDED_WEEKS) && EMBEDDED_WEEKS.length){
-    isSnapshotMode = true; setLocked(false); setLoading(null);
+    isSnapshotMode = true; setLocked(false); setLoading(null); endBoot();
     weeksData = EMBEDDED_WEEKS.slice().map(normalizeWeekRecord).sort((a,b)=> a.weekEndDate.localeCompare(b.weekEndDate));
     document.getElementById('storageModeNote').textContent = 'Viewing a shared snapshot (read-only) \u2014 data baked in at export time.';
     ['emptyUploadFolderBtn','emptyUploadFilesBtn','settingsNavBtn','userChipWrap','liveBadge'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));
