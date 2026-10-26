@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard - 1.3.1</title>
+<title>Dashboard - 1.4.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- fonts load without holding up the page (the system font shows for a moment) -->
@@ -1160,6 +1160,7 @@ button.onb-tile{font:inherit;text-align:left;cursor:pointer}button.onb-tile:disa
 .onb-catpop{position:absolute;z-index:3000;background:#fff;border-radius:12px;box-shadow:0 12px 32px rgba(15,23,42,.18),0 0 0 1px rgba(15,23,42,.06);padding:8px;min-width:250px}.ocp-row{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;font-size:13px;cursor:pointer}.ocp-row:hover{background:#f1f5f9}.ocp-row input{width:16px;height:16px;accent-color:#0a84ff}.ocp-all{border-bottom:1px solid #eef1f5;margin-bottom:4px;font-weight:600}.ocp-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 6px 2px;border-top:1px solid #eef1f5;margin-top:4px}
 .ol-dur{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;color:#475569;white-space:nowrap}.ol-dur input,.ol-catchk input{accent-color:#0a84ff}.ol-cats{display:flex;flex-wrap:wrap;gap:6px 16px;margin-bottom:8px}.ol-catchk{display:inline-flex;align-items:center;gap:6px;font-size:13px}
 th.onb-ctcol{color:#64748b;font-style:italic}
+.perf-monthly{margin:0 0 16px}.perf-mtable td,.perf-mtable th{white-space:nowrap}
 .lt-tx-h{margin:18px 0 8px;font-size:14px}.lt-tx-list{display:flex;flex-direction:column;border:1px solid #e6eaf0;border-radius:12px;overflow:hidden}.lt-tx-row{display:grid;grid-template-columns:1.4fr 1fr auto;align-items:center;gap:12px;padding:10px 14px;border-top:1px solid #eef1f5}.lt-tx-row:first-child{border-top:0}.lt-tx-row>div:first-child{display:flex;flex-direction:column;gap:2px}.lt-tx-row span,.lt-tx-when{font-size:12.5px;color:#475569}.lt-tx-row small{color:#94a3b8}.lt-tx-arrow{font-style:normal;color:#0a84ff;margin:0 2px}@media(max-width:700px){.lt-tx-row{grid-template-columns:1fr}}
 .onb-colbtn{margin-left:auto;align-self:center}.onb-aq{align-items:center}.onb-colpop{min-width:330px}.ocp-head,.ocp-col{display:grid;grid-template-columns:1fr 56px 64px;align-items:center;gap:6px}.ocp-head{padding:4px 8px 8px;border-bottom:1px solid #eef1f5;margin-bottom:4px;font-size:11.5px;color:#64748b;text-align:center}.ocp-head b{text-align:left;color:#0a1f44;font-size:13px}.ocp-col input{justify-self:center;width:16px;height:16px;accent-color:#0a84ff}.ocp-name small{color:#94a3b8;font-size:11px}.ocp-warn{margin:6px 8px;padding:7px 9px;border-radius:8px;background:#fff7e6;color:#8a5300;font-size:12px}.ocp-note{margin:6px 8px 0;font-size:11.5px;color:#64748b}
 .onb-late-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}.onb-late-head .mr-tabhint{flex:1;min-width:260px}.onb-psttag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:1px 6px;border-radius:6px;background:#ede9fe;color:#5b21b6;vertical-align:1px}
@@ -5828,6 +5829,37 @@ function scopeWeekToDivision(week, division){
   return {...week,byRecruiter,byBranch,totals};
 }
 let weeklyRenderRevision=0;
+// ---- Overview → By month: every month from the uploaded weeks (weeks that span two months are split by day) ----
+let monthlyAll=false;
+function monthlyRowsData(){
+  const div=universalDivision, months=[...new Set(weeksData.flatMap(w=>[tgShift(w.weekEndDate,-6).slice(0,7), w.weekEndDate.slice(0,7)]))].sort().reverse();
+  return months.map(m=>{ const from=m+'-01', d=new Date(from+'T12:00:00'); d.setMonth(d.getMonth()+1,0); const to=toIsoDateOnly(d), inR=x=>x>=from&&x<=to;
+    const t=emptyTotals(), weekly=[]; let approx=false;
+    weeksData.filter(w=>tgShift(w.weekEndDate,-6)<=to&&w.weekEndDate>=from).forEach(w=>{ const sw=scopeWeekToDivision(w,div), whole=tgShift(w.weekEndDate,-6)>=from&&w.weekEndDate<=to; let active=0;
+      Object.entries(sw.byRecruiter||{}).forEach(([n,r])=>{ const c=whole?{o:r,ok:true}:clipEntity(r,inR); if(!c.ok) approx=true; let any=0; for(const k in t){ t[k]+=c.o[k]||0; any+=c.o[k]||0; } if(any>0) active++; });
+      if(active) weekly.push(active); });
+    // average recruiters a week = the weekly counts of active recruiters, averaged over the month's weeks (whole number)
+    const avgRec=weekly.length?Math.round(weekly.reduce((a,b)=>a+b,0)/weekly.length):0;
+    return {m, from, to, t, avgRec, weeks:weekly.length, hpr:avgRec?t.i9/avgRec/4:null, approx, running:to>=ltToday()&&from<=ltToday()}; }).filter(r=>Object.values(r.t).some(v=>v));
+}
+function monthlyTableHtml(){
+  if(typeof canSeeSection==='function'&&!canSeeSection('perf.monthly')) return '';
+  const all=monthlyRowsData(); if(!all.length) return '';
+  const rows=monthlyAll?all:all.slice(0,12), pc=(a,b)=>b?(a/b*100).toFixed(1)+'%':'–';
+  let open=true; try{ open=localStorage.getItem('ipd_monthly_open')!=='0'; }catch(e){}
+  return `<details class="panel set-details perf-monthly" id="perfMonthlyBox" data-section="perf.monthly" ${open?'open':''}><summary><span class="sd-title">By month</span><span class="sd-status">${all.length} month${all.length===1?'':'s'}${universalDivision?' · '+escapeHtml(universalDivision):''}</span></summary>
+   <div class="panel-head"><div><span class="hint">Each month’s own days — a week that spans two months is split by day. Show % and No-show % are out of interviews. Avg recruiters = recruiters with any activity, averaged over the month’s weeks. Hires per recruiter = hires ÷ avg recruiters ÷ 4.</span></div><div style="display:flex;gap:8px">${copyBtnHtml('perfMonthly')}${Server.can('export')?downloadBtnHtml('perfMonthly','by-month.xlsx'):''}</div></div>
+   <div class="hp-table-wrap"><table class="users-table perf-mtable" id="perfMonthly"><thead><tr><th>Month</th><th class="num">Schedules</th><th class="num">Interviews</th><th class="num">Shows</th><th class="num">Show %</th><th class="num">No shows</th><th class="num">No-show %</th><th class="num">Hires</th><th class="num" title="Recruiters with any schedule, interview, show, hire or placement — averaged over the month’s weeks">Avg recruiters</th><th class="num" title="Hires ÷ avg recruiters ÷ 4 weeks">Hires per recruiter</th><th class="num">Placed</th></tr></thead><tbody>
+   ${rows.map(r=>`<tr><td>${escapeHtml(monthLabel(r.from))}${r.running?' <span class="hint">so far</span>':''}${r.approx?' <span class="hint" title="Some rows have no day-by-day detail, so this month includes whole weeks at its edges">≈</span>':''}</td><td class="num">${fmtNum(r.t.schedules)}</td><td class="num">${fmtNum(r.t.scheduledDateOf)}</td><td class="num">${fmtNum(r.t.shows)}</td><td class="num">${pc(r.t.shows,r.t.scheduledDateOf)}</td><td class="num">${fmtNum(r.t.noShows)}</td><td class="num">${pc(r.t.noShows,r.t.scheduledDateOf)}</td><td class="num"><strong>${fmtNum(r.t.i9)}</strong></td>
+     <td class="num">${r.avgRec?fmtNum(r.avgRec):'–'}</td>
+     <td class="num" title="${fmtNum(r.t.i9)} ÷ ${fmtNum(r.avgRec)} ÷ 4"><strong>${r.hpr==null?'–':(Math.round(r.hpr*100)/100).toFixed(2)}</strong></td><td class="num">${fmtNum(r.t.placed)}</td></tr>`).join('')}
+   </tbody></table></div>${all.length>12?`<p style="margin:8px 0 0"><button type="button" class="link-btn" id="perfMonthlyMore">${monthlyAll?'Show the last 12 months':'Show all '+all.length+' months'}</button></p>`:''}</details>`;
+}
+function wireMonthlyTable(root){
+  const box=root.querySelector('#perfMonthlyBox'); if(!box) return;
+  box.addEventListener('toggle',()=>{ try{ localStorage.setItem('ipd_monthly_open', box.open?'1':'0'); }catch(e){} });
+  root.querySelector('#perfMonthlyMore')?.addEventListener('click',()=>{ monthlyAll=!monthlyAll; refreshUI(); });
+}
 /* ---- Overview tabs stay frozen under the page heading while scrolling ---- */
 function ovxStickyUpdate(){
   const bar=document.getElementById('ovModeBar'), tb=document.querySelector('.topbar'); if(!bar) return;
@@ -6032,6 +6064,7 @@ async function renderWeeklyView(){
     return execSummaryHtml({t, goal:teamGoal, prevT:isMultiWeekMode?null:prevT, multi:isMultiWeekMode, label:weekLabel, hpr, pend, byRec:filteredByRecruiter, goals:goalsForWeek, scopeDiv:universalDivision}); })();
   container.innerHTML = `
     ${execHtml}
+    ${monthlyTableHtml()}
     <div id="perfDetailWrap" ${perfDetailOpen?'':'hidden'}>
     ${universalDivision ? `<div class="hint" style="margin-bottom:10px;">Viewing <strong>${escapeHtml(universalDivision)}</strong> only</div>` : ''}
 
@@ -6079,6 +6112,7 @@ async function renderWeeklyView(){
     </div></section>
     </div>
   `;
+  wireMonthlyTable(container);
   // executive summary: switch, clicks, chart and division table
   container.querySelectorAll('[data-pv]').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); const want=a.dataset.pv==='det'; if(want===perfDetailOpen) return;
     const pick=a.closest('.ex-viewpick'); pick.classList.toggle('det',want); pick.classList.toggle('sum',!want);
@@ -6272,11 +6306,16 @@ async function renderWeeklyTopPerformers(week, suppliedGoals){
 const HIRES_PER_RECRUITER_TARGET = 15; // same target as the "Hires per Recruiter" trend chart
 // Total hires ÷ number of recruiters with any activity, summed over the weeks given (so for
 // several weeks it is hires per recruiter per week).
+// recruiters counted for a week = those with any schedule, interview, show, hire or placement that week
+const autoRecruiterCount=w=>Object.values(w.byRecruiter||{}).filter(r=>(r.schedules||0)+(r.scheduledDateOf||0)+(r.shows||0)+(r.i9||0)+(r.placed||0)>0).length;
+const weekRecruiterCount=autoRecruiterCount;
 function hiresPerRecruiter(weeks){
-  let hires=0, recruiters=0;
-  (weeks||[]).forEach(w=>{ if(!w) return; hires += (w.totals&&w.totals.i9)||0; recruiters += Object.values(w.byRecruiter||{}).filter(r=>(r.schedules||0)+(r.scheduledDateOf||0)+(r.shows||0)+(r.i9||0)+(r.placed||0)>0).length; });
-  return {hires, recruiters, value: recruiters ? hires/recruiters : null};
+  let hires=0, recruiters=0, n=0;
+  (weeks||[]).forEach(w=>{ if(!w) return; n++; hires += (w.totals&&w.totals.i9)||0; recruiters += autoRecruiterCount(w); });
+  return {hires, recruiters, weeks:n, value: recruiters ? hires/recruiters : null};
 }
+// "279 recruiters" over 5 weeks reads as 279 people — say "about 56 recruiters a week" instead
+const hprWho=h=>!h||!h.recruiters?'':h.weeks>1?`about ${fmtNum(Math.round(h.recruiters/h.weeks))} recruiters a week`:`${fmtNum(h.recruiters)} recruiter${h.recruiters===1?'':'s'}`;
 const KPI_ICONS={hire:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5 1.6 0 3 .5 4.1 1.4"/><path d="M15.5 17.5l2 2 4-4.5"/>',brief:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"/>',cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',chat:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',check:'<path d="M20 6L9 17l-5-5"/>',x:'<path d="M18 6L6 18M6 6l12 12"/>',target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',trend:'<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',down:'<path d="M3 7l6 6 4-4 8 8"/><path d="M15 17h6v-6"/>'};
 // last 8 weeks up to the selected one, scoped to the selected division
 function kpiSeries(week, pick, skipPending){
@@ -6335,7 +6374,7 @@ function mergedKpiCards(o){
   const seg=(v,c,l)=>v>0&&t.scheduledDateOf?`<i style="width:${v/t.scheduledDateOf*100}%;background:${c}" title="${l}: ${fmtNum(v)}"></i>`:'';
   const stack=pend||!t.scheduledDateOf?'':`<div class="mk-stack">${seg(t.shows,'#2fa57a','Shows')}${seg(t.noShows,'#b9c7cd','No shows')}${seg(other,'#e3e9eb','Not yet resolved')}</div>`;
   const iIns = pend||!t.shows ? '' : ins('good', sr>=70 ? `<b>${fmtNum(t.shows)}</b> candidates showed up · show rate above 70%` : `<b>${fmtNum(t.shows)}</b> candidates showed up for interviews`);
-  const hIns = !hpr.hires ? '' : ins('good', hpr.value>=15 ? `<b>${fmtNum(hpr.hires)}</b> hires · above 15 per recruiter` : `<b>${fmtNum(hpr.hires)}</b> hires made by <b>${fmtNum(hpr.recruiters)}</b> recruiters`);
+  const hIns = !hpr.hires ? '' : ins('good', hpr.value>=15 ? `<b>${fmtNum(hpr.hires)}</b> hires · above 15 per recruiter` : `<b>${fmtNum(hpr.hires)}</b> hires · ${escapeHtml(hprWho(hpr))}`);
   const sSt='info', iSt='info', hSt='info';
   // weekly averages when the selection spans more than one week
   // …and per recruiter (per recruiter per week across several weeks: active recruiter-weeks, as for hires per recruiter)
@@ -6364,7 +6403,7 @@ function mergedKpiCards(o){
       body:row('hire_rate','of shows',pend?'Pending':num(t.shows),hr,null,false),
       insight:'', foot:'', spark:'', avg:''}) :
     card({key:'hires',label:'Hires per recruiter',accent:'#7a5fb8',status:hSt,kd:'hires_per_recruiter',
-      value:hpr.value==null?'–':hpr.value.toFixed(1), sub:`${num(hpr.hires)} hires · ${num(hpr.recruiters)} recruiters`,
+      value:hpr.value==null?'–':hpr.value.toFixed(1), sub:`${num(hpr.hires)} hires · ${escapeHtml(hprWho(hpr))}`,
       ringHtml:ring(hpr.value==null?null:hpr.value/15,hpr.value==null?'–':hpr.value.toFixed(1),'of 15',hSt),
       body:row('hire_rate','Hires from shows',pend?'Pending':`${num(t.i9)}<small class="hint"> / ${num(t.shows)}</small>`,hr,null,false,'hires'),
       insight:hIns, foot:[d.hpr,d.hires].filter(Boolean).join(''), spark:sp.hires, avg:avgH}),
@@ -6424,8 +6463,8 @@ async function openKpiInsights(key){
   const keep=n=>!only||only.has(n);
   // ---- headline numbers ----
   const weekVal=w=>{ const sw=scopeWeekToDivision(w,ctx.division), rec=activeRecruiters(sw);
-    const goal=rec.reduce((s,[n])=>s+kpiGoalOf(n,w.weekEndDate),0); return kpiValue(def, sw.totals, goal, rec.length); };
-  const tot=sumTotals(ctx.weeks), recAll=ctx.weeks.reduce((s,w)=>s+activeRecruiters(w).length,0);
+    const goal=rec.reduce((s,[n])=>s+kpiGoalOf(n,w.weekEndDate),0); return kpiValue(def, sw.totals, goal, ctx.division?rec.length:weekRecruiterCount(sw)); };
+  const tot=sumTotals(ctx.weeks), recAll=ctx.weeks.reduce((s,w)=>s+(ctx.division?activeRecruiters(w).length:weekRecruiterCount(w)),0);
   const cur=kpiValue(def, tot, ctx.teamGoal, recAll);
   const endIdx=weeksData.findIndex(w=>w.weekEndDate===ctx.end.weekEndDate);
   const hist=weeksData.slice(Math.max(0,endIdx-11), endIdx+1).filter(w=>!(def.pend&&weekIsFullyPending(w.weekEndDate)));
@@ -9788,7 +9827,7 @@ const PAGE_SECTIONS = {
   performance:[['perf.kpis','KPI cards (all)'],
                 ['perf.kpi.schedules','· Schedules vs goal card'],['perf.detail.schedules','·· Schedules — click-through details'],['perf.kpi.goal_reach','·· Goal reach % line'],['perf.detail.goal_reach','·· Goal reach — click-through details'],
                 ['perf.kpi.interviews','· Interviews card'],['perf.detail.interviews','·· Interviews — click-through details'],['perf.kpi.shows','·· Shows + show rate line'],['perf.detail.show_rate','·· Show rate — click-through details'],['perf.kpi.no_shows','·· No shows + no-show rate line'],['perf.detail.no_show_rate','·· No-show rate — click-through details'],
-                ['perf.kpi.hires','· Hires per recruiter card (with total hires)'],['perf.detail.hires_per_recruiter','·· Hires per recruiter — click-through details'],['perf.kpi.hire_rate','·· Hire rate line'],['perf.detail.hires','·· Hires — click-through details'],
+                ['perf.monthly','By month table'],['perf.kpi.hires','· Hires per recruiter card (with total hires)'],['perf.detail.hires_per_recruiter','·· Hires per recruiter — click-through details'],['perf.kpi.hire_rate','·· Hire rate line'],['perf.detail.hires','·· Hires — click-through details'],
                 ['perf.kpi.placed','· Placed card (of hires, of shows)'],['perf.detail.placed','·· Placed — click-through details'],
                 ['perf.detail.part.trend','Card details — 12-week trend'],['perf.detail.part.divisions','Card details — division split'],['perf.detail.part.recruiters','Card details — recruiter ranking'],['perf.detail.part.branches','Card details — branch ranking'],['perf.detail.all_people','Card details — all recruiters & branches (untick = only their assigned team)'],
                 ['perf.trends','Trends charts'],['perf.leaderboards','Leaderboards (recruiter & branch snapshots)'],['perf.divisions','Division breakdown'],['perf.history','Previous 6 weeks table'],['perf.insights','Insights'],['perf.composition','Composition pies (monthly / quarterly)']],
@@ -13832,7 +13871,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '1.3.1';   // shown in the browser tab title (Dashboard - 1.3.1)
+const APP_VERSION = '1.4.0';   // shown in the browser tab title (Dashboard - 1.4.0)
 // Everyone gets the latest look: the page checks the published file for a newer version — right after it opens
 // (switches straight over) and every few minutes / when the tab comes back (offers an Update button).
 const AppUpdate=(()=>{
