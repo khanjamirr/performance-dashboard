@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard - 1.4.1</title>
+<title>Dashboard - 1.4.3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- fonts load without holding up the page (the system font shows for a moment) -->
@@ -5840,9 +5840,22 @@ function monthlyRowsData(){
   return months.map(m=>{ const from=m+'-01', d=new Date(from+'T12:00:00'); d.setMonth(d.getMonth()+1,0); const to=toIsoDateOnly(d), inR=x=>x>=from&&x<=to;
     const t=emptyTotals(), weekly=[]; let approx=false;
     weeksData.filter(w=>tgShift(w.weekEndDate,-6)<=to&&w.weekEndDate>=from).forEach(w=>{ const sw=scopeWeekToDivision(w,div), whole=tgShift(w.weekEndDate,-6)>=from&&w.weekEndDate<=to; let active=0;
-      Object.entries(sw.byRecruiter||{}).forEach(([n,r])=>{ const c=whole?{o:r,ok:true}:clipEntity(r,inR); if(!c.ok) approx=true; let any=0; for(const k in t){ t[k]+=c.o[k]||0; any+=c.o[k]||0; } if(any>0) active++; });
-      if(active) weekly.push(active); });
-    // average recruiters a week = the weekly counts of active recruiters, averaged over the month's weeks (whole number)
+      // a week that spans two months: each number is split by day when it can be; a number without day-by-day detail
+      // goes whole to ONE month (the one holding the week's Thursday, i.e. most of its working days) — never to both
+      const thu=tgShift(w.weekEndDate,-2), mine=inR(thu);
+      Object.entries(sw.byRecruiter||{}).forEach(([n,r])=>{ let any=0;
+        for(const k in t){ let v;
+          if(whole) v=r[k]||0;
+          else { const tot=r[k]||0, dl=r.daily&&Object.keys(r.daily).length?Object.values(r.daily).reduce((a,x)=>a+((x&&x[k])||0),0):null;
+            if(dl!==null&&dl===tot) v=Object.entries(r.daily).reduce((a,[d,x])=>a+(inR(d)?((x&&x[k])||0):0),0);
+            else { const lk=(TG_METRICS.find(m=>m[0]===k)||[])[3], L=lk&&r[lk];
+              if(Array.isArray(L)&&L.length===tot&&L.every(c=>c&&c.date)) v=L.filter(c=>inR(c.date)).length;
+              else { v=mine?tot:0; if(tot) approx=true; } } }
+          t[k]+=v; any+=v; }
+        // recruiters are counted over the whole week, in the one month that holds the week's Thursday
+        if(mine&&TG_METRICS.some(([k])=>(r[k]||0)>0)) active++; });
+      if(mine&&active) weekly.push(active); });
+    // average recruiters a week = each of the month's weeks (the weeks whose Thursday is in it) counted whole, then averaged
     const avgRec=weekly.length?Math.round(weekly.reduce((a,b)=>a+b,0)/weekly.length):0;
     return {m, from, to, t, avgRec, weeks:weekly.length, hpr:avgRec?t.i9/avgRec/4:null, approx, running:to>=ltToday()&&from<=ltToday()}; }).filter(r=>Object.values(r.t).some(v=>v));
 }
@@ -5852,11 +5865,11 @@ function monthlyTableHtml(){
   const rows=monthlyAll?all:all.slice(0,12), pc=(a,b)=>b?(a/b*100).toFixed(1)+'%':'–';
   let open=true; try{ open=localStorage.getItem('ipd_monthly_open')!=='0'; }catch(e){}
   return `<details class="panel set-details perf-monthly" id="perfMonthlyBox" data-section="perf.monthly" ${open?'open':''}><summary><span class="sd-title">By month</span><span class="sd-status">${all.length} month${all.length===1?'':'s'}${universalDivision?' · '+escapeHtml(universalDivision):''}</span></summary>
-   <div class="panel-head"><div><span class="hint">Each month’s own days — a week that spans two months is split by day. Show % and No-show % are out of interviews. Avg recruiters = recruiters with any activity, averaged over the month’s weeks. Hires per recruiter = hires ÷ avg recruiters ÷ 4.</span></div><div style="display:flex;gap:8px">${copyBtnHtml('perfMonthly')}${Server.can('export')?downloadBtnHtml('perfMonthly','by-month.xlsx'):''}</div></div>
+   <div class="panel-head"><div><span class="hint">Each month’s own days — a week that spans two months is split by day. Show % and No-show % are out of interviews. Avg recruiters = recruiters with any activity in a week, averaged over the month’s weeks (a week belongs to the month holding its Thursday). Hires per recruiter = hires ÷ avg recruiters ÷ 4.</span></div><div style="display:flex;gap:8px">${copyBtnHtml('perfMonthly')}${Server.can('export')?downloadBtnHtml('perfMonthly','by-month.xlsx'):''}</div></div>
    <div class="hp-table-wrap"><table class="users-table perf-mtable" id="perfMonthly"><thead><tr><th>Month</th><th class="num">Schedules</th><th class="num">Interviews</th><th class="num">Shows</th><th class="num">Show %</th><th class="num">No shows</th><th class="num">No-show %</th><th class="num">Hires</th><th class="num" title="Recruiters with any schedule, interview, show, hire or placement — averaged over the month’s weeks">Avg recruiters</th><th class="num" title="Hires ÷ avg recruiters ÷ 4 weeks">Hires per recruiter</th><th class="num">Placed</th></tr></thead><tbody>
-   ${rows.map(r=>`<tr><td>${escapeHtml(monthLabel(r.from))}${r.running?' <span class="hint">so far</span>':''}${r.approx?' <span class="hint" title="Some rows have no day-by-day detail, so this month includes whole weeks at its edges">≈</span>':''}</td><td class="num">${fmtNum(r.t.schedules)}</td><td class="num">${r.t.scheduledDateOf?fmtNum(r.t.scheduledDateOf):'–'}</td><td class="num">${r.t.scheduledDateOf?fmtNum(r.t.shows):'–'}</td><td class="num">${pc(r.t.shows,r.t.scheduledDateOf)}</td><td class="num">${r.t.scheduledDateOf?fmtNum(r.t.noShows):'–'}</td><td class="num">${pc(r.t.noShows,r.t.scheduledDateOf)}</td><td class="num"><strong>${r.t.i9?fmtNum(r.t.i9):'–'}</strong></td>
+   ${rows.map(r=>`<tr><td>${escapeHtml(monthLabel(r.from))}${r.running?' <span class="hint">so far</span>':''}${r.approx?' <span class="hint" title="Some numbers have no day-by-day detail: a week shared with the next or previous month is counted whole in the month holding most of its working days">≈</span>':''}</td><td class="num">${fmtNum(r.t.schedules)}</td><td class="num">${r.t.scheduledDateOf?fmtNum(r.t.scheduledDateOf):'–'}</td><td class="num">${r.t.scheduledDateOf?fmtNum(r.t.shows):'–'}</td><td class="num">${pc(r.t.shows,r.t.scheduledDateOf)}</td><td class="num">${r.t.scheduledDateOf?fmtNum(r.t.noShows):'–'}</td><td class="num">${pc(r.t.noShows,r.t.scheduledDateOf)}</td><td class="num"><strong>${r.t.i9?fmtNum(r.t.i9):'–'}</strong></td>
      <td class="num">${r.avgRec?fmtNum(r.avgRec):'–'}</td>
-     <td class="num" title="${r.hpr?fmtNum(r.t.i9)+' ÷ '+fmtNum(r.avgRec)+' ÷ 4':'No hires in this month'}"><strong>${!r.hpr?'–':(Math.round(r.hpr*100)/100).toFixed(2)}</strong></td><td class="num">${r.t.placed?fmtNum(r.t.placed):'–'}</td></tr>`).join('')}
+     <td class="num" title="${r.hpr?fmtNum(r.t.i9)+' ÷ '+fmtNum(r.avgRec)+' ÷ 4':'No hires in this month'}"><strong>${!r.hpr?'–':(Math.round(r.hpr*10)/10).toFixed(1)}</strong></td><td class="num">${r.t.placed?fmtNum(r.t.placed):'–'}</td></tr>`).join('')}
    </tbody></table></div>${all.length>12?`<p class="perf-mmore"><button type="button" class="link-btn" id="perfMonthlyMore">${monthlyAll?'Show the last 12 months':'Show all '+all.length+' months'}</button></p>`:''}</details>`;
 }
 function wireMonthlyTable(root){
@@ -13875,7 +13888,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentVi
 
 
 /* ============================= INIT ============================= */
-const APP_VERSION = '1.4.1';   // shown in the browser tab title (Dashboard - 1.4.1)
+const APP_VERSION = '1.4.3';   // shown in the browser tab title (Dashboard - 1.4.3)
 // Everyone gets the latest look: the page checks the published file for a newer version — right after it opens
 // (switches straight over) and every few minutes / when the tab comes back (offers an Update button).
 const AppUpdate=(()=>{
